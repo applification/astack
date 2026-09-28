@@ -2,7 +2,7 @@
 
 AStack is a Codex workflow for moving from an intended change to a verified result. The installable plugin is named **Applification**. It supplies task routing and engineering habits; each project supplies its own commands, environments, and product decisions.
 
-The first version contains one entry skill, [`applification`](plugins/applification/skills/applification/SKILL.md). Give it the task and it routes feature work, bug fixes, refactors, performance work, investigations, and pull requests. It uses a short change contract for substantial behavior changes, chooses verification by affected behavior, and reports proof against the exact revision. Example Mapping, Gherkin, a separate story tracker, and a universal proof runner are not required.
+The first version contains one entry skill, [`applification`](plugins/applification/skills/applification/SKILL.md). Give it the task and it routes feature work, bug fixes, refactors, performance work, investigations, and pull requests. Web UI features use Pencil and Storybook before production wiring; every feature ends in a PR. A substantial behavior change uses a short change contract, and proof targets affected behavior on the exact revision. Example Mapping, Gherkin, a separate story tracker, and a universal proof runner are not required.
 
 ## Install in Codex
 
@@ -19,7 +19,7 @@ For local development of this plugin, use `codex plugin marketplace add /absolut
 
 ## Working contract
 
-For a substantial behavior change, AStack records an outcome, a few observable acceptance cases, affected surfaces, and unresolved product decisions. A design sprint, when useful, produces the visual direction and component states before this contract is finalized. The contract is carried into the PR description alongside proof results; long-lived domain concepts belong in the project's own documentation.
+For a substantial behavior change, AStack records an outcome, a few observable acceptance cases, affected surfaces, and unresolved product decisions. For a web UI feature, the Pencil design and Storybook states inform that contract before production wiring. In a clean web repository, AStack defaults to Vite + React + TypeScript and selects Next.js when server rendering or server routes are needed. The contract is carried into the PR description alongside proof results; long-lived domain concepts belong in the project's own documentation.
 
 Proof distinguishes an automated check from a running-product observation. A passing test or a screenshot supports only the behavior it actually exercised. Applicable but untested surfaces remain visible as gaps.
 

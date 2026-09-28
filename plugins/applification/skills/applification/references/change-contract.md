@@ -22,7 +22,7 @@ Product choices that cannot be settled from the design or code.
 
 Use a few cases that distinguish success from plausible wrong behavior. Include cancellation, authorization, persistence, error handling, or accessibility only when material to this change. Give each case a stable ID within the change so tests, proof results, and review can refer to it. Do not turn every UI state into a separate requirement.
 
-For a design sprint, link the chosen design and relevant Storybook states. Capture interactions and data effects that a static frame cannot express. A presentation prototype may inform the contract, but its fake state does not prove production behavior.
+For a web UI feature, link the required Pencil design and relevant Storybook states. Capture interactions and data effects that a static frame cannot express. A presentation prototype may inform the contract, but its fake state does not prove production behavior.
 
 Resolve decisions that change the intended result before implementing them. If learning changes acceptance, update the contract explicitly and tell the user when the choice is theirs. The contract is allowed to evolve; it must not drift silently to match the implementation.
 

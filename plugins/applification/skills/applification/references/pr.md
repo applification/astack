@@ -2,6 +2,8 @@
 
 Before opening or updating a PR, inspect the full diff against the agreed change contract. Review two questions separately:
 
+The Feature route finishes with a PR. If a required design or proof step is blocked after independent work is complete, open a draft PR that names the blocker and the unverified acceptance cases. Do not describe that feature as finished. A missing remote or base branch must be resolved before a PR can exist.
+
 1. **Intent:** Does every acceptance case have an implementation and an appropriate proof result? Did the diff add material behavior outside scope?
 2. **Quality:** Does the code preserve project invariants, keep a clear data shape, avoid unnecessary layers, and have tests at useful seams?
 
