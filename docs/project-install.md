@@ -1,6 +1,6 @@
 # Install AStack for a project
 
-AStack's plugin remains in the [AStack repository](https://github.com/applification/astack). A project controls when to take an update through its marketplace entry and keeps only its own workflow profile locally. This avoids copied skill files and lets project changes review a new AStack version alongside any revised guidance.
+The Applification plugin remains in the [AStack repository](https://github.com/applification/astack). A project controls when to take an update through its marketplace entry and keeps only its own workflow profile locally. This avoids copied skill files and lets project changes review a new AStack version alongside any revised guidance.
 
 ## Project files
 
@@ -8,14 +8,15 @@ Create `.agents/plugins/marketplace.json` in the project, using a marketplace na
 
 ```json
 {
-  "name": "my-project-astack",
+  "name": "my-project-applification",
   "interface": { "displayName": "My Project Plugins" },
   "plugins": [
     {
-      "name": "astack",
+      "name": "applification",
       "source": {
-        "source": "url",
+        "source": "git-subdir",
         "url": "https://github.com/applification/astack.git",
+        "path": "./plugins/applification",
         "ref": "main"
       },
       "policy": {
@@ -31,7 +32,7 @@ Create `.agents/plugins/marketplace.json` in the project, using a marketplace na
 In a trusted project, `.codex/config.toml` enables the matching plugin ID:
 
 ```toml
-[plugins."astack@my-project-astack"]
+[plugins."applification@my-project-applification"]
 enabled = true
 ```
 
@@ -39,12 +40,12 @@ Register the local project marketplace and install AStack:
 
 ```sh
 codex plugin marketplace add /absolute/path/to/my-project
-codex plugin add astack@my-project-astack
+codex plugin add applification@my-project-applification
 ```
 
-The CLI installation also enables the plugin at user level. If AStack should run only in this project, set the same plugin ID to `enabled = false` in the user Codex configuration and keep `enabled = true` in this project's configuration. Project settings take precedence in trusted projects. Confirm the effective state with `codex plugin list --marketplace my-project-astack --json` from the project and from another directory.
+The CLI installation also enables the plugin at user level. If AStack should run only in this project, set the same plugin ID to `enabled = false` in the user Codex configuration and keep `enabled = true` in this project's configuration. Project settings take precedence in trusted projects. Confirm the effective state with `codex plugin list --marketplace my-project-applification --json` from the project and from another directory.
 
-Ask Codex to use `$apf-mode` to set up the project. It inspects the repository and writes `.astack/project.md` for project-specific proof paths and decision locations. Keep any `AGENTS.md` pointer short; it should opt into the workflow rather than duplicate it.
+Ask Codex to use `$applification` to set up the project. It inspects the repository and writes `.astack/project.md` for project-specific proof paths and decision locations. Keep any `AGENTS.md` pointer short; it should opt into the workflow rather than duplicate it.
 
 ## Update
 

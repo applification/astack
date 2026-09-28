@@ -1,12 +1,12 @@
 {
-  "name": "astack",
-  "interface": { "displayName": "AStack" },
+  "name": "applification",
+  "interface": { "displayName": "Applification" },
   "plugins": [
     {
-      "name": "astack",
+      "name": "applification",
       "source": {
         "source": "local",
-        "path": "./"
+        "path": "./plugins/applification"
       },
       "policy": {
         "installation": "AVAILABLE",
