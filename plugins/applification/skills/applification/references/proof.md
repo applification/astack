@@ -8,6 +8,8 @@ For each acceptance case, identify the cheapest check that can catch its failure
 
 Use component stories for rendering and interaction states, tests for focused domain and protocol behavior, and real-app driving for end-to-end state, identity, timing, or integration claims. A visual result cannot establish persistence; a mocked callback cannot establish an authorized server write. Do not demand video or full-suite runs for every case when a narrower check proves it.
 
+For web running-app proof, use [agent-browser](https://agent-browser.dev/) by default when available. Follow the installed CLI's current `agent-browser skills get core` guidance, use a named session, and drive the actual app through its interactive snapshot. Capture a screenshot of a decisive visible state when it helps review; record a short [video](https://agent-browser.dev/recording) when timing, transitions, or a hard-to-reproduce journey matter. Storybook can be driven with the same tool for component checks, while Pencil remains the design comparison surface. The browser observation is one part of the proof result; confirm persisted or authorized effects with a fresh read or independent view.
+
 ## Run
 
 Before driving an instance, establish that it is the intended build and environment with disposable or authorized fixtures. Do not infer this from an open port alone. Record the full commit, build or deployment identity where relevant, surface, actor or test persona, action, expected observation, and actual observation. Confirm material mutations with a fresh read or independent view. Keep secrets and credentials out of evidence.

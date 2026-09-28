@@ -1,6 +1,6 @@
-# Web feature path
+# Web feature design sprint
 
-Use for every feature that adds or changes a web UI, including a small visible change. Pencil and Storybook are required. Keep the pass small when the change is small; do not omit either tool because the result seems obvious. A feature with no web UI does not need these artifacts.
+Use as the opening design sprint for every feature that adds or changes a web UI, including a small visible change. Pencil and Storybook are required. Keep the pass small when the change is small; do not omit either tool because the result seems obvious. A feature with no web UI does not need these artifacts.
 
 ## Choose the stack
 
@@ -10,12 +10,12 @@ Needing a database alone does not change this web stack choice. Use [Convex](dat
 
 Set up Storybook in the chosen application before implementing the feature UI, including stories for shared components from `packages/ui`. Use the current official [React/Vite](https://storybook.js.org/docs/get-started/frameworks/react-vite) or [Next.js/Vite](https://storybook.js.org/docs/get-started/frameworks/nextjs-vite) integration and confirm that Storybook starts. Do not migrate an existing project only to satisfy this default stack rule.
 
-## Design and component loop
+## Sprint loop and handoff
 
-1. Write a short brief: actor, problem, intended outcome, and the material interaction states. Use the [change contract](change-contract.md) to record observable behavior and open product choices.
+1. Write a short brief: actor, problem, intended outcome, and the material interaction states. For a substantial behavior change, draft [acceptance cases](change-contract.md) with stable IDs and list open product choices. Given/When/Then is one concise way to describe an observable case.
 2. Create or update a `.pen` file with Pencil's design tools. Read Pencil's own tool guidance before editing; `.pen` files are not plain text and must not be inspected or changed with shell text tools. Save the design with the project so the PR can point to it. Show the consequential states, including empty, loading, error, or confirmation only when they matter to the feature.
 3. Build the presentation components in Storybook using fixture data through props. Add stories for the designed states and interactions. Keep these components suitable for production, while treating mocked requests and local placeholder state as prototypes.
 4. Load the Storybook story in Pencil's browser, compare it with the design, and correct visible differences. Verify the story renders and its material interaction works. Resolve product or taste choices with the user when the available context cannot settle them.
-5. Trace the real data and ownership path, then wire the kept components into the application. Replace prototype data flows with the actual state, authorization, and persistence behavior. Prove the relevant acceptance cases in the running app; a passing story alone does not prove a server effect.
+5. Before production wiring, settle the design direction and product decisions, then trace the real data and ownership path. Keep suitable presentation components; replace prototype data flows with actual state, authorization, and persistence behavior. Prove the relevant acceptance cases in the running app; a passing story alone does not prove a server effect.
 
-Carry the `.pen` path, Storybook story identifiers, and running-app proof into the feature PR. If Pencil or Storybook is unavailable, state the concrete blocker and continue independent work; a draft PR may preserve progress, but the web feature is not complete until the required design and component checks run or the user explicitly changes the requirement.
+The sprint hands off a chosen `.pen` design, Storybook states, and any acceptance cases or unresolved decisions; it does not create a permanent feature map or Gherkin suite. Carry the `.pen` path, Storybook story identifiers, and running-app proof into the feature PR. If Pencil or Storybook is unavailable, state the concrete blocker and continue independent work; a draft PR may preserve progress, but the web feature is not complete until the required design and component checks run or the user explicitly changes the requirement.

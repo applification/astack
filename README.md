@@ -2,7 +2,7 @@
 
 AStack is a Codex workflow for moving from an intended change to a verified result. The installable plugin is named **Applification**. It supplies task routing and engineering habits; each project supplies its own commands, environments, and product decisions.
 
-The first version contains one entry skill, [`applification`](plugins/applification/skills/applification/SKILL.md). Give it the task and it routes feature work, bug fixes, refactors, performance work, investigations, and pull requests. Web UI features use Pencil and Storybook before production wiring; every feature ends in a PR. A substantial behavior change uses a short change contract, and proof targets affected behavior on the exact revision. Example Mapping, Gherkin, a separate story tracker, and a universal proof runner are not required.
+The first version contains one entry skill, [`applification`](plugins/applification/skills/applification/SKILL.md). Give it the task and it routes feature work, bug fixes, refactors, performance work, investigations, and pull requests. Web UI features start with a Pencil and Storybook design sprint; every feature ends in a PR. A substantial behavior change uses a short change contract, and proof targets affected behavior on the exact revision. Example Mapping, Gherkin, a separate story tracker, and a universal proof runner are not required.
 
 ## Install in Codex
 
@@ -19,9 +19,9 @@ For local development of this plugin, use `codex plugin marketplace add /absolut
 
 ## Working contract
 
-For a substantial behavior change, AStack records an outcome, a few observable acceptance cases, affected surfaces, and unresolved product decisions. For a web UI feature, the Pencil design and Storybook states inform that contract before production wiring. New products use a Bun workspace monorepo with Turborepo: deployable surfaces in `apps/`, reusable code in `packages/`. A web UI uses shadcn/ui and Tailwind CSS from `packages/ui`, with Vite + React + TypeScript by default or Next.js when server rendering or server routes are needed. Apps needing a database use Convex in `packages/backend`, starting with a local development deployment. The contract is carried into the PR description alongside proof results; long-lived domain concepts belong in the project's own documentation.
+For a substantial behavior change, AStack records an outcome, a few observable acceptance cases, affected surfaces, and unresolved product decisions. Given/When/Then can express a case but is not required. For a web UI feature, the Pencil design and Storybook states inform that contract before production wiring. New products use a Bun workspace monorepo with Turborepo: deployable surfaces in `apps/`, reusable code in `packages/`. A web UI uses shadcn/ui and Tailwind CSS from `packages/ui`, with Vite + React + TypeScript by default or Next.js when server rendering or server routes are needed. Apps needing a database use Convex in `packages/backend`, starting with a local development deployment. The contract is carried into the PR description alongside proof results; long-lived domain concepts belong in the project's own documentation.
 
-Proof distinguishes an automated check from a running-product observation. A passing test or a screenshot supports only the behavior it actually exercised. Applicable but untested surfaces remain visible as gaps.
+Proof distinguishes an automated check from a running-product observation. Agent-browser is the default web driver for real-app checks and useful screenshots or short recordings. A passing test or a screenshot supports only the behavior it actually exercised. Applicable but untested surfaces remain visible as gaps.
 
 ## Development
 
