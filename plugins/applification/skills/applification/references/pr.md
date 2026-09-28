@@ -11,6 +11,8 @@ For a change to a shared contract, persisted shape, event, or lifecycle, trace a
 
 Use a second reviewer or subagent only when the change's risk or breadth justifies the extra pass and the project permits it. Independent review remains advisory; the lead assesses each finding against actual code and intent.
 
+Before marking a PR ready, account for proof media. Attach any screenshots or recordings captured during proof to the PR, or link committed media accessible from it. If none was captured, state briefly why media is unnecessary for review. Video is optional; use it when motion, timing, or a journey needs to be seen.
+
 Keep the PR description brief and useful to a reviewer:
 
 - **Why:** the intended outcome and reason for change.
@@ -20,4 +22,4 @@ Keep the PR description brief and useful to a reviewer:
 - **Blast radius:** affected users, surfaces, or data and the key safety fact.
 - **Verification for other changes:** named claims, observed results, revision and environment, and any skipped or inconclusive checks when there is no behavior contract.
 
-Attach media when it makes a claim easier to inspect. Do not substitute a list of commands for their observed outcomes. Keep existing project CI and merge requirements visible. Follow the user's and project's merge policy; AStack itself does not authorize a merge or deployment.
+Do not substitute a list of commands for their observed outcomes. Keep existing project CI and merge requirements visible. Follow the user's and project's merge policy; AStack itself does not authorize a merge or deployment.

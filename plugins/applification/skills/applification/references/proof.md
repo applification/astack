@@ -22,4 +22,4 @@ Use these outcomes consistently:
 - `skipped`: applicable but not run, with a reason.
 - `not applicable`: behavior cannot be reached from that surface, with a reason.
 
-Preserve the first failure when rerunning. Cleanup stops what the run started and removes disposable state; it does not erase evidence needed to explain a failure. Publish a concise proof result and useful media to the PR when one exists. A later code change invalidates proof for behavior it could affect until the new revision is checked.
+Preserve the first failure when rerunning. Cleanup stops what the run started and removes disposable state; it does not erase evidence needed to explain a failure. Publish a concise proof result to the PR when one exists, and follow its [media checkpoint](pr.md) for any screenshots or recordings captured during proof. A later code change invalidates proof for behavior it could affect until the new revision is checked.

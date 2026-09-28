@@ -21,6 +21,7 @@ Invoke each task through `$applification <request>`. The user chooses only this 
 | "Adopt AStack in an existing pnpm app" | Inspect scripts and CI; migrate package manager and workspace structure to Bun/Turborepo as a reviewable adoption change, with one lockfile and working proof commands. Do not mix package managers during feature work; open a PR. |
 | "Cut report generation from four seconds to two" | Performance route; measure the same user path before and after, report limitations, and open a PR for the change. |
 | "Review PR #42 and fix the confirmed regression" | Review against intent and proof, make the authorized fix, and update PR #42 rather than opening another PR. |
+| "Finish the PR after browser proof captured a screenshot" | Attach the screenshot to the PR or link its committed copy. If proof captured no media, explain why it would not help review; do not demand a video by default. |
 | "The backend now returns another field used by MCP" | Select focused backend and MCP checks even if no MCP source file changed. |
 | "Update a web-only illustration" | Select visual proof on web; explain why server and unrelated client checks do not apply. |
 | "Implement the proposed design despite an unresolved delete-confirmation choice" | Ask for the product decision before coding that branch; continue independent work. |
