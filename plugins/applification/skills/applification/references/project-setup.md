@@ -4,6 +4,8 @@ Use this when installing AStack in a project or when the task needs a proof rout
 
 For the first feature in a clean repository, establish the smallest runnable product and a Git publication target early. If it has a web UI, use the [web feature stack rule](web-feature.md) and set up Storybook and a Pencil design file. Add the project profile once actual commands and surfaces exist; do not fill it with anticipated commands.
 
+If the new app needs a database, choose [Convex](database.md) and record how to start and identify its local deployment in the project profile. Keep local data and credentials out of version control.
+
 Inspect the actual repository first: entry points and user surfaces, package scripts or task runner, local startup and fixture commands, existing tests and CI, authentication and safe data environments, project instructions, issue/PR workflow, and the current home for durable domain terms or decisions. Reuse working paths. Confirm a proposed command from its source or by running a safe check; do not invent a command that merely sounds conventional.
 
 Create or update `.astack/project.md` with only what a later agent cannot cheaply infer:

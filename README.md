@@ -19,7 +19,7 @@ For local development of this plugin, use `codex plugin marketplace add /absolut
 
 ## Working contract
 
-For a substantial behavior change, AStack records an outcome, a few observable acceptance cases, affected surfaces, and unresolved product decisions. For a web UI feature, the Pencil design and Storybook states inform that contract before production wiring. In a clean web repository, AStack defaults to Vite + React + TypeScript and selects Next.js when server rendering or server routes are needed. The contract is carried into the PR description alongside proof results; long-lived domain concepts belong in the project's own documentation.
+For a substantial behavior change, AStack records an outcome, a few observable acceptance cases, affected surfaces, and unresolved product decisions. For a web UI feature, the Pencil design and Storybook states inform that contract before production wiring. In a clean web repository, AStack defaults to Vite + React + TypeScript and selects Next.js when server rendering or server routes are needed. New apps needing a database use Convex, starting with a local development deployment. The contract is carried into the PR description alongside proof results; long-lived domain concepts belong in the project's own documentation.
 
 Proof distinguishes an automated check from a running-product observation. A passing test or a screenshot supports only the behavior it actually exercised. Applicable but untested surfaces remain visible as gaps.
 
