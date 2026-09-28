@@ -1,6 +1,6 @@
 # Proof
 
-Proof is a claim about an observable result on a named revision and environment. Select it from the change contract and the project's actual surfaces. AStack does not supply a universal driver; use the project's working commands or build a small repeatable lever when the same manual sequence would otherwise recur.
+Proof is a claim about an observable result on a named revision and environment. Select it from the behavior contract and the project's actual surfaces. AStack does not supply a universal driver; use the project's working commands or build a small repeatable lever when the same manual sequence would otherwise recur.
 
 ## Select
 

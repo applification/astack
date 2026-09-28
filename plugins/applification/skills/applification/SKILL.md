@@ -26,7 +26,7 @@ For a new product, use the [Bun and Turborepo repository standard](references/pr
 
 Read `.astack/project.md` when the task needs project-specific commands or policy. Read [project setup](references/project-setup.md) when asked to configure AStack, when starting a feature in a clean repository, or when no runnable proof route exists. Missing configuration alone does not make a small task into a setup task. Inspect the project directly when one missing fact is all that is needed.
 
-Use [the change contract](references/change-contract.md) for substantial behavior changes. A brief outcome and observable acceptance cases connect the design sprint, implementation, review, and proof. Given/When/Then can clarify a case but is not a required format or executable specification. Small fixes may keep that contract in the conversation and PR; longer work needs a durable working location.
+Use [the behavior contract](references/behavior-contract.md) for substantial behavior changes. The design sprint develops that contract: its outcome and acceptance cases link the chosen Pencil frames, Storybook states, implementation, and proof. Given/When/Then can clarify a case but is not required. Small fixes may keep the contract in the conversation and PR; longer work needs a durable working location.
 
 ## Shared decisions
 

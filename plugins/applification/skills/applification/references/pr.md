@@ -15,9 +15,9 @@ Keep the PR description brief and useful to a reviewer:
 
 - **Why:** the intended outcome and reason for change.
 - **Scope:** the material behavior and implementation boundaries.
-- **Acceptance:** the agreed observable cases for a substantial behavior change; omit for a small change whose outcome is already clear from Why.
+- **Behavior contract and validation:** the agreed observable cases for a substantial behavior change, with evidence and results beside each case. For web UI work, include the chosen Pencil frames, Storybook story IDs, and running-product observations with their exact revision and environment. Name skipped or inconclusive checks. Omit a separate contract for a small change whose outcome is already clear from Why.
 - **Tradeoffs:** only choices a reviewer would reasonably question.
 - **Blast radius:** affected users, surfaces, or data and the key safety fact.
-- **Verification:** applicable acceptance IDs or other named claims with result, exact revision and environment, commands or journeys run, linked evidence, and any skipped or inconclusive checks.
+- **Verification for other changes:** named claims, observed results, revision and environment, and any skipped or inconclusive checks when there is no behavior contract.
 
 Attach media when it makes a claim easier to inspect. Do not substitute a list of commands for their observed outcomes. Keep existing project CI and merge requirements visible. Follow the user's and project's merge policy; AStack itself does not authorize a merge or deployment.

@@ -33,8 +33,9 @@ Which behavior or dependency changes call for each surface, including indirect
 effects such as backend changes exposed through another client.
 
 ## Project decisions
-Where durable domain terms and consequential decisions live; PR and release
-rules; actions reserved for the owner.
+Where durable domain terms and consequential decisions live; where a behavior
+contract lives across sessions before a PR; PR and release rules; actions
+reserved for the owner.
 ```
 
 Write concise paths and commands, with pointers to authoritative project docs. Do not copy long procedures or secrets into the profile. AStack does not prescribe an issue tracker or a universal test runner. A project may replace old guidance while adopting AStack; reconcile conflicting instructions rather than leaving two active processes.
