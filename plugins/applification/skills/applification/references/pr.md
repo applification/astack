@@ -5,6 +5,8 @@ Before opening or updating a PR, inspect the full diff against the agreed change
 1. **Intent:** Does every acceptance case have an implementation and an appropriate proof result? Did the diff add material behavior outside scope?
 2. **Quality:** Does the code preserve project invariants, keep a clear data shape, avoid unnecessary layers, and have tests at useful seams?
 
+For a change to a shared contract, persisted shape, event, or lifecycle, trace affected consumers beyond direct callers. State the fact that must hold for the change to be safe and the evidence supporting it; mark that fact unverified when the available source cannot establish it.
+
 Use a second reviewer or subagent only when the change's risk or breadth justifies the extra pass and the project permits it. Independent review remains advisory; the lead assesses each finding against actual code and intent.
 
 Keep the PR description brief and useful to a reviewer:

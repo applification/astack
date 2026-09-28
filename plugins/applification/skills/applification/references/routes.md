@@ -4,7 +4,7 @@ Choose the route that matches the user's outcome. These are decision guides, not
 
 ## Feature
 
-Clarify the observable outcome through a [change contract](change-contract.md). If appearance or interaction is uncertain, run a design sprint: choose a direction with the user, explore the consequential states, and build keepable presentation components where the project supports them. Ground the subsystems the feature touches. Sketch data shape and module boundaries before promoting prototype state or changing a costly interface. Implement in coherent slices, use fast checks, and [prove](proof.md) the integrated behavior on applicable surfaces.
+Clarify the observable outcome through a [change contract](change-contract.md). If appearance or interaction is uncertain, run a design sprint: choose a direction with the user, explore the consequential states, and build keepable presentation components where the project supports them. Trace the affected entry points from trigger through data, ownership, and side effects. Check history before removing an unusual constraint; distinguish recorded intent from an inference based on current code. Sketch data shape and module boundaries before promoting prototype state or changing a costly interface. Implement in coherent slices, use fast checks, and [prove](proof.md) the integrated behavior on applicable surfaces.
 
 ## Bug fix
 
