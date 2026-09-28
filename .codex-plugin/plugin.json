@@ -1,0 +1,19 @@
+{
+  "name": "astack",
+  "version": "0.1.0",
+  "description": "A project-independent engineering workflow for Codex",
+  "author": { "name": "Applification Ltd" },
+  "homepage": "https://github.com/applification/astack",
+  "repository": "https://github.com/applification/astack",
+  "license": "MIT",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "AStack",
+    "shortDescription": "Build and prove the intended change",
+    "longDescription": "Route engineering tasks through a short intent contract, proportional feedback, real-product proof, and focused review.",
+    "developerName": "Applification Ltd",
+    "category": "Developer Tools",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": "Use AStack to take this change from intent to proof."
+  }
+}
