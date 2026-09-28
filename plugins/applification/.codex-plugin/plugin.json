@@ -1,8 +1,10 @@
 {
   "name": "applification",
-  "version": "0.1.0",
+  "version": "0.1.0+codex.20260928132430",
   "description": "Applification's project-independent AStack workflow for Codex",
-  "author": { "name": "Applification Ltd" },
+  "author": {
+    "name": "Applification Ltd"
+  },
   "homepage": "https://github.com/applification/astack",
   "repository": "https://github.com/applification/astack",
   "license": "MIT",
@@ -13,7 +15,10 @@
     "longDescription": "Route engineering tasks through a short intent contract, proportional feedback, real-product proof, and focused review.",
     "developerName": "Applification Ltd",
     "category": "Developer Tools",
-    "capabilities": ["Read", "Write"],
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
     "defaultPrompt": "Use Applification to take this change from intent to proof.",
     "websiteURL": "https://www.applification.net/",
     "composerIcon": "./assets/applification-mark-light.svg",

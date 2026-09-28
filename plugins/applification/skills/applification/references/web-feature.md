@@ -4,11 +4,11 @@ Use for every feature that adds or changes a web UI, including a small visible c
 
 ## Choose the stack
 
-Keep an existing project's framework unless the feature itself warrants migration. In a clean repository, default to **Vite + React + TypeScript** for a client app. Choose **Next.js App Router + TypeScript** when the requested product needs server rendering, server routes, or a Next.js-specific capability. Record the reason for choosing Next.js. Consult the current [Vite](https://vite.dev/guide/) or [Next.js](https://nextjs.org/docs/app/getting-started/installation) setup guide rather than assuming old scaffold flags. Use the project's package manager if one is already established.
+Keep an existing project's framework unless the feature itself warrants migration. In a clean repository, use the [Bun and Turborepo layout](project-setup.md). Put the web app in `apps/web` and reusable UI in `packages/ui`, using **shadcn/ui and Tailwind CSS**. Default to **Vite + React + TypeScript** for a client app. Choose **Next.js App Router + TypeScript** when the requested product needs server rendering, server routes, or a Next.js-specific capability. Record the reason for choosing Next.js. Consult the current [shadcn monorepo](https://ui.shadcn.com/docs/monorepo), [Vite](https://vite.dev/guide/), or [Next.js](https://nextjs.org/docs/app/getting-started/installation) setup guide rather than assuming old scaffold flags. Use Bun for installing dependencies, running scripts, and invoking JavaScript CLIs.
 
 Needing a database alone does not change this web stack choice. Use [Convex](database.md) with either React/Vite or Next.js.
 
-Set up Storybook in the chosen application before implementing the feature UI. Use the current official [React/Vite](https://storybook.js.org/docs/get-started/frameworks/react-vite) or [Next.js/Vite](https://storybook.js.org/docs/get-started/frameworks/nextjs-vite) integration and confirm that Storybook starts. Do not migrate an existing project only to satisfy this default stack rule.
+Set up Storybook in the chosen application before implementing the feature UI, including stories for shared components from `packages/ui`. Use the current official [React/Vite](https://storybook.js.org/docs/get-started/frameworks/react-vite) or [Next.js/Vite](https://storybook.js.org/docs/get-started/frameworks/nextjs-vite) integration and confirm that Storybook starts. Do not migrate an existing project only to satisfy this default stack rule.
 
 ## Design and component loop
 

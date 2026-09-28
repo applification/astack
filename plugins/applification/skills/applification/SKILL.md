@@ -22,7 +22,7 @@ Choose a route before loading references. Read only its section in [work routes]
 
 If none fits, state a small task-specific route with an outcome and a way to check it. Web UI features follow the required [Pencil and Storybook path](references/web-feature.md); other routes use only the surfaces they affect.
 
-For a new app that needs a database, use the [Convex path](references/database.md). A database requirement does not by itself require Next.js; the web stack still follows the feature's rendering and server needs.
+For a new product, use the [Bun and Turborepo repository standard](references/project-setup.md). Put reusable UI in `packages/ui`; when persistence is needed, put [Convex](references/database.md) in `packages/backend`. A database requirement does not by itself require Next.js; the web stack still follows the feature's rendering and server needs.
 
 Read `.astack/project.md` when the task needs project-specific commands or policy. Read [project setup](references/project-setup.md) when asked to configure AStack, when starting a feature in a clean repository, or when no runnable proof route exists. Missing configuration alone does not make a small task into a setup task. Inspect the project directly when one missing fact is all that is needed.
 
@@ -30,6 +30,7 @@ Use [the change contract](references/change-contract.md) for substantial behavio
 
 ## Shared decisions
 
+- Use Bun for JavaScript dependency management and scripts. New products use Bun workspaces and Turborepo; [project setup](references/project-setup.md) covers explicit migration when adopting AStack in a repository that uses another package manager.
 - Choose checks by affected behavior and dependency boundaries, not changed paths alone. Use fast feedback while editing and an appropriate running-product check when integration matters. Read [proof](references/proof.md) before claiming a behavior is verified.
 - Keep acceptance about observable behavior. Tests and project proof commands implement checks; they do not redefine the intended outcome.
 - When a product decision remains unresolved, ask a targeted question and continue independent work. Record a decision that changes the contract; do not silently infer it from a prototype.
