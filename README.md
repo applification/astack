@@ -2,7 +2,7 @@
 
 AStack is a Codex workflow for moving from an intended change to a verified result. The installable plugin is named **Applification**. It supplies task routing and engineering habits; each project supplies its own commands, environments, and product decisions.
 
-The first version contains one entry skill, [`applification`](plugins/applification/skills/applification/SKILL.md). Give it the task and it routes feature work, bug fixes, refactors, performance work, investigations, and pull requests. Web UI features start with a Pencil and Storybook design sprint; every feature ends in a PR. A substantial behavior change uses a short change contract, and proof targets affected behavior on the exact revision. Example Mapping, Gherkin, a separate story tracker, and a universal proof runner are not required.
+The first version contains one entry skill, [`applification`](plugins/applification/skills/applification/SKILL.md). Give it the task and it routes feature work, bug fixes, refactors, performance work, investigations, and pull requests. Web UI features start with a Pencil and Storybook design sprint; repository changes meant to be kept end in a PR. A substantial behavior change uses a short change contract, and proof targets affected behavior on the exact revision. Example Mapping, Gherkin, a separate story tracker, and a universal proof runner are not required.
 
 ## Install in Codex
 

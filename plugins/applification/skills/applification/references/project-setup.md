@@ -40,3 +40,5 @@ rules; actions reserved for the owner.
 Write concise paths and commands, with pointers to authoritative project docs. Do not copy long procedures or secrets into the profile. AStack does not prescribe an issue tracker or a universal test runner. A project may replace old guidance while adopting AStack; reconcile conflicting instructions rather than leaving two active processes.
 
 Exercise one harmless proof route after setup. If it cannot run, record the missing prerequisite and the exact limit; setup is not complete merely because the file exists.
+
+When setup changes the repository, finish with a [pull request](pr.md) showing the resulting layout, proof route, and any migration limits.
