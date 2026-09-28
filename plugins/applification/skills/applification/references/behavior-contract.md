@@ -1,6 +1,6 @@
 # Behavior contract
 
-Use for substantial behavior changes and design sprints. The contract is one reviewable account of the intended behavior and the evidence used to implement and validate it. Start it with an outcome and a few observable acceptance cases, then add design evidence and proof as the work progresses. Do not turn the sprint into separate design and documentation handoffs.
+Use for substantial behavior changes and design sprints. The contract is one reviewable account of the intended behavior and the evidence used to implement and validate it. Start it with an outcome and a few observable acceptance cases, then add design evidence and proof as the work progresses. For a design sprint, keep it at `.astack/<feature>/behavior-contract.md` with the Pencil file and retained evidence in the same tracked feature folder.
 
 Keep the contract short enough to read during implementation and review. It should answer:
 
@@ -16,4 +16,4 @@ For web UI work, the `.pen` file and Storybook stories are evidence inside the c
 
 Resolve decisions that change the intended result before implementing them. If learning changes acceptance, update the contract explicitly and tell the user when the choice is theirs. The contract may evolve; it must not drift silently to match the implementation.
 
-The current task can hold the working contract. For multi-session work before a PR, use the project's existing issue or another durable location named in `.astack/project.md`. Once a PR exists, its description carries the agreed contract, design and component evidence, and proof results. AStack does not require a new `docs/` file for each feature or a separate design handoff. Keep enduring domain concepts in project documentation when useful; the physical location of a `.pen` file does not define a separate workflow.
+Update the tracked contract as decisions and proof change. The PR links it and summarizes the outcome and remaining gaps; it need not duplicate the full contract. Keep enduring feature-specific domain and asset decisions in the same folder when useful. For work without a design sprint, a short contract may stay in the task and PR. Do not create a parallel `docs/` feature file or leave the `.pen` file in a separate `design/` workstream.

@@ -19,7 +19,21 @@ For local development of this plugin, use `codex plugin marketplace add /absolut
 
 ## Behavior contract
 
-For a substantial behavior change, AStack keeps one contract with an outcome, a few observable acceptance cases, affected surfaces, and unresolved product decisions. Given/When/Then can express a case but is not required. For a web UI feature, the sprint adds the chosen Pencil frames and Storybook story IDs beside the cases they support, with what each actually demonstrated. Implementation follows that contract, and running-product proof records the results for the same cases. The PR carries the contract and evidence; AStack does not require a separate feature document under `docs/` or treat the `.pen` file as a separate handoff. Long-lived domain concepts can still live in project documentation.
+For a substantial behavior change, AStack keeps one contract with an outcome, a few observable acceptance cases, affected surfaces, and unresolved product decisions. Given/When/Then can express a case but is not required. For a web UI feature, the sprint adds the chosen Pencil frames and Storybook story IDs beside the cases they support, with what each actually demonstrated. Implementation follows that contract, and running-product proof records the results for the same cases. The PR links the tracked contract and summarizes its evidence.
+
+The sprint artifacts live together in `.astack/`, which must be visible to Git:
+
+```text
+.astack/
+  project.md
+  presence/
+    behavior-contract.md
+    loami-chat.pen
+    embedded-image.png
+    evidence/
+```
+
+Storybook stories stay with their components in `apps/` or `packages/` and are referenced from the contract. AStack does not create separate root `design/` and `docs/` folders for feature work.
 
 New products use a Bun workspace monorepo with Turborepo: deployable surfaces in `apps/`, reusable code in `packages/`. A web UI uses shadcn/ui and Tailwind CSS from `packages/ui`, with Vite + React + TypeScript by default or Next.js when server rendering or server routes are needed. Apps needing a database use Convex in `packages/backend`, starting with a local development deployment.
 

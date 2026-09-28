@@ -14,7 +14,7 @@ When adopting AStack in an existing repository, inspect its current package mana
 
 Inspect the actual repository first: entry points and user surfaces, package scripts or task runner, local startup and fixture commands, existing tests and CI, authentication and safe data environments, project instructions, issue/PR workflow, and the current home for durable domain terms or decisions. Reuse working paths. Confirm a proposed command from its source or by running a safe check; do not invent a command that merely sounds conventional.
 
-Create or update `.astack/project.md` with only what a later agent cannot cheaply infer:
+Create or update a tracked `.astack/project.md` with only what a later agent cannot cheaply infer. For a web UI design sprint, keep the behavior contract, Pencil file, supporting design assets, and retained validation evidence together under `.astack/<feature>/`; Storybook stories stay with their components and are referenced from the contract. Do not make separate root `design/` and `docs/` folders for the sprint. Check the repository's ignore rules, remove or override any rule that ignores `.astack/`, and verify the files appear in Git before treating setup as complete.
 
 ```markdown
 # AStack project profile
@@ -33,12 +33,12 @@ Which behavior or dependency changes call for each surface, including indirect
 effects such as backend changes exposed through another client.
 
 ## Project decisions
-Where durable domain terms and consequential decisions live; where a behavior
-contract lives across sessions before a PR; PR and release rules; actions
-reserved for the owner.
+Where durable domain terms and consequential decisions live; which feature
+folders are active under `.astack/`; PR and release rules; actions reserved
+for the owner.
 ```
 
-Write concise paths and commands, with pointers to authoritative project docs. Do not copy long procedures or secrets into the profile. AStack does not prescribe an issue tracker or a universal test runner. A project may replace old guidance while adopting AStack; reconcile conflicting instructions rather than leaving two active processes.
+Write concise paths and commands, with pointers to feature contracts and authoritative project sources. Do not copy long procedures or secrets into the profile or feature folders. AStack does not prescribe an issue tracker or a universal test runner. A project may replace old guidance while adopting AStack; reconcile conflicting instructions rather than leaving two active processes.
 
 Exercise one harmless proof route after setup. If it cannot run, record the missing prerequisite and the exact limit; setup is not complete merely because the file exists.
 
