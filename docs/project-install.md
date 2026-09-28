@@ -44,7 +44,7 @@ codex plugin add astack@my-project-astack
 
 The CLI installation also enables the plugin at user level. If AStack should run only in this project, set the same plugin ID to `enabled = false` in the user Codex configuration and keep `enabled = true` in this project's configuration. Project settings take precedence in trusted projects. Confirm the effective state with `codex plugin list --marketplace my-project-astack --json` from the project and from another directory.
 
-Ask Codex to use `$astack` to set up the project. It inspects the repository and writes `.astack/project.md` for project-specific proof paths and decision locations. Keep any `AGENTS.md` pointer short; it should opt into the workflow rather than duplicate it.
+Ask Codex to use `$apf-mode` to set up the project. It inspects the repository and writes `.astack/project.md` for project-specific proof paths and decision locations. Keep any `AGENTS.md` pointer short; it should opt into the workflow rather than duplicate it.
 
 ## Update
 

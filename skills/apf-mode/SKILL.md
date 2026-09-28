@@ -1,11 +1,11 @@
 ---
-name: astack
-description: Run AStack's engineering workflow when the user invokes AStack or project guidance opts in. Route project setup, features, bugs, refactors, investigations, proof, and PR work to focused instructions.
+name: apf-mode
+description: AStack's single entry point. When invoked with a task, choose the appropriate engineering route and carry the user's prompt through intent, implementation, proportional proof, and review.
 ---
 
-# AStack
+# APF mode
 
-Help the user reach a checkable outcome with the least process that protects it. User instructions and the project's established constraints take precedence over this skill. AStack is Codex-first; use available capabilities rather than assuming particular tool names or subagents.
+Treat the user's prompt after `$apf-mode` as the task, not as a request to choose a workflow. Select the route from the task's intended outcome and carry it through to a checkable result. If no task was supplied, ask what the user wants done. Help the user reach that result with the least process that protects it. User instructions and the project's established constraints take precedence over this skill. AStack is Codex-first; use available capabilities rather than assuming particular tool names or subagents.
 
 ## Route the work
 

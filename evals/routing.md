@@ -2,6 +2,8 @@
 
 Use these as realistic checks when editing the skill. Judge the chosen route and actual behavior, not whether the final wording matches this file. Run tasks in a disposable project or review a recorded trial before changing a broad instruction.
 
+Invoke each task through `$apf-mode <request>`. The user chooses only this entry point; AStack chooses the route. A bare `$apf-mode` should ask for the task rather than inventing one.
+
 | Request | Expected decision |
 | --- | --- |
 | "Change the label on the web account button" | Small feature or edit; no design sprint, no MCP or iOS proof unless the shared component reaches them. |
