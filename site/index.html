@@ -383,14 +383,21 @@
       <div class="explainer-card"><p class="card-kicker">IN YOUR PROJECT</p><pre class="file-tree"><code>my-project/
 ├─ .agents/plugins/marketplace.json  pinned ref
 ├─ .codex/config.toml              enable plugin
-├─ .codex/skills/astack-&lt;app&gt;/     control CLI
+├─ .codex/skills/astack-&lt;app&gt;/
+│  ├─ SKILL.md                     control guide
+│  └─ scripts/astack-&lt;app&gt;.ts      control CLI
 ├─ .astack/                        tracked in Git
 │  ├─ project.md                   local profile
 │  ├─ feature-map/&lt;app&gt;/           user paths
-│  └─ &lt;feature&gt;/
+│  │  ├─ README.md                 sweep order
+│  │  └─ presence.md               feature area
+│  ├─ presence/
+│  │  ├─ behavior-contract.md
+│  │  ├─ presence.pen              if selected
+│  │  └─ evidence/                 retained proof
+│  └─ saved-items/
 │     ├─ behavior-contract.md
-│     ├─ &lt;feature&gt;.pen             if selected
-│     └─ evidence/                 retained proof
+│     └─ evidence/
 └─ AGENTS.md                       optional pointer</code></pre></div>
     </div>
     <div class="explain-strip"><p><strong>Install and pin.</strong> Add a project marketplace entry, enable the plugin, then install it. Update by changing the pinned ref and exercising a representative route.</p><p><strong>Set up once.</strong> astack records real project commands in <code>.astack/project.md</code>. For a runnable product that needs repeatable driving, it creates or adopts a control CLI and feature map.</p><p><strong>Work through it.</strong> Start a task with <code>$applification:astack &lt;task&gt;</code>. The route map above shows what happens next.</p></div>
