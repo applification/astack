@@ -10,18 +10,18 @@ Identify what the agent must do repeatedly: start or connect to the right instan
 
 ## Create the project skill and CLI
 
-Use a short lowercase hyphenated app name. Put the project-owned files together:
+Use a short lowercase hyphenated app name. Keep the executable and its operating instructions in the project skill; keep the product map in tracked `.astack/` project knowledge:
 
 ```text
 .codex/skills/astack-<app>/
   SKILL.md
   scripts/astack-<app>.ts
-  references/features/
+.astack/feature-map/<app>/
     README.md
     <feature-area>.md
 ```
 
-The script is an executable Bun TypeScript CLI with a `#!/usr/bin/env bun` shebang. Add an `astack-<app>` root package script that invokes it, so the stable command is `bun run astack-<app> doctor`. Its `--help` lists real subcommands, arguments, examples, and evidence locations. The skill shows the exact invocation and says when to use the feature map. Do not require a globally installed `astack` binary.
+The script is an executable Bun TypeScript CLI with a `#!/usr/bin/env bun` shebang. Add an `astack-<app>` root package script that invokes it, so the stable command is `bun run astack-<app> doctor`. Its `--help` lists real subcommands, arguments, examples, and evidence locations. The skill shows the exact invocation and points to `.astack/feature-map/<app>/README.md`. Do not require a globally installed `astack` binary.
 
 Implement a small command set around the product. Include `doctor` and commands to drive and observe at least one real user path. Add `start` and `stop` when the CLI owns a long-lived instance; a short-lived CLI or service may need a different launch model. Expose app-specific actions such as `new-session`, `send`, or `select-state` when they hide repeated navigation or interaction. Add `snapshot`, `screenshot`, `console`, `network`, `record`, or `trace` only when the underlying driver and product support them. Avoid a large pass-through copy of another tool's command tree. Prefer accessible names and stable user-visible handles to coordinates or private component state.
 
@@ -35,7 +35,7 @@ For a Next.js app, let the agent inspect routes, compilation issues, and server 
 
 ## Map user behavior
 
-The feature map is an index plus one short file per real feature area, sized to the product. `references/features/README.md` links the areas and gives a useful broad-sweep order. Each feature file answers:
+The feature map is an index plus one short file per real feature area, sized to the product. `.astack/feature-map/<app>/README.md` links the areas and gives a useful broad-sweep order. Each feature file answers:
 
 - What users can do and which entry points reach it.
 - The exact `astack-<app>` commands that drive those entry points through the running product.
