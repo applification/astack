@@ -1,11 +1,11 @@
 ---
-name: applification
-description: Applification's single entry point for AStack. When invoked with a task, choose the appropriate engineering route and carry the user's prompt through intent, implementation, proportional proof, and review.
+name: astack
+description: AStack by Applification. When invoked with an engineering task, choose the appropriate route and carry the user's prompt through intent, implementation, proportional proof, and review.
 ---
 
-# Applification
+# AStack
 
-Treat the user's prompt after `$applification` as the task, not as a request to choose a workflow. Select the route from the task's intended outcome and carry it through to a checkable result. If no task was supplied, ask what the user wants done. Help the user reach that result with the least process that protects it. User instructions and the project's established constraints take precedence over this skill. AStack is Codex-first; use available capabilities rather than assuming particular tool names or subagents.
+Treat the user's prompt after `$applification:astack` as the task, not as a request to choose a workflow. Select the route from the task's intended outcome and carry it through to a checkable result. If no task was supplied, ask what the user wants done. Help the user reach that result with the least process that protects it. User instructions and the project's established constraints take precedence over this skill. AStack is Codex-first; use available capabilities rather than assuming particular tool names or subagents.
 
 ## Route the work
 

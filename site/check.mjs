@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relative) => readFileSync(path.join(root, relative), 'utf8');
-const skill = read('plugins/applification/skills/applification/SKILL.md');
+const skill = read('plugins/applification/skills/astack/SKILL.md');
 const html = read('site/index.html');
 const app = read('site/app.js');
 const scenarios = JSON.parse(read('site/scenarios.json'));
