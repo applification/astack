@@ -47,6 +47,12 @@ The CLI installation also enables the plugin at user level. If AStack should run
 
 Ask Codex to use `$applification` to set up the project. It inspects the repository and writes `.astack/project.md` for project-specific proof paths and decision locations. Design sprint contracts, Pencil files, and retained evidence go into tracked `.astack/<feature>/` folders. Check that `.astack/` is not ignored by Git. Keep any `AGENTS.md` pointer short; it should opt into the workflow rather than duplicate it.
 
+For a project that uses Convex, also install and enable `convex@openai-curated-remote` in Codex. AStack calls on its `@Convex` app and `convex:*` skills for setup, backend changes, and the required Convex PR review. Check that the plugin is available in a new task before starting Convex work; AStack's plugin installation does not install companion plugins.
+
+```sh
+codex plugin add convex@openai-curated-remote
+```
+
 ## Update
 
 Change the marketplace `ref` or `sha` to the AStack revision the project will adopt. Refresh the marketplace and reinstall the plugin, then start a new Codex task and exercise a representative project route. Update `.astack/project.md` only when the project's own commands or policies changed. Do not edit installed plugin cache files.

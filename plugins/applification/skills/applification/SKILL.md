@@ -31,6 +31,7 @@ Use [the behavior contract](references/behavior-contract.md) for substantial beh
 ## Shared decisions
 
 - Use Bun for JavaScript dependency management and scripts. New products use Bun workspaces and Turborepo; [project setup](references/project-setup.md) covers explicit migration when adopting AStack in a repository that uses another package manager.
+- When a task creates, adds, or changes Convex, follow [the Convex path](references/database.md). Use the `@Convex` plugin for general setup and architecture, `$convex:convex-expert` before editing backend code, and `$convex:add` for a new capability when its existing-app scope fits. A PR that touches Convex requires the `$convex:convex-reviewer` pass described in [PR and review](references/pr.md).
 - Choose checks by affected behavior and dependency boundaries, not changed paths alone. Use fast feedback while editing and an appropriate running-product check when integration matters. Read [proof](references/proof.md) before claiming a behavior is verified.
 - Keep acceptance about observable behavior. Tests and project proof commands implement checks; they do not redefine the intended outcome.
 - When a product decision remains unresolved, ask a targeted question and continue independent work. Record a decision that changes the contract; do not silently infer it from a prototype.
