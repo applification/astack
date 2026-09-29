@@ -366,39 +366,39 @@
 ├─ plugins/applification/
 │  ├─ .codex-plugin/plugin.json
 │  └─ skills/astack/
-│     ├─ SKILL.md              <span class="tree-note">route choice + shared rules</span>
+│     ├─ SKILL.md              <span class="tree-note">entry skill</span>
 │     └─ references/
-│        ├─ routes.md           <span class="tree-note">route details</span>
-│        ├─ behavior-contract.md <span class="tree-note">cases + evidence</span>
-│        ├─ web-feature.md      <span class="tree-note">UI design decisions</span>
-│        ├─ app-control.md      <span class="tree-note">CLI + feature map</span>
-│        ├─ project-setup.md    <span class="tree-note">adoption + new apps</span>
+│        ├─ routes.md           <span class="tree-note">routes</span>
+│        ├─ behavior-contract.md <span class="tree-note">acceptance</span>
+│        ├─ web-feature.md      <span class="tree-note">design sprint</span>
+│        ├─ app-control.md      <span class="tree-note">app control</span>
+│        ├─ project-setup.md    <span class="tree-note">setup</span>
 │        ├─ shadcn-lint.md      <span class="tree-note">UI lint</span>
-│        ├─ database.md         <span class="tree-note">Convex path</span>
-│        ├─ mcp-server.md       <span class="tree-note">MCP server path</span>
+│        ├─ database.md         <span class="tree-note">Convex</span>
+│        ├─ mcp-server.md       <span class="tree-note">MCP</span>
 │        ├─ proof.md            <span class="tree-note">observed results</span>
-│        └─ pr.md               <span class="tree-note">review + PR</span>
+│        └─ pr.md               <span class="tree-note">PR review</span>
 ├─ docs/project-install.md
 └─ evals/routing.md</code></pre></div>
       <div class="explainer-card"><p class="card-kicker">IN YOUR PROJECT</p><pre class="file-tree"><code>my-project/
-├─ .agents/plugins/marketplace.json  <span class="tree-note">pinned ref</span>
-├─ .codex/config.toml              <span class="tree-note">enable plugin</span>
+├─ .agents/plugins/marketplace.json  <span class="tree-note">pinned</span>
+├─ .codex/config.toml              <span class="tree-note">enabled</span>
 ├─ .codex/skills/astack-&lt;app&gt;/
-│  ├─ SKILL.md                     <span class="tree-note">control guide</span>
-│  └─ scripts/astack-&lt;app&gt;.ts      <span class="tree-note">control CLI</span>
+│  ├─ SKILL.md                     <span class="tree-note">guide</span>
+│  └─ scripts/astack-&lt;app&gt;.ts      <span class="tree-note">CLI</span>
 ├─ .astack/                        <span class="tree-note">tracked in Git</span>
-│  ├─ project.md                   <span class="tree-note">local profile</span>
+│  ├─ project.md                   <span class="tree-note">profile</span>
 │  ├─ feature-map/&lt;app&gt;/           <span class="tree-note">user paths</span>
-│  │  ├─ README.md                 <span class="tree-note">sweep order</span>
-│  │  └─ presence.md               <span class="tree-note">feature area</span>
+│  │  ├─ README.md                 <span class="tree-note">index</span>
+│  │  └─ presence.md               <span class="tree-note">feature</span>
 │  ├─ presence/
 │  │  ├─ behavior-contract.md
 │  │  ├─ presence.pen              <span class="tree-note">if selected</span>
-│  │  └─ evidence/                 <span class="tree-note">retained proof</span>
+│  │  └─ evidence/                 <span class="tree-note">proof</span>
 │  └─ saved-items/
 │     ├─ behavior-contract.md
 │     └─ evidence/
-└─ AGENTS.md                       <span class="tree-note">optional pointer</span></code></pre></div>
+└─ AGENTS.md                       <span class="tree-note">pointer</span></code></pre></div>
     </div>
     <div class="explain-strip"><p><strong>Install and pin.</strong> Add a project marketplace entry, enable the plugin, then install it. Update by changing the pinned ref and exercising a representative route.</p><p><strong>Set up once.</strong> astack records real project commands in <code>.astack/project.md</code>. For a runnable product that needs repeatable driving, it creates or adopts a control CLI and feature map.</p><p><strong>Work through it.</strong> Start a task with <code>$applification:astack &lt;task&gt;</code>. The route map above shows what happens next.</p></div>
     <p class="source-row">Follow the <a href="https://github.com/applification/astack/blob/main/docs/project-install.md">project installation guide ↗</a> for the exact marketplace and config files.</p>
