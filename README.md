@@ -1,8 +1,24 @@
 # AStack
 
-AStack is a Codex workflow for moving from an intended change to a verified result. The installable plugin is named **Applification**. It supplies task routing and engineering habits; each project supplies its own commands, environments, and product decisions.
+AStack is a Codex workflow for moving from an intended change to a verified result. The installable plugin is named **Applification**. Give it an engineering task with `$applification`; it chooses a route, uses the relevant guidance, and checks the outcome. Each project supplies its own commands, environments, and product decisions.
 
-The first version contains one entry skill, [`applification`](plugins/applification/skills/applification/SKILL.md). Give it the task and it routes feature work, bug fixes, refactors, performance work, app control setup, investigations, and pull requests. For web UI work, the agent decides whether Pencil, Storybook, or both would help with the change and records why. Repository changes meant to be kept end in a PR, with proof of affected behavior on the exact revision. Example Mapping, Gherkin, a separate story tracker, and a universal proof runner are not required.
+**[Explore the AStack site](https://astack.applification.net/)** for a visual route map and searchable routing examples. This README and the [skill source](plugins/applification/skills/applification/SKILL.md) hold the detail. The site lives in [`site/`](site/) in this repository.
+
+## How it works
+
+| You want to… | AStack's route |
+| --- | --- |
+| Add or change user behavior | Feature |
+| Fix a reported defect | Bug fix |
+| Change structure while preserving behavior | Refactor |
+| Improve measured slowness | Performance |
+| Answer a question from evidence | Investigation |
+| Review or finish an existing change | Pull request |
+| Make a running app controllable for verification | App control |
+
+The route is a decision guide, not a checklist. AStack picks checks that can catch the relevant failure and records what was actually observed. Kept repository changes end in a pull request; a read-only investigation ends with an answer. See the [work routes](plugins/applification/skills/applification/references/routes.md), [proof guidance](plugins/applification/skills/applification/references/proof.md), and [routing examples](evals/routing.md).
+
+The plugin has one entry skill, [`applification`](plugins/applification/skills/applification/SKILL.md). For web UI work, it decides whether Pencil, Storybook, or both would help with the change and records why. Proof names the affected behavior, revision, environment, and observed result. Example Mapping, Gherkin, a separate story tracker, and a universal proof runner are not required.
 
 ## Install in Codex
 
@@ -50,6 +66,8 @@ For MCP servers, AStack has a separate [server and proof path](plugins/applifica
 ## Development
 
 Validate the skill and plugin with Codex's bundled `skill-creator` and `plugin-creator` validators before publishing. See [evaluation cases](evals/routing.md) for behavior to exercise when changing routing or proof selection.
+
+The site is plain HTML, CSS, and JavaScript in [`site/`](site/). Preview it with `python3 -m http.server 8000 --directory site`. Run `node site/check.mjs` to catch route, eval, or source-link drift. GitHub Pages publishes the folder after a merge to `main` at `astack.applification.net`. When changing AStack behavior, update the site and README in the same PR; the Pages workflow checks that routes, eval copy, and source links stay current.
 
 ## Sources
 
