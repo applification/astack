@@ -5,7 +5,7 @@ on:
     paths:
       - "site/**"
       - "README.md"
-      - "plugins/applification/skills/applification/**"
+      - "plugins/applification/skills/astack/**"
       - "evals/routing.md"
       - ".github/workflows/site.yml"
   push:
