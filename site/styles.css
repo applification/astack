@@ -1167,7 +1167,7 @@ section[id] {
     padding-block:3rem 4rem
   }
   .hero h1 {
-    font-size:clamp(4.2rem,15vw,6.2rem)
+    font-size:clamp(3.1rem,12vw,4.8rem)
   }
   .hero-lede {
     font-size:1.06rem
