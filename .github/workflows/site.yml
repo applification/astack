@@ -1,4 +1,4 @@
-name: AStack site
+name: astack site
 
 on:
   pull_request:

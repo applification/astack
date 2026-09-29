@@ -1,6 +1,6 @@
 # Proof
 
-Proof is a claim about an observable result on a named revision and environment. Select it from the behavior contract and the project's actual surfaces. Use the project's `astack-<app>` control CLI and feature map when present. If none exists during a small task, use the project's working commands for that task; follow [app control and feature map](app-control.md) during project setup or when repeated app driving needs a reliable command. AStack does not supply a universal app driver.
+Proof is a claim about an observable result on a named revision and environment. Select it from the behavior contract and the project's actual surfaces. Use the project's `astack-<app>` control CLI and feature map when present. If none exists during a small task, use the project's working commands for that task; follow [app control and feature map](app-control.md) during project setup or when repeated app driving needs a reliable command. astack does not supply a universal app driver.
 
 ## Select
 

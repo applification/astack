@@ -1,7 +1,7 @@
 {
   "name": "applification",
-  "version": "0.1.0+codex.20260929094126",
-  "description": "Applification's project-independent AStack workflow for Codex",
+  "version": "0.1.0+codex.20260929113807",
+  "description": "astack by Applification: a project-independent engineering workflow for Codex",
   "author": {
     "name": "Applification Ltd"
   },
@@ -11,15 +11,15 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Applification",
-    "shortDescription": "Build and prove the intended change",
-    "longDescription": "Route engineering tasks through a short intent contract, proportional feedback, real-product proof, and focused review.",
+    "shortDescription": "astack: build and prove the intended change",
+    "longDescription": "astack by Applification routes engineering tasks through a short intent contract, proportional feedback, real-product proof, and focused review.",
     "developerName": "Applification Ltd",
     "category": "Developer Tools",
     "capabilities": [
       "Read",
       "Write"
     ],
-    "defaultPrompt": "Use Applification to take this change from intent to proof.",
+    "defaultPrompt": "Use astack by Applification to take this change from intent to proof.",
     "websiteURL": "https://www.applification.net/",
     "composerIcon": "./assets/applification-mark-light.svg",
     "logo": "./assets/applification-mark-light.svg",
