@@ -9,7 +9,9 @@ Before opening or updating a PR, inspect the full diff against the agreed intent
 
 For a change to a shared contract, persisted shape, event, or lifecycle, trace affected consumers beyond direct callers. State the fact that must hold for the change to be safe and the evidence supporting it; mark that fact unverified when the available source cannot establish it.
 
-Use a second reviewer or subagent only when the change's risk or breadth justifies the extra pass and the project permits it. Independent review remains advisory; the lead assesses each finding against actual code and intent.
+When the PR changes Convex schema, functions, configuration, or client integration, invoke `$convex:convex-reviewer` on the completed diff before marking it ready. Check its findings against the code, fix confirmed security, authorization, validator, index, pagination, reactivity, and type-safety issues, then rerun affected checks. Record the reviewer result and any unresolved finding in the PR. If the reviewer skill is unavailable, keep the PR in draft and name that missing review; AStack cannot claim the Convex review gate passed.
+
+Use an additional independent reviewer or subagent only when the change's risk or breadth justifies the extra pass and the project permits it. This is separate from the required Convex reviewer skill. Independent review remains advisory; the lead assesses each finding against actual code and intent.
 
 Before marking a PR ready, account for proof media. Attach any screenshots or recordings captured during proof to the PR, or link committed media accessible from it. If none was captured, state briefly why media is unnecessary for review. Video is optional; use it when motion, timing, or a journey needs to be seen.
 
