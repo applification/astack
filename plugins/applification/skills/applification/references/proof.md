@@ -1,6 +1,6 @@
 # Proof
 
-Proof is a claim about an observable result on a named revision and environment. Select it from the behavior contract and the project's actual surfaces. AStack does not supply a universal driver; use the project's working commands or build a small repeatable lever when the same manual sequence would otherwise recur.
+Proof is a claim about an observable result on a named revision and environment. Select it from the behavior contract and the project's actual surfaces. Use the project's `astack-<app>` control CLI and feature map when present. If none exists during a small task, use the project's working commands for that task; follow [app control and feature map](app-control.md) during project setup or when repeated app driving needs a reliable command. AStack does not supply a universal app driver.
 
 ## Select
 
@@ -15,6 +15,8 @@ For web running-app proof, use [agent-browser](https://agent-browser.dev/) by de
 ## Run
 
 Before driving an instance, establish that it is the intended build and environment with disposable or authorized fixtures. Do not infer this from an open port alone. Record the full commit, build or deployment identity where relevant, surface, actor or test persona, action, expected observation, and actual observation. Confirm material mutations with a fresh read or independent view. Keep secrets and credentials out of evidence.
+
+Use the feature map to find the affected user entry points. Run the control CLI's `doctor` before driving and after a surprising failure. A CLI command's exit code shows whether that command completed its own action and checks; judge each acceptance case from the observed running-product result and record any untested path as a gap.
 
 Use these outcomes consistently:
 
