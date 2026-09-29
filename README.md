@@ -41,6 +41,8 @@ For Convex work, install the companion `convex@openai-curated-remote` plugin. AS
 
 Proof distinguishes an automated check from a running-product observation. Agent-browser is the default web driver for real-app checks and useful screenshots or short recordings. A passing test or a screenshot supports only the behavior it actually exercised. Applicable but untested surfaces remain visible as gaps. Before a PR is ready, attach any media captured during proof or explain why media was unnecessary; video is optional.
 
+For MCP servers, AStack has a separate [server and proof path](plugins/applification/skills/applification/references/mcp-server.md). It uses the project's transport and authentication requirements, tests tool contracts through an MCP client, and checks the running endpoint and agent behavior when those boundaries matter. Agent evaluations are selected for changes to tool discovery or model use; a mock server does not establish that the real server works.
+
 ## Development
 
 Validate the skill and plugin with Codex's bundled `skill-creator` and `plugin-creator` validators before publishing. See [evaluation cases](evals/routing.md) for behavior to exercise when changing routing or proof selection.

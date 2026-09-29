@@ -8,6 +8,8 @@ For each acceptance case, identify the cheapest check that can catch its failure
 
 Use component stories for rendering and interaction states, tests for focused domain and protocol behavior, and real-app driving for end-to-end state, identity, timing, or integration claims. A visual result cannot establish persistence; a mocked callback cannot establish an authorized server write. Do not demand video or full-suite runs for every case when a narrower check proves it.
 
+For MCP behavior, follow the [MCP proof path](mcp-server.md#prove-the-affected-boundary). A direct tool call checks its contract; a client connection to the running endpoint checks transport and deployment; a model-driven run checks how an agent chooses and uses tools. Report these as distinct claims. A mock MCP server can test a consuming client, but cannot prove the server under change.
+
 For web running-app proof, use [agent-browser](https://agent-browser.dev/) by default when available. Follow the installed CLI's current `agent-browser skills get core` guidance, use a named session, and drive the actual app through its interactive snapshot. Capture a screenshot of a decisive visible state when it helps review; record a short [video](https://agent-browser.dev/recording) when timing, transitions, or a hard-to-reproduce journey matter. Storybook can be driven with the same tool for component checks, while Pencil remains the design comparison surface. The browser observation is one part of the proof result; confirm persisted or authorized effects with a fresh read or independent view.
 
 ## Run
