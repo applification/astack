@@ -1,11 +1,11 @@
 # Claude Code host adapter
 
-Read this when astack runs in Claude Code and a step depends on where Claude Code looks for files, how it is configured, or which companion plugins it has. The method in the rest of astack does not change by host. Names of third-party plugins and their components were current when this adapter was written; the installed plugin is the authority, so check it before relying on a name.
+Read this when a step depends on Claude Code's file locations, configuration, or companion plugins. Third-party plugin names here were current when written; the installed plugin is the authority.
 
 ## Invocation and instructions
 
 - Start astack with `/applification:astack <task>`. Claude Code can also load the skill on its own when a request matches its description.
-- Claude Code 2.1.277 and later reads `AGENTS.md` directly when there is no `CLAUDE.md`, `.claude/CLAUDE.md`, or `CLAUDE.local.md` in the working directory or above it. Adding any of those files stops the direct read unless a `CLAUDE.md` imports the shared file with a line containing `@AGENTS.md`. Older versions need that import. Keep `AGENTS.md` as the shared source and put only Claude-specific additions below the import.
+- Claude Code 2.1.277 and later reads `AGENTS.md` directly when there is no `CLAUDE.md`, `.claude/CLAUDE.md`, or `CLAUDE.local.md` in the working directory or above it. Once any of those exists, Claude Code reads it instead, so start `CLAUDE.md` with an `@AGENTS.md` import to keep the shared instructions. Older versions always need that import. Keep `AGENTS.md` as the shared source and put only Claude-specific additions below the import.
 - Enable astack for a project as described in the [project installation guide](https://github.com/applification/astack/blob/main/docs/project-install.md#claude-code). Plugins declared in a repository's `.claude/settings.json` load in local sessions after the folder is trusted; Claude Code cloud sessions do not load them, although they do load project skills committed under `.claude/skills/`.
 
 ## Project skills
@@ -20,7 +20,7 @@ Claude Code bundles `/run`, `/verify`, and `/run-skill-generator`. They record t
 
 ## MCP servers
 
-Configure project MCP servers in `.mcp.json` at the repository root, for example with `claude mcp add --scope project next-devtools -- bunx next-devtools-mcp`, which writes:
+Configure project MCP servers in `.mcp.json` at the repository root, for example with `claude mcp add --scope project next-devtools -- bunx next-devtools-mcp`, which writes an entry like:
 
 ```json
 {

@@ -13,7 +13,7 @@ Identify what the agent must do repeatedly: start or connect to the right instan
 Use a short lowercase hyphenated app name. Keep the executable at a host-neutral path in the project, a thin operating skill for each agent host the project uses, and the product map in tracked `.astack/` project knowledge:
 
 ```text
-tools/astack-<app>.ts
+tools/astack-<app>.ts              # or another host-neutral path
 <host project skill directory>/astack-<app>/SKILL.md
 .astack/feature-map/<app>/
     README.md

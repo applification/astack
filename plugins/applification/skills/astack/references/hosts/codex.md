@@ -1,6 +1,6 @@
 # Codex host adapter
 
-Read this when astack runs in Codex and a step depends on where Codex looks for files, how it is configured, or which companion plugins it has. The method in the rest of astack does not change by host. Names of third-party plugins and their components were current when this adapter was written; the installed plugin is the authority, so check it before relying on a name.
+Read this when a step depends on Codex's file locations, configuration, or companion plugins. Third-party plugin names here were current when written; the installed plugin is the authority.
 
 ## Invocation and instructions
 
@@ -10,7 +10,7 @@ Read this when astack runs in Codex and a step depends on where Codex looks for 
 
 ## Project skills
 
-Current Codex documentation lists `.agents/skills/<name>/SKILL.md`, searched from the working directory up to the repository root, as the repository skill location. Projects set up by earlier astack versions keep their control skill in `.codex/skills/astack-<app>/`. Before relying on either location, confirm in `/skills` that Codex discovers the project's `astack-<app>` skill; do not move a working skill only to match this note. The control CLI itself follows the host-neutral layout in [app control](../app-control.md).
+Current Codex documentation lists `.agents/skills/<name>/SKILL.md`, searched from the working directory up to the repository root, as the repository skill location. Projects set up by earlier astack versions keep their control skill in `.codex/skills/astack-<app>/`. Put a new `astack-<app>` skill in `.agents/skills/`. For an existing one, confirm in `/skills` that Codex discovers it before relying on it; do not move a working skill only to match this note. The control CLI itself follows the host-neutral layout in [app control](../app-control.md).
 
 ## MCP servers
 

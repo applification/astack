@@ -234,14 +234,14 @@ for (const copyButton of document.querySelectorAll('[data-copy]')) {
     try {
       await navigator.clipboard.writeText(command.textContent);
       copyButton.textContent = 'Copied';
-      copyButton.setAttribute('aria-label', 'Installation commands copied');
+      copyButton.setAttribute('aria-label', label.replace(/^Copy/, 'Copied'));
     } catch {
       const range = document.createRange();
       range.selectNodeContents(command);
       window.getSelection().removeAllRanges();
       window.getSelection().addRange(range);
       copyButton.textContent = 'Selected';
-      copyButton.setAttribute('aria-label', 'Installation commands selected; press copy');
+      copyButton.setAttribute('aria-label', label.replace(/^Copy (.*)$/, '$1 selected; press copy'));
     }
     window.setTimeout(() => {
       copyButton.textContent = 'Copy';
