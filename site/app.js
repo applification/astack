@@ -49,9 +49,12 @@ const routes = {
   }
 };
 
-const steps = document.querySelector('#route-steps');
 const map = document.querySelector('#route-map');
 const mapScroll = document.querySelector('.map-scroll');
+const workbench = document.querySelector('#route-workbench');
+const picker = document.querySelector('#trace-panel');
+const browseButton = document.querySelector('#browse-requests');
+const detail = document.querySelector('#route-detail');
 const search = document.querySelector('#request-search');
 const results = document.querySelector('#request-results');
 const requestCount = document.querySelector('#request-count');
@@ -76,10 +79,17 @@ function centerLine(key) {
   mapScroll.scrollTo({ left, behavior: 'smooth' });
 }
 
+function setPickerOpen(open) {
+  picker.hidden = !open;
+  browseButton.setAttribute('aria-expanded', String(open));
+  if (open) search.focus();
+  else if (picker.contains(document.activeElement)) browseButton.focus();
+}
+
 function selectRoute(key, scenarioIndex = null) {
   const route = routes[key];
   if (!route) return;
-  document.querySelector('.route-detail').classList.remove('is-empty');
+  const scenario = scenarioIndex === null ? null : scenarios[scenarioIndex];
   openedRoute = key;
   selectedIndex = scenarioIndex;
   map.classList.add('has-selection');
@@ -89,22 +99,16 @@ function selectRoute(key, scenarioIndex = null) {
   for (const branch of map.querySelectorAll('[data-branch-route]')) {
     branch.classList.toggle('is-active', branch.dataset.branchRoute === key);
   }
+  detail.hidden = false;
+  detail.style.setProperty('--active-route', getComputedStyle(map.querySelector(`[data-map-route="${key}"]`)).getPropertyValue('--route'));
   document.querySelector('#route-kicker').textContent = key === 'setup' ? 'PROJECT SETUP PATH' : 'ROUTE ' + route.number + ' / ' + route.name.toUpperCase();
-  document.querySelector('#route-title').textContent = route.title;
-  document.querySelector('#route-description').textContent = route.description;
-  const scenario = scenarioIndex === null ? null : scenarios[scenarioIndex];
-  document.querySelector('#route-example').textContent = scenario ? `“${scenario.request}”` : route.example;
-  document.querySelector('#route-example-label').textContent = scenario ? 'SELECTED REQUEST' : 'EXAMPLE REQUEST';
-  document.querySelector('#route-decision-label').hidden = !scenario;
-  document.querySelector('#route-decision').hidden = !scenario;
-  renderInlineCode(document.querySelector('#route-decision'), scenario?.decision || '');
-  document.querySelector('#route-example-box').hidden = false;
-  steps.replaceChildren(...route.steps.map((step) => {
-    const item = document.createElement('li');
-    item.textContent = step;
-    return item;
-  }));
+  document.querySelector('#route-title').textContent = scenario ? `“${scenario.request}”` : route.title;
+  document.querySelector('#route-decision-label').textContent = scenario ? 'EXPECTED DECISION FROM THE EVAL' : 'ABOUT THIS ROUTE';
+  if (scenario) renderInlineCode(document.querySelector('#route-description'), scenario.decision);
+  else document.querySelector('#route-description').textContent = route.description;
   renderResults();
+  setPickerOpen(false);
+  (matchMedia('(max-width: 680px)').matches ? detail : workbench).scrollIntoView({ block: 'start', behavior: 'smooth' });
   centerLine(key);
 }
 
@@ -130,8 +134,7 @@ function renderResults() {
     heading.querySelector('.request-group-count').textContent = `${matches.length} ${matches.length === 1 ? 'example' : 'examples'}`;
     heading.addEventListener('click', () => {
       openedRoute = expanded ? (query ? `closed:${key}` : null) : key;
-      if (!expanded) selectRoute(key);
-      else renderResults();
+      renderResults();
     });
     group.append(heading);
     if (expanded) {
@@ -183,27 +186,27 @@ Promise.resolve().then(async () => {
 });
 
 function clearSelection() {
-  document.querySelector('.route-detail').classList.add('is-empty');
+  detail.hidden = true;
   map.classList.remove('has-selection');
   for (const lane of map.querySelectorAll('[data-map-route]')) lane.classList.remove('is-active');
   for (const branch of map.querySelectorAll('[data-branch-route]')) branch.classList.remove('is-active');
   selectedIndex = null;
   openedRoute = null;
-  document.querySelector('#route-kicker').textContent = 'THE LINE';
-  document.querySelector('#route-title').textContent = 'Choose a request to trace.';
-  document.querySelector('#route-description').textContent = 'The map will highlight the route AStack would take. You can also choose a line on the map itself.';
-  document.querySelector('#route-example-box').hidden = true;
-  steps.replaceChildren();
   renderResults();
 }
 
-search.addEventListener('input', clearSelection);
+search.addEventListener('input', renderResults);
+browseButton.addEventListener('click', () => setPickerOpen(picker.hidden));
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && !picker.hidden) setPickerOpen(false);
+});
 for (const button of document.querySelectorAll('[data-map-select]')) {
   button.addEventListener('click', () => selectRoute(button.dataset.mapSelect));
 }
 document.querySelector('#show-all-routes').addEventListener('click', () => {
   search.value = '';
   clearSelection();
+  setPickerOpen(false);
 });
 
 const themeButton = document.querySelector('#theme-toggle');

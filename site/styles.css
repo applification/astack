@@ -66,26 +66,12 @@ button {
 }
 .brand {
   text-decoration:none;
-  display:flex;
-  align-items:center;
-  gap:10px;
   font-weight:800;
-  font-size:1.3rem;
-  letter-spacing:-.05em
+  font-size:1.6rem;
+  letter-spacing:-.06em
 }
-.brand-mark {
-  width:30px;
-  height:30px;
-  border-radius:6px;
-  background:var(--green);
-  color:var(--white);
-  display:grid;
-  place-items:center;
-  letter-spacing:-.12em;
-  line-height:1
-}
-.brand-mark span {
-  color:var(--orange)
+.brand span {
+  color:var(--link)
 }
 .site-nav {
   display:flex;
@@ -216,10 +202,17 @@ button {
 }
 .map-heading {
   display:flex;
-  align-items:end;
+  align-items:center;
   justify-content:space-between;
   gap:2rem;
-  margin-bottom:1.2rem
+  padding:1.3rem 1.6rem;
+  border-bottom:1px solid var(--line)
+}
+.map-actions {
+  display:flex;
+  gap:.65rem;
+  flex-wrap:wrap;
+  justify-content:flex-end
 }
 .map-heading-index {
   display:block;
@@ -253,10 +246,23 @@ button {
 .map-heading button:hover {
   background:var(--mint)
 }
-.map-scroll {
-  overflow-x:auto;
+.map-heading button[aria-expanded="true"] {
+  background:var(--mint);
+  border-color:var(--link)
+}
+.map-heading button[aria-expanded="true"] span {
+  display:inline-block;
+  transform:rotate(180deg)
+}
+.route-workbench {
+  position:relative;
+  scroll-margin-top:84px;
   border:1px solid var(--line);
   border-radius:6px;
+  background:var(--white)
+}
+.map-scroll {
+  overflow-x:auto;
   background:var(--white)
 }
 .route-map {
@@ -447,27 +453,33 @@ button {
   margin:.6rem 0 0
 }
 .trace-panel {
-  display:grid;
-  grid-template-columns:1fr 1fr;
+  position:absolute;
+  z-index:4;
+  top:7.1rem;
+  right:1.6rem;
+  width:min(460px,calc(100% - 3.2rem));
+  max-height:min(680px,75vh);
+  overflow-y:auto;
   border:1px solid var(--line);
   border-radius:6px;
-  overflow:hidden;
   background:var(--white);
-  margin:3rem 0 3.5rem
+  box-shadow:0 18px 55px rgba(10,27,47,.2)
+}
+.trace-panel[hidden],.route-detail[hidden] {
+  display:none
 }
 .trace-picker {
-  padding:2rem;
-  border-right:1px solid var(--line)
+  padding:1.35rem
 }
 .trace-intro h3 {
   font-family:Newsreader,Georgia,serif;
-  font-size:2rem;
+  font-size:1.65rem;
   font-weight:450;
   line-height:1.1;
   margin:.5rem 0
 }
 .trace-intro p {
-  margin:0 0 1.5rem;
+  margin:0 0 1rem;
   max-width:30rem;
   color:var(--muted);
   font-size:.9rem;
@@ -594,100 +606,46 @@ button {
   display:none
 }
 .route-detail {
-  padding:2rem 2.4rem;
-  display:flex;
-  flex-direction:column
-}
-.route-detail.is-empty .detail-rule,.route-detail.is-empty .detail-label,.route-detail.is-empty .route-steps {
-  display:none
+  scroll-margin-top:84px;
+  border-bottom:1px solid var(--line);
+  border-left:5px solid var(--active-route);
+  background:var(--mint);
+  padding:1.15rem 1.6rem 1.2rem
 }
 .mobile-map-entry {
   display:none
 }
-.detail-kicker,.detail-label,.route-example span {
+.route-detail-head {
+  display:flex;
+  justify-content:space-between;
+  gap:1rem;
+  margin-bottom:.6rem
+}
+.detail-kicker,.detail-label,.detail-cue {
   font-size:.68rem;
   font-weight:800;
   letter-spacing:.16em;
   color:var(--muted)
 }
-.detail-kicker {
-  margin-bottom:1rem
+.detail-cue {
+  color:var(--link)
 }
 .route-detail h3 {
-  font-size:clamp(2rem,3vw,3rem);
-  letter-spacing:-.06em;
+  font-size:1.3rem;
+  letter-spacing:-.025em;
   line-height:1.1;
-  margin-bottom:1rem
-}
-.route-detail>p:not(.detail-kicker):not(.detail-label) {
-  line-height:1.65;
-  max-width:38rem;
-  color:var(--muted)
-}
-.detail-rule {
-  height:1px;
-  background:var(--line);
-  margin:1rem 0 1.4rem
+  margin:0 0 .6rem
 }
 .detail-label {
-  margin-bottom:.7rem
-}
-.route-steps {
-  list-style:none;
-  counter-reset:steps;
-  margin:0;
-  padding:0;
-  display:grid;
-  gap:.65rem
-}
-.route-steps li {
-  counter-increment:steps;
-  display:flex;
-  gap:.9rem;
-  font-size:.9rem;
-  line-height:1.45
-}
-.route-steps li:before {
-  content:"0" counter(steps);
-  font-size:.67rem;
-  letter-spacing:.1em;
-  color:var(--orange);
-  font-weight:800;
-  padding-top:.25rem
-}
-.route-example {
-  margin-top:1.6rem;
-  background:var(--mint);
-  border-left:3px solid var(--orange);
-  padding:1rem 1.2rem
-}
-.route-example[hidden] {
-  display:none
-}
-#route-decision-label {
   display:block;
-  margin-top:1rem
+  margin:0 0 .25rem
 }
-#route-decision-label[hidden],#route-decision[hidden] {
-  display:none
-}
-#route-decision {
-  color:var(--muted);
-  font-size:.82rem;
+#route-description {
+  font-size:.85rem;
   line-height:1.5;
-  margin:.45rem 0 0
-}
-.follow-line {
-  display:inline-block;
-  color:var(--link);
-  font-size:.78rem;
-  font-weight:700;
-  margin-top:1rem
-}
-.route-example p {
-  font-size:.95rem;
-  font-weight:600;
-  margin:.5rem 0 0
+  max-width:60rem;
+  margin:0;
+  color:var(--muted)
 }
 .routes-caption {
   font-size:.82rem;
@@ -905,18 +863,19 @@ button {
     font-size:clamp(2.7rem,11vw,4rem)
   }
   .trace-panel {
-    display:block
-  }
-  .trace-picker {
-    border-right:0;
-    border-bottom:1px solid var(--line)
+    position:relative;
+    width:100%;
+    right:auto;
+    top:auto;
+    max-height:55vh;
+    border:0;
+    border-bottom:1px solid var(--line);
+    border-radius:0;
+    box-shadow:none
   }
   .route-detail {
     min-height:0;
-    padding:2rem 1.3rem
-  }
-  .route-detail.is-empty {
-    display:none
+    padding:1.1rem 1rem
   }
   .method-grid {
     grid-template-columns:1fr
@@ -952,13 +911,15 @@ button {
   .map-heading {
     align-items:start;
     flex-direction:column;
-    gap:.8rem
+    gap:1rem;
+    padding:1.2rem
+  }
+  .map-actions {
+    width:100%;
+    justify-content:flex-start
   }
   .map-hint {
     display:block
-  }
-  .trace-panel {
-    margin:2.4rem 0
   }
 }
 /* Shared Applification roles, with route colours reserved for the map's seven lines. */
@@ -998,22 +959,10 @@ section[id] {
   scroll-margin-top:80px
 }
 .brand {
-  font-family:"IBM Plex Mono",ui-monospace,monospace;
-  font-size:.93rem;
-  font-weight:600;
-  letter-spacing:.04em;
-  text-transform:uppercase
-}
-.brand-mark {
   font-family:Geist,ui-sans-serif,sans-serif;
-  width:32px;
-  height:32px;
-  letter-spacing:-.12em;
-  background:var(--green);
-  color:var(--panel-text)
-}
-.brand-mark span {
-  color:var(--panel-text)
+  font-size:1.6rem;
+  font-weight:800;
+  letter-spacing:-.06em
 }
 .site-nav {
   gap:1.6rem
@@ -1051,7 +1000,7 @@ section[id] {
   align-items:end;
   padding-block:5.5rem
 }
-.eyebrow,.map-heading-index,.detail-kicker,.detail-label,.route-example span,.method-index,.note-index,.install-heading {
+.eyebrow,.map-heading-index,.detail-kicker,.detail-label,.method-index,.note-index,.install-heading {
   font-family:"IBM Plex Mono",ui-monospace,monospace;
   font-size:.7rem;
   font-weight:500;
@@ -1130,9 +1079,6 @@ section[id] {
 }
 .map-scroll,.trace-panel {
   background:var(--white)
-}
-.route-detail>p:not(.detail-kicker):not(.detail-label) {
-  color:var(--muted)
 }
 .method-section {
   background:var(--section)

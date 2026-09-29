@@ -22,7 +22,7 @@
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
-  <a class="brand" href="#top" aria-label="AStack home"><span class="brand-mark" aria-hidden="true">A<span>.</span></span><span>AStack</span></a>
+  <a class="brand" href="#top" aria-label="AStack home">AStack<span>.</span></a>
   <nav class="site-nav" aria-label="Main navigation"><a href="#routes">Routes</a><a href="#method">Method</a><a href="#adopt">Get started</a><a class="nav-repo" href="https://github.com/applification/astack">GitHub ↗</a><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark theme"><span id="theme-icon" aria-hidden="true">☾</span><span class="theme-label">Dark</span></button></nav>
 </header>
 <main id="main">
@@ -38,23 +38,22 @@
   </section>
   <section class="section-shell routes-section" id="routes" aria-labelledby="routes-title">
     <div class="section-heading"><div><p class="eyebrow">01 / ROUTING</p><h2 id="routes-title">One entry point.<br><em>Different kinds of work.</em></h2></div><p>AStack routes by the outcome you want. Pick a route below to see the shape of the work. The skill's <a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/applification/references/routes.md">route guide</a> has the detail.</p></div>
-    <div class="trace-panel" aria-labelledby="trace-title">
+    <div class="route-workbench" id="route-workbench">
+      <div class="map-heading"><div><span class="map-heading-index">THE ROUTE MAP</span><h3>One task. The right line.</h3><p>Choose a real request to see its expected decision and trace the line it takes.</p></div><div class="map-actions"><button id="browse-requests" type="button" aria-expanded="false" aria-controls="trace-panel">Browse eval examples <span aria-hidden="true">⌄</span></button><button id="show-all-routes" type="button">Show all lines</button></div></div>
+    <div class="trace-panel" id="trace-panel" aria-labelledby="trace-title" hidden>
       <div class="trace-picker">
-        <div class="trace-intro"><span class="map-heading-index">ROUTES + REAL REQUESTS</span><h3 id="trace-title">Where would your task go?</h3><p>Open a route to browse its eval examples, or search across them. Pick a request to see why it follows that line.</p></div>
+        <div class="trace-intro"><span class="map-heading-index">ROUTES + REAL REQUESTS</span><h3 id="trace-title">Choose a request</h3><p>Browse by route or search the eval cases. The selected line will light up on this map.</p></div>
         <div class="trace-controls"><label for="request-search">Search the eval examples</label><input id="request-search" type="search" placeholder="Try “parser”, “Convex”, or “review”" autocomplete="off"></div>
         <p id="request-count" class="request-count" aria-live="polite"></p>
         <div id="request-results" class="request-results"></div>
       </div>
-      <article class="route-detail is-empty" aria-live="polite" aria-atomic="true">
-        <p class="detail-kicker" id="route-kicker">THE LINE</p>
-        <h3 id="route-title">Choose a request to trace.</h3>
-        <p id="route-description">The map will highlight the route AStack would take. You can also choose a line on the map itself.</p>
-        <div class="detail-rule"></div><p class="detail-label">THE PATH</p>
-        <ol id="route-steps" class="route-steps"></ol>
-        <div class="route-example" id="route-example-box" hidden><span id="route-example-label">SELECTED REQUEST</span><p id="route-example"></p><span id="route-decision-label" hidden>EXPECTED DECISION</span><p id="route-decision" hidden></p><a class="follow-line" href="#route-map">Follow this line ↓</a></div>
-      </article>
     </div>
-    <div class="map-heading"><div><span class="map-heading-index">THE ROUTE MAP</span><h3>One task. The right line.</h3><p>Choose a line to trace it down the map. Most routes meet again at proof, review and a pull request.</p></div><button id="show-all-routes" type="button">Show all routes</button></div>
+    <article class="route-detail" id="route-detail" aria-live="polite" aria-atomic="true" hidden>
+      <div class="route-detail-head"><span class="detail-kicker" id="route-kicker"></span><span class="detail-cue">↓ Follow the highlighted line</span></div>
+      <h3 id="route-title"></h3>
+      <p class="detail-label" id="route-decision-label"></p>
+      <p id="route-description"></p>
+    </article>
     <p class="mobile-map-entry"><span>START HERE</span><strong>$applification &lt;task&gt;</strong> → choose the line that fits the outcome</p>
     <div class="map-scroll" role="region" aria-label="Vertical AStack route map. Scroll horizontally on small screens." tabindex="0">
       <div class="route-map" id="route-map">
@@ -346,6 +345,7 @@
       </div>
     </div>
     <p class="map-hint">On a narrow screen, scroll sideways to follow the lines.</p>
+    </div>
     <p class="routes-caption">The route is a decision guide, not a compulsory checklist. <a href="https://github.com/applification/astack/blob/main/evals/routing.md">See the routing examples ↗</a></p>
   </section>
   <section class="method-section" id="method" aria-labelledby="method-title"><div class="section-shell">

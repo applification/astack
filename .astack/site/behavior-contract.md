@@ -8,7 +8,7 @@ A visitor can understand what AStack does, find the route for a task, install th
 
 - A1. The landing page explains the entry skill, seven routes, proof, and the PR outcome without relying on a dated PR count or snapshot.
 - A2. The vertical route map stays readable as an underground-style map. Choosing a line highlights its branch and stations.
-- A3. The routing explorer groups the current eval cases by route without showing every case at once. Search narrows the cases; selecting one shows its expected decision and highlights the corresponding line.
+- A3. The map and routing explorer share one surface. The explorer groups current eval cases by route without showing every case at once; search narrows the cases. Selecting a case closes the explorer and brings its expected decision and highlighted map line into view together.
 - A4. Light and dark themes follow Applification's design roles, honor the system preference on first visit, and let the visitor switch and retain a choice.
 - A5. The installation commands are available as text and can be copied or selected.
 - A6. The page remains readable and navigable on a narrow mobile viewport and with a keyboard.
@@ -25,4 +25,4 @@ A visitor can understand what AStack does, find the route for a task, install th
 
 ## Proof to record in the PR
 
-Run `node site/check.mjs`, `node --check site/app.js`, and `git diff --check`. Serve `site/` locally and inspect desktop and mobile layouts, grouped evals, search, route highlighting, both themes, navigation, and install commands. After merge, confirm the Pages run and the HTTPS URL. A local preview does not establish the deployed result.
+Run `node site/check.mjs`, `node --check site/app.js`, and `git diff --check`. Serve `site/` locally and inspect desktop and mobile layouts, grouped evals, search, the selected decision beside its highlighted line, both themes, navigation, and install commands. After merge, confirm the Pages run and the HTTPS URL. A local preview does not establish the deployed result.
