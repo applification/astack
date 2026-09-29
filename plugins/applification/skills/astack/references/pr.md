@@ -9,7 +9,7 @@ Before opening or updating a PR, inspect the full diff against the agreed intent
 
 For a change to a shared contract, persisted shape, event, or lifecycle, trace affected consumers beyond direct callers. State the fact that must hold for the change to be safe and the evidence supporting it; mark that fact unverified when the available source cannot establish it.
 
-When the PR changes Convex schema, functions, configuration, or client integration, invoke `$convex:convex-reviewer` on the completed diff before marking it ready. Check its findings against the code, fix confirmed security, authorization, validator, index, pagination, reactivity, and type-safety issues, then rerun affected checks. Record the reviewer result and any unresolved finding in the PR. If the reviewer skill is unavailable, keep the PR in draft and name that missing review; AStack cannot claim the Convex review gate passed.
+When the PR changes Convex schema, functions, configuration, or client integration, invoke `$convex:convex-reviewer` on the completed diff before marking it ready. Check its findings against the code, fix confirmed security, authorization, validator, index, pagination, reactivity, and type-safety issues, then rerun affected checks. Record the reviewer result and any unresolved finding in the PR. If the reviewer skill is unavailable, keep the PR in draft and name that missing review; astack cannot claim the Convex review gate passed.
 
 Use an additional independent reviewer or subagent only when the change's risk or breadth justifies the extra pass and the project permits it. This is separate from the required Convex reviewer skill. Independent review remains advisory; the lead assesses each finding against actual code and intent.
 
@@ -24,4 +24,4 @@ Keep the PR description brief and useful to a reviewer:
 - **Blast radius:** affected users, surfaces, or data and the key safety fact.
 - **Verification for other changes:** named claims, observed results, revision and environment, and any skipped or inconclusive checks when there is no behavior contract.
 
-Do not substitute a list of commands for their observed outcomes. Keep existing project CI and merge requirements visible. Follow the user's and project's merge policy; AStack itself does not authorize a merge or deployment.
+Do not substitute a list of commands for their observed outcomes. Keep existing project CI and merge requirements visible. Follow the user's and project's merge policy; astack itself does not authorize a merge or deployment.

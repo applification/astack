@@ -1,6 +1,6 @@
 # Project setup
 
-Use this when starting a new product, adopting AStack in an existing project, or adding a proof route that the project has not described. The stack below is AStack's greenfield default, not a condition for using its work routes or app control.
+Use this when starting a new product, adopting astack in an existing project, or adding a proof route that the project has not described. The stack below is astack's greenfield default, not a condition for using its work routes or app control.
 
 For the first feature in a clean repository with no chosen stack, establish the smallest runnable product and a Git publication target early. Start with **Bun workspaces and Turborepo**, even when only one app exists. Commit `bun.lock`, declare Bun in the root `packageManager` field, and use `apps/*` and `packages/*` workspaces with a root `turbo.json`. Use `bun install`, `bun run`, and `bunx` for JavaScript dependencies, scripts, and CLIs; do not introduce npm or pnpm lockfiles or commands. Keep Turbo tasks scoped to the apps and packages affected by a change. If the user has chosen another stack for a new product, use it and keep the same behavior and proof discipline.
 
@@ -35,14 +35,14 @@ Once a product has a runnable user surface that needs repeatable driving, follow
 
 If the new app needs a database, choose [Convex](database.md) in `packages/backend/convex`, expose the generated API to consuming apps through the backend workspace, and record how to start and identify its local deployment in the project profile. Keep local data and credentials out of version control. Do not create an unused backend or empty app packages just to fill the layout.
 
-When adopting AStack in an existing repository, keep its package manager, framework, database, layout, and working commands. Create `.astack/project.md` and a control CLI only where they earn their cost; record the commands that actually run. Migrate to Bun/Turborepo or another part of the greenfield default only when requested as a separate, reviewable change, including scripts, CI, and lockfile changes. Do not mix package managers or restructure a repository as a side effect of an unrelated fix.
+When adopting astack in an existing repository, keep its package manager, framework, database, layout, and working commands. Create `.astack/project.md` and a control CLI only where they earn their cost; record the commands that actually run. Migrate to Bun/Turborepo or another part of the greenfield default only when requested as a separate, reviewable change, including scripts, CI, and lockfile changes. Do not mix package managers or restructure a repository as a side effect of an unrelated fix.
 
 Inspect the actual repository first: entry points and user surfaces, package scripts or task runner, local startup and fixture commands, existing tests and CI, authentication and safe data environments, project instructions, issue/PR workflow, and the current home for durable domain terms or decisions. Reuse working paths. Confirm a proposed command from its source or by running a safe check; do not invent a command that merely sounds conventional.
 
 Create or update a tracked `.astack/project.md` with only what a later agent cannot cheaply infer. For a web UI design sprint, keep the behavior contract and retained evidence under `.astack/<feature>/`, alongside the Pencil file and supporting assets when selected; Storybook stories, when selected, stay with their components and are referenced from the contract. Do not make separate root `design/` and `docs/` folders for the sprint. Check the repository's ignore rules, remove or override any rule that ignores `.astack/`, and verify the files appear in Git before treating setup as complete.
 
 ```markdown
-# AStack project profile
+# astack project profile
 
 ## Product surfaces
 Who uses each surface and which repository area serves it.
@@ -64,7 +64,7 @@ folders are active under `.astack/`; PR and release rules; actions reserved
 for the owner.
 ```
 
-Write concise paths and commands, with pointers to feature contracts and authoritative project sources. Do not copy long procedures or secrets into the profile or feature folders. AStack does not prescribe an issue tracker or a universal test runner. A project may replace old guidance while adopting AStack; reconcile conflicting instructions rather than leaving two active processes.
+Write concise paths and commands, with pointers to feature contracts and authoritative project sources. Do not copy long procedures or secrets into the profile or feature folders. astack does not prescribe an issue tracker or a universal test runner. A project may replace old guidance while adopting astack; reconcile conflicting instructions rather than leaving two active processes.
 
 Exercise one harmless mapped user path through the control CLI after setup, including its doctor and cleanup commands where applicable. Confirm that captured evidence survives cleanup. If the route cannot run, record the missing prerequisite and exact limit; setup is not complete merely because the files exist.
 

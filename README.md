@@ -1,6 +1,6 @@
 # astack
 
-AStack by Applification is a Codex workflow for moving from an intended change to a verified result. Install the **Applification** plugin and give its `$applification:astack` skill an engineering task. The skill chooses a route, uses the relevant guidance, and checks the outcome. Each project supplies its own commands, environments, and product decisions.
+astack by Applification is a Codex workflow for moving from an intended change to a verified result. Install the **Applification** plugin and give its `$applification:astack` skill an engineering task. The skill chooses a route, uses the relevant guidance, and checks the outcome. Each project supplies its own commands, environments, and product decisions.
 
 **[Explore the astack site](https://astack.applification.net/)** for a visual route map and searchable routing examples. This README and the [skill source](plugins/applification/skills/astack/SKILL.md) hold the detail. The site lives in [`site/`](site/) in this repository.
 
