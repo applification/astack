@@ -39,13 +39,13 @@ const routes = {
     number: '07', name: 'App control', title: 'Make the real product drivable.',
     description: 'Create or repair a project-owned command and feature map so later work can reach, act on, and observe the product.',
     steps: ['Inspect the product and working drivers', 'Create or adopt the control command', 'Map user entry points', 'Drive one real path and open a PR'],
-    example: '“Set up AStack to verify our web app.”'
+    example: '“Set up astack to verify our web app.”'
   },
   setup: {
-    number: '08', name: 'Project setup', title: 'Fit AStack to the project.',
+    number: '08', name: 'Project setup', title: 'Fit astack to the project.',
     description: 'Inspect the existing stack and working commands. Keep them where they work, record the project profile, and add product control when the app needs it.',
     steps: ['Inspect the repository and scripts', 'Keep the working stack', 'Record commands and proof routes', 'Drive one real path when the project has an app'],
-    example: '“Adopt AStack in an existing pnpm app.”'
+    example: '“Adopt astack in an existing pnpm app.”'
   }
 };
 

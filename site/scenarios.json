@@ -90,18 +90,18 @@
     "route": "feature"
   },
   {
-    "request": "Adopt AStack in an existing pnpm app",
+    "request": "Adopt astack in an existing pnpm app",
     "decision": "Inspect scripts and CI; keep pnpm and the current layout, document working proof commands, and add project-owned app control only where repeatable driving is useful. Do not migrate the package manager as part of adoption; open a PR.",
     "route": "setup"
   },
   {
-    "request": "Set up AStack to verify our existing web app",
+    "request": "Set up astack to verify our existing web app",
     "decision": "Inspect its current drivers, framework, package manager, and scripts; create or adopt a project-owned `astack-<app>` CLI in `.codex/skills/` and feature map in `.astack/feature-map/<app>/`, prove one real user path through the CLI, and open a PR. The command must drive the app, not merely wrap lint and tests; keep the working stack.",
     "route": "control"
   },
   {
     "request": "The app already has a working control CLI and feature guide",
-    "decision": "Reuse the working commands, align their skill and map with AStack's proof requirements, and avoid a duplicate driver.",
+    "decision": "Reuse the working commands, align their skill and map with astack's proof requirements, and avoid a duplicate driver.",
     "route": "control"
   },
   {

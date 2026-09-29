@@ -1,12 +1,12 @@
-# AStack site behavior contract
+# astack site behavior contract
 
 ## Outcome
 
-A visitor can understand what AStack does, find the route for a task, install the Applification plugin, and reach the current source. Maintainers can update the explanation in this repository alongside workflow changes.
+A visitor can understand what astack does, find the route for a task, install the Applification plugin, and reach the current source. Maintainers can update the explanation in this repository alongside workflow changes.
 
 ## Acceptance
 
-- A1. The landing page explains the entry skill, seven routes, proof, and the PR outcome without relying on a dated PR count or snapshot.
+- A1. The landing page uses `astack` in the wordmark and prose, and explains the entry skill, seven routes, proof, and the PR outcome without relying on a dated PR count or snapshot.
 - A2. The vertical route map stays readable as an underground-style map. Choosing a line highlights its branch and stations.
 - A3. The map and routing explorer share one surface. The explorer groups current eval cases by route without showing every case at once; search narrows the cases. Selecting a case closes the explorer and brings its expected decision and highlighted map line into view together.
 - A4. Light and dark themes follow Applification's design roles, honor the system preference on first visit, and let the visitor switch and retain a choice.
