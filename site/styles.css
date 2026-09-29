@@ -1268,6 +1268,12 @@ section[id] {
 .file-tree code,.contract-sample code {
   font-size:inherit
 }
+.file-tree .tree-note {
+  color:var(--muted);
+  font-family:Geist,ui-sans-serif,system-ui,sans-serif;
+  font-size:.94em;
+  font-weight:400
+}
 .explain-strip {
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
