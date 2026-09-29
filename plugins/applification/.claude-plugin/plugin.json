@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "applification",
+  "displayName": "Applification",
+  "description": "astack by Applification: a project-independent engineering workflow that routes a task through a short intent contract, proportional feedback, real-product proof, and focused review.",
+  "author": {
+    "name": "Applification Ltd",
+    "url": "https://www.applification.net/"
+  },
+  "homepage": "https://astack.applification.net/",
+  "repository": "https://github.com/applification/astack",
+  "license": "MIT",
+  "keywords": ["workflow", "verification", "proof", "pull-request", "engineering"],
+  "skills": "./skills/"
+}

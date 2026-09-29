@@ -704,6 +704,11 @@ button {
   grid-template-columns:1.1fr .9fr;
   gap:4.5rem
 }
+.install-cards {
+  display:grid;
+  gap:1.2rem;
+  align-self:start
+}
 .install-card {
   background:var(--green);
   color:var(--white);

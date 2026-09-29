@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#d7dfe7">
-  <meta name="description" content="astack is the workflow behind the Applification plugin for Codex. Give it an engineering task; it chooses a route, checks the result, and brings kept changes to a pull request.">
+  <meta name="description" content="astack is the workflow behind the Applification plugin for Codex and Claude Code. Give it an engineering task; it chooses a route, checks the result, and brings kept changes to a pull request.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="astack | Outcome first. Proof built in.">
-  <meta property="og:description" content="A practical map of the Applification workflow for Codex, maintained with the source.">
+  <meta property="og:description" content="A practical map of the Applification workflow for Codex and Claude Code, maintained with the source.">
   <meta property="og:url" content="https://astack.applification.net/">
   <link rel="canonical" href="https://astack.applification.net/">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
@@ -30,7 +30,7 @@
     <div class="hero-copy">
       <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> astack by Applification</p>
       <h1 id="hero-title">Outcome first.<br><em>Proof built in.</em></h1>
-      <p class="hero-lede">astack gives Codex one entry point for engineering work. Describe the change. It chooses a route, follows the relevant guidance, checks what happened, and brings kept code to a pull request.</p>
+      <p class="hero-lede">astack gives Codex and Claude Code one entry point for engineering work. Describe the change. It chooses a route, follows the relevant guidance, checks what happened, and brings kept code to a pull request.</p>
       <div class="hero-actions"><a class="button button-dark" href="#adopt">Get started <span aria-hidden="true">↗</span></a><a class="text-link" href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/SKILL.md">Read the skill ↗</a></div>
       <p class="source-note">The <a href="https://github.com/applification/astack">repository</a> is the source of truth. This site explains the workflow without pinning it to a release snapshot.</p>
     </div>
@@ -54,10 +54,10 @@
       <p class="detail-label" id="route-decision-label"></p>
       <p id="route-description"></p>
     </article>
-    <p class="mobile-map-entry"><span>START HERE</span><strong>$applification:astack &lt;task&gt;</strong> → choose the line that fits the outcome</p>
+    <p class="mobile-map-entry"><span>START HERE</span><strong>astack &lt;task&gt;</strong> → choose the line that fits the outcome</p>
     <div class="map-scroll" role="region" aria-label="Vertical astack route map. Scroll horizontally on small screens." tabindex="0">
       <div class="route-map" id="route-map">
-        <div class="v-entry"><span>START HERE</span><strong>$applification:astack &lt;task&gt;</strong><small>Choose a route from the intended outcome</small></div>
+        <div class="v-entry"><span>START HERE</span><strong>astack &lt;task&gt;</strong><small>Choose a route from the intended outcome</small></div>
         <svg class="v-branches" viewBox="0 0 1184 128" preserveAspectRatio="none" aria-hidden="true">
           <path data-branch-route="feature" d="M592 3 C592 62 34 47 34 124" stroke="#4b916f" />
           <path data-branch-route="bug" d="M592 3 C592 62 182 47 182 124" stroke="#d7775f" />
@@ -362,9 +362,11 @@
     <p class="tree-hint">Scroll the file trees sideways to read each path.</p>
     <div class="explainer-pair">
       <div class="explainer-card"><p class="card-kicker">IN THE ASTACK REPOSITORY</p><pre class="file-tree"><code>astack/
-├─ .agents/plugins/marketplace.json
+├─ .agents/plugins/marketplace.json     <span class="tree-note">Codex</span>
+├─ .claude-plugin/marketplace.json      <span class="tree-note">Claude Code</span>
 ├─ plugins/applification/
-│  ├─ .codex-plugin/plugin.json
+│  ├─ .codex-plugin/plugin.json         <span class="tree-note">Codex</span>
+│  ├─ .claude-plugin/plugin.json        <span class="tree-note">Claude Code</span>
 │  └─ skills/astack/
 │     ├─ SKILL.md                       <span class="tree-note">entry skill</span>
 │     └─ references/
@@ -377,15 +379,17 @@
 │        ├─ database.md                 <span class="tree-note">Convex</span>
 │        ├─ mcp-server.md               <span class="tree-note">MCP</span>
 │        ├─ proof.md                    <span class="tree-note">observed results</span>
-│        └─ pr.md                       <span class="tree-note">PR review</span>
+│        ├─ pr.md                       <span class="tree-note">PR review</span>
+│        └─ hosts/                      <span class="tree-note">host adapters</span>
 ├─ docs/project-install.md
 └─ evals/routing.md</code></pre></div>
       <div class="explainer-card"><p class="card-kicker">IN YOUR PROJECT</p><pre class="file-tree"><code>my-project/
-├─ .agents/plugins/marketplace.json     <span class="tree-note">pinned</span>
-├─ .codex/config.toml                   <span class="tree-note">enabled</span>
-├─ .codex/skills/astack-&lt;app&gt;/
-│  ├─ SKILL.md                          <span class="tree-note">guide</span>
-│  └─ scripts/astack-&lt;app&gt;.ts           <span class="tree-note">CLI</span>
+├─ .agents/plugins/marketplace.json     <span class="tree-note">Codex: pinned</span>
+├─ .codex/config.toml                   <span class="tree-note">Codex: enabled</span>
+├─ .claude/settings.json                <span class="tree-note">Claude Code: pinned, enabled</span>
+├─ tools/astack-&lt;app&gt;.ts                <span class="tree-note">CLI</span>
+├─ .agents/skills/astack-&lt;app&gt;/         <span class="tree-note">Codex guide</span>
+├─ .claude/skills/astack-&lt;app&gt;/         <span class="tree-note">Claude Code guide</span>
 ├─ .astack/                             <span class="tree-note">tracked in Git</span>
 │  ├─ project.md                        <span class="tree-note">profile</span>
 │  ├─ feature-map/&lt;app&gt;/                <span class="tree-note">user paths</span>
@@ -400,7 +404,7 @@
 │     └─ evidence/
 └─ AGENTS.md                            <span class="tree-note">pointer</span></code></pre></div>
     </div>
-    <div class="explain-strip"><p><strong>Install and pin.</strong> Add a project marketplace entry, enable the plugin, then install it. Update by changing the pinned ref and exercising a representative route.</p><p><strong>Set up once.</strong> astack records real project commands in <code>.astack/project.md</code>. For a runnable product that needs repeatable driving, it creates or adopts a control CLI and feature map.</p><p><strong>Work through it.</strong> Start a task with <code>$applification:astack &lt;task&gt;</code>. The route map above shows what happens next.</p></div>
+    <div class="explain-strip"><p><strong>Install and pin.</strong> Add a project marketplace entry, enable the plugin, then install it. Update by changing the pinned ref and exercising a representative route.</p><p><strong>Set up once.</strong> astack records real project commands in <code>.astack/project.md</code>. For a runnable product that needs repeatable driving, it creates or adopts a control CLI and feature map.</p><p><strong>Work through it.</strong> Start a task with <code>$applification:astack &lt;task&gt;</code> in Codex or <code>/applification:astack &lt;task&gt;</code> in Claude Code. The route map above shows what happens next.</p></div>
     <p class="source-row">Follow the <a href="https://github.com/applification/astack/blob/main/docs/project-install.md">project installation guide ↗</a> for the exact marketplace and config files.</p>
   </section>
   <section class="explainer-band" id="sprint" aria-labelledby="sprint-title"><div class="section-shell">
@@ -455,9 +459,13 @@ Should "away" hide the last-seen time?</code></pre><p class="card-foot">A frame 
   <section class="section-shell adopt-section" id="adopt" aria-labelledby="adopt-title">
     <div class="section-heading"><div><p class="eyebrow">09 / GET STARTED</p><h2 id="adopt-title">Put it to work<br><em>in your project.</em></h2></div><p>The installable plugin is called <strong>Applification</strong>. astack's guidance stays in this repo; your project owns its commands, environments, and product decisions.</p></div>
     <div class="adopt-grid">
-      <div class="install-card"><div class="install-heading"><span>TRY IT IN CODEX</span><button id="copy-command" class="copy-button" type="button" aria-label="Copy installation commands">Copy</button></div><pre><code id="install-command">codex plugin marketplace add applification/astack
+      <div class="install-cards">
+      <div class="install-card"><div class="install-heading"><span>TRY IT IN CODEX</span><button class="copy-button" type="button" data-copy="install-codex" aria-label="Copy Codex installation commands">Copy</button></div><pre><code id="install-codex">codex plugin marketplace add applification/astack
 codex plugin add applification@applification</code></pre><p>Then start a task with <code>$applification:astack</code> and describe what you want done.</p></div>
-      <div class="adopt-notes"><div><span class="note-index">01</span><h3>Pin it when it matters</h3><p>For a project-controlled version, point a local marketplace entry at an astack ref or SHA and enable it in that project's Codex config.</p><a href="https://github.com/applification/astack/blob/main/docs/project-install.md">Project install guide ↗</a></div><div><span class="note-index">02</span><h3>Keep your stack</h3><p>Adopting astack does not require a framework or package manager migration. Its Bun, Next.js, and Turborepo layout is the default for new products with no chosen stack.</p><a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/project-setup.md">Project setup ↗</a></div></div>
+      <div class="install-card"><div class="install-heading"><span>TRY IT IN CLAUDE CODE</span><button class="copy-button" type="button" data-copy="install-claude" aria-label="Copy Claude Code installation commands">Copy</button></div><pre><code id="install-claude">claude plugin marketplace add applification/astack
+claude plugin install applification@applification</code></pre><p>Then start a task with <code>/applification:astack</code> and describe what you want done.</p></div>
+      </div>
+      <div class="adopt-notes"><div><span class="note-index">01</span><h3>Pin it when it matters</h3><p>For a project-controlled version, pin astack to a ref or SHA (Codex) or a branch or tag (Claude Code) and enable it in that project's settings.</p><a href="https://github.com/applification/astack/blob/main/docs/project-install.md">Project install guide ↗</a></div><div><span class="note-index">02</span><h3>Keep your stack</h3><p>Adopting astack does not require a framework or package manager migration. Its Bun, Next.js, and Turborepo layout is the default for new products with no chosen stack.</p><a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/project-setup.md">Project setup ↗</a></div></div>
     </div>
   </section>
 </main>

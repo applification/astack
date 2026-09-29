@@ -5,7 +5,9 @@ description: astack by Applification. When invoked with an engineering task, cho
 
 # astack
 
-Treat the user's prompt after `$applification:astack` as the task, not as a request to choose a workflow. Select the route from the task's intended outcome and carry it through to a checkable result. If no task was supplied, ask what the user wants done. Help the user reach that result with the least process that protects it. User instructions and the project's established constraints take precedence over this skill. astack is Codex-first; use available capabilities rather than assuming particular tool names or subagents.
+Treat the text the user supplied with this skill as the task, not as a request to choose a workflow. Select the route from the task's intended outcome and carry it through to a checkable result. If no task was supplied, ask what the user wants done. Help the user reach that result with the least process that protects it. User instructions and the project's established constraints take precedence over this skill.
+
+astack runs in more than one agent host. The method in this skill is shared; where a step depends on a host's file locations, configuration, or companion plugins, read the adapter for the host you are running in: [Codex](references/hosts/codex.md) or [Claude Code](references/hosts/claude-code.md). Resolve companion capabilities from what is actually installed rather than assuming tool names, and report a missing capability instead of substituting a weaker check.
 
 ## Route the work
 
@@ -36,7 +38,7 @@ Use [the behavior contract](references/behavior-contract.md) for substantial beh
 ## Shared decisions
 
 - Use Bun for JavaScript dependency management and scripts in astack's greenfield default. In an existing repository, use its package manager and scripts. astack adoption does not require a package manager or workspace migration; [project setup](references/project-setup.md) covers the default and requested migrations.
-- When a task creates, adds, or changes Convex, follow [the Convex path](references/database.md). Use the `@Convex` plugin for general setup and architecture, `$convex:convex-expert` before editing backend code, and `$convex:add` for a new capability when its existing-app scope fits. A PR that touches Convex requires the `$convex:convex-reviewer` pass described in [PR and review](references/pr.md).
+- When a task creates, adds, or changes Convex, follow [the Convex path](references/database.md). Use the installed Convex plugin's guidance for setup and architecture, its backend expert before editing backend code, and its capability catalog for a new capability when its existing-app scope fits. A PR that touches Convex requires the Convex specialist review described in [PR and review](references/pr.md). The host adapter says how to find each of these in the installed plugin.
 - Choose checks by affected behavior and dependency boundaries, not changed paths alone. Use fast feedback while editing and an appropriate running-product check when integration matters. Read [proof](references/proof.md) before claiming a behavior is verified.
 - Keep acceptance about observable behavior. Tests and project proof commands implement checks; they do not redefine the intended outcome.
 - When a product decision remains unresolved, ask a targeted question and continue independent work. Record a decision that changes the contract; do not silently infer it from a prototype.

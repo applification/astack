@@ -1,0 +1,16 @@
+{
+  "name": "applification",
+  "description": "Applification plugins for Claude Code",
+  "owner": {
+    "name": "Applification Ltd",
+    "url": "https://www.applification.net/"
+  },
+  "plugins": [
+    {
+      "name": "applification",
+      "source": "./plugins/applification",
+      "description": "astack: route an engineering task from intent to proof",
+      "category": "development"
+    }
+  ]
+}

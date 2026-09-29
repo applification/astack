@@ -227,23 +227,25 @@ themeButton.addEventListener('click', () => {
   try { localStorage.setItem('astack-theme', next); } catch { /* The page still changes theme. */ }
 });
 
-const copyButton = document.querySelector('#copy-command');
-copyButton.addEventListener('click', async () => {
-  const command = document.querySelector('#install-command');
-  try {
-    await navigator.clipboard.writeText(command.textContent);
-    copyButton.textContent = 'Copied';
-    copyButton.setAttribute('aria-label', 'Installation commands copied');
-  } catch {
-    const range = document.createRange();
-    range.selectNodeContents(command);
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(range);
-    copyButton.textContent = 'Selected';
-    copyButton.setAttribute('aria-label', 'Installation commands selected; press copy');
-  }
-  window.setTimeout(() => {
-    copyButton.textContent = 'Copy';
-    copyButton.setAttribute('aria-label', 'Copy installation commands');
-  }, 2500);
-});
+for (const copyButton of document.querySelectorAll('[data-copy]')) {
+  const command = document.getElementById(copyButton.dataset.copy);
+  const label = copyButton.getAttribute('aria-label');
+  copyButton.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(command.textContent);
+      copyButton.textContent = 'Copied';
+      copyButton.setAttribute('aria-label', label.replace(/^Copy/, 'Copied'));
+    } catch {
+      const range = document.createRange();
+      range.selectNodeContents(command);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+      copyButton.textContent = 'Selected';
+      copyButton.setAttribute('aria-label', label.replace(/^Copy (.*)$/, '$1 selected; press copy'));
+    }
+    window.setTimeout(() => {
+      copyButton.textContent = 'Copy';
+      copyButton.setAttribute('aria-label', label);
+    }, 2500);
+  });
+}

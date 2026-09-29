@@ -46,22 +46,27 @@
   },
   {
     "request": "Start a new Next.js and shadcn app with Convex",
-    "decision": "Consult `@Convex` new-app guidance and runbook first; use `$convex:quickstart` if its scaffold fits, then reconcile output with Bun workspaces and the backend package. Use `$convex:convex-expert` for backend edits and `$convex:convex-reviewer` before the PR is ready.",
+    "decision": "Consult the installed Convex plugin's new-app guidance first; use its quickstart scaffold if it fits, then reconcile output with Bun workspaces and the backend package. Use the plugin's `convex-expert` for backend edits and its `convex-reviewer` before the PR is ready.",
     "route": "feature"
   },
   {
     "request": "Add Convex to our existing Vite app",
-    "decision": "Use `@Convex` existing-project setup guidance with the actual framework and package manager; do not run `$convex:quickstart` or mistake `$convex:add` for the initializer. Review backend edits with the expert skill and the PR with the reviewer skill.",
+    "decision": "Use the Convex plugin's existing-project setup guidance with the actual framework and package manager; do not run the quickstart scaffold or mistake the `add` capability catalog for the initializer. Review backend edits with the plugin's expert and the PR with its reviewer.",
     "route": "feature"
   },
   {
     "request": "Add search to the existing Convex + Next.js app",
-    "decision": "Use `$convex:add` to consult the live capability catalog, then `$convex:convex-expert` for changes under `convex/`; verify the running path and require `$convex:convex-reviewer` before the PR is ready.",
+    "decision": "Use the Convex plugin's `add` capability catalog, then its `convex-expert` for changes under `convex/`; verify the running path and require the `convex-reviewer` review before the PR is ready.",
     "route": "feature"
   },
   {
     "request": "Review a PR that changes convex/schema.ts and a mutation",
-    "decision": "Run `$convex:convex-reviewer` against the diff. Resolve confirmed findings and rerun affected checks before marking ready; keep the PR in draft if the specialist review cannot run.",
+    "decision": "Run the installed Convex plugin's `convex-reviewer` against the diff. Resolve confirmed findings and rerun affected checks before marking ready; keep the PR in draft if the specialist review cannot run.",
+    "route": "pr"
+  },
+  {
+    "request": "The installed Convex plugin exposes its reviewer under a different name or form than astack expects",
+    "decision": "Resolve the reviewer from the installed plugin, whether skill or subagent, and run it on the diff. If none can run, keep the PR in draft and name the missing specialist review; a generic review does not pass the Convex gate.",
     "route": "pr"
   },
   {
@@ -95,8 +100,18 @@
     "route": "setup"
   },
   {
+    "request": "Add a CLAUDE.md to a project whose instructions live in AGENTS.md",
+    "decision": "Start the new CLAUDE.md with an `@AGENTS.md` import so Claude Code keeps reading the shared instructions, and put only Claude-specific additions below it. Do not copy AGENTS.md content into CLAUDE.md.",
+    "route": "setup"
+  },
+  {
     "request": "Set up astack to verify our existing web app",
-    "decision": "Inspect its current drivers, framework, package manager, and scripts; create or adopt a project-owned executable `astack-<app>` CLI in `.codex/skills/` and feature map in `.astack/feature-map/<app>/`, prove its direct invocation and one real user path through the CLI, and open a PR. The command must drive the app, not merely wrap lint and tests; keep the working stack.",
+    "decision": "Inspect its current drivers, framework, package manager, and scripts; create or adopt a project-owned executable `astack-<app>` CLI at a host-neutral path, a thin skill for each agent host the project uses, and a feature map in `.astack/feature-map/<app>/`, prove its direct invocation and one real user path through the CLI, and open a PR. The command must drive the app, not merely wrap lint and tests; keep the working stack.",
+    "route": "control"
+  },
+  {
+    "request": "Set up app control in a project used from both Codex and Claude Code",
+    "decision": "Keep one executable `tools/astack-<app>.ts` and one feature map; add a thin `astack-<app>` skill in each host's project skill directory with the same invocation, map, and evidence guidance. Do not pre-approve the CLI in skill tool permissions. Prove the direct command and one mapped path, and open a PR.",
     "route": "control"
   },
   {
@@ -112,6 +127,11 @@
   {
     "request": "The app already has a working control CLI and feature guide",
     "decision": "Reuse the working commands, align their skill and map with astack's proof requirements, and avoid a duplicate driver.",
+    "route": "control"
+  },
+  {
+    "request": "In Claude Code, `/verify` starts the app differently from the astack control CLI",
+    "decision": "Use the astack CLI for astack proof and do not assume `/verify` consumes it. Either record `/verify` as separate in the project profile, or write a repository-root `verify` skill that calls the CLI and prove it drives a mapped path. Do not keep two launch recipes that disagree.",
     "route": "control"
   },
   {
