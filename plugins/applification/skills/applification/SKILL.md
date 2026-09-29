@@ -22,7 +22,7 @@ Choose a route before loading references. Read only its section in [work routes]
 
 If none fits, state a small task-specific route with an outcome and a way to check it. Web UI features start with the [Pencil and Storybook design sprint](references/web-feature.md); other routes use only the surfaces they affect.
 
-For a new product, use the [Bun and Turborepo repository standard](references/project-setup.md). Put reusable UI in `packages/ui`; when persistence is needed, put [Convex](references/database.md) in `packages/backend`. A database requirement does not by itself require Next.js; the web stack still follows the feature's rendering and server needs.
+For a new product, use the [Bun and Turborepo repository standard](references/project-setup.md). Put reusable UI in `packages/ui` and use [shadcn lint](references/shadcn-lint.md) for web and Storybook feedback; when persistence is needed, put [Convex](references/database.md) in `packages/backend`. A database requirement does not by itself require Next.js; the web stack still follows the feature's rendering and server needs.
 
 Read `.astack/project.md` when the task needs project-specific commands or policy. Read [project setup](references/project-setup.md) when asked to configure AStack, when starting a feature in a clean repository, or when no runnable proof route exists. Missing configuration alone does not make a small task into a setup task. Inspect the project directly when one missing fact is all that is needed.
 
