@@ -38,7 +38,7 @@ const routes = {
   control: {
     number: '07', name: 'App control', title: 'Make the real product drivable.',
     description: 'Create or repair a project-owned command and feature map so later work can reach, act on, and observe the product.',
-    steps: ['Inspect the product and working drivers', 'Create or adopt the control command', 'Map user entry points', 'Drive one real path and open a PR'],
+    steps: ['Inspect the product and working drivers', 'Make the checkout-local CLI directly executable', 'Map user entry points', 'Drive one real path and open a PR'],
     example: '“Set up astack to verify our web app.”'
   },
   setup: {
