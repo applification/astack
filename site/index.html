@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#d7dfe7">
   <meta name="description" content="astack is the workflow behind the Applification plugin for Codex. Give it an engineering task; it chooses a route, checks the result, and brings kept changes to a pull request.">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="astack | From task to proof">
+  <meta property="og:title" content="astack | Outcome first. Proof built in.">
   <meta property="og:description" content="A practical map of the Applification workflow for Codex, maintained with the source.">
   <meta property="og:url" content="https://astack.applification.net/">
   <link rel="canonical" href="https://astack.applification.net/">
@@ -17,19 +17,19 @@
   <script>try { const saved = localStorage.getItem('astack-theme'); document.documentElement.dataset.theme = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch { document.documentElement.dataset.theme = 'light'; }</script>
   <link rel="stylesheet" href="./styles.css">
   <script src="./app.js" defer></script>
-  <title>astack | From task to proof</title>
+  <title>astack | Outcome first. Proof built in.</title>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
   <a class="brand" href="#top" aria-label="astack home">astack<span>.</span></a>
-  <nav class="site-nav" aria-label="Main navigation"><a href="#routes">Routes</a><a href="#method">Method</a><a href="#adopt">Get started</a><a class="nav-repo" href="https://github.com/applification/astack">GitHub ↗</a><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark theme"><span id="theme-icon" aria-hidden="true">☾</span><span class="theme-label">Dark</span></button></nav>
+  <nav class="site-nav" aria-label="Main navigation"><a href="#routes">Routes</a><a href="#method">Method</a><a href="#project">In a project</a><a href="#adopt">Get started</a><a class="nav-repo" href="https://github.com/applification/astack">GitHub ↗</a><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark theme"><span id="theme-icon" aria-hidden="true">☾</span><span class="theme-label">Dark</span></button></nav>
 </header>
 <main id="main">
   <section class="hero section-shell" id="top" aria-labelledby="hero-title">
     <div class="hero-copy">
       <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> astack by Applification</p>
-      <h1 id="hero-title">From task<br>to <em>proof.</em></h1>
+      <h1 id="hero-title">Outcome first.<br><em>Proof built in.</em></h1>
       <p class="hero-lede">astack gives Codex one entry point for engineering work. Describe the change. It chooses a route, follows the relevant guidance, checks what happened, and brings kept code to a pull request.</p>
       <div class="hero-actions"><a class="button button-dark" href="#adopt">Get started <span aria-hidden="true">↗</span></a><a class="text-link" href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/SKILL.md">Read the skill ↗</a></div>
       <p class="source-note">The <a href="https://github.com/applification/astack">repository</a> is the source of truth. This site explains the workflow without pinning it to a release snapshot.</p>
@@ -357,8 +357,103 @@
       <article class="method-card"><span class="method-index">04 / REVIEW</span><h3>Show the evidence</h3><p>Kept repository changes finish in a PR. The description gives reviewers the outcome, observed result, and any gaps. Investigation ends with an answer.</p><a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/pr.md">PR guidance ↗</a></article>
     </div>
   </div></section>
+  <section class="section-shell explainer-section" id="project" aria-labelledby="project-title">
+    <div class="section-heading"><div><p class="eyebrow">03 / IN A PROJECT</p><h2 id="project-title">The plugin stays put.<br><em>Your project owns the work.</em></h2></div><p>A project can pin the Applification plugin to a revision. Its own profile, control commands, feature map and contracts live beside its code.</p></div>
+    <p class="tree-hint">Scroll the file trees sideways to read each path.</p>
+    <div class="explainer-pair">
+      <div class="explainer-card"><p class="card-kicker">IN THE ASTACK REPOSITORY</p><pre class="file-tree"><code>astack/
+├─ .agents/plugins/marketplace.json
+├─ plugins/applification/
+│  ├─ .codex-plugin/plugin.json
+│  └─ skills/astack/
+│     ├─ SKILL.md                       <span class="tree-note">entry skill</span>
+│     └─ references/
+│        ├─ routes.md                   <span class="tree-note">routes</span>
+│        ├─ behavior-contract.md        <span class="tree-note">acceptance</span>
+│        ├─ web-feature.md              <span class="tree-note">design sprint</span>
+│        ├─ app-control.md              <span class="tree-note">app control</span>
+│        ├─ project-setup.md            <span class="tree-note">setup</span>
+│        ├─ shadcn-lint.md              <span class="tree-note">UI lint</span>
+│        ├─ database.md                 <span class="tree-note">Convex</span>
+│        ├─ mcp-server.md               <span class="tree-note">MCP</span>
+│        ├─ proof.md                    <span class="tree-note">observed results</span>
+│        └─ pr.md                       <span class="tree-note">PR review</span>
+├─ docs/project-install.md
+└─ evals/routing.md</code></pre></div>
+      <div class="explainer-card"><p class="card-kicker">IN YOUR PROJECT</p><pre class="file-tree"><code>my-project/
+├─ .agents/plugins/marketplace.json     <span class="tree-note">pinned</span>
+├─ .codex/config.toml                   <span class="tree-note">enabled</span>
+├─ .codex/skills/astack-&lt;app&gt;/
+│  ├─ SKILL.md                          <span class="tree-note">guide</span>
+│  └─ scripts/astack-&lt;app&gt;.ts           <span class="tree-note">CLI</span>
+├─ .astack/                             <span class="tree-note">tracked in Git</span>
+│  ├─ project.md                        <span class="tree-note">profile</span>
+│  ├─ feature-map/&lt;app&gt;/                <span class="tree-note">user paths</span>
+│  │  ├─ README.md                      <span class="tree-note">index</span>
+│  │  └─ presence.md                    <span class="tree-note">feature</span>
+│  ├─ presence/
+│  │  ├─ behavior-contract.md
+│  │  ├─ presence.pen                   <span class="tree-note">if selected</span>
+│  │  └─ evidence/                      <span class="tree-note">proof</span>
+│  └─ saved-items/
+│     ├─ behavior-contract.md
+│     └─ evidence/
+└─ AGENTS.md                            <span class="tree-note">pointer</span></code></pre></div>
+    </div>
+    <div class="explain-strip"><p><strong>Install and pin.</strong> Add a project marketplace entry, enable the plugin, then install it. Update by changing the pinned ref and exercising a representative route.</p><p><strong>Set up once.</strong> astack records real project commands in <code>.astack/project.md</code>. For a runnable product that needs repeatable driving, it creates or adopts a control CLI and feature map.</p><p><strong>Work through it.</strong> Start a task with <code>$applification:astack &lt;task&gt;</code>. The route map above shows what happens next.</p></div>
+    <p class="source-row">Follow the <a href="https://github.com/applification/astack/blob/main/docs/project-install.md">project installation guide ↗</a> for the exact marketplace and config files.</p>
+  </section>
+  <section class="explainer-band" id="sprint" aria-labelledby="sprint-title"><div class="section-shell">
+    <div class="section-heading"><div><p class="eyebrow">04 / WEB UI</p><h2 id="sprint-title">A design sprint<br><em>with one contract.</em></h2></div><p>For a substantial behavior change, the tracked contract names the outcome and acceptance cases. Pencil and Storybook are selected independently when they help answer a design or component question.</p></div>
+    <div class="explainer-pair sprint-pair">
+      <div class="explainer-card"><h3>From choice to proof</h3><ol class="step-list"><li><strong>Start the contract.</strong><span>Record the actor, problem, outcome, material states, open choices and observable cases.</span></li><li><strong>Design consequential states.</strong><span>If Pencil helps, keep the <code>.pen</code> file and its assets in the feature folder.</span></li><li><strong>Exercise components.</strong><span>If Storybook helps, put stories beside components and run the project's UI checks.</span></li><li><strong>Compare and record.</strong><span>When both tools are selected, compare the story with the chosen frame. Link frame and story IDs to the cases they support.</span></li><li><strong>Prove in the product.</strong><span>Implement the real data path, then record running-product observations and retained evidence against the same cases.</span></li></ol><p class="card-foot">A small change can keep its outcome and tool decisions in the PR. An unavailable selected check remains an explicit gap.</p></div>
+      <div class="explainer-card"><h3>What a contract looks like</h3><p class="card-intro">Illustrative excerpt. Plain acceptance sentences work as well as Given/When/Then.</p><pre class="contract-sample"><code>## Outcome
+A member can see when another member is idle.
+
+## Acceptance
+A1. After two minutes of inactivity, the
+    member's avatar shows the Idle state.
+    Design: presence.pen → "Idle"
+    Story:  presence-avatar--idle
+    Proof:  pass · local · 3f2a91c
+            evidence/a1.png
+
+## Open decision
+Should "away" hide the last-seen time?</code></pre><p class="card-foot">A frame supports a visual decision. A story supports component states. Neither establishes timing, real data effects or persistence in the running app.</p></div>
+    </div>
+    <p class="source-row">The <a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/web-feature.md">web UI path ↗</a> and <a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/behavior-contract.md">contract guide ↗</a> define the current process.</p>
+  </div></section>
+  <section class="section-shell explainer-section" id="control" aria-labelledby="control-title">
+    <div class="section-heading"><div><p class="eyebrow">05 / APP CONTROL</p><h2 id="control-title">Give the agent a way<br><em>to drive the product.</em></h2></div><p>The project owns a small CLI around its working browser, simulator, terminal or protocol tools. The feature map tells an agent how a user reaches each behavior.</p></div>
+    <div class="control-flow" aria-label="App control flow"><div><span>01 / FIND</span><strong>Feature map</strong><p>User entry points, commands, expected results and prerequisites.</p></div><div><span>02 / CHECK</span><strong><code>doctor</code></strong><p>Identify the checkout, revision, target and whether it belongs to this run.</p></div><div><span>03 / DRIVE</span><strong><code>astack-&lt;app&gt;</code></strong><p>Act through the real product using its existing driver.</p></div><div><span>04 / OBSERVE</span><strong>Evidence</strong><p>Record the end state and confirm material effects with a fresh read.</p></div></div>
+    <p class="source-row">A passing CLI command reports what it observed. Acceptance still depends on the case and result. <a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/app-control.md">Read the app control guide ↗</a></p>
+  </section>
+  <section class="explainer-band" id="stack" aria-labelledby="stack-title"><div class="section-shell">
+    <div class="section-heading"><div><p class="eyebrow">06 / WHEN NEEDED</p><h2 id="stack-title">Defaults for new work.<br><em>Specialists for specific work.</em></h2></div><p>An existing project keeps its framework, package manager and working tools. The layout below is astack's default for a new product with no chosen stack.</p></div>
+    <div class="explainer-pair">
+      <div class="explainer-card"><h3>New product layout</h3><pre class="file-tree"><code>my-product/
+├─ bun.lock
+├─ turbo.json
+├─ apps/
+│  ├─ web/                    <span class="tree-note">Next.js</span>
+│  └─ mcp/                    <span class="tree-note">MCP server</span>
+└─ packages/
+   ├─ ui/                     <span class="tree-note">shadcn/ui</span>
+   └─ backend/convex/         <span class="tree-note">when data is needed</span></code></pre><p class="card-foot">New web apps use Portless for worktree-specific local URLs. Next DevTools provides framework diagnostics; the project's browser driver checks the user path. <a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/project-setup.md">Project setup ↗</a></p></div>
+      <div class="explainer-card"><h3>Specialist paths</h3><div class="specialist-row"><strong>Convex</strong><p>Use the companion plugin for setup and backend edits. A PR touching Convex needs its reviewer before it is ready.</p></div><div class="specialist-row"><strong>MCP server</strong><p>Check the tool contract, the running transport and agent use as separate claims when each boundary matters.</p></div><div class="specialist-row"><strong>Web UI</strong><p>Choose Pencil and Storybook by the question each can answer. Use shadcn lint where the project uses shadcn/ui.</p></div><p class="card-foot"><a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/database.md">Convex path ↗</a> · <a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/mcp-server.md">MCP path ↗</a></p></div>
+    </div>
+  </div></section>
+  <section class="section-shell explainer-section" id="proof" aria-labelledby="proof-title">
+    <div class="section-heading"><div><p class="eyebrow">07 / FINISHING THE WORK</p><h2 id="proof-title">Say what passed.<br><em>Show what was checked.</em></h2></div><p>Proof names a revision, environment, action and observed result. A later code change calls for a new check when it could affect that result.</p></div>
+    <div class="proof-grid"><div class="explainer-card"><span class="card-kicker">CHOOSE THE CHECK</span><h3>Match evidence to the claim</h3><ul class="plain-list"><li><strong>Component story</strong> for rendering or interaction states.</li><li><strong>Focused test</strong> for domain or protocol behavior.</li><li><strong>Running product</strong> for data, identity, timing or integration.</li><li><strong>MCP layers</strong> for tool contract, transport and agent choice where applicable.</li></ul></div><div class="explainer-card"><span class="card-kicker">REPORT THE RESULT</span><h3>Keep gaps visible</h3><p>Record pass, fail, inconclusive, skipped or not applicable with a reason. A command exit code or screenshot supports only what it actually observed.</p><p>When proof captures a screenshot or recording, attach it to the PR or link retained media. If no media helps review, say why.</p></div><div class="explainer-card"><span class="card-kicker">OPEN THE PR</span><h3>Connect outcome and evidence</h3><p>The PR states why the work happened, what changed, the affected users or systems, the contract when there is one, and observed results with gaps.</p><p>Blocked design, proof or required specialist review stays visible in a draft PR. Investigation alone ends with an answer.</p></div></div>
+    <p class="source-row"><a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/proof.md">Proof guide ↗</a> · <a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/pr.md">PR and review guide ↗</a></p>
+  </section>
+  <section class="explainer-band reading-band" id="reading" aria-labelledby="reading-title"><div class="section-shell">
+    <div class="section-heading"><div><p class="eyebrow">08 / UNDER THE HOOD</p><h2 id="reading-title">The skill reads<br><em>what the task needs.</em></h2></div><p>The entry skill chooses a route. It then reads the relevant reference and project guidance, without loading every specialist path for every task.</p></div>
+    <div class="reading-grid"><p><strong><code>SKILL.md</code></strong><span>Always: route choice and shared rules.</span></p><p><strong><code>references/routes.md</code></strong><span>The chosen route when its detail is needed.</span></p><p><strong><code>references/web-feature.md</code></strong><span>A change to web UI.</span></p><p><strong><code>.astack/project.md</code></strong><span>When project commands or policy matter.</span></p><p><strong><code>.astack/feature-map/&lt;app&gt;/</code></strong><span>When finding and driving a user path.</span></p><p><strong><code>references/proof.md</code></strong><span>Before claiming behavior is verified.</span></p></div>
+  </div></section>
   <section class="section-shell adopt-section" id="adopt" aria-labelledby="adopt-title">
-    <div class="section-heading"><div><p class="eyebrow">03 / ADOPTION</p><h2 id="adopt-title">Put it to work<br><em>in your project.</em></h2></div><p>The installable plugin is called <strong>Applification</strong>. astack's guidance stays in this repo; your project owns its commands, environments, and product decisions.</p></div>
+    <div class="section-heading"><div><p class="eyebrow">09 / GET STARTED</p><h2 id="adopt-title">Put it to work<br><em>in your project.</em></h2></div><p>The installable plugin is called <strong>Applification</strong>. astack's guidance stays in this repo; your project owns its commands, environments, and product decisions.</p></div>
     <div class="adopt-grid">
       <div class="install-card"><div class="install-heading"><span>TRY IT IN CODEX</span><button id="copy-command" class="copy-button" type="button" aria-label="Copy installation commands">Copy</button></div><pre><code id="install-command">codex plugin marketplace add applification/astack
 codex plugin add applification@applification</code></pre><p>Then start a task with <code>$applification:astack</code> and describe what you want done.</p></div>
