@@ -4,11 +4,32 @@ Use this when installing AStack in a project or when the task needs a proof rout
 
 For the first feature in a clean repository, establish the smallest runnable product and a Git publication target early. Start with **Bun workspaces and Turborepo**, even when only one app exists. Commit `bun.lock`, declare Bun in the root `packageManager` field, and use `apps/*` and `packages/*` workspaces with a root `turbo.json`. Use `bun install`, `bun run`, and `bunx` for JavaScript dependencies, scripts, and CLIs; do not introduce npm or pnpm lockfiles or commands. Keep Turbo tasks scoped to the apps and packages affected by a change.
 
-Put deployable surfaces under `apps/` (`web`, `mcp`, `ios`, `desktop`, and others only when needed) and reusable code under `packages/`. Share code only where consumers and platform boundaries justify it. For a web UI, put the app in `apps/web`, shared shadcn/ui components and Tailwind styling in `packages/ui`, then follow the [web feature path](web-feature.md) with Storybook and a Pencil design file. The official [shadcn monorepo scaffold](https://ui.shadcn.com/docs/monorepo) can create the web and UI workspaces with Turborepo; for example, `bunx shadcn@latest init -t vite --monorepo` starts the default web path. Select Vite or Next.js by the web feature rule. Check the generated package manager, lockfile, workspace imports, and running scripts before building on it. Add the project profile once actual commands and surfaces exist; do not fill it with anticipated commands.
+Put deployable surfaces under `apps/` (`web`, `mcp`, `ios`, `desktop`, and others only when needed) and reusable code under `packages/`. Share code only where consumers and platform boundaries justify it. For a web UI, put a Next.js App Router app in `apps/web`, shared shadcn/ui components and Tailwind styling in `packages/ui`, then follow the [web feature path](web-feature.md) with Storybook and a Pencil design file. Consult the current [shadcn monorepo scaffold](https://ui.shadcn.com/docs/monorepo) and [Next.js installation guide](https://nextjs.org/docs/app/getting-started/installation) for Bun-compatible setup. Check the generated package manager, lockfile, workspace imports, and running scripts before building on it. Add the project profile once actual commands and surfaces exist; do not fill it with anticipated commands.
 
 For a new MCP server, create `apps/mcp` and follow the [MCP server path](mcp-server.md). A server with no web UI does not need `apps/web`, `packages/ui`, Pencil, or Storybook. Add a shared backend package only when its domain behavior has a real consumer; keep the protocol adapter in the MCP app.
 
-For a new web product, configure [shadcn lint](shadcn-lint.md) for web and Storybook files, verify save-time diagnostics where an editor supports them, and record the UI lint command in `.astack/project.md`. Add [agent-browser](https://agent-browser.dev/installation) as a Bun-managed development dependency for repeatable running-app proof. Verify that its browser runtime can start, then record the project's web proof command and safe fixture route in `.astack/project.md`. Keep generated screenshots and recordings out of source control unless the project deliberately tracks them.
+For a new web product, install [Portless](https://portless.sh/) as a Bun-managed development dependency and use it for local Next.js startup. Portless currently requires Node.js 24+ to run, in addition to the project's Bun requirement. With Turborepo, use the web workspace's `dev` script for `portless`, a separate `dev:app` script for `next dev`, and a `portless` package setting with the app name and `"script": "dev:app"`. Keep the root Turbo `dev` task pointed at workspace `dev` scripts. Run `portless doctor` and start the app once in an interactive environment to establish its local proxy and TLS trust; first-run setup can require privilege and cannot prompt in a headless agent or CI session. Record the actual Portless URL and startup command in `.astack/project.md`. Linked Git worktrees get their own hostnames, so do not hardcode the main checkout's URL in proof commands. Run build and lint checks directly in CI when a local proxy is unnecessary.
+
+For example, after adding Portless to `apps/web`, use this workspace setup with the product's actual name:
+
+```json
+{
+  "scripts": { "dev": "portless", "dev:app": "next dev" },
+  "portless": { "name": "myapp", "script": "dev:app" }
+}
+```
+
+For a new Next.js app, preserve the framework's generated `AGENTS.md` guidance to its version-matched bundled docs. Next.js 16.3+ can maintain that block when `next dev` runs; keep project instructions outside its managed markers. [Next DevTools MCP](https://nextjs.org/docs/app/guides/mcp) requires separate `next-devtools-mcp` installation and agent-client configuration even though Next.js 16+ supplies the development endpoint. Install it with Bun in the repository root and configure the project's Codex MCP server in trusted `.codex/config.toml` (or the actual agent client's equivalent):
+
+```toml
+[mcp_servers.next-devtools]
+command = "bunx"
+args = ["next-devtools-mcp"]
+```
+
+Verify Codex loads it and that its project metadata identifies this checkout's running server before relying on its logs, routes, or errors. Next.js also publishes a separate [`next-dev-loop` skill](https://nextjs.org/docs/app/guides/ai-agents#next-dev-loop) for the edit and verify loop; use it when installed and relevant. Use [agent-browser](https://agent-browser.dev/installation) as a Bun-managed development dependency for real browser interaction and evidence; framework diagnostics alone do not prove the user path.
+
+Configure [shadcn lint](shadcn-lint.md) for web and Storybook files, verify save-time diagnostics where an editor supports them, and record the UI lint command in `.astack/project.md`. Verify that the browser runtime can start, then record the project's web proof command and safe fixture route in `.astack/project.md`. Keep generated screenshots and recordings out of source control unless the project deliberately tracks them.
 
 Once a product has a runnable user surface, follow [app control and feature map](app-control.md) to create or adopt a project-owned `astack-<app>` CLI that can drive and observe it. Build the smallest real command set and map for the first feature, then extend them as the product grows. A project with several independently launched apps may need a control skill for each. A library without a running user surface keeps its existing executable checks; do not fabricate an app driver for it.
 

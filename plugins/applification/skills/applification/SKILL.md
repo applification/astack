@@ -23,7 +23,7 @@ Choose a route before loading references. Read only its section in [work routes]
 
 If none fits, state a small task-specific route with an outcome and a way to check it. Web UI features start with the [Pencil and Storybook design sprint](references/web-feature.md); other routes use only the surfaces they affect.
 
-For a new product, use the [Bun and Turborepo repository standard](references/project-setup.md). Put reusable UI in `packages/ui` and use [shadcn lint](references/shadcn-lint.md) for web and Storybook feedback; when persistence is needed, put [Convex](references/database.md) in `packages/backend`. A database requirement does not by itself require Next.js; the web stack still follows the feature's rendering and server needs.
+For a new product, use the [Bun and Turborepo repository standard](references/project-setup.md). Start new web products with Next.js App Router, run local web apps through Portless, and put reusable UI in `packages/ui`. Use [shadcn lint](references/shadcn-lint.md) for web and Storybook feedback; when persistence is needed, put [Convex](references/database.md) in `packages/backend`. Preserve an existing app's framework unless migration is requested.
 
 For work that adds or changes an MCP server, read the [MCP server path](references/mcp-server.md). It covers the server boundary and how to prove tool behavior, transport, authorization, and agent use when each applies. An MCP App with a web UI also follows the web feature path for that UI.
 
