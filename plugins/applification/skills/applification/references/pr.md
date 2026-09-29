@@ -19,7 +19,7 @@ Keep the PR description brief and useful to a reviewer:
 
 - **Why:** the intended outcome and reason for change.
 - **Scope:** the material behavior and implementation boundaries.
-- **Behavior contract and validation:** link the tracked `.astack/<feature>/behavior-contract.md` for design sprints and summarize its agreed cases, chosen Pencil frames, Storybook story IDs, running-product results, and gaps. Name the exact revision and environment for proof. Omit a separate contract for a small change whose outcome is already clear from Why.
+- **Behavior contract and validation:** link the tracked `.astack/<feature>/behavior-contract.md` for design sprints and summarize its agreed cases, Pencil and Storybook decisions for web UI work, any chosen frames or story IDs, running-product results, and gaps. Name the exact revision and environment for proof. Omit a separate contract for a small change whose outcome is already clear from Why; put its web UI tool decisions in the PR.
 - **Tradeoffs:** only choices a reviewer would reasonably question.
 - **Blast radius:** affected users, surfaces, or data and the key safety fact.
 - **Verification for other changes:** named claims, observed results, revision and environment, and any skipped or inconclusive checks when there is no behavior contract.

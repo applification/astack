@@ -1,6 +1,6 @@
 # Database path
 
-Choose **Convex** when a new app or new feature needs a database and the project has not already committed to another database. In a new Bun/Turborepo project, keep the Convex source and generated API in `packages/backend/convex`, with consuming apps depending on the backend workspace. Add `convex` to that workspace with Bun. Keep an existing project's established database unless the user asks for a migration. New web products use the [Next.js App Router path](https://docs.convex.dev/client/nextjs/app-router/); adapt to an existing app's framework rather than migrating it to add persistence.
+Choose **Convex** when a new product needs a database and the user has not chosen another one. In a new Bun/Turborepo project, keep the Convex source and generated API in `packages/backend/convex`, with consuming apps depending on the backend workspace. Add `convex` to that workspace with Bun. For an existing project, follow its database requirements and conventions; introduce or migrate to Convex only when the change calls for that decision. New web products using AStack's default use the [Next.js App Router path](https://docs.convex.dev/client/nextjs/app-router/); adapt to an existing app's framework rather than migrating it to add persistence.
 
 ## Choose the Convex route
 

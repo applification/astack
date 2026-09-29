@@ -1,6 +1,6 @@
 # shadcn lint for web and Storybook
 
-Use [`@shadcn/lint`](https://github.com/shadcn-ui/lint#rules) as the fast design-system check for AStack web UI work. Cover the web app, shared UI consumers, and Storybook stories in the same lint policy. A passing lint run checks the supported class and style rules; it does not establish that a story renders or that the running app behaves correctly.
+When a project uses shadcn/ui, use [`@shadcn/lint`](https://github.com/shadcn-ui/lint#rules) as a fast design-system check. Cover the web app, shared UI consumers, and Storybook stories when present in the same lint policy. A passing lint run checks the supported class and style rules; it does not establish that a story renders or that the running app behaves correctly.
 
 ## Set up the project
 
@@ -27,8 +27,8 @@ For an existing codebase, first measure findings on both the web app and stories
 
 ## Make feedback immediate
 
-Expose a `lint:ui` script (or the project's existing equivalent) that checks the web app, shared UI package, and Storybook files. Include it in the normal workspace lint task and CI. Record its exact command in `.astack/project.md`; add a short `AGENTS.md` instruction to run it after UI or story edits and fix new findings before claiming a file is done. Agents working outside an editor should run the command on changed files during the edit loop and the full UI scope before review.
+Expose a `lint:ui` script (or the project's existing equivalent) that checks the web app, shared UI package, and Storybook files when present. Include it in the normal workspace lint task and CI. Record its exact command in `.astack/project.md`; add a short `AGENTS.md` instruction to run it after UI or story edits and fix new findings before claiming a file is done. Agents working outside an editor should run the command on changed files during the edit loop and the full UI scope before review.
 
 Enable the editor's ESLint or Oxlint diagnostics for the project's JSX/TSX and story files so a save reports violations. Confirm this in the actual editor with a temporary violation in both an app component and a `*.stories.tsx` file, then remove the violation. Also run the lint command on those paths to confirm the agent sees the same findings. A script alone does not create save-time diagnostics; if the editor integration is unavailable, use the per-file command as the immediate check and report that limit.
 
-Keep Storybook render and interaction checks, and running-app proof where needed, alongside lint. They answer different questions.
+Keep selected Storybook render and interaction checks, and running-app proof where needed, alongside lint. They answer different questions.
