@@ -35,7 +35,7 @@ The sprint artifacts live together in `.astack/`, which must be visible to Git:
 
 Storybook stories stay with their components in `apps/` or `packages/` and are referenced from the contract. AStack does not create separate root `design/` and `docs/` folders for feature work.
 
-New products use a Bun workspace monorepo with Turborepo: deployable surfaces in `apps/`, reusable code in `packages/`. A web UI uses shadcn/ui and Tailwind CSS from `packages/ui`, with Vite + React + TypeScript by default or Next.js when server rendering or server routes are needed. Apps needing a database use Convex in `packages/backend`, starting with a local development deployment.
+New products use a Bun workspace monorepo with Turborepo: deployable surfaces in `apps/`, reusable code in `packages/`. A web UI uses shadcn/ui and Tailwind CSS from `packages/ui`, with Vite + React + TypeScript by default or Next.js when server rendering or server routes are needed. The [shadcn lint workflow](plugins/applification/skills/applification/references/shadcn-lint.md) adds design-system checks for web and Storybook files, with editor feedback where supported and a command agents can run after edits. Apps needing a database use Convex in `packages/backend`, starting with a local development deployment.
 
 Proof distinguishes an automated check from a running-product observation. Agent-browser is the default web driver for real-app checks and useful screenshots or short recordings. A passing test or a screenshot supports only the behavior it actually exercised. Applicable but untested surfaces remain visible as gaps. Before a PR is ready, attach any media captured during proof or explain why media was unnecessary; video is optional.
 

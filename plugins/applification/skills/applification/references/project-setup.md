@@ -6,7 +6,7 @@ For the first feature in a clean repository, establish the smallest runnable pro
 
 Put deployable surfaces under `apps/` (`web`, `mcp`, `ios`, `desktop`, and others only when needed) and reusable code under `packages/`. Share code only where consumers and platform boundaries justify it. For a web UI, put the app in `apps/web`, shared shadcn/ui components and Tailwind styling in `packages/ui`, then follow the [web feature path](web-feature.md) with Storybook and a Pencil design file. The official [shadcn monorepo scaffold](https://ui.shadcn.com/docs/monorepo) can create the web and UI workspaces with Turborepo; for example, `bunx shadcn@latest init -t vite --monorepo` starts the default web path. Select Vite or Next.js by the web feature rule. Check the generated package manager, lockfile, workspace imports, and running scripts before building on it. Add the project profile once actual commands and surfaces exist; do not fill it with anticipated commands.
 
-For a new web product, add [agent-browser](https://agent-browser.dev/installation) as a Bun-managed development dependency for repeatable running-app proof. Verify that its browser runtime can start, then record the project's web proof command and safe fixture route in `.astack/project.md`. Keep generated screenshots and recordings out of source control unless the project deliberately tracks them.
+For a new web product, configure [shadcn lint](shadcn-lint.md) for web and Storybook files, verify save-time diagnostics where an editor supports them, and record the UI lint command in `.astack/project.md`. Add [agent-browser](https://agent-browser.dev/installation) as a Bun-managed development dependency for repeatable running-app proof. Verify that its browser runtime can start, then record the project's web proof command and safe fixture route in `.astack/project.md`. Keep generated screenshots and recordings out of source control unless the project deliberately tracks them.
 
 If the new app needs a database, choose [Convex](database.md) in `packages/backend/convex`, expose the generated API to consuming apps through the backend workspace, and record how to start and identify its local deployment in the project profile. Keep local data and credentials out of version control. Do not create an unused backend or empty app packages just to fill the layout.
 
@@ -23,8 +23,9 @@ Create or update a tracked `.astack/project.md` with only what a later agent can
 Who uses each surface and which repository area serves it.
 
 ## Feedback and proof
-Fast checks while editing; checkpoint checks; how to start, identify, drive,
-and stop a disposable running instance; safe fixtures; evidence location.
+Fast checks while editing, including the UI lint command for web and stories;
+checkpoint checks; how to start, identify, drive, and stop a disposable running
+instance; safe fixtures; evidence location.
 Name checks that establish only a component or contract and those that reach
 the real user path.
 
