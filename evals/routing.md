@@ -1,8 +1,8 @@
-# AStack routing and proof examples
+# astack routing and proof examples
 
 Use these as realistic checks when editing the skill. Judge the chosen route and actual behavior, not whether the final wording matches this file. Run tasks in a disposable project or review a recorded trial before changing a broad instruction.
 
-Invoke each task through `$applification <request>`. The user chooses only this entry point; AStack chooses the route. A bare `$applification` should ask for the task rather than inventing one.
+Invoke each task through `$applification <request>`. The user chooses only this entry point; astack chooses the route. A bare `$applification` should ask for the task rather than inventing one.
 
 | Request | Expected decision |
 | --- | --- |
@@ -24,9 +24,9 @@ Invoke each task through `$applification <request>`. The user chooses only this 
 | "Add an MCP-only tool" | Behavior contract and implementation, then direct client checks of schema, success, errors and permissions; connect to the running endpoint if transport or deployment is affected. Add an agent check when the model must discover or choose the new tool. Open a PR; no Pencil, Storybook, or shadcn lint without a web UI. |
 | "In an empty repo, build an authenticated remote MCP tool" | Start Bun/Turborepo with `apps/mcp`; use an HTTP MCP adapter and verify token validation, resource discovery, direct calls and the running HTTP endpoint. Add shared packages only for real consumers. No web UI package, Pencil, Storybook, or Convex unless the feature needs them. |
 | "In an empty repo, build a local stdio MCP tool" | Start with `apps/mcp` and the MCP SDK's stdio transport. Do not add Hono, HTTP auth or an HTTP adapter without a requirement for them; prove a spawned client can initialize and call the tool. |
-| "Adopt AStack in an existing pnpm app" | Inspect scripts and CI; keep pnpm and the current layout, document working proof commands, and add project-owned app control only where repeatable driving is useful. Do not migrate the package manager as part of adoption; open a PR. |
-| "Set up AStack to verify our existing web app" | Inspect its current drivers, framework, package manager, and scripts; create or adopt a project-owned `astack-<app>` CLI in `.codex/skills/` and feature map in `.astack/feature-map/<app>/`, prove one real user path through the CLI, and open a PR. The command must drive the app, not merely wrap lint and tests; keep the working stack. |
-| "The app already has a working control CLI and feature guide" | Reuse the working commands, align their skill and map with AStack's proof requirements, and avoid a duplicate driver. |
+| "Adopt astack in an existing pnpm app" | Inspect scripts and CI; keep pnpm and the current layout, document working proof commands, and add project-owned app control only where repeatable driving is useful. Do not migrate the package manager as part of adoption; open a PR. |
+| "Set up astack to verify our existing web app" | Inspect its current drivers, framework, package manager, and scripts; create or adopt a project-owned `astack-<app>` CLI in `.codex/skills/` and feature map in `.astack/feature-map/<app>/`, prove one real user path through the CLI, and open a PR. The command must drive the app, not merely wrap lint and tests; keep the working stack. |
+| "The app already has a working control CLI and feature guide" | Reuse the working commands, align their skill and map with astack's proof requirements, and avoid a duplicate driver. |
 | "A different checkout already owns the usual dev port" | For a new Next.js app, Portless assigns a separate upstream port and a worktree-specific URL. `astack-<app> doctor` reports that URL and verifies its route and process belong to this checkout. It must not stop the other checkout's process. |
 | "A headless agent starts a new Next.js app before Portless trust is configured" | Report the failed proxy or certificate preflight and exact interactive setup needed. Do not drive another checkout's route or quietly switch to a fixed port. |
 | "Next DevTools reports a route error while the browser still renders a page" | Confirm the DevTools connection points at this checkout, inspect the runtime error, then use the control CLI and browser to establish the affected user-path outcome. Do not treat a framework diagnostic as browser proof. |
@@ -42,4 +42,4 @@ Invoke each task through `$applification <request>`. The user chooses only this 
 | "Update a web-only illustration" | Select visual proof on web; explain why server and unrelated client checks do not apply. |
 | "Implement the proposed design despite an unresolved delete-confirmation choice" | Ask for the product decision before coding that branch; continue independent work. |
 
-After a trial, record whether AStack chose the right route, found an important missing decision, selected checks proportionately, and reported proof honestly. Fix an observed failure narrowly rather than adding more universal gates.
+After a trial, record whether astack chose the right route, found an important missing decision, selected checks proportionately, and reported proof honestly. Fix an observed failure narrowly rather than adding more universal gates.

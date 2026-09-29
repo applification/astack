@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#d7dfe7">
+  <meta name="description" content="astack is the workflow behind the Applification plugin for Codex. Give it an engineering task; it chooses a route, checks the result, and brings kept changes to a pull request.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="astack | From task to proof">
+  <meta property="og:description" content="A practical map of the Applification workflow for Codex, maintained with the source.">
+  <meta property="og:url" content="https://astack.applification.net/">
+  <link rel="canonical" href="https://astack.applification.net/">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,300..700&display=swap" rel="stylesheet">
+  <script>try { const saved = localStorage.getItem('astack-theme'); document.documentElement.dataset.theme = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch { document.documentElement.dataset.theme = 'light'; }</script>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+  <title>astack | From task to proof</title>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <a class="brand" href="#top" aria-label="astack home">astack<span>.</span></a>
+  <nav class="site-nav" aria-label="Main navigation"><a href="#routes">Routes</a><a href="#method">Method</a><a href="#adopt">Get started</a><a class="nav-repo" href="https://github.com/applification/astack">GitHub ↗</a><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark theme"><span id="theme-icon" aria-hidden="true">☾</span><span class="theme-label">Dark</span></button></nav>
+</header>
+<main id="main">
+  <section class="hero section-shell" id="top" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Applification for Codex</p>
+      <h1 id="hero-title">From task<br>to <em>proof.</em></h1>
+      <p class="hero-lede">astack gives Codex one entry point for engineering work. Describe the change. It chooses a route, follows the relevant guidance, checks what happened, and brings kept code to a pull request.</p>
+      <div class="hero-actions"><a class="button button-dark" href="#adopt">Get started <span aria-hidden="true">↗</span></a><a class="text-link" href="https://github.com/applification/astack/blob/main/plugins/applification/skills/applification/SKILL.md">Read the skill ↗</a></div>
+      <p class="source-note">The <a href="https://github.com/applification/astack">repository</a> is the source of truth. This site explains the workflow without pinning it to a release snapshot.</p>
+    </div>
+    <aside class="hero-aside"><p class="eyebrow">THE WORKING METHOD</p><p>A task goes to the route that fits it. astack asks what would prove the outcome, then brings the evidence into review.</p><a href="#routes">Follow the route map ↗</a></aside>
+  </section>
+  <section class="section-shell routes-section" id="routes" aria-labelledby="routes-title">
+    <div class="section-heading"><div><p class="eyebrow">01 / ROUTING</p><h2 id="routes-title">One entry point.<br><em>Different kinds of work.</em></h2></div><p>astack routes by the outcome you want. Pick a route below to see the shape of the work. The skill's <a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/applification/references/routes.md">route guide</a> has the detail.</p></div>
+    <div class="route-workbench" id="route-workbench">
+      <div class="map-heading"><div><span class="map-heading-index">THE ROUTE MAP</span><h3>One task. The right line.</h3><p>Choose a real request to see its expected decision and trace the line it takes.</p></div><div class="map-actions"><button id="browse-requests" type="button" aria-expanded="false" aria-controls="trace-panel">Browse eval examples <span aria-hidden="true">⌄</span></button><button id="show-all-routes" type="button">Show all lines</button></div></div>
+    <div class="trace-panel" id="trace-panel" aria-labelledby="trace-title" hidden>
+      <div class="trace-picker">
+        <div class="trace-intro"><span class="map-heading-index">ROUTES + REAL REQUESTS</span><h3 id="trace-title">Choose a request</h3><p>Browse by route or search the eval cases. The selected line will light up on this map.</p></div>
+        <div class="trace-controls"><label for="request-search">Search the eval examples</label><input id="request-search" type="search" placeholder="Try “parser”, “Convex”, or “review”" autocomplete="off"></div>
+        <p id="request-count" class="request-count" aria-live="polite"></p>
+        <div id="request-results" class="request-results"></div>
+      </div>
+    </div>
+    <article class="route-detail" id="route-detail" aria-live="polite" aria-atomic="true" hidden>
+      <div class="route-detail-head"><span class="detail-kicker" id="route-kicker"></span><span class="detail-cue">↓ Follow the highlighted line</span></div>
+      <h3 id="route-title"></h3>
+      <p class="detail-label" id="route-decision-label"></p>
+      <p id="route-description"></p>
+    </article>
+    <p class="mobile-map-entry"><span>START HERE</span><strong>$applification &lt;task&gt;</strong> → choose the line that fits the outcome</p>
+    <div class="map-scroll" role="region" aria-label="Vertical astack route map. Scroll horizontally on small screens." tabindex="0">
+      <div class="route-map" id="route-map">
+        <div class="v-entry"><span>START HERE</span><strong>$applification &lt;task&gt;</strong><small>Choose a route from the intended outcome</small></div>
+        <svg class="v-branches" viewBox="0 0 1184 128" preserveAspectRatio="none" aria-hidden="true">
+          <path data-branch-route="feature" d="M592 3 C592 62 34 47 34 124" stroke="#4b916f" />
+          <path data-branch-route="bug" d="M592 3 C592 62 182 47 182 124" stroke="#d7775f" />
+          <path data-branch-route="refactor" d="M592 3 C592 62 330 47 330 124" stroke="#6f8eb2" />
+          <path data-branch-route="performance" d="M592 3 C592 62 478 47 478 124" stroke="#b78b3e" />
+          <path data-branch-route="investigation" d="M592 3 C592 62 626 47 626 124" stroke="#8875a6" />
+          <path data-branch-route="pr" d="M592 3 C592 62 774 47 774 124" stroke="#5b9d9b" />
+          <path data-branch-route="control" d="M592 3 C592 62 922 47 922 124" stroke="#b46f85" />
+          <path data-branch-route="setup" d="M592 3 C592 62 1070 47 1070 124" stroke="#536779" stroke-dasharray="5 5"/>
+        </svg>
+        <div class="v-columns">
+          <div class="v-column" data-map-route="feature" style="--route:#4b916f">
+            <button class="v-title" type="button" data-map-select="feature">Feature</button>
+            <div class="v-stations">
+              <div class="v-station">
+                <strong>Behavior contract</strong>
+                <small>For substantial changes</small>
+              </div>
+              <div class="v-station">
+                <strong>Choose UI evidence</strong>
+                <small>Pencil or Storybook when useful</small>
+              </div>
+              <div class="v-station">
+                <strong>Trace ownership</strong>
+                <small>Trigger, data and side effects</small>
+              </div>
+              <div class="v-station">
+                <strong>Implement in slices</strong>
+                <small>Check as you go</small>
+              </div>
+              <div class="v-station">
+                <strong>Update control path</strong>
+                <small>If a mapped path moves</small>
+              </div>
+            </div>
+            <div class="v-shared">
+              <div class="v-station">
+                <strong>Proof</strong>
+                <small>Observed result</small>
+              </div>
+              <div class="v-station">
+                <strong>Review</strong>
+                <small>Intent + quality</small>
+              </div>
+              <div class="v-station">
+                <strong>Pull request</strong>
+                <small>Evidence and gaps</small>
+              </div>
+            </div>
+          </div>
+          <div class="v-column" data-map-route="bug" style="--route:#d7775f">
+            <button class="v-title" type="button" data-map-select="bug">Bug fix</button>
+            <div class="v-stations">
+              <div class="v-station">
+                <strong>Reproduce symptom</strong>
+                <small>On the real surface</small>
+              </div>
+              <div class="v-station">
+                <strong>Find the cause</strong>
+                <small>Use code and history</small>
+              </div>
+              <div class="v-station">
+                <strong>Smallest fix</strong>
+                <small>Supported by evidence</small>
+              </div>
+              <div class="v-station">
+                <strong>Rerun the path</strong>
+                <small>The original failing journey</small>
+              </div>
+            </div>
+            <div class="v-shared">
+              <div class="v-station">
+                <strong>Proof</strong>
+                <small>Observed result</small>
+              </div>
+              <div class="v-station">
+                <strong>Review</strong>
+                <small>Intent + quality</small>
+              </div>
+              <div class="v-station">
+                <strong>Pull request</strong>
+                <small>Evidence and gaps</small>
+              </div>
+            </div>
+          </div>
+          <div class="v-column" data-map-route="refactor" style="--route:#6f8eb2">
+            <button class="v-title" type="button" data-map-select="refactor">Refactor</button>
+            <div class="v-stations">
+              <div class="v-station">
+                <strong>Name the invariant</strong>
+                <small>What must not change</small>
+              </div>
+              <div class="v-station">
+                <strong>Pin the output</strong>
+                <small>Test or recorded result</small>
+              </div>
+              <div class="v-station">
+                <strong>Move in small steps</strong>
+                <small>Rerun the pin</small>
+              </div>
+              <div class="v-station">
+                <strong>Delete old paths</strong>
+                <small>Once callers have moved</small>
+              </div>
+            </div>
+            <div class="v-shared">
+              <div class="v-station">
+                <strong>Proof</strong>
+                <small>Observed result</small>
+              </div>
+              <div class="v-station">
+                <strong>Review</strong>
+                <small>Intent + quality</small>
+              </div>
+              <div class="v-station">
+                <strong>Pull request</strong>
+                <small>Evidence and gaps</small>
+              </div>
+            </div>
+          </div>
+          <div class="v-column" data-map-route="performance" style="--route:#b78b3e">
+            <button class="v-title" type="button" data-map-select="performance">Performance</button>
+            <div class="v-stations">
+              <div class="v-station">
+                <strong>Pick a metric</strong>
+                <small>User or operational</small>
+              </div>
+              <div class="v-station">
+                <strong>Measure baseline</strong>
+                <small>Comparable conditions</small>
+              </div>
+              <div class="v-station">
+                <strong>Find bottleneck</strong>
+                <small>Before editing</small>
+              </div>
+              <div class="v-station">
+                <strong>Change one cause</strong>
+                <small>Compare with baseline</small>
+              </div>
+            </div>
+            <div class="v-shared">
+              <div class="v-station">
+                <strong>Proof</strong>
+                <small>Observed result</small>
+              </div>
+              <div class="v-station">
+                <strong>Review</strong>
+                <small>Intent + quality</small>
+              </div>
+              <div class="v-station">
+                <strong>Pull request</strong>
+                <small>Evidence and gaps</small>
+              </div>
+            </div>
+          </div>
+          <div class="v-column v-investigation" data-map-route="investigation" style="--route:#8875a6">
+            <button class="v-title" type="button" data-map-select="investigation">Investigation</button>
+            <div class="v-stations">
+              <div class="v-station">
+                <strong>Gather evidence</strong>
+                <small>Code, history or product</small>
+              </div>
+              <div class="v-station">
+                <strong>Separate fact</strong>
+                <small>From inference</small>
+              </div>
+              <div class="v-station">
+                <strong>Answer or advise</strong>
+                <small>With tradeoffs when asked</small>
+              </div>
+            </div>
+            <div class="v-end">Ends with an answer</div>
+          </div>
+          <div class="v-column" data-map-route="pr" style="--route:#5b9d9b">
+            <button class="v-title" type="button" data-map-select="pr">Pull request</button>
+            <div class="v-stations">
+              <div class="v-station">
+                <strong>Read full diff</strong>
+                <small>Against intended outcome</small>
+              </div>
+              <div class="v-station">
+                <strong>Trace consumers</strong>
+                <small>Beyond direct callers</small>
+              </div>
+              <div class="v-station">
+                <strong>Specialist review</strong>
+                <small>When the change needs it</small>
+              </div>
+              <div class="v-station">
+                <strong>Fix on this branch</strong>
+                <small>When authorised</small>
+              </div>
+              <div class="v-station">
+                <strong>Account for media</strong>
+                <small>Attach, link or explain</small>
+              </div>
+            </div>
+            <div class="v-shared">
+              <div class="v-station">
+                <strong>Proof</strong>
+                <small>Observed result</small>
+              </div>
+              <div class="v-station">
+                <strong>Review</strong>
+                <small>Intent + quality</small>
+              </div>
+              <div class="v-station">
+                <strong>Pull request</strong>
+                <small>Evidence and gaps</small>
+              </div>
+            </div>
+          </div>
+          <div class="v-column" data-map-route="control" style="--route:#b46f85">
+            <button class="v-title" type="button" data-map-select="control">App control</button>
+            <div class="v-stations">
+              <div class="v-station">
+                <strong>Inspect product</strong>
+                <small>And working drivers</small>
+              </div>
+              <div class="v-station">
+                <strong>Build or adopt CLI</strong>
+                <small>Project-owned commands</small>
+              </div>
+              <div class="v-station">
+                <strong>Write feature map</strong>
+                <small>User entry points</small>
+              </div>
+              <div class="v-station">
+                <strong>Prove one path</strong>
+                <small>Drive, observe, clean up</small>
+              </div>
+            </div>
+            <div class="v-shared">
+              <div class="v-station">
+                <strong>Proof</strong>
+                <small>Observed result</small>
+              </div>
+              <div class="v-station">
+                <strong>Review</strong>
+                <small>Intent + quality</small>
+              </div>
+              <div class="v-station">
+                <strong>Pull request</strong>
+                <small>Evidence and gaps</small>
+              </div>
+            </div>
+          </div>
+          <div class="v-column v-setup " data-map-route="setup" style="--route:#536779">
+            <a class="v-title" href="https://github.com/applification/astack/blob/main/plugins/applification/skills/applification/references/project-setup.md">Project setup ↗</a>
+            <div class="v-stations">
+              <div class="v-station">
+                <strong>Inspect the repo</strong>
+                <small>Scripts and constraints</small>
+              </div>
+              <div class="v-station">
+                <strong>Keep working stack</strong>
+                <small>Unless migration is asked for</small>
+              </div>
+              <div class="v-station">
+                <strong>Write project profile</strong>
+                <small>Commands and proof routes</small>
+              </div>
+              <div class="v-station">
+                <strong>Add app control</strong>
+                <small>For a runnable product</small>
+              </div>
+            </div>
+            <div class="v-shared">
+              <div class="v-station">
+                <strong>Proof</strong>
+                <small>Observed result</small>
+              </div>
+              <div class="v-station">
+                <strong>Review</strong>
+                <small>Intent + quality</small>
+              </div>
+              <div class="v-station">
+                <strong>Pull request</strong>
+                <small>Evidence and gaps</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="v-caption"><strong>Lines continue into shared proof, review and PR stages.</strong> Investigation stops with an answer. Project setup is a task-specific path outside the seven-route table.</div>
+      </div>
+    </div>
+    <p class="map-hint">On a narrow screen, scroll sideways to follow the lines.</p>
+    </div>
+    <p class="routes-caption">The route is a decision guide, not a compulsory checklist. <a href="https://github.com/applification/astack/blob/main/evals/routing.md">See the routing examples ↗</a></p>
+  </section>
+  <section class="method-section" id="method" aria-labelledby="method-title"><div class="section-shell">
+    <div class="section-heading"><div><p class="eyebrow">02 / METHOD</p><h2 id="method-title">The check follows<br><em>the claim.</em></h2></div><p>A passing command says what that command checked. astack asks for evidence from the surface where the behavior actually matters.</p></div>
+    <div class="method-grid">
+      <article class="method-card"><span class="method-index">01 / INTENT</span><h3>Name the outcome</h3><p>For a substantial change, keep a short behavior contract in <code>.astack/&lt;feature&gt;/</code>. It ties cases, design choices, and proof together.</p><a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/applification/references/behavior-contract.md">Behavior contract ↗</a></article>
+      <article class="method-card"><span class="method-index">02 / BUILD</span><h3>Use what helps</h3><p>For web UI, decide separately whether Pencil and Storybook would answer a real design or component question. Existing projects keep their working stack.</p><a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/applification/references/web-feature.md">Web UI guidance ↗</a></article>
+      <article class="method-card"><span class="method-index">03 / PROVE</span><h3>Observe the product</h3><p>Run a check that can catch the failure. When integration matters, drive the actual product and record what happened on a named revision and environment.</p><a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/applification/references/proof.md">Proof guidance ↗</a></article>
+      <article class="method-card"><span class="method-index">04 / REVIEW</span><h3>Show the evidence</h3><p>Kept repository changes finish in a PR. The description gives reviewers the outcome, observed result, and any gaps. Investigation ends with an answer.</p><a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/applification/references/pr.md">PR guidance ↗</a></article>
+    </div>
+  </div></section>
+  <section class="section-shell adopt-section" id="adopt" aria-labelledby="adopt-title">
+    <div class="section-heading"><div><p class="eyebrow">03 / ADOPTION</p><h2 id="adopt-title">Put it to work<br><em>in your project.</em></h2></div><p>The installable plugin is called <strong>Applification</strong>. astack's guidance stays in this repo; your project owns its commands, environments, and product decisions.</p></div>
+    <div class="adopt-grid">
+      <div class="install-card"><div class="install-heading"><span>TRY IT IN CODEX</span><button id="copy-command" class="copy-button" type="button" aria-label="Copy installation commands">Copy</button></div><pre><code id="install-command">codex plugin marketplace add applification/astack
+codex plugin add applification@applification</code></pre><p>Then start a task with <code>$applification</code> and describe what you want done.</p></div>
+      <div class="adopt-notes"><div><span class="note-index">01</span><h3>Pin it when it matters</h3><p>For a project-controlled version, point a local marketplace entry at an astack ref or SHA and enable it in that project's Codex config.</p><a href="https://github.com/applification/astack/blob/main/docs/project-install.md">Project install guide ↗</a></div><div><span class="note-index">02</span><h3>Keep your stack</h3><p>Adopting astack does not require a framework or package manager migration. Its Bun, Next.js, and Turborepo layout is the default for new products with no chosen stack.</p><a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/applification/references/project-setup.md">Project setup ↗</a></div></div>
+    </div>
+  </section>
+</main>
+<footer class="site-footer"><div class="section-shell footer-inner"><div><a class="footer-brand" href="#top">astack<span>.</span></a><p>Open source, built by <a href="https://www.applification.net/">Applification</a>.</p></div><div class="footer-links"><a href="https://github.com/applification/astack">Repository ↗</a><a href="https://github.com/applification/astack/blob/main/README.md">README ↗</a><a href="https://github.com/applification/astack/blob/main/LICENSE">MIT license ↗</a></div></div></footer>
+</body>
+</html>
