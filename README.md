@@ -2,7 +2,7 @@
 
 AStack is a Codex workflow for moving from an intended change to a verified result. The installable plugin is named **Applification**. It supplies task routing and engineering habits; each project supplies its own commands, environments, and product decisions.
 
-The first version contains one entry skill, [`applification`](plugins/applification/skills/applification/SKILL.md). Give it the task and it routes feature work, bug fixes, refactors, performance work, app control setup, investigations, and pull requests. A web UI feature uses a Pencil and Storybook design sprint to develop one behavior contract for implementation and validation. Repository changes meant to be kept end in a PR, with proof of affected behavior on the exact revision. Example Mapping, Gherkin, a separate story tracker, and a universal proof runner are not required.
+The first version contains one entry skill, [`applification`](plugins/applification/skills/applification/SKILL.md). Give it the task and it routes feature work, bug fixes, refactors, performance work, app control setup, investigations, and pull requests. For web UI work, the agent decides whether Pencil, Storybook, or both would help with the change and records why. Repository changes meant to be kept end in a PR, with proof of affected behavior on the exact revision. Example Mapping, Gherkin, a separate story tracker, and a universal proof runner are not required.
 
 ## Install in Codex
 
@@ -19,9 +19,9 @@ For local development of this plugin, use `codex plugin marketplace add /absolut
 
 ## Behavior contract
 
-For a substantial behavior change, AStack keeps one contract with an outcome, a few observable acceptance cases, affected surfaces, and unresolved product decisions. Given/When/Then can express a case but is not required. For a web UI feature, the sprint adds the chosen Pencil frames and Storybook story IDs beside the cases they support, with what each actually demonstrated. Implementation follows that contract, and running-product proof records the results for the same cases. The PR links the tracked contract and summarizes its evidence.
+For a substantial behavior change, AStack keeps one contract with an outcome, a few observable acceptance cases, affected surfaces, and unresolved product decisions. Given/When/Then can express a case but is not required. For web UI work, record the Pencil and Storybook decisions; when used, link the chosen frames and story IDs beside the cases they support, with what each actually demonstrated. Implementation follows that contract, and running-product proof records the results for the same cases. The PR links the tracked contract and summarizes its evidence.
 
-The sprint artifacts live together in `.astack/`, which must be visible to Git:
+When a design sprint uses Pencil, its artifacts live together in `.astack/`, which must be visible to Git:
 
 ```text
 .astack/
@@ -33,17 +33,17 @@ The sprint artifacts live together in `.astack/`, which must be visible to Git:
     evidence/
 ```
 
-Storybook stories stay with their components in `apps/` or `packages/` and are referenced from the contract. AStack does not create separate root `design/` and `docs/` folders for feature work.
+When used, Storybook stories stay with their components in `apps/` or `packages/` and are referenced from the contract. AStack does not create separate root `design/` and `docs/` folders for feature work.
 
 ## App control
 
 The [app control route](plugins/applification/skills/applification/references/app-control.md) creates a project-local `astack-<app>` CLI that can launch or connect to a running product, check its identity, exercise user actions, inspect results, and capture evidence. Its skill and script live in `.codex/skills/astack-<app>/`; a short feature map in `.astack/feature-map/<app>/` records how users reach each feature and which CLI commands drive it. The CLI is built from the project's existing browser, simulator, terminal, or protocol tools; AStack does not bundle one driver for every product. Setup proves one mapped path end to end, and later changes update the command and map when that path changes.
 
-New products use a Bun workspace monorepo with Turborepo: deployable surfaces in `apps/`, reusable code in `packages/`. A new web UI uses Next.js App Router + TypeScript and shadcn/ui with Tailwind CSS from `packages/ui`. Local web development uses [Portless](https://portless.sh/) for stable, worktree-specific URLs; Portless currently requires Node.js 24+ alongside Bun. Next.js's version-matched agent docs and separately configured DevTools MCP support runtime inspection. The [shadcn lint workflow](plugins/applification/skills/applification/references/shadcn-lint.md) adds design-system checks for web and Storybook files, with editor feedback where supported and a command agents can run after edits. Apps needing a database use Convex in `packages/backend`, starting with a named development deployment.
+For new products without a chosen stack, AStack's default is a Bun workspace monorepo with Turborepo: deployable surfaces in `apps/`, reusable code in `packages/`. A new web UI uses Next.js App Router + TypeScript and shadcn/ui with Tailwind CSS from `packages/ui`. Local web development uses [Portless](https://portless.sh/) for stable, worktree-specific URLs; Portless currently requires Node.js 24+ alongside Bun. Next.js's version-matched agent docs and separately configured DevTools MCP support runtime inspection. The [shadcn lint workflow](plugins/applification/skills/applification/references/shadcn-lint.md) adds design-system checks when shadcn/ui is used. New products needing a database use Convex in `packages/backend`, starting with a named development deployment. Existing projects keep their working stack and tools unless a migration is requested.
 
 For Convex work, install the companion `convex@openai-curated-remote` plugin. AStack uses `@Convex` for general guidance, `$convex:quickstart` where its new-app scaffold fits, `$convex:convex-expert` for backend edits, and `$convex:add` for capabilities in an existing Convex + Next.js app. [Convex PR review](plugins/applification/skills/applification/references/pr.md) requires `$convex:convex-reviewer` before the PR is ready. AStack itself does not bundle the Convex plugin.
 
-Proof distinguishes an automated check from a running-product observation. Agent-browser is the default web driver beneath a web project's control CLI for real-app checks and useful screenshots or short recordings. A passing test or a screenshot supports only the behavior it actually exercised. Applicable but untested surfaces remain visible as gaps. Before a PR is ready, attach any media captured during proof or explain why media was unnecessary; video is optional.
+Proof distinguishes an automated check from a running-product observation. Agent-browser is the greenfield default web driver beneath a project's control CLI; existing apps can use their working driver. A passing test or a screenshot supports only the behavior it actually exercised. Applicable but untested surfaces remain visible as gaps. Before a PR is ready, attach any media captured during proof or explain why media was unnecessary; video is optional.
 
 For MCP servers, AStack has a separate [server and proof path](plugins/applification/skills/applification/references/mcp-server.md). It uses the project's transport and authentication requirements, tests tool contracts through an MCP client, and checks the running endpoint and agent behavior when those boundaries matter. Agent evaluations are selected for changes to tool discovery or model use; a mock server does not establish that the real server works.
 
