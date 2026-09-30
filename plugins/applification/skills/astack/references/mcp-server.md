@@ -2,6 +2,8 @@
 
 Use this path when building or changing an MCP server. Start from the project's existing transport, host requirements and authentication model. Keep domain authorization in the domain service even when an MCP gateway has authenticated the caller. An MCP-only change has no web design sprint; an MCP App with visible UI also follows the [web feature path](web-feature.md) for its UI states.
 
+For ChatGPT MCP Apps, OpenAI extensions, portable packaging or events, also use [ChatGPT plugin engineering](chatgpt-plugin.md). Its [compatibility ledger](openai-compatibility.md) overrides the generic v2 default when using the released OpenAI helper; do not mix incompatible SDK majors.
+
 ## Choose the serving boundary
 
 For a new TypeScript remote HTTP server, use the [official `@modelcontextprotocol/server` SDK](https://ts.sdk.modelcontextprotocol.io/v2/) for tools, resources and prompts. A practical Fetch-compatible starting point is [`mcp-handler`](https://github.com/vercel/mcp-handler) for the HTTP MCP handler, Hono for routes and CORS, Zod for input schemas, and `jose` when verifying JWT bearer tokens. Keep their versions compatible and confirm the runtime requirements from the current package documentation. Mount the handler at a stable MCP URL; put health and OAuth metadata on explicit routes. Register tools separately from HTTP wiring so the same definitions can be inspected by an MCP client without starting a deployment. The SDK's own HTTP handler and auth middleware are also valid when they fit the host better; do not layer two handlers for the same endpoint.

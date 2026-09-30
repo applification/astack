@@ -5,8 +5,13 @@ on:
     paths:
       - "site/**"
       - "README.md"
-      - "plugins/applification/skills/applification/**"
+      - "plugins/applification/**"
       - "evals/routing.md"
+      - "examples/chatgpt-plugin/**"
+      - "scripts/**"
+      - "package.json"
+      - "bun.lock"
+      - ".agents/plugins/marketplace.json"
       - ".github/workflows/site.yml"
   push:
     branches: [main]
@@ -32,9 +37,29 @@ jobs:
         with:
           path: site
 
+  plugin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.0
+      - name: Validate portable astack package and site
+        run: bun install --frozen-lockfile && bun run check && bun test scripts
+      - name: Build and prove both reference profiles
+        working-directory: examples/chatgpt-plugin
+        env:
+          STORYBOOK_DISABLE_TELEMETRY: "1"
+        run: bun install --frozen-lockfile && bun run build && bun run typecheck && bun test && bun run build:storybook
+      - name: Validate built portable artifact
+        run: bun scripts/check-plugins.ts examples/chatgpt-plugin/dist/plugin
+
   deploy:
     if: github.event_name != 'pull_request'
-    needs: build
+    needs: [build, plugin]
     runs-on: ubuntu-latest
     permissions:
       contents: read

@@ -183,5 +183,55 @@
     "request": "Implement the proposed design despite an unresolved delete-confirmation choice",
     "decision": "Ask for the product decision before coding that branch; continue independent work.",
     "route": "feature"
+  },
+  {
+    "request": "Add our app to the ChatGPT sidebar and conversation panel",
+    "decision": "Feature route with ChatGPT plugin guidance. Verify SDK peers, empty launch inputs, shared MCP App UI and target host capabilities; prove actual installed entrypoints separately from Storybook and protocol checks.",
+    "route": "feature"
+  },
+  {
+    "request": "Expose our shared React components inside ChatGPT",
+    "decision": "Use the MCP App UI path, keep host APIs in an adapter, bundle components as a versioned HTML resource, choose Storybook states and verify standard bridge lifecycle. Do not embed Storybook or require a framework migration.",
+    "route": "feature"
+  },
+  {
+    "request": "Let users open a specific record through a plugin deep link",
+    "decision": "Validate the global-entrypoint route and encoded identity/path, handle initial and changed host context, recheck record access and prove navigation in the supported host. Android deep-link coverage remains unsupported at launch.",
+    "route": "feature"
+  },
+  {
+    "request": "Let users mention records in the ChatGPT composer",
+    "decision": "Use authorized bounded mention search with an empty-query case and app visibility. Prove selection in desktop; do not claim Work web or mobile composer mentions.",
+    "route": "feature"
+  },
+  {
+    "request": "Ask users to choose an image in a registered plugin form",
+    "decision": "Use MCP 2026-07-28 MRTR and validate accept, decline and cancel without duplicate effects. Do not copy the legacy OpenAI elicitInput helper into registered-server guidance.",
+    "route": "feature"
+  },
+  {
+    "request": "Monitor document updates and act in ChatGPT",
+    "decision": "Use MCP Events with user-authorized subscriptions, durable filters, verified signed callbacks, expiry and idempotent unsubscribe. Prove lifecycle locally and the intended response in ChatGPT; webhook 2xx is receipt only.",
+    "route": "feature"
+  },
+  {
+    "request": "Make our private local MCP server available to Work web",
+    "decision": "Use a reachable HTTPS development endpoint or Secure MCP Tunnel with actual workspace association and runtime credentials. Installing a local folder does not expose localhost to Work web.",
+    "route": "setup"
+  },
+  {
+    "request": "Package this plugin using the latest manifest format",
+    "decision": "Use root plugin.json and mcp.json with portable schemas and explicit transport types; put OpenAI metadata under extensions.com.openai, validate relocated assets/scripts and avoid fallback manifests.",
+    "route": "feature"
+  },
+  {
+    "request": "MCP Jam passes, can we claim our sidebar integration works?",
+    "decision": "Investigation route; distinguish protocol and emulated-host evidence from actual installed ChatGPT proof. Run the real entrypoint or report that claim unverified.",
+    "route": "investigation"
+  },
+  {
+    "request": "Use the OpenAI extensions helper with the split v2 SDK",
+    "decision": "Inspect the chosen published peers and compatibility ledger. Do not suppress peer errors or cast incompatible servers; prove a supported profile or an explicit adapter before claiming combined support.",
+    "route": "investigation"
   }
 ]

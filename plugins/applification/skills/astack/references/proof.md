@@ -12,6 +12,8 @@ For MCP behavior, follow the [MCP proof path](mcp-server.md#prove-the-affected-b
 
 For web running-app proof, use the project's working browser driver; [agent-browser](https://agent-browser.dev/) is the greenfield default when available. When using it, follow the installed CLI's current `agent-browser skills get core` guidance, use a named session, and drive the actual app through its interactive snapshot. Capture a screenshot of a decisive visible state when it helps review; record a short [video](https://agent-browser.dev/recording) when timing, transitions, or a hard-to-reproduce journey matter. Selected Storybook stories can be driven with the same tool for component checks, while selected Pencil frames provide a design comparison surface. The browser observation is one part of the proof result; confirm persisted or authorized effects with a fresh read or independent view.
 
+For ChatGPT plugins, follow [plugin engineering](chatgpt-plugin.md). Record component, protocol, agent and installed-host observations separately. A Storybook view, MCP Jam host emulation or local webhook acknowledgment cannot prove actual ChatGPT navigation, native forms, attachment behavior or completed event actions. Test supported target clients and report unavailable account/host coverage as skipped.
+
 ## Run
 
 Before driving an instance, establish that it is the intended build and environment with disposable or authorized fixtures. Do not infer this from an open port alone. Record the full commit, build or deployment identity where relevant, surface, actor or test persona, action, expected observation, and actual observation. Confirm material mutations with a fresh read or independent view. Keep secrets and credentials out of evidence.

@@ -364,7 +364,8 @@
       <div class="explainer-card"><p class="card-kicker">IN THE ASTACK REPOSITORY</p><pre class="file-tree"><code>astack/
 ├─ .agents/plugins/marketplace.json
 ├─ plugins/applification/
-│  ├─ .codex-plugin/plugin.json
+│  ├─ plugin.json                      <span class="tree-note">portable manifest</span>
+│  ├─ mcp.json                         <span class="tree-note">no bundled server</span>
 │  └─ skills/astack/
 │     ├─ SKILL.md                       <span class="tree-note">entry skill</span>
 │     └─ references/
@@ -376,6 +377,8 @@
 │        ├─ shadcn-lint.md              <span class="tree-note">UI lint</span>
 │        ├─ database.md                 <span class="tree-note">Convex</span>
 │        ├─ mcp-server.md               <span class="tree-note">MCP</span>
+│        ├─ chatgpt-plugin.md           <span class="tree-note">plugins + extensions</span>
+│        ├─ mcp-events.md               <span class="tree-note">monitoring</span>
 │        ├─ proof.md                    <span class="tree-note">observed results</span>
 │        └─ pr.md                       <span class="tree-note">PR review</span>
 ├─ docs/project-install.md
@@ -427,6 +430,11 @@ Should "away" hide the last-seen time?</code></pre><p class="card-foot">A frame 
     <div class="section-heading"><div><p class="eyebrow">05 / APP CONTROL</p><h2 id="control-title">Give the agent a way<br><em>to drive the product.</em></h2></div><p>The project owns a small CLI around its working browser, simulator, terminal or protocol tools. The feature map tells an agent how a user reaches each behavior.</p></div>
     <div class="control-flow" aria-label="App control flow"><div><span>01 / FIND</span><strong>Feature map</strong><p>User entry points, commands, expected results and prerequisites.</p></div><div><span>02 / CHECK</span><strong><code>doctor</code></strong><p>Identify the checkout, revision, target and whether it belongs to this run.</p></div><div><span>03 / DRIVE</span><strong><code>astack-&lt;app&gt;</code></strong><p>Act through the real product using its existing driver.</p></div><div><span>04 / OBSERVE</span><strong>Evidence</strong><p>Record the end state and confirm material effects with a fresh read.</p></div></div>
     <p class="source-row">A passing CLI command reports what it observed. Acceptance still depends on the case and result. <a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/app-control.md">Read the app control guide ↗</a></p>
+  </section>
+  <section class="section-shell explainer-section" id="plugins" aria-labelledby="plugins-title">
+    <div class="section-heading"><div><p class="eyebrow">CHATGPT PLUGINS</p><h2 id="plugins-title">Build the integration.<br><em>Check it in its host.</em></h2></div><p>astack guides MCP Apps, sidebar and conversation views, shared UI, deep links, forms, mentions and event subscriptions. It checks SDK compatibility before implementation and records which client supports the requested behavior.</p></div>
+    <div class="explain-strip"><p><strong>Share the UI.</strong> Bundle production components from your UI package. Storybook checks component states; the MCP bridge handles host context and tools.</p><p><strong>Package locally.</strong> Use portable <code>plugin.json</code> and <code>mcp.json</code>. A local marketplace package and a reachable server connection are separate pieces.</p><p><strong>Prove the claim.</strong> Protocol tests and MCP Jam support local checks. Installed ChatGPT proof establishes navigation, native forms and responses to subscribed events.</p></div>
+    <p class="source-row"><a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/chatgpt-plugin.md">Plugin engineering ↗</a> · <a href="https://github.com/applification/astack/blob/main/examples/chatgpt-plugin/README.md">Reference example ↗</a></p>
   </section>
   <section class="explainer-band" id="stack" aria-labelledby="stack-title"><div class="section-shell">
     <div class="section-heading"><div><p class="eyebrow">06 / WHEN NEEDED</p><h2 id="stack-title">Defaults for new work.<br><em>Specialists for specific work.</em></h2></div><p>An existing project keeps its framework, package manager and working tools. The layout below is astack's default for a new product with no chosen stack.</p></div>

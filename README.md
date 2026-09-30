@@ -61,11 +61,15 @@ For Convex work, install the companion `convex@openai-curated-remote` plugin. as
 
 Proof distinguishes an automated check from a running-product observation. Agent-browser is the greenfield default web driver beneath a project's control CLI; existing apps can use their working driver. A passing test or a screenshot supports only the behavior it actually exercised. Applicable but untested surfaces remain visible as gaps. Before a PR is ready, attach any media captured during proof or explain why media was unnecessary; video is optional.
 
+For ChatGPT plugins, astack has a [plugin engineering path](plugins/applification/skills/astack/references/chatgpt-plugin.md) for MCP Apps, shared UI and Storybook, OpenAI extensions, portable packaging, local installation, and MCP 2.0 forms/events. It selects a verified [SDK compatibility profile](plugins/applification/skills/astack/references/openai-compatibility.md), distinguishes local checks from installed ChatGPT proof, and keeps platform gaps explicit. The [reference example](examples/chatgpt-plugin/README.md) exercises released-extension and MCP 2.0 profiles separately. It does not implement Loami.
+
+The plugin uses root [plugin.json](plugins/applification/plugin.json) and [mcp.json](plugins/applification/mcp.json), with OpenAI presentation metadata under `extensions.com.openai`. The MCP configuration is empty because astack distributes engineering guidance, not an application server.
+
 For MCP servers, astack has a separate [server and proof path](plugins/applification/skills/astack/references/mcp-server.md). It uses the project's transport and authentication requirements, tests tool contracts through an MCP client, and checks the running endpoint and agent behavior when those boundaries matter. Agent evaluations are selected for changes to tool discovery or model use; a mock server does not establish that the real server works.
 
 ## Development
 
-Validate the skill and plugin with Codex's bundled `skill-creator` and `plugin-creator` validators before publishing. See [evaluation cases](evals/routing.md) for behavior to exercise when changing routing or proof selection.
+Validate the skill with Codex's bundled `skill-creator` validator and the portable manifests with `bun scripts/check-plugins.ts`. The latter checks the published Agent Plugins schemas, packaged paths and marketplace discovery. See [evaluation cases](evals/routing.md) for behavior to exercise when changing routing or proof selection.
 
 The site is plain HTML, CSS, and JavaScript in [`site/`](site/). Preview it with `python3 -m http.server 8000 --directory site`. Run `node site/check.mjs` to catch route, eval, or source-link drift. GitHub Pages publishes the folder after a merge to `main` at `astack.applification.net`. When changing astack behavior, update the site and README in the same PR; the Pages workflow checks that routes, eval copy, and source links stay current.
 

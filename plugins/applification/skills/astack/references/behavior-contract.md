@@ -1,5 +1,7 @@
 # Behavior contract
 
+For ChatGPT plugin work, also record the target client/version, entrypoint, authenticated actor, model-visible context, UI-only state, persistence owner, fallback and installed-host proof. For events include the user-authorized monitoring action and stop condition. See [plugin engineering](chatgpt-plugin.md).
+
 Use for substantial behavior changes and design sprints. The contract is one reviewable account of the intended behavior and the evidence used to implement and validate it. Start it with an outcome and a few observable acceptance cases, then add design evidence and proof as the work progresses. For a design sprint, keep it at `.astack/<feature>/behavior-contract.md` with retained evidence and any selected Pencil file in the same tracked feature folder.
 
 Keep the contract short enough to read during implementation and review. It should answer:
