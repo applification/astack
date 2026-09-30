@@ -31,3 +31,9 @@ Implementation revision: `e87b9046d8fb58e7cfd02d0d99fa1da549833532`, branch `cod
 The PR remains draft pending installed-client proof where the capability is claimed: portable astack loading and reference skill activation, ChatGPT supported entrypoints/links/settings/mentions/files/context, registered MRTR forms, and user-authorized events reaching the subscribed chat and triggering the requested response. Account/workspace identity, host version, real connection ID, tunnel credentials and OAuth need an actual configured test environment. The fixture uses a fixed development persona and a single-owner file store; production account isolation, transactional storage and distributed leases are outside its scope.
 
 The released helper profile is intentionally separate from MCP 2.0. No combined helper/MRTR compatibility, MCP Jam host equivalence, mobile support, public submission readiness or Loami integration is claimed. Retest SDK boundaries when the published peers or host contract changes.
+
+## Routing example clarification
+
+The follow-up to `1899d89` names the existing cases explicitly: “Add OpenAI plugin extensions for a ChatGPT sidebar and conversation panel” and “Build an MCP App using our shared React UI components”. Both keep the Feature route and now state the specialized references to load. The picker searches request text; explicit names make these examples discoverable by the product terms.
+
+`bun run check` and `git diff --check` pass for this clarification; all 47 examples still match. In the running website at localhost:6027, searching each term returns its example, and selecting it shows ROUTE 01 / FEATURE with the expected guidance. [MCP App routing](media/routing-mcp-app.jpg) and [OpenAI extensions routing](media/routing-openai-extensions.jpg) retain those observations. This proves the site's expected-route display, not a live agent routing evaluation. No runtime server or UI adapter code changed.

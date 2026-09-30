@@ -185,13 +185,13 @@
     "route": "feature"
   },
   {
-    "request": "Add our app to the ChatGPT sidebar and conversation panel",
-    "decision": "Feature route with ChatGPT plugin guidance. Verify SDK peers, empty launch inputs, shared MCP App UI and target host capabilities; prove actual installed entrypoints separately from Storybook and protocol checks.",
+    "request": "Add OpenAI plugin extensions for a ChatGPT sidebar and conversation panel",
+    "decision": "Feature route \u2192 ChatGPT plugin engineering \u2192 OpenAI extensions and MCP App UI guidance. Check SDK compatibility, define entrypoints with empty launch inputs, and share the UI through a versioned MCP App resource. Choose useful component states in Storybook, then prove the sidebar and conversation panel in the supported ChatGPT host.",
     "route": "feature"
   },
   {
-    "request": "Expose our shared React components inside ChatGPT",
-    "decision": "Use the MCP App UI path, keep host APIs in an adapter, bundle components as a versioned HTML resource, choose Storybook states and verify standard bridge lifecycle. Do not embed Storybook or require a framework migration.",
+    "request": "Build an MCP App using our shared React UI components",
+    "decision": "Feature route \u2192 MCP server and web feature paths \u2192 ChatGPT plugin engineering and MCP App UI guidance. Keep presentation components in the UI package and host APIs in an adapter. Bundle a versioned HTML resource, register the UI tool/resource metadata, choose Storybook states, and prove bridge initialization, tool input/results and teardown in the target host.",
     "route": "feature"
   },
   {
