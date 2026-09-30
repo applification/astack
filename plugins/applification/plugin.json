@@ -1,0 +1,32 @@
+{
+  "name": "applification",
+  "version": "0.2.0",
+  "description": "astack by Applification: a project-independent engineering workflow for Codex",
+  "author": {
+    "name": "Applification Ltd"
+  },
+  "homepage": "https://github.com/applification/astack",
+  "repository": "https://github.com/applification/astack",
+  "license": "MIT",
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Applification",
+        "shortDescription": "astack: build and prove the intended change",
+        "longDescription": "astack by Applification routes engineering tasks through a short intent contract, proportional feedback, real-product proof, and focused review.",
+        "developerName": "Applification Ltd",
+        "category": "Developer Tools",
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
+        "defaultPrompt": "Use astack by Applification to take this change from intent to proof.",
+        "websiteURL": "https://www.applification.net/",
+        "composerIcon": "./assets/applification-mark-light.svg",
+        "logo": "./assets/applification-mark-light.svg",
+        "logoDark": "./assets/applification-mark-dark.svg"
+      }
+    }
+  }
+}

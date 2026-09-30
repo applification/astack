@@ -1,0 +1,12 @@
+{
+  "name": "astack",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node site/check.mjs && bun scripts/check-plugins.ts",
+    "check:plugins": "bun scripts/check-plugins.ts"
+  },
+  "devDependencies": {
+    "@cfworker/json-schema": "4.1.1"
+  }
+}

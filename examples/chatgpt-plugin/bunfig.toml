@@ -1,0 +1,4 @@
+[install]
+# Preserve a seven-day age gate; the newly released SDK profiles are the intentional exception.
+minimumReleaseAge = 604800
+minimumReleaseAgeExcludes = ["@openai/mcp-extensions", "@modelcontextprotocol/sdk", "@modelcontextprotocol/ext-apps", "@modelcontextprotocol/server", "@modelcontextprotocol/client", "@modelcontextprotocol/core"]
