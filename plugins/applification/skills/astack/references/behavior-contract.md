@@ -9,7 +9,8 @@ Keep the contract short enough to read during implementation and review. It shou
 - Who can do what, and why?
 - Which observable cases distinguish success from plausible wrong behavior? Give material cases stable IDs such as A1 and A2.
 - For web UI work, why were Pencil and Storybook each selected or skipped? When selected, which frames or stories demonstrate the relevant states or interactions? Tie each to the relevant case and say what was actually checked.
-- How will each case be validated in the running product or at another appropriate seam? Record the result on the exact revision and environment once checked.
+- How will each material case be validated? Give it a stable ID and link its test or check, target, actor, fixture, expected observation and independent read when side effects matter. Record the result on the exact revision and environment once checked.
+- Which exploration charters can expose missing cases, and why were they selected or skipped? Keep candidates, confirmation/rejection evidence, fixes and retained regressions distinct from acceptance results. A charter with no findings does not establish that its acceptance cases passed.
 - Which product choices remain open, and what is outside this change?
 
 Given/When/Then is optional shorthand for a case, not an executable specification. Include cancellation, authorization, persistence, errors, or accessibility when they materially change the outcome. Do not turn every visual state into another requirement.
