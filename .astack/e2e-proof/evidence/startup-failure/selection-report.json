@@ -1,0 +1,291 @@
+{
+  "schemaVersion": "report-1",
+  "run": {
+    "id": "01a0fd40-c4c6-77df-8dd3-22c0144bfe5f",
+    "specVersion": "0.1",
+    "runner": {
+      "name": "e2e",
+      "version": "0.15.1"
+    },
+    "status": "failed",
+    "exitCode": 1,
+    "startedAt": "2026-10-02T15:34:35.784Z",
+    "finishedAt": "2026-10-02T15:34:38.530Z",
+    "project": {
+      "id": "astack-e2e-proof-reference",
+      "configDigest": "790f64cddcf94eddf70aa08e08d25f2ad3313f0a904f09baa79c415b62a97e4d"
+    },
+    "environment": {
+      "ci": false,
+      "trustNoticeShown": false,
+      "os": "darwin 27.0.0",
+      "arch": "arm64",
+      "runtime": "node v25.8.2"
+    },
+    "vcs": {
+      "commit": "398d090f4be9243bf01b978b9d6cce069ff05a79",
+      "branch": "codex/testerarmy-proof-loop",
+      "dirty": false
+    },
+    "targets": [
+      {
+        "id": "desktop",
+        "index": 0,
+        "platform": "web",
+        "baseOrigin": "http://127.0.0.1:59933",
+        "environment": "test",
+        "engine": {
+          "name": "web",
+          "version": "0.11.1",
+          "spiVersion": 1
+        },
+        "capabilities": [
+          "actions",
+          "artifacts",
+          "browser",
+          "keyboard",
+          "location",
+          "observation",
+          "pointer",
+          "state"
+        ],
+        "artifactCapabilities": [
+          "screenshot",
+          "trace",
+          "video"
+        ],
+        "stateCapability": true
+      }
+    ],
+    "serialGroups": [],
+    "results": [
+      {
+        "id": "e941eb8d4d80dd9803e36c9bbbf44e08f0a450165a5fc128cf917ee03339a5d1",
+        "testId": "tests/selected-state.probe.ts::%5BA1%5D%20choosing%20the%20selected%20state%20stops%20playback",
+        "kind": "test",
+        "declarationIndex": 1,
+        "titlePath": [
+          "[A1] choosing the selected state stops playback"
+        ],
+        "file": "tests/selected-state.probe.ts",
+        "source": {
+          "file": "tests/selected-state.probe.ts",
+          "line": 3,
+          "column": 1
+        },
+        "targetId": "desktop",
+        "platform": "web",
+        "agent": "default",
+        "repeat": 0,
+        "tags": [],
+        "selected": true,
+        "status": "failed",
+        "attempts": [
+          {
+            "id": "01a0fd40-c7da-7b04-bae5-b5dbe9ed07e6",
+            "index": 0,
+            "status": "failed",
+            "startedAt": "2026-10-02T15:34:36.250Z",
+            "durationMs": 2249,
+            "artifacts": [
+              {
+                "id": "01a0fd40-c7da-7b04-bae5-b5dbe9ed07e6:artifact:0",
+                "kind": "log",
+                "mediaType": "text/plain",
+                "redaction": "complete",
+                "producer": {
+                  "kind": "attempt"
+                },
+                "path": "desktop/tests_selected-state.probe.ts___5BA1_5D_20choosing_20the_20selected_20state_20stops_20playback-4af48ae5/default/attempt-0/failure/screen.txt",
+                "size": 269,
+                "sha256": "8678d6938931fd9122de8d4966fbbbfe2b5f556cbcf35c8c6886b4da6fdffe7e"
+              },
+              {
+                "id": "01a0fd40-c7da-7b04-bae5-b5dbe9ed07e6:artifact:1",
+                "kind": "screenshot",
+                "mediaType": "image/png",
+                "redaction": "complete",
+                "producer": {
+                  "kind": "attempt"
+                },
+                "path": "desktop/tests_selected-state.probe.ts___5BA1_5D_20choosing_20the_20selected_20state_20stops_20playback-4af48ae5/default/attempt-0/screenshots/001-failure.png",
+                "size": 13541,
+                "sha256": "8de75d9be956f226ea97b39f78b253da46883de32c0e748dc1a0c6d935a3c8a7"
+              },
+              {
+                "id": "01a0fd40-c7da-7b04-bae5-b5dbe9ed07e6:artifact:2",
+                "kind": "trace",
+                "mediaType": "application/zip",
+                "redaction": "not-required",
+                "producer": {
+                  "kind": "attempt"
+                },
+                "path": "desktop/tests_selected-state.probe.ts___5BA1_5D_20choosing_20the_20selected_20state_20stops_20playback-4af48ae5/default/attempt-0/trace/trace.zip",
+                "size": 356572,
+                "sha256": "749d3de723f31e525bca4559434a61e29382bd683599d6ee6c89cf2f75c7e5da"
+              }
+            ],
+            "error": {
+              "category": "test",
+              "code": "ASSERTION_FAILED",
+              "message": "expect.toBeVisible failed\nlocator: getByRole(\"button\", name: \"Play sequence\")\nexpected: visible\nobserved: no node (match count 0)",
+              "retryable": false,
+              "phase": "body",
+              "details": {
+                "locator": "getByRole(\"button\", name: \"Play sequence\")",
+                "expected": "visible",
+                "observed": "no node",
+                "matches": 0
+              },
+              "source": {
+                "file": "tests/selection.ts",
+                "line": 8,
+                "column": 3
+              }
+            },
+            "secondaryErrors": [],
+            "cleanup": "complete",
+            "failure": {
+              "url": "http://127.0.0.1:59933/",
+              "screen": "01a0fd40-c7da-7b04-bae5-b5dbe9ed07e6:artifact:0",
+              "screenshot": "01a0fd40-c7da-7b04-bae5-b5dbe9ed07e6:artifact:1"
+            },
+            "steps": [
+              {
+                "id": "01a0fd40-c7da-7b04-bae5-b5dbe9ed07e6:0",
+                "index": 0,
+                "kind": "app",
+                "api": "app.open",
+                "label": "/",
+                "status": "passed",
+                "startedAt": "2026-10-02T15:34:36.499Z",
+                "durationMs": 184,
+                "events": [],
+                "artifacts": [],
+                "source": {
+                  "file": "tests/helpers.ts",
+                  "line": 10,
+                  "column": 13
+                }
+              },
+              {
+                "id": "01a0fd40-c7da-7b04-bae5-b5dbe9ed07e6:1",
+                "index": 1,
+                "kind": "assertion",
+                "api": "expect.toBeVisible",
+                "label": "getByRole(\"button\", name: \"Pause sequence\")",
+                "status": "passed",
+                "startedAt": "2026-10-02T15:34:36.685Z",
+                "durationMs": 36,
+                "events": [],
+                "artifacts": [],
+                "source": {
+                  "file": "tests/selection.ts",
+                  "line": 5,
+                  "column": 62
+                }
+              },
+              {
+                "id": "01a0fd40-c7da-7b04-bae5-b5dbe9ed07e6:2",
+                "index": 2,
+                "kind": "assertion",
+                "api": "expect.toHaveAttribute",
+                "label": "getByRole(\"button\", name: \"Idle\")",
+                "status": "passed",
+                "startedAt": "2026-10-02T15:34:36.721Z",
+                "durationMs": 6,
+                "events": [],
+                "artifacts": [],
+                "source": {
+                  "file": "tests/selection.ts",
+                  "line": 6,
+                  "column": 52
+                }
+              },
+              {
+                "id": "01a0fd40-c7da-7b04-bae5-b5dbe9ed07e6:3",
+                "index": 3,
+                "kind": "locator",
+                "api": "locator.tap",
+                "label": "getByRole(\"button\", name: \"Idle\")",
+                "status": "passed",
+                "startedAt": "2026-10-02T15:34:36.727Z",
+                "durationMs": 80,
+                "events": [],
+                "artifacts": [],
+                "source": {
+                  "file": "tests/selection.ts",
+                  "line": 7,
+                  "column": 44
+                }
+              },
+              {
+                "id": "01a0fd40-c7da-7b04-bae5-b5dbe9ed07e6:4",
+                "index": 4,
+                "kind": "assertion",
+                "api": "expect.toBeVisible",
+                "label": "getByRole(\"button\", name: \"Play sequence\")",
+                "status": "failed",
+                "startedAt": "2026-10-02T15:34:36.807Z",
+                "durationMs": 1588,
+                "events": [],
+                "artifacts": [],
+                "source": {
+                  "file": "tests/selection.ts",
+                  "line": 8,
+                  "column": 61
+                },
+                "error": {
+                  "category": "test",
+                  "code": "ASSERTION_FAILED",
+                  "message": "expect.toBeVisible failed\nlocator: getByRole(\"button\", name: \"Play sequence\")\nexpected: visible\nobserved: no node (match count 0)",
+                  "retryable": false,
+                  "details": {
+                    "locator": "getByRole(\"button\", name: \"Play sequence\")",
+                    "expected": "visible",
+                    "observed": "no node",
+                    "matches": 0
+                  },
+                  "source": {
+                    "file": "tests/selection.ts",
+                    "line": 8,
+                    "column": 3
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "errors": [],
+    "summary": {
+      "discovered": 1,
+      "selected": 1,
+      "executed": 1,
+      "passed": 0,
+      "failed": 1,
+      "flaky": 0,
+      "skipped": 0
+    },
+    "limits": {
+      "maxAgentContextBytes": 16384,
+      "maxLedgerBytes": 8192,
+      "maxObservationBytes": 262144,
+      "maxEventsPerStep": 1000,
+      "maxModelTokensPerCall": 64000
+    },
+    "usage": {
+      "discoveredResults": 1,
+      "maxAgentContextBytes": 0,
+      "maxLedgerBytes": 0,
+      "maxObservationBytes": 0,
+      "artifactBytes": 370382,
+      "downloads": 0,
+      "events": 0,
+      "modelTokens": 0,
+      "maxModelCallsInStep": 0,
+      "maxActionStepsInStep": 0
+    }
+  }
+}

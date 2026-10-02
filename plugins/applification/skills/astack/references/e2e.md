@@ -4,7 +4,7 @@ Use [Tester Army e2e](https://e2e.tester.army/docs) for repeatable running-app v
 
 ## Set up from the installed version
 
-Inspect scripts, auth, fixtures, app control and existing tests first. Install exact compatible `e2e`, `@e2e-dev/web` and Playwright versions with the project's package manager and commit the lockfile. The [runnable reference](../../../../../examples/e2e-proof/README.md) pins the versions proven here; check current compatibility before selecting versions for a new product. The reference helpers are project-owned examples, not a universal astack runner.
+Inspect scripts, auth, fixtures, app control and existing tests first. Install exact compatible `e2e`, `@e2e-dev/web` and Playwright versions with the project's package manager and commit the lockfile. The [runnable reference](https://github.com/applification/astack/tree/main/examples/e2e-proof) pins the versions proven here; check current compatibility before selecting versions for a new product. The reference helpers are project-owned examples, not a universal astack runner.
 
 Run the installed `e2e init` or `e2e guide` through the project's package manager. Keep `.agents/skills/e2e` matched to the pinned package and refresh it on upgrades. Point `AGENTS.md` to it. Use upstream guidance for APIs and astack for acceptance, evidence and review policy. Do not copy the entire upstream skill into the astack plugin. Installed guides or bundled docs are the first source for flags and report fields; current online docs may describe a newer release.
 
@@ -75,6 +75,6 @@ Use least-privilege disposable accounts. e2e redaction is not an isolation bound
 
 ## Proven scope
 
-The [reference](../../../../../examples/e2e-proof/README.md) exercises real Chromium checks, isolated confirmation, failure-preserving reruns, wrong-instance rejection and conservative report interpretation without model calls. Its exploration fixture is sanitized recorded evidence, not a fresh exploration. Authenticated persistence, native mobile, live model quality and a restarted Codex host require separate project trials before claiming those capabilities verified.
+The [reference](https://github.com/applification/astack/tree/main/examples/e2e-proof) exercises real Chromium checks, isolated confirmation, failure-preserving reruns, wrong-instance rejection and conservative report interpretation without model calls. Its exploration fixture is sanitized recorded evidence, not a fresh exploration. Authenticated persistence, native mobile, live model quality and a restarted Codex host require separate project trials before claiming those capabilities verified.
 
 Primary guidance: [writing tests](https://e2e.tester.army/docs/writing-tests), [coding agents](https://e2e.tester.army/docs/coding-agents), [exploration verdicts](https://e2e.tester.army/docs/explore), [bug bashes](https://e2e.tester.army/docs/bug-bash), [cache](https://e2e.tester.army/docs/cache), [security](https://e2e.tester.army/docs/security), [CI](https://e2e.tester.army/docs/ci).
