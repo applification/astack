@@ -1,0 +1,16 @@
+{
+  "commit": "398d090f4be9243bf01b978b9d6cce069ff05a79",
+  "dirty": false,
+  "checkout": "/Users/davehudson/.codex/worktrees/a0d4/astack/examples/e2e-proof",
+  "digest": "88e9e6db62f2db382f3a4373e72d87a9cb0bfa42aae5c68177c5ad0d8149dc47",
+  "runId": "020de9e1-0d40-45cb-9ad3-bbaeccddfdce",
+  "variant": "buggy",
+  "mode": "probe",
+  "rerunOf": "/Users/davehudson/.codex/worktrees/a0d4/astack/examples/e2e-proof/.e2e/runs/probe-53a1b25a-413e-4116-9994-fce42ac9a988",
+  "startedAt": "2026-10-02T15:34:38.574Z",
+  "actor": "anonymous",
+  "fixture": "disposable selection preview",
+  "target": "desktop",
+  "exitCode": 1,
+  "reportSha256": "d6b724421e1cc3537495e8d50f9b56e86b0ef52210c8f0d070718f7158ee2bd0"
+}

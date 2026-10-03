@@ -8,7 +8,7 @@ Clarify the observable outcome through a [behavior contract](behavior-contract.m
 
 ## Bug fix
 
-Reproduce the reported symptom on its real surface or build the closest runnable signal that can fail on that symptom. Make the loop as fast and deterministic as practical. Use code and history to distinguish causes, then change the smallest mechanism supported by evidence. Rerun the original signal after the fix; a neighboring unit test alone does not establish that the reported symptom is gone. Add a regression check at a meaningful seam when it earns its maintenance cost. End with a [pull request](pr.md) that names the original symptom, cause, fix, and observed before/after proof.
+Reproduce the reported symptom on its real surface or build the closest runnable signal that can fail on that symptom. Make the loop as fast and deterministic as practical. Use code and history to distinguish causes, then change the smallest mechanism supported by evidence. Rerun the original signal after the fix; a neighboring unit test alone does not establish that the reported symptom is gone. Add a regression check at a meaningful seam when it earns its maintenance cost. Findings from exploration follow the [candidate confirmation and regression loop](e2e.md) when e2e is in use; setup or locator failures do not confirm a bug. End with a [pull request](pr.md) that names the original symptom, cause, fix, and observed before/after proof.
 
 ## Refactor
 

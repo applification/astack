@@ -3,3 +3,4 @@
 **/storybook-static/
 **/.turbo/
 examples/chatgpt-plugin/.data/
+examples/e2e-proof/.e2e/

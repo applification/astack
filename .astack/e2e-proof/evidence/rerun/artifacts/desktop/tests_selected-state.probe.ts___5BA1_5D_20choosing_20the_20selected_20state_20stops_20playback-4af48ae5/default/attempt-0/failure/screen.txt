@@ -1,0 +1,11 @@
+# Screen at failure
+url: http://127.0.0.1:59939/
+revision: b1
+viewport: 1000x700
+nodes: 5
+
+#root document "Selection proof reference"
+ #n5 heading "Selection proof reference"
+ #n6 status "Idle selected"
+ #n7 button "Idle" [pressed focused]
+ #n8 button "Pause sequence"

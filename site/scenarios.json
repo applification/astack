@@ -66,7 +66,7 @@
   },
   {
     "request": "In an empty repo, build a web flow with a timed confirmation",
-    "decision": "Use the Pencil/Storybook design sprint to develop one behavior contract: link chosen frames and stories to material acceptance cases, then use agent-browser to prove the timed interaction in the running app; capture a short recording if timing matters, and open a PR with the contract and evidence.",
+    "decision": "Use the Pencil/Storybook design sprint to develop one behavior contract: link chosen frames and stories to material acceptance cases, then use an exact e2e check to prove the timed interaction in the running app, preserving an existing runner when present; capture a short recording if timing matters, and open a PR with the contract and evidence.",
     "route": "feature"
   },
   {
@@ -186,12 +186,12 @@
   },
   {
     "request": "Add OpenAI plugin extensions for a ChatGPT sidebar and conversation panel",
-    "decision": "Feature route \u2192 ChatGPT plugin engineering \u2192 OpenAI extensions and MCP App UI guidance. Check SDK compatibility, define entrypoints with empty launch inputs, and share the UI through a versioned MCP App resource. Choose useful component states in Storybook, then prove the sidebar and conversation panel in the supported ChatGPT host.",
+    "decision": "Feature route → ChatGPT plugin engineering → OpenAI extensions and MCP App UI guidance. Check SDK compatibility, define entrypoints with empty launch inputs, and share the UI through a versioned MCP App resource. Choose useful component states in Storybook, then prove the sidebar and conversation panel in the supported ChatGPT host.",
     "route": "feature"
   },
   {
     "request": "Build an MCP App using our shared React UI components",
-    "decision": "Feature route \u2192 MCP server and web feature paths \u2192 ChatGPT plugin engineering and MCP App UI guidance. Keep presentation components in the UI package and host APIs in an adapter. Bundle a versioned HTML resource, register the UI tool/resource metadata, choose Storybook states, and prove bridge initialization, tool input/results and teardown in the target host.",
+    "decision": "Feature route → MCP server and web feature paths → ChatGPT plugin engineering and MCP App UI guidance. Keep presentation components in the UI package and host APIs in an adapter. Bundle a versioned HTML resource, register the UI tool/resource metadata, choose Storybook states, and prove bridge initialization, tool input/results and teardown in the target host.",
     "route": "feature"
   },
   {
@@ -233,5 +233,75 @@
     "request": "Use the OpenAI extensions helper with the split v2 SDK",
     "decision": "Inspect the chosen published peers and compatibility ledger. Do not suppress peer errors or cast incompatible servers; prove a supported profile or an explicit adapter before claiming combined support.",
     "route": "investigation"
+  },
+  {
+    "request": "Start a new web app with repeatable verification",
+    "decision": "Use e2e for running-app regressions and live MCP inspection; pin compatible dependencies and install version-matched project guidance. Prove the intended instance and one exact path; keep app control, backend and host proof at their own boundaries.",
+    "route": "setup"
+  },
+  {
+    "request": "Adopt astack in an app with working Playwright regressions",
+    "decision": "Preserve Playwright and the package manager. Map acceptance to existing checks, retain evidence and use the candidate confirmation loop; do not migrate the runner without a request.",
+    "route": "setup"
+  },
+  {
+    "request": "Exploration CI is green but the charter timed out with no findings",
+    "decision": "Read report steps, assessment and termination. Record the charter as inconclusive despite exit zero; no acceptance case passes without an independent check. Keep required regressions separate.",
+    "route": "pr"
+  },
+  {
+    "request": "An explorer says saving lost data, but its repro failed during login",
+    "decision": "Leave the finding a candidate. Login/setup failure is inconclusive; repair fixtures and reproduce the relevant body assertion, including an independent persistence read, before confirming.",
+    "route": "bug"
+  },
+  {
+    "request": "An explorer flags intended disabled controls as a bug",
+    "decision": "Check the behavior contract and source artifacts, then reject with evidence and a reason. Preserve the original claim and do not change intended behavior to satisfy the explorer.",
+    "route": "bug"
+  },
+  {
+    "request": "The known failing probe is excluded, so can the PR be ready",
+    "decision": "Excluding a repro from the passing suite does not waive a confirmed acceptance defect. Fix it and retain the passing regression, or obtain explicit owner acceptance of the limitation.",
+    "route": "pr"
+  },
+  {
+    "request": "The regression passed only on retry",
+    "decision": "Record the latest pass and flaky status, preserve the first failure, and investigate or obtain explicit acceptance before claiming the affected case verified.",
+    "route": "pr"
+  },
+  {
+    "request": "The test server belongs to another checkout",
+    "decision": "Refuse to drive it; classify the identity/setup failure as inconclusive. Start an isolated owned instance or resolve the CLI-owned URL and build/run identity. Never stop another checkout's process.",
+    "route": "control"
+  },
+  {
+    "request": "The rerun failed before writing a fresh report",
+    "decision": "Keep the original report and artifacts unchanged. Separate the selection seed from fresh evidence and report the rerun inconclusive; do not relabel the prior report as a new observation.",
+    "route": "bug"
+  },
+  {
+    "request": "A backend change alters the browser save flow",
+    "decision": "Select the affected browser regression and a focused persistence/state charter even without frontend changes. Confirm writes through a fresh independent read; backend checks alone may miss the user-path regression.",
+    "route": "feature"
+  },
+  {
+    "request": "Update only the verification docs",
+    "decision": "Run documentation, package and site consistency checks. Skip app exploration because no product behavior changed; a new executable reference still needs its own real checks.",
+    "route": "feature"
+  },
+  {
+    "request": "The e2e MCP config file exists, so claim Codex inspection works",
+    "decision": "Prove stdio initialize/open/observe/locate/close and actual host configuration loading separately. A launcher test does not establish that a restarted Codex host loaded it.",
+    "route": "setup"
+  },
+  {
+    "request": "A cached agent action passed, so claim the new model chooses correctly",
+    "decision": "Record replay separately and run live without cache for model-choice claims. Cached actions can support their exact observed outcome, not fresh model behavior.",
+    "route": "pr"
+  },
+  {
+    "request": "The CI artifact link has expired",
+    "decision": "Name the evidence gap and rerun if necessary. Retain sanitized evidence supporting lasting claims under the feature folder or a durable approved store, beyond short CI expiry.",
+    "route": "pr"
   }
 ]

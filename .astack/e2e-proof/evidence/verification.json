@@ -1,0 +1,68 @@
+{
+  "acceptance": {
+    "A1": {
+      "outcome": "pass",
+      "observed": "Exact repro fails against buggy variant and passes as retained regression against fixed variant",
+      "before": "/Users/davehudson/.codex/worktrees/a0d4/astack/examples/e2e-proof/.e2e/runs/probe-53a1b25a-413e-4116-9994-fce42ac9a988",
+      "after": "/Users/davehudson/.codex/worktrees/a0d4/astack/examples/e2e-proof/.e2e/runs/regression-ad5609d2-7c13-4b02-bae4-c078f09646bc"
+    },
+    "A2": {
+      "outcome": "pass",
+      "observed": "Original evidence digests unchanged after reruns; startup failure keeps selection seed separate",
+      "rerun": "/Users/davehudson/.codex/worktrees/a0d4/astack/examples/e2e-proof/.e2e/runs/probe-020de9e1-0d40-45cb-9ad3-bbaeccddfdce",
+      "startupFailure": "/Users/davehudson/.codex/worktrees/a0d4/astack/examples/e2e-proof/.e2e/runs/probe-b4182fb6-3a11-4ab9-8029-61dca4837d20"
+    },
+    "A3": {
+      "outcome": "pass",
+      "observed": "Wrong run identity rejected as inconclusive setup failure",
+      "report": "/Users/davehudson/.codex/worktrees/a0d4/astack/examples/e2e-proof/.e2e/runs/probe-86234617-860a-4333-be8c-fbf6f2e0d996"
+    },
+    "A4": {
+      "outcome": "pass",
+      "observed": "Recorded green exploration interpreted as inconclusive",
+      "source": "fixtures/green-exploration.json"
+    }
+  },
+  "finding": {
+    "id": "selected-state",
+    "acceptance": "A1",
+    "status": "regression",
+    "history": [
+      {
+        "status": "candidate",
+        "source": "Deliberately seeded teaching defect"
+      },
+      {
+        "status": "confirmed",
+        "evidence": "/Users/davehudson/.codex/worktrees/a0d4/astack/examples/e2e-proof/.e2e/runs/probe-53a1b25a-413e-4116-9994-fce42ac9a988",
+        "reason": "selection.ts asserts Play sequence after choosing Idle"
+      },
+      {
+        "status": "fixed",
+        "evidence": "/Users/davehudson/.codex/worktrees/a0d4/astack/examples/e2e-proof/.e2e/runs/regression-ad5609d2-7c13-4b02-bae4-c078f09646bc"
+      },
+      {
+        "status": "regression",
+        "test": "tests/selected-state.e2e.ts"
+      }
+    ]
+  },
+  "exploration": {
+    "outcome": "inconclusive",
+    "reason": "Exploration ended step-limit; 1 incomplete steps. Findings need reproduction; no acceptance proof.",
+    "flaky": false,
+    "candidates": 0,
+    "ready": false
+  },
+  "firstFailureDigests": {
+    "/Users/davehudson/.codex/worktrees/a0d4/astack/examples/e2e-proof/.e2e/runs/probe-53a1b25a-413e-4116-9994-fce42ac9a988/failures/tests_selected-state.probe.ts-_A1__choosing_the_selected_state_stops_playback-f49eceae-e941eb8d.md": "e84047f30c3a060140f7e7f296aa0ccae1155cf9c8f3e5475b3dec7506010570",
+    "/Users/davehudson/.codex/worktrees/a0d4/astack/examples/e2e-proof/.e2e/runs/probe-53a1b25a-413e-4116-9994-fce42ac9a988/artifacts/desktop/tests_selected-state.probe.ts___5BA1_5D_20choosing_20the_20selected_20state_20stops_20playback-4af48ae5/default/attempt-0/screenshots/001-failure.png": "8de75d9be956f226ea97b39f78b253da46883de32c0e748dc1a0c6d935a3c8a7",
+    "/Users/davehudson/.codex/worktrees/a0d4/astack/examples/e2e-proof/.e2e/runs/probe-53a1b25a-413e-4116-9994-fce42ac9a988/artifacts/desktop/tests_selected-state.probe.ts___5BA1_5D_20choosing_20the_20selected_20state_20stops_20playback-4af48ae5/default/attempt-0/trace/trace.zip": "749d3de723f31e525bca4559434a61e29382bd683599d6ee6c89cf2f75c7e5da",
+    "/Users/davehudson/.codex/worktrees/a0d4/astack/examples/e2e-proof/.e2e/runs/probe-53a1b25a-413e-4116-9994-fce42ac9a988/artifacts/desktop/tests_selected-state.probe.ts___5BA1_5D_20choosing_20the_20selected_20state_20stops_20playback-4af48ae5/default/attempt-0/failure/screen.txt": "8678d6938931fd9122de8d4966fbbbfe2b5f556cbcf35c8c6886b4da6fdffe7e",
+    "/Users/davehudson/.codex/worktrees/a0d4/astack/examples/e2e-proof/.e2e/runs/probe-53a1b25a-413e-4116-9994-fce42ac9a988/report.json": "9d27c91b26ab0b3a67132e782a7507bd49afadc41476a20df4d0061a5fb56353",
+    "/Users/davehudson/.codex/worktrees/a0d4/astack/examples/e2e-proof/.e2e/runs/probe-53a1b25a-413e-4116-9994-fce42ac9a988/summary.md": "958a7c7192f5be660f863b6df8671b00f562af99d032441591bcc31990a9c0a2",
+    "/Users/davehudson/.codex/worktrees/a0d4/astack/examples/e2e-proof/.e2e/runs/probe-53a1b25a-413e-4116-9994-fce42ac9a988/identity.json": "7918e1a13abde1bc878e7750725445f37c7dae3663756ff932992020f6834ba6",
+    "/Users/davehudson/.codex/worktrees/a0d4/astack/examples/e2e-proof/.e2e/runs/probe-53a1b25a-413e-4116-9994-fce42ac9a988/junit.xml": "b4ff058ae21fdc03d286c93d1c8d2f4ffd35c3c5cd2df1cff57c34a9376c2c6c"
+  },
+  "scope": "Real Chromium, no model calls. Exploration fixture is recorded, not a fresh run."
+}

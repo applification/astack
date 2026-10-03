@@ -29,7 +29,7 @@ command = "bunx"
 args = ["next-devtools-mcp"]
 ```
 
-Verify Codex loads it and that its project metadata identifies this checkout's running server before relying on its logs, routes, or errors. Next.js also publishes a separate [`next-dev-loop` skill](https://nextjs.org/docs/app/guides/ai-agents#next-dev-loop) for the edit and verify loop; use it when installed and relevant. Use [agent-browser](https://agent-browser.dev/installation) as a Bun-managed development dependency for real browser interaction and evidence; framework diagnostics alone do not prove the user path.
+Verify Codex loads it and that its project metadata identifies this checkout's running server before relying on its logs, routes, or errors. Next.js also publishes a separate [`next-dev-loop` skill](https://nextjs.org/docs/app/guides/ai-agents#next-dev-loop) for the edit and verify loop; use it when installed and relevant. Use [Tester Army e2e](e2e.md) as the default for repeatable web verification and live MCP inspection. Install exact compatible versions, commit the lockfile, and install or refresh its version-matched project skill. Configure and prove the actual agent client's MCP launcher; an entry in a config file alone does not prove the host loaded it. Keep a working browser driver for project app control when useful; framework diagnostics alone do not prove the user path.
 
 Configure [shadcn lint](shadcn-lint.md) for web files and Storybook files when present, verify save-time diagnostics where an editor supports them, and record the UI lint command in `.astack/project.md`. Verify that the browser runtime can start, then record the project's web proof command and safe fixture route in `.astack/project.md`. Keep generated screenshots and recordings out of source control unless the project deliberately tracks them.
 
@@ -54,7 +54,9 @@ Fast checks while editing, including the UI lint command for web and stories;
 checkpoint checks; how to start, identify, drive, and stop a disposable running
 instance; safe fixtures; evidence location.
 Name checks that establish only a component or contract and those that reach
-the real user path. Link each existing `astack-<app>` skill and feature map.
+the real user path. Record regression, probe, rerun, exploration and triage commands
+when present, model and budget policy, safe fixtures, instance ownership, required CI
+checks, and durable evidence retention. Record actual commands, not anticipated ones. Link each existing `astack-<app>` skill and feature map.
 
 ## Selection rules
 Which behavior or dependency changes call for each surface, including indirect

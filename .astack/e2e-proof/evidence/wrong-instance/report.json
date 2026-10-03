@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "report-1",
+  "run": {
+    "id": "01a0fd40-e5eb-7ed1-9b50-4c81e30f51df",
+    "specVersion": "0.1",
+    "runner": {
+      "name": "e2e",
+      "version": "0.15.1"
+    },
+    "status": "failed",
+    "exitCode": 1,
+    "startedAt": "2026-10-02T15:34:44.208Z",
+    "finishedAt": "2026-10-02T15:34:44.877Z",
+    "project": {
+      "id": "astack-e2e-proof-reference",
+      "configDigest": "790f64cddcf94eddf70aa08e08d25f2ad3313f0a904f09baa79c415b62a97e4d"
+    },
+    "environment": {
+      "ci": false,
+      "trustNoticeShown": false,
+      "os": "darwin 27.0.0",
+      "arch": "arm64",
+      "runtime": "node v25.8.2"
+    },
+    "vcs": {
+      "commit": "398d090f4be9243bf01b978b9d6cce069ff05a79",
+      "branch": "codex/testerarmy-proof-loop",
+      "dirty": false
+    },
+    "targets": [
+      {
+        "id": "desktop",
+        "index": 0,
+        "platform": "web",
+        "baseOrigin": "http://127.0.0.1:59953",
+        "environment": "test",
+        "engine": {
+          "name": "web",
+          "version": "0.11.1",
+          "spiVersion": 1
+        },
+        "capabilities": [
+          "actions",
+          "artifacts",
+          "browser",
+          "keyboard",
+          "location",
+          "observation",
+          "pointer",
+          "state"
+        ],
+        "artifactCapabilities": [
+          "screenshot",
+          "trace",
+          "video"
+        ],
+        "stateCapability": true
+      }
+    ],
+    "serialGroups": [],
+    "results": [
+      {
+        "id": "e941eb8d4d80dd9803e36c9bbbf44e08f0a450165a5fc128cf917ee03339a5d1",
+        "testId": "tests/selected-state.probe.ts::%5BA1%5D%20choosing%20the%20selected%20state%20stops%20playback",
+        "kind": "test",
+        "declarationIndex": 1,
+        "titlePath": [
+          "[A1] choosing the selected state stops playback"
+        ],
+        "file": "tests/selected-state.probe.ts",
+        "source": {
+          "file": "tests/selected-state.probe.ts",
+          "line": 3,
+          "column": 1
+        },
+        "targetId": "desktop",
+        "platform": "web",
+        "agent": "default",
+        "repeat": 0,
+        "tags": [],
+        "selected": true,
+        "status": "failed",
+        "attempts": [
+          {
+            "id": "01a0fd40-e8d7-7e39-9424-8345ea742a49",
+            "index": 0,
+            "status": "failed",
+            "startedAt": "2026-10-02T15:34:44.695Z",
+            "durationMs": 153,
+            "artifacts": [
+              {
+                "id": "01a0fd40-e8d7-7e39-9424-8345ea742a49:artifact:0",
+                "kind": "trace",
+                "mediaType": "application/zip",
+                "redaction": "not-required",
+                "producer": {
+                  "kind": "attempt"
+                },
+                "path": "desktop/tests_selected-state.probe.ts___5BA1_5D_20choosing_20the_20selected_20state_20stops_20playback-4af48ae5/default/attempt-0/trace/trace.zip",
+                "size": 17958,
+                "sha256": "0acba0f707ff8b9a6c993f2eb64aa9adaa6990ab3d628333c546f7f8e4f3ddfa"
+              }
+            ],
+            "error": {
+              "category": "test",
+              "code": "ASSERTION_FAILED",
+              "message": "expected \"another-run\" to be \"86234617-860a-4333-be8c-fbf6f2e0d996\"",
+              "retryable": false,
+              "phase": "beforeEach",
+              "source": {
+                "file": "tests/helpers.ts",
+                "line": 8,
+                "column": 51
+              }
+            },
+            "secondaryErrors": [],
+            "cleanup": "complete",
+            "steps": []
+          }
+        ]
+      }
+    ],
+    "errors": [],
+    "summary": {
+      "discovered": 1,
+      "selected": 1,
+      "executed": 1,
+      "passed": 0,
+      "failed": 1,
+      "flaky": 0,
+      "skipped": 0
+    },
+    "limits": {
+      "maxAgentContextBytes": 16384,
+      "maxLedgerBytes": 8192,
+      "maxObservationBytes": 262144,
+      "maxEventsPerStep": 1000,
+      "maxModelTokensPerCall": 64000
+    },
+    "usage": {
+      "discoveredResults": 1,
+      "maxAgentContextBytes": 0,
+      "maxLedgerBytes": 0,
+      "maxObservationBytes": 0,
+      "artifactBytes": 17958,
+      "downloads": 0,
+      "events": 0,
+      "modelTokens": 0,
+      "maxModelCallsInStep": 0,
+      "maxActionStepsInStep": 0
+    }
+  }
+}
