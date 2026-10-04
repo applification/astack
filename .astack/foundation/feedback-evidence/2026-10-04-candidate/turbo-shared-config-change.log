@@ -1,0 +1,33 @@
+
+   • turbo 2.11.7
+   • Packages in scope: @foundation/backend, @foundation/config, @foundation/domain, @foundation/mcp-ui, @foundation/ui, @foundation/web
+   • Running lint, typecheck in 6 packages
+   • Remote caching disabled
+
+@foundation/config:lint: cache miss, executing 1ecf7bc959358678
+@foundation/domain:lint: cache miss, executing d98a43b38f31ab64
+@foundation/domain:typecheck: cache miss, executing e60c712978f80a37
+@foundation/domain:lint: $ eslint src --max-warnings 0
+@foundation/domain:typecheck: $ tsc --noEmit
+@foundation/config:lint: $ eslint . --max-warnings 0
+@foundation/backend:typecheck: cache miss, executing 53d942328a95ed5b
+@foundation/ui:typecheck: cache miss, executing 897947d1d108f567
+@foundation/ui:typecheck: $ tsc --noEmit
+@foundation/backend:typecheck: $ tsc --noEmit
+@foundation/mcp-ui:typecheck: cache miss, executing 99f9dab14138098c
+@foundation/mcp-ui:typecheck: $ tsc --noEmit
+@foundation/web:typecheck: cache miss, executing 850d65560b1e2bdd
+@foundation/web:typecheck: $ tsc --noEmit
+@foundation/backend:lint: cache miss, executing 073205faf79b8999
+@foundation/ui:lint: cache miss, executing 4ded965c9dd56fa9
+@foundation/ui:lint: $ eslint src --max-warnings 0
+@foundation/backend:lint: $ eslint . --max-warnings 0
+@foundation/mcp-ui:lint: cache miss, executing 3fab04043f4788f3
+@foundation/web:lint: cache miss, executing eac140ad6cfdb6c3
+@foundation/web:lint: $ eslint src vite.config.ts --max-warnings 0
+@foundation/mcp-ui:lint: $ eslint src vite.config.ts --max-warnings 0
+
+  Tasks:    11 successful, 11 total
+ Cached:    0 cached, 11 total
+   Time:    7.471s
+Summary:    /private<disposable-project>/.turbo/runs/3KFUO0JbsBo4rFPzFM6ThmaQMl8.json

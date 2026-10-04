@@ -1,0 +1,57 @@
+[
+  {
+    "id": "@foundation/backend#lint",
+    "cacheStatus": "MISS",
+    "hash": "073205faf79b8999"
+  },
+  {
+    "id": "@foundation/backend#typecheck",
+    "cacheStatus": "MISS",
+    "hash": "53d942328a95ed5b"
+  },
+  {
+    "id": "@foundation/config#lint",
+    "cacheStatus": "MISS",
+    "hash": "1ecf7bc959358678"
+  },
+  {
+    "id": "@foundation/domain#lint",
+    "cacheStatus": "MISS",
+    "hash": "d98a43b38f31ab64"
+  },
+  {
+    "id": "@foundation/domain#typecheck",
+    "cacheStatus": "MISS",
+    "hash": "e60c712978f80a37"
+  },
+  {
+    "id": "@foundation/mcp-ui#lint",
+    "cacheStatus": "MISS",
+    "hash": "3fab04043f4788f3"
+  },
+  {
+    "id": "@foundation/mcp-ui#typecheck",
+    "cacheStatus": "MISS",
+    "hash": "99f9dab14138098c"
+  },
+  {
+    "id": "@foundation/ui#lint",
+    "cacheStatus": "MISS",
+    "hash": "4ded965c9dd56fa9"
+  },
+  {
+    "id": "@foundation/ui#typecheck",
+    "cacheStatus": "MISS",
+    "hash": "897947d1d108f567"
+  },
+  {
+    "id": "@foundation/web#lint",
+    "cacheStatus": "MISS",
+    "hash": "eac140ad6cfdb6c3"
+  },
+  {
+    "id": "@foundation/web#typecheck",
+    "cacheStatus": "MISS",
+    "hash": "850d65560b1e2bdd"
+  }
+]

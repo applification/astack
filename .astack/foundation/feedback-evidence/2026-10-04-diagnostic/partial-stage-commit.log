@@ -1,0 +1,20 @@
+[feedback-proof d788ddf] Prove partial staged hook preservation
+ 1 file changed, 2 insertions(+)
+⋯ Backing up original state…
+✔ Done backing up original state (839f522)!
+⋯ Hiding unstaged changes to partially staged files…
+✔ Done hiding unstaged changes to partially staged files!
+⋯ Running tasks for staged files…
+    *.{ts,tsx,js,mjs} — 1 file
+      ⋯ prettier --write
+      ⋯ eslint --max-warnings 0
+
+✔ prettier --write
+✔ eslint --max-warnings 0
+
+✔ Done running tasks for staged files!
+⋯ Staging changes from tasks…
+✔ Done staging changes from tasks!
+⋯ Restoring unstaged changes…
+⋯ Cleaning up temporary files…
+✔ Done cleaning up temporary files!

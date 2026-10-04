@@ -1,0 +1,10 @@
+diff --git a/packages/domain/src/index.ts b/packages/domain/src/index.ts
+index feca69d..ae03690 100644
+--- a/packages/domain/src/index.ts
++++ b/packages/domain/src/index.ts
+@@ -20,3 +20,5 @@ export const errorMessage = (error: unknown): string =>
+   error instanceof Error ? error.message : 'Something went wrong. Try again.';
+
+ export const feedbackStageProbe = 'staged-valid';
++
++Promise.resolve('staged-invalid');

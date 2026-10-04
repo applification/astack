@@ -1,0 +1,46 @@
+AFFECTED: base HEAD; complete workspace (shared/config change or uncertain scope). Includes consumer checks.
+
+   • turbo 2.11.7
+   • Packages in scope: @foundation/backend, @foundation/config, @foundation/domain, @foundation/mcp-ui, @foundation/ui, @foundation/web
+   • Running typecheck in 6 packages
+   • Remote caching disabled
+
+@foundation/domain:typecheck: cache miss, executing de524a56849db976
+@foundation/domain:typecheck: $ tsc --noEmit
+@foundation/backend:typecheck: cache miss, executing 801603520b528492
+@foundation/ui:typecheck: cache miss, executing bf2bd1c866926136
+@foundation/ui:typecheck: $ tsc --noEmit
+@foundation/backend:typecheck: $ tsc --noEmit
+@foundation/mcp-ui:typecheck: cache miss, executing e77a839e43ec9798
+@foundation/mcp-ui:typecheck: $ tsc --noEmit
+@foundation/web:typecheck: cache miss, executing 4c636db086048511
+@foundation/web:typecheck: $ tsc --noEmit
+
+ Tasks:    5 successful, 5 total
+Cached:    0 cached, 5 total
+  Time:    2.812s
+
+bun test v1.4.0 (34cbb9a40)
+{"mode":"affected","elapsedMs":11259,"outcome":"pass"}
+$ bun scripts/check.ts affected HEAD
+$ eslint . --max-warnings 0
+$ bun scripts/prepare-check.ts && turbo typecheck && tsc --noEmit -p tsconfig.json
+
+tests/domain.test.ts:
+(pass) work-item boundary > normalizes a title and rejects empty or oversized input [0.37ms]
+(pass) work-item boundary > rejects malformed host results before they reach presentation [1.00ms]
+
+tests/proof-policy.test.ts:
+(pass) proof boundary policy > local subprocesses do not inherit deployment or authentication secrets [0.07ms]
+(pass) proof boundary policy > retained logs redact signed tokens and Bearer [REDACTED] [0.10ms]
+(pass) proof boundary policy > external script or stylesheet resources cannot pass packaging proof [0.36ms]
+(pass) proof boundary policy > a malformed DTO cannot become persisted-state evidence [0.43ms]
+(pass) proof boundary policy > trial event accounting keeps usage and excludes conversation text from action caps [0.07ms]
+
+tests/provenance.test.ts:
+(pass) source identity changes for untracked inputs but excludes secrets and observations [3.36ms]
+
+ 8 pass
+ 0 fail
+ 16 expect() calls
+Ran 8 tests across 3 files. [252.00ms]

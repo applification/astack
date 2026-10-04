@@ -1,0 +1,33 @@
+
+   • turbo 2.11.7
+   • Packages in scope: @foundation/backend, @foundation/config, @foundation/domain, @foundation/mcp-ui, @foundation/ui, @foundation/web
+   • Running lint, typecheck in 6 packages
+   • Remote caching disabled
+
+@foundation/config:lint: cache hit, replaying logs ee5a6298072c72f0
+@foundation/config:lint: $ eslint . --max-warnings 0
+@foundation/domain:typecheck: cache hit, replaying logs f29f5e3984e96c3f
+@foundation/domain:lint: cache hit, replaying logs bead15137469a656
+@foundation/domain:typecheck: $ tsc --noEmit
+@foundation/domain:lint: $ eslint src --max-warnings 0
+@foundation/backend:lint: cache hit, replaying logs fa795fa30f76c8bb
+@foundation/ui:lint: cache hit, replaying logs 9690736f96200138
+@foundation/backend:lint: $ eslint . --max-warnings 0
+@foundation/backend:typecheck: cache hit, replaying logs 085e500e4d40a6a5
+@foundation/ui:lint: $ eslint src --max-warnings 0
+@foundation/backend:typecheck: $ tsc --noEmit
+@foundation/ui:typecheck: cache hit, replaying logs 95943e0af9b2a3bf
+@foundation/ui:typecheck: $ tsc --noEmit
+@foundation/mcp-ui:lint: cache hit, replaying logs 2aea03a54cadf5f5
+@foundation/web:lint: cache hit, replaying logs 07d0edd80ba2c491
+@foundation/mcp-ui:lint: $ eslint src vite.config.ts --max-warnings 0
+@foundation/web:lint: $ eslint src vite.config.ts --max-warnings 0
+@foundation/web:typecheck: cache hit, replaying logs abca7ce9de797f75
+@foundation/mcp-ui:typecheck: cache hit, replaying logs 279440b1fb243b09
+@foundation/web:typecheck: $ tsc --noEmit
+@foundation/mcp-ui:typecheck: $ tsc --noEmit
+
+  Tasks:    11 successful, 11 total
+ Cached:    11 cached, 11 total
+   Time:    11ms >>> FULL TURBO
+Summary:    /private<disposable-project>/.turbo/runs/3KFUN2hbf9rwUg3N16jZUmb8FE2.json

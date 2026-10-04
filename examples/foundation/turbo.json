@@ -1,7 +1,9 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "globalDependencies": [
-    "packages/config/**",
+    "packages/config/typescript.json",
+    "packages/config/eslint.mjs",
+    "packages/config/package.json",
     "eslint.config.mjs",
     "tsconfig.json"
   ],

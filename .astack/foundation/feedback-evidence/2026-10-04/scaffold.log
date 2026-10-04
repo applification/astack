@@ -1,0 +1,1 @@
+Created app at <disposable-project>. Run bun install --frozen-lockfile, then bun run check:ci and bun run readiness. WorkOS setup is described in README.md.

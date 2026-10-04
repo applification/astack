@@ -1,0 +1,24 @@
+AFFECTED: base HEAD; complete workspace (shared/config change or uncertain scope). Includes consumer checks.
+
+/private<disposable-project>/scripts/runtime.ts
+  135:9   error  Unnecessary conditional, value is always falsy  @typescript-eslint/no-unnecessary-condition
+  137:40  error  Unnecessary conditional, value is always falsy  @typescript-eslint/no-unnecessary-condition
+
+✖ 2 problems (2 errors, 0 warnings)
+
+$ bun scripts/check.ts affected HEAD
+$ eslint . --max-warnings 0
+error: script "lint" exited with code 1
+10 |     cwd: root,
+11 |     stdout: 'inherit',
+12 |     stderr: 'inherit',
+13 |   });
+14 |   if (result.exitCode !== 0)
+15 |     throw new Error(`Required check failed: ${command.join(' ')}`);
+                   ^
+error: Required check failed: bun run lint
+      at run (/private<disposable-project>/scripts/check.ts:15:15)
+      at /private<disposable-project>/scripts/check.ts:119:5
+
+Bun v1.4.0 (macOS arm64)
+error: script "check:affected" exited with code 1
