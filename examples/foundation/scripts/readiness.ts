@@ -509,7 +509,7 @@ export async function verify(
     await check(
       'R7',
       'local MCP App host',
-      'The real MCP resource renders and changes persisted status through AppBridge; a web reload observes that change.',
+      'The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads.',
       async () => {
         host = await startMcpHost(active);
         const forbiddenProxy = await fetch(`${host.url}/mcp`, {
@@ -520,7 +520,9 @@ export async function verify(
         assert.equal(forbiddenProxy.status, 403);
         const appPage = await liveBrowser.newPage();
         const hostMessages: string[] = [];
+        const uncaughtAppErrors: string[] = [];
         appPage.on('pageerror', (error) => {
+          uncaughtAppErrors.push(error.message);
           hostMessages.push(error.message);
         });
         appPage.on('console', (message) => {
@@ -541,6 +543,32 @@ export async function verify(
             .frameLocator('#app')
             .getByText(title, { exact: true })
             .waitFor();
+          const styles = () =>
+            appPage
+              .frameLocator('#app')
+              .locator('html')
+              .evaluate((element) => {
+                const computed = getComputedStyle(element);
+                return {
+                  theme: element.getAttribute('data-theme'),
+                  colorScheme: computed.colorScheme,
+                  background: computed.backgroundColor,
+                  color: computed.color,
+                  font: computed.fontFamily,
+                  fontCss:
+                    document.getElementById('__mcp-host-fonts')?.textContent ??
+                    '',
+                };
+              });
+          const initialStyles = await waitFor(async () => {
+            const observed = await styles();
+            return observed.theme === 'dark' ? observed : false;
+          }, 'initial host theme');
+          assert.equal(initialStyles.colorScheme, 'dark');
+          assert.equal(initialStyles.background, 'rgb(19, 27, 39)');
+          assert.equal(initialStyles.color, 'rgb(241, 245, 249)');
+          assert.ok(initialStyles.font.includes('Astack Proof Sans'));
+          assert.ok(initialStyles.fontCss.includes('Astack Proof Sans'));
           await appPage
             .frameLocator('#app')
             .getByRole('button', { name: 'Reopen', exact: true })
@@ -563,11 +591,117 @@ export async function verify(
             .frameLocator('#app')
             .getByRole('button', { name: 'Mark done', exact: true })
             .waitFor();
+          await appPage
+            .getByRole('button', { name: 'Update host palette', exact: true })
+            .click();
+          const updatedStyles = await waitFor(async () => {
+            const observed = await styles();
+            return observed.theme === 'light' ? observed : false;
+          }, 'updated host theme');
+          assert.equal(updatedStyles.colorScheme, 'light');
+          assert.equal(updatedStyles.background, 'rgb(255, 244, 219)');
+          assert.equal(updatedStyles.color, 'rgb(53, 35, 14)');
+          assert.ok(updatedStyles.font.includes('Astack Proof Serif'));
+          assert.ok(updatedStyles.fontCss.includes('Astack Proof Serif'));
+          assert.equal(
+            updatedStyles.fontCss.includes('Astack Proof Sans'),
+            false,
+          );
+          await appPage
+            .getByRole('button', { name: 'Teardown and remount', exact: true })
+            .click();
+          await appPage
+            .getByRole('status')
+            .filter({ hasText: 'Remounted after teardown acknowledgement' })
+            .waitFor();
+          assert.equal(
+            await appPage.locator('body').getAttribute('data-mounts'),
+            '2',
+          );
+          assert.equal(
+            await appPage
+              .locator('body')
+              .getAttribute('data-teardown-acknowledgements'),
+            '1',
+          );
+          assert.equal(
+            await appPage
+              .locator('body')
+              .getAttribute('data-closed-connections'),
+            '2',
+          );
+          await appPage
+            .frameLocator('#app')
+            .getByText(title, { exact: true })
+            .waitFor();
+          const remountedStyles = await styles();
+          assert.deepEqual(remountedStyles, updatedStyles);
+          await appPage
+            .frameLocator('#app')
+            .getByRole('button', { name: 'Mark done', exact: true })
+            .click();
+          await waitFor(
+            async () =>
+              items(await owner.query(list, {})).find(
+                (value) => value.id === item.id,
+              )?.status === 'done'
+                ? true
+                : false,
+            'persisted remounted App status change',
+          );
+          await page.reload();
+          await page.getByText(title, { exact: true }).waitFor();
+          await page
+            .getByRole('button', { name: 'Reopen', exact: true })
+            .waitFor();
+          await appPage
+            .frameLocator('#app')
+            .getByRole('button', { name: 'Reopen', exact: true })
+            .waitFor();
           await appPage.screenshot({
             path: join(evidence, 'mcp-app-host.png'),
             fullPage: true,
           });
           report.artifacts.push('mcp-app-host.png');
+          await appPage
+            .getByRole('button', { name: 'Close App', exact: true })
+            .click();
+          await appPage
+            .getByRole('status')
+            .filter({ hasText: 'App closed after teardown acknowledgement' })
+            .waitFor();
+          assert.equal(await appPage.locator('#app').count(), 0);
+          assert.equal(
+            await appPage
+              .locator('body')
+              .getAttribute('data-teardown-acknowledgements'),
+            '2',
+          );
+          assert.equal(
+            await appPage
+              .locator('body')
+              .getAttribute('data-closed-connections'),
+            '4',
+          );
+          assert.deepEqual(uncaughtAppErrors, []);
+          await writeFile(
+            join(evidence, 'mcp-host-observations.json'),
+            JSON.stringify(
+              {
+                initialStyles,
+                updatedStyles,
+                remountedStyles,
+                mounts: 2,
+                teardownAcknowledgements: 2,
+                closedOwnedConnections: 4,
+                uncaughtAppErrors,
+                browserMessages: hostMessages,
+              },
+              null,
+              2,
+            ) + '\n',
+          );
+          report.artifacts.push('mcp-host-observations.json');
         } catch (error) {
           hostMessages.push(await appPage.getByRole('status').innerText());
           await appPage.screenshot({

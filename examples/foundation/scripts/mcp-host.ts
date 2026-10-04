@@ -58,7 +58,7 @@ export async function startMcpHost(
       }
       if (path === '/')
         return new Response(
-          '<!doctype html><html><head><meta charset="utf-8"><title>Local MCP App host</title></head><body><h1>Local MCP App host</h1><p id="status" role="status">Connecting</p><iframe id="app" title="Work items MCP App" sandbox="allow-scripts" style="width:100%;height:700px;border:1px solid #ddd"></iframe><script type="module" src="/host.js"></script></body></html>',
+          '<!doctype html><html><head><meta charset="utf-8"><title>Local MCP App host</title></head><body><h1>Local MCP App host</h1><p id="status" role="status">Connecting</p><button id="palette" disabled>Update host palette</button><button id="remount" disabled>Teardown and remount</button><button id="close-app" disabled>Close App</button><div id="app-container"></div><script type="module" src="/host.js"></script></body></html>',
           { headers: { 'content-type': 'text/html' } },
         );
       return new Response('Not found', { status: 404 });

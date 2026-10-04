@@ -1,7 +1,12 @@
 import { createRoot } from 'react-dom/client';
 import { useEffect, useRef, useState } from 'react';
 import type { AppEventMap } from '@modelcontextprotocol/ext-apps';
-import { App } from '@modelcontextprotocol/ext-apps';
+import {
+  App,
+  applyDocumentTheme,
+  applyHostFonts,
+  applyHostStyleVariables,
+} from '@modelcontextprotocol/ext-apps';
 import { WorkItemsResultSchema, errorMessage } from '@foundation/domain';
 import type { WorkItem } from '@foundation/domain';
 import { Notice, Workspace, WorkItemList } from '@foundation/ui';
@@ -16,7 +21,13 @@ function McpWorkItems() {
   const saving = useRef(false);
   useEffect(() => {
     let active = true;
-    const app = new App({ name: 'astack-work-items', version: '1.0.0' });
+    let disposeSizeNotifications: (() => void) | undefined;
+    let fontCss: string | undefined;
+    const app = new App(
+      { name: 'astack-work-items', version: '1.0.0' },
+      {},
+      { autoResize: false },
+    );
     const onResult = (result: AppEventMap['toolresult']) => {
       if (!active) return;
       try {
@@ -27,11 +38,45 @@ function McpWorkItems() {
       }
     };
     const onContext = (context: AppEventMap['hostcontextchanged']) => {
-      if (context.theme)
-        document.documentElement.style.colorScheme = context.theme;
+      if (!active) return;
+      if (context.theme) applyDocumentTheme(context.theme);
+      if (context.styles?.variables)
+        applyHostStyleVariables(context.styles.variables);
+      const suppliedFonts = context.styles?.css?.fonts;
+      if (suppliedFonts !== undefined && suppliedFonts !== fontCss) {
+        // The SDK helper injects once. Remove our previous block when the host
+        // supplies replacement fonts, then let the helper install the new CSS.
+        if (fontCss !== undefined)
+          document.getElementById('__mcp-host-fonts')?.remove();
+        applyHostFonts(suppliedFonts);
+        fontCss = suppliedFonts;
+      }
     };
+    const invalidate = () => {
+      active = false;
+      connectedApp.current = undefined;
+      saving.current = false;
+      disposeSizeNotifications?.();
+      disposeSizeNotifications = undefined;
+      app.removeEventListener('toolresult', onResult);
+      app.removeEventListener('hostcontextchanged', onContext);
+    };
+    const close = () => {
+      invalidate();
+      app.close().catch(console.error);
+    };
+    window.addEventListener('pagehide', close);
     app.addEventListener('toolresult', onResult);
     app.addEventListener('hostcontextchanged', onContext);
+    app.onteardown = () => {
+      invalidate();
+      setBridge(undefined);
+      setPendingId(undefined);
+      // The transport stays open until the host receives this acknowledgement.
+      // Pagehide or component cleanup closes the transport after the host can
+      // safely remove the acknowledged iframe.
+      return {};
+    };
     app
       .connect()
       .then(() => {
@@ -40,17 +85,17 @@ function McpWorkItems() {
           setBridge(app);
           const context = app.getHostContext();
           if (context) onContext(context);
+          disposeSizeNotifications = app.setupSizeChangedNotifications();
         }
       })
       .catch((failure: unknown) => {
         if (active) setError(errorMessage(failure));
       });
     return () => {
-      active = false;
-      connectedApp.current = undefined;
-      app.removeEventListener('toolresult', onResult);
-      app.removeEventListener('hostcontextchanged', onContext);
-      app.close().catch(console.error);
+      invalidate();
+      window.removeEventListener('pagehide', close);
+      app.onteardown = undefined;
+      close();
     };
   }, []);
   async function toggle(item: WorkItem) {
@@ -84,8 +129,10 @@ function McpWorkItems() {
     } catch (failure) {
       if (connectedApp.current === bridge) setError(errorMessage(failure));
     } finally {
-      saving.current = false;
-      if (connectedApp.current === bridge) setPendingId(undefined);
+      if (connectedApp.current === bridge) {
+        saving.current = false;
+        setPendingId(undefined);
+      }
     }
   }
   return (
@@ -101,7 +148,8 @@ function McpWorkItems() {
           {...(pendingId ? { pendingId } : {})}
           onStatusChange={(item) => {
             toggle(item).catch((failure: unknown) => {
-              setError(errorMessage(failure));
+              if (connectedApp.current === bridge)
+                setError(errorMessage(failure));
             });
           }}
         />
