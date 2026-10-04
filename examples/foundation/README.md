@@ -41,3 +41,11 @@ Build the MCP UI before `bunx --no-install convex dev` in `packages/backend`. St
 The pre-commit hook uses pinned Husky/lint-staged, formatting and staged lint, with backup/partial-stage protection. Install in a fresh Git checkout with `bun install`. The scaffold does not initialize Git implicitly; run `git init` when creating a repository. Broader affected checks run before handoff/CI; a pre-push hook is deferred until its measured cost fits. Generated files are narrowly excluded. Agents must correct code rather than bypass hooks or weaken checks.
 
 `.astack/project.md` records actual proof/control routes. The control script in `.codex/skills/astack-work-items/` identifies prerequisites and runs disposable verification. Trial prompts/rubric and retained outcomes live in the source repository's `.astack/foundation/`. Read the retained result before asserting provider, host or agent behaviour; those are separate claims.
+
+From the source repository, run actual delivery trials after committing the candidate:
+
+```sh
+bun examples/foundation/scripts/trials.ts --candidate <commit> --rubric .astack/foundation/trial-rubric.md --output <new-evidence-directory> --rounds 2 --model <configured-model> --reasoning <configured-effort>
+```
+
+Every round uses fresh creation, feature and bug-fix agents plus independent scored reviewers. The candidate's immutable verifier checks delivered source, including title-edit assertions for the feature. The rubric is committed before execution and remains fixed across rounds. Timeouts, missing proof and authorization defects cannot pass; prompts, source, observations, usage, costs when available and interventions survive disposable-project cleanup. The runner reuses CLI authentication, installs only the temporary candidate plugin and removes it afterwards.
