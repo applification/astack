@@ -237,10 +237,18 @@ export async function startRuntime(
       throw new AggregateError(errors, 'Disposable runtime cleanup failed');
   };
   try {
+    const sourceRevision = await command(
+      ['git', 'rev-parse', 'HEAD'],
+      source,
+    ).then(
+      (value) => value.trim(),
+      () => 'unversioned',
+    );
     await cp(source, project, {
       recursive: true,
       filter: (path) => isSourcePath(relative(source, path)),
     });
+    const buildId = `${sourceRevision}@sha256-${await sourceDigest(project)}`;
     await command(['bun', 'install', '--frozen-lockfile'], project);
     const [cloudPort, sitePort, webPort] = await Promise.all([
       freePort(),
@@ -255,7 +263,6 @@ export async function startRuntime(
       mcpUrl = `${siteUrl}/mcp`;
     const issuer = `${siteUrl}/proof-issuer`,
       webAudience = 'astack-work-items-web';
-    const buildId = await revisionIdentity(source);
     const { privateKey, publicKey } = await generateKeyPair('RS256', {
       modulusLength: 2048,
     });
