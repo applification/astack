@@ -1,6 +1,6 @@
 # Foundation iteration evidence
 
-Implementation candidate: `baa74729f5c2b120be549d82177a92ca0ee9d41e`. Subsequent commits curate evidence and record provider configuration; they do not change the tested profile. The original baseline is `f29f52dc5ee5b73feb1b24d301cb61f1a578549f`.
+Initial implementation candidate: `baa74729f5c2b120be549d82177a92ca0ee9d41e`. Later repairs change scaffold path protection, hook setup, source identity and trial orchestration/retention; application/backend behavior remains the same. The repaired candidate is validated and recorded separately. The original baseline is `f29f52dc5ee5b73feb1b24d301cb61f1a578549f`.
 
 ## Observed checks
 
