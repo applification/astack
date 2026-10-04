@@ -15,6 +15,7 @@ import { isUtf8 } from 'node:buffer';
 import { join, resolve, relative, extname } from 'node:path';
 import { z } from 'zod';
 import { StringDecoder } from 'node:string_decoder';
+import { stripVTControlCharacters } from 'node:util';
 import { command, commandBytes, foundationRoot, redact } from './runtime';
 import { isSourcePath, sourceDigest } from './source-identity';
 
@@ -751,12 +752,19 @@ export async function retainProject(
   project: string,
   retained: string,
   proofArtifacts = false,
+  includeRoots?: readonly string[],
 ): Promise<Record<string, string>> {
   await mkdir(retained, { recursive: true });
   const hashes: Record<string, string> = {};
   const retainedHashes: Record<
     string,
-    { originalSha256: string; retainedSha256: string; transformed: boolean }
+    {
+      originalSha256: string;
+      retainedSha256: string;
+      transformed: boolean;
+      retainedPath: string;
+      transforms: string[];
+    }
   > = {};
   const omittedFiles: {
     path: string;
@@ -771,7 +779,13 @@ export async function retainProject(
     ).sort((a, b) => a.name.localeCompare(b.name))) {
       const path = join(directory, entry.name),
         name = relative(project, path);
-      const proof = proofArtifacts || name.startsWith('.proof/');
+      if (includeRoots && !includeRoots.includes(name.split('/')[0] ?? ''))
+        continue;
+      const proof =
+        proofArtifacts ||
+        ['.proof', '.astack'].some(
+          (root) => name === root || name.startsWith(`${root}/`),
+        );
       if (
         name
           .split('/')
@@ -816,15 +830,26 @@ export async function retainProject(
         const imageExtension = ['.png', '.jpg', '.jpeg', '.webp'].includes(
           extension,
         );
+        const terminalLog =
+          extension === '.log' && isUtf8(bytes) && !bytes.includes(0);
+        const archiveDisguisedAsLog =
+          terminalLog &&
+          (['PK\u0003\u0004', 'PK\u0005\u0006', 'PK\u0007\u0008'].includes(
+            bytes.subarray(0, 4).toString('latin1'),
+          ) ||
+            /^BZh[1-9]/.test(bytes.subarray(0, 4).toString('ascii')));
         const unsupported =
           /\.(?:zip|gz|gzip|bz2|xz|7z|rar|tar|pdf|woff2?|ttf|otf|eot|wasm|db|sqlite|mp[34]|mov|webm|wav)$/i.test(
             name,
           ) ||
+          archiveDisguisedAsLog ||
           !isUtf8(bytes) ||
+          bytes.includes(0) ||
           // ANSI ESC is expected in terminal logs; other binary controls are not.
-          /[\u0000-\u0008\u000b\u000c\u000e-\u001a\u001c-\u001f\u007f]/.test(
-            bytes.toString('utf8'),
-          );
+          (!terminalLog &&
+            /[\u0000-\u0008\u000b\u000c\u000e-\u001a\u001c-\u001f\u007f]/.test(
+              bytes.toString('utf8'),
+            ));
         if (!binaryImage && (imageExtension || unsupported)) {
           omittedFiles.push({
             path: redactTrial(name),
@@ -839,13 +864,35 @@ export async function retainProject(
         hashes[name] = digest(bytes);
         const destination = join(retained, 'delivered', name);
         await mkdir(resolve(destination, '..'), { recursive: true });
-        const retainedBytes = binaryImage
-          ? bytes
-          : Buffer.from(redactTrial(bytes.toString('utf8')));
+        const sourceText = binaryImage ? '' : bytes.toString('utf8');
+        const normalized = terminalLog
+          ? stripVTControlCharacters(sourceText).replace(
+              /(Bearer\s+|(?:CONVEX_SELF_HOSTED_ADMIN_KEY|CONVEX_DEPLOY_KEY|WORKOS_API_KEY)\s*[=:]\s*)[\u0001-\u0008\u000b\u000c\u000e-\u001f\u007f \t]+/gi,
+              '$1',
+            )
+          : sourceText;
+        const redacted = binaryImage ? '' : redactTrial(normalized);
+        // Exposing controls before redaction would split an opaque credential
+        // at the newly introduced backslash. Mask first, then show controls.
+        const sanitized = terminalLog
+          ? redacted.replace(
+              /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g,
+              (control) =>
+                `\\u${control.charCodeAt(0).toString(16).padStart(4, '0')}`,
+            )
+          : redacted;
+        const retainedBytes = binaryImage ? bytes : Buffer.from(sanitized);
         retainedHashes[name] = {
           originalSha256: hashes[name] ?? digest(bytes),
           retainedSha256: digest(retainedBytes),
           transformed: !retainedBytes.equals(bytes),
+          retainedPath: `delivered/${name}`,
+          transforms: [
+            ...(normalized !== sourceText || sanitized !== redacted
+              ? ['terminal-control-normalization']
+              : []),
+            ...(redacted !== normalized ? ['credential-redaction'] : []),
+          ],
         };
         await writeFile(destination, retainedBytes);
       }
@@ -862,11 +909,22 @@ export async function retainProject(
     JSON.stringify(
       {
         format: 'astack-trial-retention/v1',
+        scope: includeRoots
+          ? {
+              kind: 'creation-workspace-siblings',
+              includedRoots: includeRoots,
+              deliveredProjectExcluded: true,
+            }
+          : {
+              kind: 'project',
+              sourceSelection: 'isSourcePath',
+              proofRoots: ['.astack', '.proof'],
+            },
         files: retainedHashes,
         omittedFiles,
         excludedPaths: { privateOrCredentialPaths, namesRetained: false },
         policy:
-          'Source digests describe original delivered bytes. Retained byte digests describe sanitized UTF-8 text or byte-exact supported PNG/JPEG/WebP images; transformed files are marked. Unsupported binaries and archives are omitted with hashes/reasons and sanitized display paths, including proof trace ZIPs whose contents can contain credentials. Separate omission entries preserve all artifacts even when display paths redact identically. Credential/private paths are excluded without recording their names; environments, dependencies and symlinks are excluded.',
+          'Source digest selection is unchanged. Lifecycle metadata/docs and nested proof under .astack/.proof are additionally retained as evidence. Original/retained byte digests and observed transforms describe every artifact. UTF-8 non-NUL .log output has VT sequences removed before credential redaction and remaining controls displayed as Unicode escapes; other source text is unchanged except credential redaction. PNG/JPEG/WebP images remain byte-exact. Unsupported binaries/archives are omitted with hashes/reasons and sanitized display paths, including proof trace ZIPs. Separate omission entries preserve colliding display paths. Credential/private paths are excluded without names; environments, dependencies and symlinks are excluded.',
       },
       null,
       2,
@@ -879,15 +937,11 @@ export async function retainWorkspaceEvidence(
   workspace: string,
   retained: string,
 ): Promise<Record<string, string>> {
-  const evidence = join(workspace, 'evidence');
-  try {
-    await readdir(evidence);
-  } catch (error) {
-    if (error instanceof Error && 'code' in error && error.code === 'ENOENT')
-      return {};
-    throw error;
-  }
-  return retainProject(evidence, join(retained, 'workspace-evidence'), true);
+  return retainProject(workspace, join(retained, 'workspace-evidence'), true, [
+    '.astack',
+    '.proof',
+    'evidence',
+  ]);
 }
 
 export function trialRounds(value: number): number {
@@ -1268,8 +1322,7 @@ export async function runTrials(options: {
               workspace,
               retained,
             );
-            if (Object.keys(workspaceEvidence).length)
-              workspaceEvidenceManifest = `${name}/workspace-evidence/retention.json`;
+            workspaceEvidenceManifest = `${name}/workspace-evidence/retention.json`;
           }
         } catch (error) {
           await writeFile(

@@ -37,7 +37,7 @@ import {
   foundationRoot,
   waitFor,
 } from '../scripts/runtime';
-import { isSourcePath } from '../scripts/source-identity';
+import { isSourcePath, sourceDigest } from '../scripts/source-identity';
 
 function deferred() {
   let resolve: () => void = () => {
@@ -356,7 +356,7 @@ describe('independent delivery trial gates', () => {
       await retainWorkspaceEvidence(workspace, retained);
       const sibling = join(retained, 'workspace-evidence');
       const sanitized = await readFile(
-        join(sibling, 'delivered/report.md'),
+        join(sibling, 'delivered/evidence/report.md'),
         'utf8',
       );
       expect(sanitized).toContain('Observed persistence');
@@ -367,7 +367,7 @@ describe('independent delivery trial gates', () => {
         ) as unknown,
       ).toMatchObject({
         files: {
-          'report.md': {
+          'evidence/report.md': {
             originalSha256: hash(observation),
             retainedSha256: hash(sanitized),
             transformed: true,
@@ -379,7 +379,155 @@ describe('independent delivery trial gates', () => {
         'private.pem',
         'node_modules/dependency.js',
       ])
-        expect(await Bun.file(join(sibling, 'delivered', name)).exists()).toBe(
+        expect(
+          await Bun.file(join(sibling, 'delivered/evidence', name)).exists(),
+        ).toBe(false);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+  test('lifecycle metadata and nested evidence survive both project and creation sibling retention', async () => {
+    const directory = await mkdtemp(
+      join(tmpdir(), 'astack-trial-lifecycle-test-'),
+    );
+    const workspace = join(directory, 'workspace'),
+      project = join(workspace, 'app'),
+      retained = join(directory, 'retained');
+    const hash = (text: string) =>
+      createHash('sha256').update(text).digest('hex');
+    try {
+      await mkdir(join(project, '.astack/feature/evidence/nested'), {
+        recursive: true,
+      });
+      await mkdir(join(workspace, '.astack/creation/evidence'), {
+        recursive: true,
+      });
+      await mkdir(join(workspace, '.proof'), { recursive: true });
+      await mkdir(join(workspace, 'evidence'), { recursive: true });
+      await writeFile(join(project, 'main.ts'), 'export const ready = true;\n');
+      await writeFile(
+        join(project, '.astack/feature/intent.md'),
+        'Owner intent and accepted scope.\n',
+      );
+      const originalSourceDigest = await sourceDigest(project);
+      const inline = 'Web and MCP agree. WORKOS_API_KEY=private-inline-value\n';
+      const sibling = 'Creation passed. Bearer private-sibling-value\n';
+      await writeFile(
+        join(project, '.astack/feature/evidence/nested/report.md'),
+        inline,
+      );
+      await writeFile(
+        join(project, '.astack/feature/evidence/.env.example'),
+        'excluded environment',
+      );
+      await writeFile(
+        join(project, '.astack/feature/evidence/private-key.pem'),
+        'excluded private key',
+      );
+      await mkdir(join(project, '.astack/feature/evidence/node_modules/pkg'), {
+        recursive: true,
+      });
+      await writeFile(
+        join(project, '.astack/feature/evidence/node_modules/pkg/index.js'),
+        'excluded dependency',
+      );
+      await writeFile(
+        join(workspace, '.astack/creation/intent.md'),
+        'Scaffold lifecycle intent.\n',
+      );
+      await writeFile(
+        join(workspace, '.astack/creation/evidence/report.md'),
+        sibling,
+      );
+      await writeFile(
+        join(workspace, '.proof/root-report.md'),
+        'Root proof.\n',
+      );
+      await writeFile(join(workspace, 'evidence/checks.log'), 'PASS checks\n');
+      await writeFile(
+        join(workspace, '.astack/creation/evidence/.env'),
+        'excluded environment',
+      );
+      await writeFile(
+        join(workspace, '.astack/creation/evidence/credentials.json'),
+        'excluded credentials',
+      );
+      expect(await sourceDigest(project)).toBe(originalSourceDigest);
+      const projectHashes = await retainProject(project, retained);
+      expect(projectHashes['.astack/feature/intent.md']).toBe(
+        hash('Owner intent and accepted scope.\n'),
+      );
+      const inlinePath = '.astack/feature/evidence/nested/report.md';
+      const retainedInline = await readFile(
+        join(retained, 'delivered', inlinePath),
+        'utf8',
+      );
+      expect(retainedInline).toContain('Web and MCP agree.');
+      expect(retainedInline).not.toContain('private-inline-value');
+      expect(
+        JSON.parse(
+          await readFile(join(retained, 'retention.json'), 'utf8'),
+        ) as unknown,
+      ).toMatchObject({
+        scope: { kind: 'project', proofRoots: ['.astack', '.proof'] },
+        files: {
+          [inlinePath]: {
+            originalSha256: hash(inline),
+            retainedSha256: hash(retainedInline),
+            transformed: true,
+            retainedPath: `delivered/${inlinePath}`,
+            transforms: ['credential-redaction'],
+          },
+        },
+      });
+      const siblingHashes = await retainWorkspaceEvidence(workspace, retained);
+      const siblingPath = '.astack/creation/evidence/report.md';
+      const output = join(retained, 'workspace-evidence');
+      const retainedSibling = await readFile(
+        join(output, 'delivered', siblingPath),
+        'utf8',
+      );
+      expect(siblingHashes[siblingPath]).toBe(hash(sibling));
+      expect(siblingHashes['.astack/creation/intent.md']).toBeDefined();
+      expect(siblingHashes['.proof/root-report.md']).toBeDefined();
+      expect(siblingHashes['evidence/checks.log']).toBeDefined();
+      expect(retainedSibling).not.toContain('private-sibling-value');
+      expect(
+        JSON.parse(
+          await readFile(join(output, 'retention.json'), 'utf8'),
+        ) as unknown,
+      ).toMatchObject({
+        scope: {
+          kind: 'creation-workspace-siblings',
+          includedRoots: ['.astack', '.proof', 'evidence'],
+          deliveredProjectExcluded: true,
+        },
+        files: {
+          [siblingPath]: {
+            originalSha256: hash(sibling),
+            retainedSha256: hash(retainedSibling),
+            transformed: true,
+            retainedPath: `delivered/${siblingPath}`,
+            transforms: ['credential-redaction'],
+          },
+        },
+      });
+      expect(
+        await Bun.file(join(output, 'delivered/app/main.ts')).exists(),
+      ).toBe(false);
+      for (const path of [
+        '.astack/feature/evidence/.env.example',
+        '.astack/feature/evidence/private-key.pem',
+        '.astack/feature/evidence/node_modules/pkg/index.js',
+      ])
+        expect(await Bun.file(join(retained, 'delivered', path)).exists()).toBe(
+          false,
+        );
+      for (const path of [
+        '.astack/creation/evidence/.env',
+        '.astack/creation/evidence/credentials.json',
+      ])
+        expect(await Bun.file(join(output, 'delivered', path)).exists()).toBe(
           false,
         );
     } finally {
@@ -409,6 +557,11 @@ describe('independent delivery trial gates', () => {
         '.proof/report.gz': gzipSync('WORKOS_API_KEY=compressed-private-value'),
         '.proof/font.woff2': Buffer.from([119, 79, 70, 50, 0, 255]),
         '.proof/custom.data': Buffer.from([0, 255, 128]),
+        '.proof/zip-disguised.log': Buffer.from(
+          'PK\u0003\u0004compressed bytes without a NUL',
+        ),
+        '.proof/gzip-disguised.log': gzipSync('PASS checks'),
+        '.proof/nul-disguised.log': Buffer.from('PASS\u0000binary'),
         '.proof/fake.png': Buffer.from('Bearer private-value'),
         [`.proof/${jwt}.zip`]: Buffer.from([80, 75, 3, 4]),
         [`.proof/${secondJwt}.zip`]: Buffer.from([80, 75, 3, 4, 8]),
@@ -425,7 +578,7 @@ describe('independent delivery trial gates', () => {
         'Observed persistence.\n',
       );
       const coloredLog =
-        '\u001b[32mObserved persistence\u001b[0m\nWORKOS_API_KEY=private-log-value\nBearer \u001b[32mprivate-colored-value\u001b[0m\n';
+        '\u001b[32mPASS observed persistence\u001b[0m\n\u001b]8;;https://example.invalid/?WORKOS_API_KEY=private-link-value\u0007FAILED validation\u001b]8;;\u0007\nbackspace\b\b preserved\u0007\nWORKOS_API_KEY=private-log-value\nBearer \u001b[32mprivate-colored-value\u001b[0m\nWORKOS_API_KEY=\u0007private-leading-api-value\nBearer \b private-leading-bearer-value\nBearer embedded-credential\bcredential-tail\n';
       await writeFile(join(project, '.proof/runtime.log'), coloredLog);
       const hashes = await retainProject(project, retained);
       expect(hashes['.proof/screenshot.png']).toBe(hash(png));
@@ -438,11 +591,40 @@ describe('independent delivery trial gates', () => {
         join(retained, 'delivered/.proof/runtime.log'),
         'utf8',
       );
-      expect(retainedLog).toContain('\u001b[32mObserved persistence\u001b[0m');
+      expect(retainedLog).toContain('PASS observed persistence');
+      expect(retainedLog).toContain('FAILED validation');
+      expect(retainedLog).toContain('backspace\\u0008\\u0008 preserved\\u0007');
+      expect(retainedLog).not.toContain('\u001b');
+      expect(retainedLog).not.toContain('private-link-value');
       expect(retainedLog).toContain('WORKOS_API_KEY=[REDACTED]');
       expect(retainedLog).not.toContain('private-log-value');
       expect(retainedLog).not.toContain('private-colored-value');
+      for (const value of [
+        'private-leading-api-value',
+        'private-leading-bearer-value',
+        'embedded-credential',
+        'credential-tail',
+      ])
+        expect(retainedLog).not.toContain(value);
       expect(hashes['.proof/runtime.log']).toBe(hash(Buffer.from(coloredLog)));
+      expect(
+        JSON.parse(
+          await readFile(join(retained, 'retention.json'), 'utf8'),
+        ) as unknown,
+      ).toMatchObject({
+        files: {
+          '.proof/runtime.log': {
+            originalSha256: hash(Buffer.from(coloredLog)),
+            retainedSha256: hash(Buffer.from(retainedLog)),
+            transformed: true,
+            retainedPath: 'delivered/.proof/runtime.log',
+            transforms: [
+              'terminal-control-normalization',
+              'credential-redaction',
+            ],
+          },
+        },
+      });
       const manifestText = await readFile(
         join(retained, 'retention.json'),
         'utf8',
