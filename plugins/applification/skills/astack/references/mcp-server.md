@@ -4,6 +4,8 @@ Use this path when building or changing an MCP server. Start from the project's 
 
 For ChatGPT MCP Apps, OpenAI extensions, portable packaging or events, also use [ChatGPT plugin engineering](chatgpt-plugin.md). Its [compatibility ledger](openai-compatibility.md) overrides the generic v2 default when using the released OpenAI helper; do not mix incompatible SDK majors.
 
+The [foundation profile](foundation.md) serves authenticated HTTP MCP directly from a Convex HTTP action and uses WorkOS Connect for OAuth. Share authorized backend operations with web; keep transport details at the MCP adapter and the host bridge out of portable UI. This profile needs no separate `apps/mcp` service. A separate server remains appropriate for other runtimes, deployment boundaries, or stdio tools. Apply the profile's identity rules before choosing token validation or delegation.
+
 ## Choose the serving boundary
 
 For a new TypeScript remote HTTP server, use the [official `@modelcontextprotocol/server` SDK](https://ts.sdk.modelcontextprotocol.io/v2/) for tools, resources and prompts. A practical Fetch-compatible starting point is [`mcp-handler`](https://github.com/vercel/mcp-handler) for the HTTP MCP handler, Hono for routes and CORS, Zod for input schemas, and `jose` when verifying JWT bearer tokens. Keep their versions compatible and confirm the runtime requirements from the current package documentation. Mount the handler at a stable MCP URL; put health and OAuth metadata on explicit routes. Register tools separately from HTTP wiring so the same definitions can be inspected by an MCP client without starting a deployment. The SDK's own HTTP handler and auth middleware are also valid when they fit the host better; do not layer two handlers for the same endpoint.

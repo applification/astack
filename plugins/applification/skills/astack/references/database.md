@@ -1,6 +1,6 @@
 # Database path
 
-Choose **Convex** when a new product needs a database and the user has not chosen another one. In a new Bun/Turborepo project, keep the Convex source and generated API in `packages/backend/convex`, with consuming apps depending on the backend workspace. Add `convex` to that workspace with Bun. For an existing project, follow its database requirements and conventions; introduce or migrate to Convex only when the change calls for that decision. New web products using astack's default use the [Next.js App Router path](https://docs.convex.dev/client/nextjs/app-router/); adapt to an existing app's framework rather than migrating it to add persistence.
+Choose **Convex** when a new product needs a database and the user has not chosen another one. In a new Bun/Turborepo project, keep the Convex source and generated API in `packages/backend/convex`, with consuming apps depending on the backend workspace. Add `convex` to that workspace with Bun. For an existing project, follow its database requirements and conventions; introduce or migrate to Convex only when the change calls for that decision. The [foundation profile](foundation.md) uses the [React client](https://docs.convex.dev/client/react/overview) in Vite and serves MCP through Convex HTTP actions. Use the [Next.js App Router path](https://docs.convex.dev/client/nextjs/app-router/) when that is the chosen framework.
 
 ## Choose the Convex route
 
@@ -16,6 +16,8 @@ If the plugin or a named skill is unavailable, install or enable `convex@openai-
 ## Prove the backend behavior
 
 Define the data shape, access paths, and ownership before writing queries or mutations. Use indexed queries with bounded results, reactive queries for reads, mutations for transactional writes, and actions for external side effects. Keep credentials in Convex environment variables and store storage IDs rather than expiring file URLs. Let the expert skill and the project's code decide the exact implementation.
+
+Convex owns its reactive server state; do not copy query results into a second client cache with manual invalidation. Use the official [TanStack Query integration](https://docs.convex.dev/client/tanstack/tanstack-query) when the chosen platform needs it. Form state is local input state, and using TanStack Form does not imply a Query dependency. WorkOS is the foundation auth provider; follow [its web and MCP identity boundaries](foundation.md#identity-across-web-and-mcp). The backend enforces identity and ownership regardless of the calling surface.
 
 Use the plugin's current deployment guidance for setup. For disposable development proof, a [local Convex deployment](https://docs.convex.dev/cli/local-deployments) is useful when the feature does not need externally reachable services. Record which deployment the app and CLI use, keep `bunx convex dev` running, and exclude local state and secrets from Git. Use a suitable cloud or preview deployment when auth, webhooks, or another integration needs one.
 

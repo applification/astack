@@ -1,25 +1,26 @@
 # Project setup
 
-Use this when starting a new product, adopting astack in an existing project, or adding a proof route that the project has not described. The stack below is astack's greenfield default, not a condition for using its work routes or app control.
+Use this when starting a new product, adopting astack in an existing project, or adding a proof route that the project has not described. The stack below is astack's greenfield default, not a condition for using its work routes or app control. For a product with persistent web and MCP behavior, start from the [Convex + MCP + WorkOS foundation profile](foundation.md) and its runnable work-item reference.
 
 For the first feature in a clean repository with no chosen stack, establish the smallest runnable product and a Git publication target early. Start with **Bun workspaces and Turborepo**, even when only one app exists. Commit `bun.lock`, declare Bun in the root `packageManager` field, and use `apps/*` and `packages/*` workspaces with a root `turbo.json`. Use `bun install`, `bun run`, and `bunx` for JavaScript dependencies, scripts, and CLIs; do not introduce npm or pnpm lockfiles or commands. Keep Turbo tasks scoped to the apps and packages affected by a change. If the user has chosen another stack for a new product, use it and keep the same behavior and proof discipline.
 
-Put deployable surfaces under `apps/` (`web`, `mcp`, `ios`, `desktop`, and others only when needed) and reusable code under `packages/`. Share code only where consumers and platform boundaries justify it. For a web UI, put a Next.js App Router app in `apps/web`, shared shadcn/ui components and Tailwind styling in `packages/ui`, then follow the [web feature path](web-feature.md) to decide whether Pencil and Storybook are useful for the initial feature. Consult the current [shadcn monorepo scaffold](https://ui.shadcn.com/docs/monorepo) and [Next.js installation guide](https://nextjs.org/docs/app/getting-started/installation) for Bun-compatible setup. Check the generated package manager, lockfile, workspace imports, and running scripts before building on it. Add the project profile once actual commands and surfaces exist; do not fill it with anticipated commands.
+Put deployable surfaces under `apps/` (`web`, `mcp-ui`, `ios`, `desktop`, and others only when needed) and reusable code under `packages/`. Share code only where consumers and platform boundaries justify it. For a new interactive web UI, put a **React + TypeScript + Vite** app in `apps/web`, shared shadcn/ui components and Tailwind styling in `packages/ui`, then follow the [web feature path](web-feature.md) to decide whether Pencil and Storybook are useful for the initial feature. Use **Next.js App Router** when server rendering or public content requirements justify it, and record that choice. Consult the current [Vite](https://vite.dev/guide/), [shadcn monorepo](https://ui.shadcn.com/docs/monorepo), or [Next.js installation](https://nextjs.org/docs/app/getting-started/installation) guidance for the chosen profile. Check the generated package manager, lockfile, workspace imports, and running scripts before building on it. Add the project profile once actual commands and surfaces exist; do not fill it with anticipated commands.
 
 For a ChatGPT plugin, use [plugin engineering](chatgpt-plugin.md) to choose verified SDK profiles, UI consumers and portable packaging. Keep product runtime servers in the product, not in astack itself. Record host/account constraints and connection refresh commands when known.
 
-For a new MCP server, create `apps/mcp` and follow the [MCP server path](mcp-server.md). A server with no web UI does not need `apps/web`, `packages/ui`, Pencil, or Storybook. Add a shared backend package only when its domain behavior has a real consumer; keep the protocol adapter in the MCP app.
+For MCP backed by the foundation's Convex operations, serve its protocol adapter from a Convex HTTP action in `packages/backend/convex`; share the authorized operations with web and keep an MCP host bridge in `apps/mcp-ui` when it has a UI. Follow the [MCP server path](mcp-server.md) for transport and proof. Create `apps/mcp` when a separate process or deployment is needed. A server with no web UI does not need `apps/web`, `packages/ui`, Pencil, or Storybook. Add persistence only when the behavior needs it.
 
-For a new web product, install [Portless](https://portless.sh/) as a Bun-managed development dependency and use it for local Next.js startup. Portless currently requires Node.js 24+ to run, in addition to the project's Bun requirement. With Turborepo, use the web workspace's `dev` script for `portless`, a separate `dev:app` script for `next dev`, and a `portless` package setting with the app name and `"script": "dev:app"`. Keep the root Turbo `dev` task pointed at workspace `dev` scripts. Run `portless doctor` and start the app once in an interactive environment to establish its local proxy and TLS trust; first-run setup can require privilege and cannot prompt in a headless agent or CI session. Record the actual Portless URL and startup command in `.astack/project.md`. Linked Git worktrees get their own hostnames, so do not hardcode the main checkout's URL in proof commands. Run build and lint checks directly in CI when a local proxy is unnecessary.
+For a new web product, install [Portless](https://portless.sh/) as a Bun-managed development dependency. It supports Vite and Next.js and currently requires Node.js 24+ alongside Bun. Keep root Turbo `dev` pointed at workspace `dev` scripts. Run `portless doctor` and establish proxy/TLS trust interactively before headless proof. Record the checkout's actual URL and startup command in `.astack/project.md`; linked worktrees get separate hostnames. Run CI build and lint directly when a proxy is unnecessary.
 
-For example, after adding Portless to `apps/web`, use this workspace setup with the product's actual name:
+For example, use the product's actual name in the web workspace's [Portless command](https://portless.sh/commands):
 
 ```json
 {
-  "scripts": { "dev": "portless", "dev:app": "next dev" },
-  "portless": { "name": "myapp", "script": "dev:app" }
+  "scripts": { "dev": "portless run --name myapp vite", "dev:app": "vite" }
 }
 ```
+
+Use `next dev` in both script commands for the Next.js profile. Portless injects the Vite port/host flags; verify the installed version's behavior and avoid script indirection that prevents detection. Register the actual URL in WorkOS origins and redirect settings.
 
 For a new Next.js app, preserve the framework's generated `AGENTS.md` guidance to its version-matched bundled docs. Next.js 16.3+ can maintain that block when `next dev` runs; keep project instructions outside its managed markers. [Next DevTools MCP](https://nextjs.org/docs/app/guides/mcp) requires separate `next-devtools-mcp` installation and agent-client configuration even though Next.js 16+ supplies the development endpoint. Install it with Bun in the repository root and configure the project's Codex MCP server in trusted `.codex/config.toml` (or the actual agent client's equivalent):
 
@@ -35,7 +36,7 @@ Configure [shadcn lint](shadcn-lint.md) for web files and Storybook files when p
 
 Once a product has a runnable user surface that needs repeatable driving, follow [app control and feature map](app-control.md) to create or adopt a project-owned `astack-<app>` CLI that can drive and observe it. Keep its skill and script in `.codex/skills/astack-<app>/` and its map in `.astack/feature-map/<app>/`. Build the smallest real command set and map for the first feature, then extend them as the product grows. A project with several independently launched apps may need a control skill and map for each. A library without a running user surface keeps its existing executable checks; do not fabricate an app driver for it.
 
-If the new app needs a database, choose [Convex](database.md) in `packages/backend/convex`, expose the generated API to consuming apps through the backend workspace, and record how to start and identify its local deployment in the project profile. Keep local data and credentials out of version control. Do not create an unused backend or empty app packages just to fill the layout.
+If the new app needs a database, choose [Convex](database.md) in `packages/backend/convex`, expose the generated API to consuming apps through the backend workspace, and record how to start and identify its local deployment in the project profile. The foundation uses WorkOS for web authentication and MCP OAuth; use its [identity guidance](foundation.md#identity-across-web-and-mcp) and the current platform integration. Keep local data and credentials out of version control. Do not create an unused backend or empty app packages just to fill the layout.
 
 When adopting astack in an existing repository, keep its package manager, framework, database, layout, and working commands. Create `.astack/project.md` and a control CLI only where they earn their cost; record the commands that actually run. Migrate to Bun/Turborepo or another part of the greenfield default only when requested as a separate, reviewable change, including scripts, CI, and lockfile changes. Do not mix package managers or restructure a repository as a side effect of an unrelated fix.
 
@@ -57,6 +58,8 @@ Name checks that establish only a component or contract and those that reach
 the real user path. Record regression, probe, rerun, exploration and triage commands
 when present, model and budget policy, safe fixtures, instance ownership, required CI
 checks, and durable evidence retention. Record actual commands, not anticipated ones. Link each existing `astack-<app>` skill and feature map.
+For the foundation profile, describe check:quick, check:affected, check:ci and
+readiness, including their selection inputs and the claims they cannot establish.
 
 ## Selection rules
 Which behavior or dependency changes call for each surface, including indirect
