@@ -8,7 +8,8 @@
     "packages/*"
   ],
   "scripts": {
-    "prepare": "husky",
+    "prepare": "bun scripts/install-hooks.ts",
+    "hooks:install": "bun scripts/install-hooks.ts",
     "dev": "turbo dev",
     "build": "turbo build",
     "build:mcp-ui": "bun run --cwd apps/mcp-ui build && bun scripts/embed-ui.ts",

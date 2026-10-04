@@ -1,0 +1,35 @@
+{
+  "kind": "Derived focused extracts; original trial gates and scores are unchanged.",
+  "originalCandidate": "baa74729f5c2b120be549d82177a92ca0ee9d41e",
+  "originalReviewSha256": "4c47b383f728cc5fd644d030db9cfc58e7afe969c5b125335c8f3547de863593",
+  "originalReviewScore": "10/12",
+  "originalGate": "fail",
+  "originalDelivery": "partial",
+  "nestedHookFinding": {
+    "title": "[P2] Wire hooks for the enclosing repository and app directory",
+    "file": "round-1-creation/app/package.json",
+    "line": 11,
+    "priority": 2,
+    "explanation": "The prepare command runs Husky inside app/, where no .git exists; installation reports '.git can't be found' and core.hooksPath is unset. Additionally, .husky/pre-commit changes to the enclosing root, where its pinned lint-staged command cannot resolve. Configure installation from the Git root targeting app/.husky and execute checks from app/. Removing the read-only restriction alone would not fix these paths."
+  },
+  "nextStageInitialCommitFailure": "Harness interruption: Error: git -c exited 1: \u26a0 Skipping backup because there\u2019s no initial commit yet. This might result in data loss.\n\n\u22ef Preparing lint-staged\u2026\n\u2714 Done preparing lint-staged!\n\u22ef Running tasks for staged files\u2026\n    *.{ts,tsx,js,mjs} \u2014 39 files\n      \u22ef prettier --write\n      \u22ef eslint --max-warnings 0\n    *.{json,md,css,html,yml} \u2014 27 files\n      \u22ef prettier --write\n\n\u2714 prettier --write\n\u2714 prettier --write\n\u2716 eslint --max-warnings 0\n\n\u2716 Failed to run tasks for staged files!\n\u22ef Staging changes from tasks\u2026\n\u2714 Done staging changes from tasks!\n\n\u2716 eslint --max-warnings 0:\n\n<original-owned-trial>/round-1-feature/packages/backend/convex/_generated/api.ts\n  0:0  warning  File ignored because of a matching ignore pattern. Use \"--no-ignore\" to disable file ignore settings or use \"--no-warn-ignored\" to suppress this warning\n\n<original-owned-trial>/round-1-feature/packages/backend/convex/_generated/dataModel.ts\n  0:0  warning  File ignored because of a matching ignore pattern. Use \"--no-ignore\" to disable file ignore settings or use \"--no-warn-ignored\" to suppress this warning\n\n<original-owned-trial>/round-1-feature/packages/backend/convex/_generated/server.ts\n  0:0  warning  File ignored because of a matching ignore pattern. Use \"--no-ignore\" to disable file ignore settings or use \"--no-warn-ignored\" to suppress this warning\n\n<original-owned-trial>/round-1-feature/packages/backend/convex/lib/mcp.ts\n  39:11  error  Unsafe assignment of an error typed value  @typescript-eslint/no-unsafe-assignment\n\n\u2716 4 problems (1 error, 3 warnings)\nhusky - pre-commit script failed (code 1)\n",
+  "reviewDiscoveredProvisioningFailure": {
+    "kind": "Independent reviewer observation communicated to the implementing agent; separate from original delivery trial.",
+    "input": "A regular file at .husky/_ blocks Husky shim provisioning.",
+    "firstObservedResult": {
+      "installationExitCode": 1,
+      "configuredExitCode": 0,
+      "hooksPath": ".husky/_\n"
+    },
+    "cause": "Husky configures core.hooksPath before writing shim files.",
+    "repair": "Capture and restore exact prior local/effective hook configuration when installation fails.",
+    "regression": "Final proof includes default/configured hook rollback and real existing-hook execution after failure."
+  },
+  "reviewDiscoveredInventoryFailure": {
+    "kind": "Independent reviewer observation communicated during repair review.",
+    "input": "Nested client app/ with indexed outside.txt at Git root.",
+    "firstObservedResult": "git ls-files --full-name from project cwd enumerated only project-subtree files, missing outside.txt.",
+    "repair": "Enumerate from repository root with git -C.",
+    "regression": "Final proof includes separately indexed and untracked owner files outside the project."
+  }
+}
