@@ -100,6 +100,7 @@ export async function command(
     detached: true,
   });
   let output = '';
+  let forcedStop: ReturnType<typeof setTimeout> | undefined;
   child.stdout.on('data', (chunk: Buffer) => {
     output += chunk.toString();
   });
@@ -111,6 +112,13 @@ export async function command(
       try {
         process.kill(-child.pid, 'SIGTERM');
       } catch {}
+      forcedStop = setTimeout(() => {
+        if (child.pid && !hasExited(child)) {
+          try {
+            process.kill(-child.pid, 'SIGKILL');
+          } catch {}
+        }
+      }, 5000);
     }
   }, timeoutMs);
   try {
@@ -125,6 +133,7 @@ export async function command(
     return redact(output);
   } finally {
     clearTimeout(timer);
+    if (forcedStop) clearTimeout(forcedStop);
   }
 }
 export function launch(
@@ -218,8 +227,14 @@ export async function startRuntime(
   const logs: string[] = [],
     processes: OwnedProcess[] = [];
   const stop = async () => {
-    for (const process of [...processes].reverse()) await stopProcess(process);
-    await rm(privateDirectory, { recursive: true, force: true });
+    const errors: unknown[] = [];
+    for (const process of [...processes].reverse())
+      await stopProcess(process).catch((error: unknown) => errors.push(error));
+    await rm(privateDirectory, { recursive: true, force: true }).catch(
+      (error: unknown) => errors.push(error),
+    );
+    if (errors.length)
+      throw new AggregateError(errors, 'Disposable runtime cleanup failed');
   };
   try {
     await cp(source, project, {
