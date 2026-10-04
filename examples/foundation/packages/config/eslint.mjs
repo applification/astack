@@ -21,6 +21,7 @@ const portableBoundary = {
   create(context) {
     const importer = context.filename;
     const portable = /\/packages\/(?:ui|domain)\//.test(importer);
+    const domain = /\/packages\/domain\//.test(importer);
     const importerPackage = importer.match(/\/(?:apps|packages)\/[^/]+\//)?.[0];
     function inspect(node, source) {
       if (typeof source !== 'string') {
@@ -53,6 +54,11 @@ const portableBoundary = {
         !source.startsWith('@foundation/');
       const forbidden =
         privateCrossing ||
+        (domain &&
+          (/\/packages\/ui\//.test(filename) ||
+            /^(?:react(?:\/|$)|react-dom(?:\/|$)|@tanstack\/react-|@radix-ui\/)/.test(
+              source,
+            ))) ||
         (portable &&
           (/(?:^|\/)(?:apps|packages\/backend)\//.test(filename) ||
             /^(?:convex|@workos|@convex-dev|@tanstack\/(?:react-router|react-query)|@modelcontextprotocol|node:|axios|ky|undici)/.test(
@@ -149,6 +155,22 @@ export default tseslint.config(
         { allowNumber: true },
       ],
       'foundation/portable-ui': 'error',
+    },
+  },
+  {
+    files: ['packages/domain/**/*.ts'],
+    rules: {
+      'no-restricted-globals': [
+        'error',
+        {
+          name: 'window',
+          message: 'DATA 01: browser capabilities belong in an app adapter.',
+        },
+        {
+          name: 'document',
+          message: 'DATA 01: browser capabilities belong in an app adapter.',
+        },
+      ],
     },
   },
   {
