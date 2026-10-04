@@ -12,15 +12,36 @@ import { Button, Input, Notice, WorkItemList, Workspace } from '@foundation/ui';
 
 function LoginButton() {
   const { signIn } = useAuth();
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string>();
+  async function login() {
+    setPending(true);
+    setError(undefined);
+    try {
+      await signIn();
+    } catch (failure) {
+      setError(errorMessage(failure));
+    } finally {
+      setPending(false);
+    }
+  }
   return (
-    <Button
-      type="button"
-      onClick={() => {
-        signIn().catch(console.error);
-      }}
-    >
-      Sign in
-    </Button>
+    <>
+      <Button
+        type="button"
+        disabled={pending}
+        onClick={() => {
+          login().catch((failure: unknown) => setError(errorMessage(failure)));
+        }}
+      >
+        {pending ? 'Opening sign in…' : 'Sign in'}
+      </Button>
+      {error && (
+        <p role="alert" className="error">
+          {error}
+        </p>
+      )}
+    </>
   );
 }
 function CreateForm({
