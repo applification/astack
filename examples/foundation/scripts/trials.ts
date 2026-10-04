@@ -1,9 +1,11 @@
 import { spawn, spawnSync } from 'node:child_process';
 import {
+  appendFile,
   mkdir,
   mkdtemp,
   readFile,
   readdir,
+  rename,
   rm,
   writeFile,
 } from 'node:fs/promises';
@@ -11,6 +13,7 @@ import { homedir, tmpdir, platform, release, arch } from 'node:os';
 import { createHash } from 'node:crypto';
 import { join, resolve, relative, extname } from 'node:path';
 import { z } from 'zod';
+import { StringDecoder } from 'node:string_decoder';
 import { command, foundationRoot, redact } from './runtime';
 import { isSourcePath, sourceDigest } from './source-identity';
 
@@ -109,6 +112,17 @@ type AgentRun = {
   final: unknown;
   model: string;
   reasoning: string | null;
+  sandbox: 'read-only' | 'workspace-write' | 'danger-full-access';
+  sandboxPurpose: string;
+  outputHashes: Record<
+    'events' | 'stderr',
+    { originalSha256: string; retainedSha256: string }
+  >;
+  processCleanup: {
+    descendantEnumeration: 'available' | 'limited' | 'not-observed';
+    observations: string[];
+    coverage: string;
+  };
 };
 type Acceptance = {
   outcome: 'pass' | 'fail' | 'inconclusive';
@@ -118,6 +132,11 @@ type Acceptance = {
   error?: string;
 };
 type Stage = 'creation' | 'feature' | 'bug';
+type StageResult = Record<string, unknown> & {
+  round: number;
+  kind: Stage;
+  gate: ReviewGate;
+};
 type ReviewGate = {
   outcome: 'pass' | 'fail' | 'inconclusive';
   total: number | null;
@@ -181,10 +200,33 @@ export function reviewGate(
 }
 
 /** Include detached descendants; escalate so a limit cannot wait forever on ignored SIGTERM. */
-function descendants(pid: number): number[] {
-  const output = spawnSync('ps', ['-axo', 'pid=,ppid='], {
-    encoding: 'utf8',
-  }).stdout;
+type ProcessTable = {
+  stdout: string | null;
+  status: number | null;
+  error?: Error | undefined;
+};
+export function descendants(
+  pid: number,
+  inspect: () => ProcessTable = () =>
+    spawnSync('ps', ['-axo', 'pid=,ppid='], { encoding: 'utf8' }),
+): { pids: number[]; available: boolean; observation: string } {
+  let table: ProcessTable;
+  try {
+    table = inspect();
+  } catch (error) {
+    return {
+      pids: [pid],
+      available: false,
+      observation: `Process enumeration threw: ${redact(error instanceof Error ? error.message : JSON.stringify(error))}`,
+    };
+  }
+  if (table.error || table.status !== 0 || typeof table.stdout !== 'string')
+    return {
+      pids: [pid],
+      available: false,
+      observation: `Process enumeration unavailable: status=${String(table.status)}, ${redact(table.error?.message ?? 'no stdout')}`,
+    };
+  const output = table.stdout;
   const entries = output
     .trim()
     .split('\n')
@@ -194,12 +236,25 @@ function descendants(pid: number): number[] {
   while (changed) {
     changed = false;
     for (const [child, parent] of entries)
-      if (child && parent && owned.has(parent) && !owned.has(child)) {
+      if (
+        child &&
+        parent &&
+        child > 0 &&
+        parent > 0 &&
+        Number.isInteger(child) &&
+        Number.isInteger(parent) &&
+        owned.has(parent) &&
+        !owned.has(child)
+      ) {
         owned.add(child);
         changed = true;
       }
   }
-  return [...owned].reverse();
+  return {
+    pids: [...owned].reverse(),
+    available: true,
+    observation: `Derived ${owned.size - 1} descendant process IDs from a ps snapshot; the CLI process ID is separately known.`,
+  };
 }
 function signalOwned(
   pid: number,
@@ -227,6 +282,7 @@ export async function runAgent(options: {
   actionLimit?: number;
   model: string;
   reasoning?: string | undefined;
+  sandbox?: 'workspace-write' | 'danger-full-access';
 }): Promise<AgentRun> {
   await mkdir(options.directory, { recursive: true });
   const schemaPath = join(options.directory, 'schema.json');
@@ -234,6 +290,12 @@ export async function runAgent(options: {
   await writeFile(schemaPath, JSON.stringify(z.toJSONSchema(outputSchema)));
   await writeFile(join(options.directory, 'prompt.txt'), options.prompt);
   const finalPath = join(options.directory, 'final.json');
+  const sandbox = options.reviewer
+    ? 'read-only'
+    : (options.sandbox ?? 'workspace-write');
+  const eventsPath = join(options.directory, 'events.jsonl');
+  const stderrPath = join(options.directory, 'stderr.log');
+  await Promise.all([writeFile(eventsPath, ''), writeFile(stderrPath, '')]);
   const args = [
     'exec',
     '--ephemeral',
@@ -246,7 +308,7 @@ export async function runAgent(options: {
     '-c',
     'agents.enabled=false',
     '-s',
-    options.reviewer ? 'read-only' : 'workspace-write',
+    sandbox,
     '-c',
     'sandbox_workspace_write.network_access=true',
     '--output-schema',
@@ -271,17 +333,24 @@ export async function runAgent(options: {
   const startedAt = Date.now(),
     events = new TrialEvents();
   let lines = '',
+    stderrLines = '',
     stdout = '',
     stderr = '',
     termination = 'normal';
   let escalation: ReturnType<typeof setTimeout> | undefined;
   let ownedChildren: number[] = [];
+  const enumerations: ReturnType<typeof descendants>[] = [];
+  const enumerate = (pid: number) => {
+    const observed = descendants(pid);
+    enumerations.push(observed);
+    return observed.pids;
+  };
   const stop = (reason: string) => {
     if (termination !== 'normal') return;
     termination = reason;
     if (!child.pid) return;
     const pid = child.pid,
-      owned = descendants(pid);
+      owned = enumerate(pid);
     ownedChildren = owned;
     signalOwned(pid, owned, 'SIGTERM');
     escalation = setTimeout(() => {
@@ -294,24 +363,47 @@ export async function runAgent(options: {
     },
     options.timeoutMs ?? 20 * 60_000,
   );
+  const writeEvidence = serialWrites();
+  const stdoutDecoder = new StringDecoder('utf8');
+  const stderrDecoder = new StringDecoder('utf8');
+  let pendingEvidence = Promise.resolve();
+  let evidenceFailure: unknown;
+  const retain = (path: string, completeLines: string) => {
+    pendingEvidence = writeEvidence(() =>
+      appendFile(path, redactTrial(completeLines)),
+    ).catch((error: unknown) => {
+      evidenceFailure = error;
+      stop('evidence retention failure');
+    });
+  };
   child.stdout.on('data', (chunk: Buffer) => {
-    const text = chunk.toString();
+    const text = stdoutDecoder.write(chunk);
     stdout += text;
     lines += text;
+    let completeLines = '';
     let newline: number;
     while ((newline = lines.indexOf('\n')) >= 0) {
       const line = lines.slice(0, newline);
       lines = lines.slice(newline + 1);
+      completeLines += line + '\n';
       try {
         events.accept(JSON.parse(line));
       } catch {}
-      if (events.completed && child.pid) ownedChildren = descendants(child.pid);
+      if (events.completed && child.pid) ownedChildren = enumerate(child.pid);
       if (events.actionIds.size >= (options.actionLimit ?? 80))
         stop('action limit');
     }
+    if (completeLines) retain(eventsPath, completeLines);
   });
   child.stderr.on('data', (chunk: Buffer) => {
-    stderr += chunk.toString();
+    const text = stderrDecoder.write(chunk);
+    stderr += text;
+    stderrLines += text;
+    const newline = stderrLines.lastIndexOf('\n');
+    if (newline >= 0) {
+      retain(stderrPath, stderrLines.slice(0, newline + 1));
+      stderrLines = stderrLines.slice(newline + 1);
+    }
   });
   child.stdin.end(options.prompt);
   let exitCode: number | null = null;
@@ -337,13 +429,28 @@ export async function runAgent(options: {
     if (escalation) clearTimeout(escalation);
   }
   // Parse a final JSONL line even if the CLI ended without a trailing newline.
+  const stdoutTail = stdoutDecoder.end(),
+    stderrTail = stderrDecoder.end();
+  stdout += stdoutTail;
+  lines += stdoutTail;
+  stderr += stderrTail;
+  stderrLines += stderrTail;
   if (lines.trim()) {
     try {
       events.accept(JSON.parse(lines));
     } catch {}
   }
-  await writeFile(join(options.directory, 'events.jsonl'), redact(stdout));
-  await writeFile(join(options.directory, 'stderr.log'), redact(stderr));
+  if (lines) retain(eventsPath, lines);
+  if (stderrLines) retain(stderrPath, stderrLines);
+  await pendingEvidence;
+  if (evidenceFailure !== undefined)
+    stderr += `\nLive evidence retention failed: ${redact(evidenceFailure instanceof Error ? evidenceFailure.message : JSON.stringify(evidenceFailure))}\n`;
+  // Keep all emitted output, including malformed JSONL and the final partial line.
+  // Waiting for queued appends prevents them from overwriting final retention.
+  const retainedEvents = redactTrial(stdout);
+  const retainedStderr = redact(stderr);
+  await writeFile(eventsPath, retainedEvents);
+  await writeFile(stderrPath, retainedStderr);
   let final: unknown = null;
   try {
     const finalText = redact(await readFile(finalPath, 'utf8'));
@@ -372,11 +479,76 @@ export async function runAgent(options: {
     final,
     model: options.model,
     reasoning: options.reasoning ?? null,
+    sandbox,
+    sandboxPurpose: options.reviewer
+      ? 'Independent reviewer may inspect evidence and source but cannot edit the disposable project.'
+      : sandbox === 'danger-full-access'
+        ? 'Explicitly selected controlled local environment: Chromium launch, process inspection and Git metadata operations are required for running product proof.'
+        : 'Delivery can edit its workspace; host restrictions may prevent browser, process or Git proof and are reported without automatic sandbox fallback.',
+    outputHashes: {
+      events: {
+        originalSha256: digest(stdout),
+        retainedSha256: digest(retainedEvents),
+      },
+      stderr: {
+        originalSha256: digest(stderr),
+        retainedSha256: digest(retainedStderr),
+      },
+    },
+    processCleanup: {
+      descendantEnumeration: enumerations.some((entry) => !entry.available)
+        ? 'limited'
+        : enumerations.length
+          ? 'available'
+          : 'not-observed',
+      observations: enumerations.map((entry) => entry.observation),
+      coverage:
+        'Owned detached CLI process-group signaling does not depend on ps. Separately detached descendants are covered only when present in an available process-table snapshot; unavailable enumeration cannot establish full descendant cleanup.',
+    },
   };
 }
 
 const digest = (data: Buffer | string) =>
   createHash('sha256').update(data).digest('hex');
+
+/** Preserve symbolic source templates while still masking actual credentials. */
+export function redactTrial(text: string): string {
+  const safe = text
+    .replace(
+      /\b[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/g,
+      '[REDACTED JWT]',
+    )
+    .replace(
+      /((?:CONVEX_SELF_HOSTED_ADMIN_KEY|CONVEX_DEPLOY_KEY|WORKOS_API_KEY)(?:\\?["'`])?\s*[=:]\s*)((?:\\?["'`])?)([^\s"'`\\,;)}\]]+)/gi,
+      (_match: string, prefix: string, quote: string) =>
+        `${prefix}${quote}[REDACTED]`,
+    )
+    .replace(
+      /-----BEGIN (?:[A-Z ]*PRIVATE KEY)-----[\s\S]*?-----END (?:[A-Z ]*PRIVATE KEY)-----/g,
+      '[REDACTED PRIVATE KEY]',
+    );
+  const symbolic: string[] = [];
+  const protectedText = safe.replace(
+    /Bearer\s+\$\{[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*\}/g,
+    (expression) => {
+      const index = symbolic.push(expression) - 1;
+      return `\u0000astack-symbolic-bearer-${index}\u0000`;
+    },
+  );
+  return (
+    protectedText
+      // Credentials start with a token character. Excluding JavaScript loop
+      // keywords also preserves `for (const bearer of ...)` in archived source.
+      .replace(
+        /Bearer\s+(?!of\b|in\b)[A-Za-z0-9_~+/.\-][^\s"'`\\,;)}\]]*/gi,
+        'Bearer [REDACTED]',
+      )
+      .replace(
+        /\u0000astack-symbolic-bearer-(\d+)\u0000/g,
+        (marker: string, index: string) => symbolic[Number(index)] ?? marker,
+      )
+  );
+}
 async function fileDigests(
   directory: string,
   prefix = '',
@@ -521,16 +693,35 @@ async function trustedAcceptance(
 }
 
 /** Keep delivered source and local product evidence before disposing its running project. */
-async function retainProject(
+export async function retainProject(
   project: string,
   retained: string,
+  proofArtifacts = false,
 ): Promise<Record<string, string>> {
+  await mkdir(retained, { recursive: true });
   const hashes: Record<string, string> = {};
+  const retainedHashes: Record<
+    string,
+    { originalSha256: string; retainedSha256: string; transformed: boolean }
+  > = {};
   async function visit(directory: string): Promise<void> {
     for (const entry of await readdir(directory, { withFileTypes: true })) {
       const path = join(directory, entry.name),
         name = relative(project, path);
-      const proof = name.startsWith('.proof/');
+      const proof = proofArtifacts || name.startsWith('.proof/');
+      if (
+        name
+          .split('/')
+          .some(
+            (part) =>
+              /(?:^|[._-])(?:private(?:[-_]?key)?|credentials?|secrets?)(?:[._-]|$)/i.test(
+                part,
+              ) ||
+              /\.(?:pem|key|p12|pfx)$/i.test(part) ||
+              /^id_(?:rsa|ed25519)$/.test(part),
+          )
+      )
+        continue;
       if (!isSourcePath(name) && name !== '.proof' && !proof) continue;
       if (
         proof &&
@@ -552,10 +743,15 @@ async function retainProject(
         const binaryImage = ['.png', '.jpg', '.jpeg', '.webp'].includes(
           extname(name),
         );
-        await writeFile(
-          destination,
-          binaryImage ? bytes : redact(bytes.toString('utf8')),
-        );
+        const retainedBytes = binaryImage
+          ? bytes
+          : Buffer.from(redactTrial(bytes.toString('utf8')));
+        retainedHashes[name] = {
+          originalSha256: hashes[name] ?? digest(bytes),
+          retainedSha256: digest(retainedBytes),
+          transformed: !retainedBytes.equals(bytes),
+        };
+        await writeFile(destination, retainedBytes);
       }
       // Symlinks are not followed or copied into evidence.
     }
@@ -565,7 +761,35 @@ async function retainProject(
     join(retained, 'delivered-files.json'),
     JSON.stringify(hashes, null, 2),
   );
+  await writeFile(
+    join(retained, 'retention.json'),
+    JSON.stringify(
+      {
+        format: 'astack-trial-retention/v1',
+        files: retainedHashes,
+        policy:
+          'Source digests describe original delivered bytes. Retained byte digests describe sanitized artifacts; transformed files are explicitly marked. Credentials, private key artifacts, environments, dependencies and symlinks are excluded.',
+      },
+      null,
+      2,
+    ),
+  );
   return hashes;
+}
+
+export async function retainWorkspaceEvidence(
+  workspace: string,
+  retained: string,
+): Promise<Record<string, string>> {
+  const evidence = join(workspace, 'evidence');
+  try {
+    await readdir(evidence);
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT')
+      return {};
+    throw error;
+  }
+  return retainProject(evidence, join(retained, 'workspace-evidence'), true);
 }
 
 export function trialRounds(value: number): number {
@@ -574,16 +798,73 @@ export function trialRounds(value: number): number {
   return value;
 }
 
+export function trialConcurrency(value: number): number {
+  if (!Number.isInteger(value) || value < 1 || value > 2)
+    throw new Error('Trial concurrency must be one or two independent rounds.');
+  return value;
+}
+
+/** Stop assigning rounds after a failure, but drain every round already started. */
+export async function runTrialRounds(
+  rounds: number,
+  concurrency: number,
+  runRound: (round: number) => Promise<void>,
+): Promise<void> {
+  trialRounds(rounds);
+  trialConcurrency(concurrency);
+  let nextRound = 1;
+  const failures: unknown[] = [];
+  const worker = async () => {
+    while (failures.length === 0 && nextRound <= rounds) {
+      const round = nextRound++;
+      try {
+        await runRound(round);
+      } catch (error) {
+        failures.push(error);
+      }
+    }
+  };
+  await Promise.allSettled(
+    Array.from({ length: Math.min(rounds, concurrency) }, () => worker()),
+  );
+  if (failures.length) throw failures[0];
+}
+
+/** Serializes report replacement and live evidence writes; one failure does not poison later writes. */
+export function serialWrites(): (write: () => Promise<void>) => Promise<void> {
+  let tail = Promise.resolve();
+  return (write) => {
+    const next = tail.then(write);
+    tail = next.catch(() => undefined);
+    return next;
+  };
+}
+
+export function orderedResults<T extends { round: number; kind: Stage }>(
+  results: readonly T[],
+): T[] {
+  const rank: Record<Stage, number> = { creation: 0, feature: 1, bug: 2 };
+  return [...results].sort(
+    (a, b) => a.round - b.round || rank[a.kind] - rank[b.kind],
+  );
+}
+
 /** Explicit invocation only. The trials grant no merge, publication or deployment authority. */
 export async function runTrials(options: {
   candidate: string;
   rubric: string;
   output: string;
   rounds?: number;
+  concurrency?: number;
+  deliverySandbox?: 'workspace-write' | 'danger-full-access';
   model: string;
   reasoning?: string | undefined;
 }) {
   const rounds = trialRounds(options.rounds ?? 2);
+  const concurrency = trialConcurrency(options.concurrency ?? 1);
+  const deliverySandbox = z
+    .enum(['workspace-write', 'danger-full-access'])
+    .parse(options.deliverySandbox ?? 'workspace-write');
   if (!options.model.trim())
     throw new Error(
       'Supply the configured model explicitly; user configuration is ignored for isolation.',
@@ -593,6 +874,17 @@ export async function runTrials(options: {
   const candidate = (
     await command(['git', 'rev-parse', `${options.candidate}^{commit}`], repo)
   ).trim();
+  const harnessIdentity = {
+    repositoryRevision: (
+      await command(['git', 'rev-parse', 'HEAD'], repo)
+    ).trim(),
+    sourceDigest: await sourceDigest(foundationRoot),
+    orchestrationDigest: digest(await readFile(import.meta.path)),
+    sourceScope:
+      'Executing foundation source, including untracked inputs, excluding credentials and generated/proof outputs.',
+    trustedAcceptance:
+      'Candidate snapshot verifier; orchestration changes do not replace the candidate acceptance oracle.',
+  };
   const rubricPath = resolve(options.rubric),
     rubricText = await readFile(rubricPath, 'utf8');
   if (!rubricText.trim()) throw new Error('Trial rubric is empty');
@@ -619,7 +911,7 @@ export async function runTrials(options: {
   );
   const temporary = await mkdtemp(join(tmpdir(), 'astack-trials-')),
     snapshot = join(temporary, 'candidate');
-  const results: Record<string, unknown>[] = [],
+  const results: StageResult[] = [],
     harness: Record<string, unknown>[] = [];
   const event = (action: string, stage?: string) =>
     harness.push({
@@ -630,40 +922,49 @@ export async function runTrials(options: {
   let installed = false,
     marketplace = '',
     config: string[] = [];
-  const writeReport = async () => {
-    const completed = results.length === rounds * 3;
-    const allPassed =
-      completed &&
-      results.every((result) => (result.gate as ReviewGate).outcome === 'pass');
-    const conclusive =
-      completed &&
-      results.every(
-        (result) => (result.gate as ReviewGate).outcome !== 'inconclusive',
+  const reportWrites = serialWrites();
+  const writeReport = () =>
+    reportWrites(async () => {
+      const completed = results.length === rounds * 3;
+      const allPassed =
+        completed && results.every((result) => result.gate.outcome === 'pass');
+      const conclusive =
+        completed &&
+        results.every((result) => result.gate.outcome !== 'inconclusive');
+      const temporaryReport = join(output, '.report.json.tmp');
+      await writeFile(
+        temporaryReport,
+        JSON.stringify(
+          {
+            format: 'astack-foundation-trials/v2',
+            candidate,
+            harnessIdentity,
+            rubricDigest: digest(rubricText),
+            rounds,
+            concurrency,
+            deliverySandbox,
+            reviewerSandbox: 'read-only',
+            requiredStages: ['creation', 'feature', 'bug'],
+            model: options.model,
+            reasoning: options.reasoning ?? null,
+            outcome: allPassed ? 'pass' : conclusive ? 'fail' : 'inconclusive',
+            limits: {
+              taskMs: 20 * 60_000,
+              reviewerMs: 20 * 60_000,
+              actions: 80,
+            },
+            results: orderedResults(results),
+            harness,
+            interventionRecord: 'interventions.json',
+            interpretation:
+              'A pass requires every task in at least two independent rounds to complete trusted product acceptance and the predeclared scored independent review. Live WorkOS and installed ChatGPT remain separate proof gaps.',
+          },
+          null,
+          2,
+        ),
       );
-    await writeFile(
-      join(output, 'report.json'),
-      JSON.stringify(
-        {
-          format: 'astack-foundation-trials/v2',
-          candidate,
-          rubricDigest: digest(rubricText),
-          rounds,
-          requiredStages: ['creation', 'feature', 'bug'],
-          model: options.model,
-          reasoning: options.reasoning ?? null,
-          outcome: allPassed ? 'pass' : conclusive ? 'fail' : 'inconclusive',
-          limits: { taskMs: 20 * 60_000, reviewerMs: 20 * 60_000, actions: 80 },
-          results,
-          harness,
-          interventionRecord: 'interventions.json',
-          interpretation:
-            'A pass requires every task in at least two independent rounds to complete trusted product acceptance and the predeclared scored independent review. Live WorkOS and installed ChatGPT remain separate proof gaps.',
-        },
-        null,
-        2,
-      ),
-    );
-  };
+      await rename(temporaryReport, join(output, 'report.json'));
+    });
   try {
     await mkdir(snapshot, { recursive: true });
     const archive = join(temporary, 'candidate.tar');
@@ -737,12 +1038,15 @@ export async function runTrials(options: {
       JSON.stringify(
         {
           candidate,
+          harnessIdentity,
           rubricDigest: digest(rubricText),
           marketplace,
           installedDigest: verifiedInstall.digest,
           installedFiles: verifiedInstall.files,
           sourceFiles: expected,
           profileSourceDigest,
+          deliverySandbox,
+          reviewerSandbox: 'read-only',
           versions,
           host: { platform: platform(), release: release(), arch: arch() },
           model: options.model,
@@ -756,7 +1060,8 @@ export async function runTrials(options: {
       ),
     );
     await writeReport();
-    for (let round = 1; round <= rounds; round++) {
+    await runTrialRounds(rounds, concurrency, async (round) => {
+      event('Started independent round.', `round-${round}`);
       for (const kind of ['creation', 'feature', 'bug'] as const) {
         const name = `round-${round}-${kind}`,
           workspace = join(temporary, name),
@@ -823,6 +1128,7 @@ export async function runTrials(options: {
           directory: join(retained, 'task'),
           config,
           model: options.model,
+          sandbox: deliverySandbox,
           reasoning: options.reasoning,
           prompt: `$applification:astack ${task}\n\nThis is an authorized disposable local trial. Complete changes and proof; do not publish a PR, push, merge, delegate recursively, weaken checks or contact anyone. Use the project scripts, skill and feature map. Do not inspect the trial harness or evaluator rubric. Keep credentials out of evidence. Report observed checks and material gaps honestly. The caller enforces a 20-minute deadline and 80-action cap. Return structured final output; findings may be empty.`,
         });
@@ -846,12 +1152,25 @@ export async function runTrials(options: {
         );
         await command(['git', 'add', '-N', '.'], workspace);
         const diff = await command(['git', 'diff', baseline, '--'], workspace);
-        await writeFile(join(retained, 'change.diff'), redact(diff));
+        const retainedDiff = redactTrial(diff);
+        await writeFile(join(retained, 'change.diff'), retainedDiff);
         let deliveredFiles: Record<string, string> = {},
+          workspaceEvidence: Record<string, string> = {},
+          retentionManifest: string | null = null,
+          workspaceEvidenceManifest: string | null = null,
           deliveredSourceDigest: string | null = null;
         try {
           deliveredSourceDigest = await sourceDigest(project);
           deliveredFiles = await retainProject(project, retained);
+          retentionManifest = `${name}/retention.json`;
+          if (kind === 'creation') {
+            workspaceEvidence = await retainWorkspaceEvidence(
+              workspace,
+              retained,
+            );
+            if (Object.keys(workspaceEvidence).length)
+              workspaceEvidenceManifest = `${name}/workspace-evidence/retention.json`;
+          }
         } catch (error) {
           await writeFile(
             join(retained, 'retention-error.txt'),
@@ -879,6 +1198,14 @@ export async function runTrials(options: {
           baseline,
           deliveredSourceDigest,
           deliveredFiles,
+          retentionManifest,
+          workspaceEvidence,
+          workspaceEvidenceManifest,
+          diffHashes: {
+            originalSha256: digest(diff),
+            retainedSha256: digest(retainedDiff),
+            transformed: diff !== retainedDiff,
+          },
           agent,
           reviewer,
           before,
@@ -888,7 +1215,9 @@ export async function runTrials(options: {
         await writeReport();
         await rm(workspace, { recursive: true, force: true });
       }
-    }
+      event('Finished independent round.', `round-${round}`);
+      await writeReport();
+    });
   } catch (error) {
     event(`Harness interruption: ${redact(String(error))}`);
     await writeReport();
@@ -922,6 +1251,11 @@ export async function runTrials(options: {
         workspace,
         join(output, entry.name, 'interrupted'),
       ).catch(() => undefined);
+      if (entry.name.endsWith('-creation'))
+        await retainWorkspaceEvidence(
+          workspace,
+          join(output, entry.name, 'interrupted'),
+        ).catch(() => undefined);
     }
     await rm(temporary, { recursive: true, force: true });
     const interventionFile = join(output, 'interventions.json');
@@ -938,7 +1272,7 @@ export async function runTrials(options: {
     );
     await writeReport();
   }
-  return results;
+  return orderedResults(results);
 }
 
 if (import.meta.main) {
@@ -952,7 +1286,7 @@ if (import.meta.main) {
     model = value('--model');
   if (!candidate || !rubric || !output || !model)
     throw new Error(
-      'Usage: bun scripts/trials.ts --candidate COMMIT --rubric FILE --output NEW_DIRECTORY --model CONFIGURED_MODEL [--rounds 2] [--reasoning EFFORT]',
+      'Usage: bun scripts/trials.ts --candidate COMMIT --rubric FILE --output NEW_DIRECTORY --model CONFIGURED_MODEL [--rounds 2] [--concurrency 1|2] [--delivery-sandbox workspace-write|danger-full-access] [--reasoning EFFORT]',
     );
   const results = await runTrials({
     candidate,
@@ -960,8 +1294,12 @@ if (import.meta.main) {
     output,
     model,
     rounds: Number(value('--rounds') ?? 2),
+    concurrency: Number(value('--concurrency') ?? 1),
+    deliverySandbox: z
+      .enum(['workspace-write', 'danger-full-access'])
+      .parse(value('--delivery-sandbox') ?? 'workspace-write'),
     reasoning: value('--reasoning'),
   });
-  if (results.some((result) => (result.gate as ReviewGate).outcome !== 'pass'))
+  if (results.some((result) => result.gate.outcome !== 'pass'))
     process.exitCode = 1;
 }
