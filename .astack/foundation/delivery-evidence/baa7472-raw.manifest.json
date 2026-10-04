@@ -1,0 +1,151 @@
+{
+  "format": "astack-historical-delivery-export/v1",
+  "kind": "Path-sanitized export of already retained historical artifacts; it does not repair old source corruption or establish a valid replay snapshot.",
+  "sourceRoot": "examples/foundation/.proof/delivery-baa7472",
+  "archive": "baa7472-raw.zip",
+  "archiveSha256": "4b0697c76b31bb4d3cab56e89053af37e174545145c8e6e3f4c970e93763c867",
+  "archiveBytes": 841099,
+  "archiveMethod": {
+    "sortedRelativePaths": true,
+    "timestamp": "1980-01-01T00:00:00",
+    "unixMode": "100644",
+    "compression": "DEFLATE level 9",
+    "sameEnvironmentDuplicateBuildIdentical": true,
+    "allEntriesCheckedAgainstRetainedSha256": true,
+    "sourceOriginalsRecheckedUnchanged": true
+  },
+  "summary": {
+    "path": ".astack/foundation/delivery-evidence/baa7472-summary.json",
+    "sha256": "1ef15e1a74416db7f868dfd80444c1142d45a750fda3a65a8bae3c2cbfde28f9",
+    "originalRecordHashesStillReferToLocalOriginals": true
+  },
+  "trial": {
+    "candidate": "baa74729f5c2b120be549d82177a92ca0ee9d41e",
+    "installedDigest": "b35a05602dac11476d6c8b9df067fabfaef2b02d5ecb8b497ee2ff4c3e82ea6a",
+    "rubricDigest": "8aa129b3809a7e2da895c0d51fb16e3dac8194b2f57d59290974a41068ea6bdb",
+    "model": "gpt-6.1-sol",
+    "reasoning": "ultra",
+    "deliverySandbox": "workspace-write",
+    "reviewerSandbox": "read-only",
+    "intendedRounds": 2,
+    "intendedStages": 6,
+    "completedStages": 1,
+    "deliveryOutcome": "partial",
+    "independentScore": 10,
+    "scoreMaximum": 12,
+    "deliveryGate": "fail",
+    "trustedAcceptance": "pass",
+    "overallOutcome": "inconclusive",
+    "cost": null,
+    "costReason": "No monetary cost returned by original Codex JSONL; no estimate substituted."
+  },
+  "scan": {
+    "method": "Pattern scan of all original and exported bytes decoded as UTF-8 with errors ignored; replacement only for valid UTF-8. PNGs were visually checked for synthetic test data. Values were not printed. Pattern checks are bounded observations, not a guarantee of detecting every possible secret.",
+    "fileCount": 221,
+    "utf8FileCount": 219,
+    "binaryFileCount": 2,
+    "symlinkCount": 0,
+    "originalByteCount": 2443413,
+    "retainedByteCount": 2435011,
+    "originalMatchCounts": {
+      "privateKeyBlocks": 0,
+      "signedJwtPatterns": 0,
+      "providerKeyPatterns": 0,
+      "literalBearerCredentials": 0,
+      "credentialAssignments": 0,
+      "personalFilesystemPrefixes": 272,
+      "randomizedMacTemporaryPrefixes": 202
+    },
+    "exportedMatchCounts": {
+      "privateKeyBlocks": 0,
+      "signedJwtPatterns": 0,
+      "providerKeyPatterns": 0,
+      "literalBearerCredentials": 0,
+      "credentialAssignments": 0,
+      "personalFilesystemPrefixes": 0,
+      "randomizedMacTemporaryPrefixes": 0
+    },
+    "issues": []
+  },
+  "transformationPolicy": {
+    "personalUserPrefix": "/Users/<local-user> becomes <host-user>",
+    "randomizedMacTemporaryPrefix": "Both /var/folders/<bucket>/<random>/T and its /private alias become <host-temp>",
+    "allOtherRetainedBytes": "Unchanged, including old source corruption and pre-redaction manifests.",
+    "binaryFiles": "Byte-for-byte unchanged.",
+    "transformedFileCount": 25
+  },
+  "historicalSourceRetention": [
+    {
+      "stage": "round-1-creation",
+      "recordedFiles": 78,
+      "knownHistoricalSourceManifestMismatches": [
+        {
+          "path": "tests/proof-policy.test.ts",
+          "recordedPreRedactionSha256": "00c4180acb312356909f809979ff88b5d847116b71f70cdf0f50c98b650cf8b7",
+          "observedRetainedSourceSha256": "f7929b2412c13d440bea2b05f343bea7eddce61d88816b82c9243ebe4280c816"
+        },
+        {
+          "path": "scripts/readiness.ts",
+          "recordedPreRedactionSha256": "dc618f7418fa382d0277a8f935149de4b99cc7feeefb4d8cc45123cf48a6314e",
+          "observedRetainedSourceSha256": "92a015976748e921607496daf54c9bb008944c2714bf0a14f4a2f1dcf50ad941"
+        },
+        {
+          "path": "scripts/mcp-host.ts",
+          "recordedPreRedactionSha256": "b09829d7958d5faa4ecb9e4f2adf62b956b4007e0bcf2cf09ef4780b073f8958",
+          "observedRetainedSourceSha256": "b2c39ff8cd5fb42cd26b6410c38112a6588a15cd0b56b69c1febd582793f021f"
+        },
+        {
+          "path": "scripts/readiness-mcp.ts",
+          "recordedPreRedactionSha256": "285551b5598039ec8cc51330d23132d5ead8657fef1f269c5d7750d72777622a",
+          "observedRetainedSourceSha256": "23342e60627a186e9890e0e7da3eaed3778b36fe6f9e64c67d124bc1873a26f9"
+        },
+        {
+          "path": "packages/backend/convex/http.ts",
+          "recordedPreRedactionSha256": "f7a33e2c070ec9cd4431835917a6fd672fd5b5390f636b06c41d3a6beb1315df",
+          "observedRetainedSourceSha256": "505a9476ace347334c949d5eadbf67a3ced2c84c1bee0a362652f387b99f2a12"
+        }
+      ]
+    },
+    {
+      "stage": "round-1-feature/interrupted",
+      "recordedFiles": 90,
+      "knownHistoricalSourceManifestMismatches": [
+        {
+          "path": "tests/proof-policy.test.ts",
+          "recordedPreRedactionSha256": "00c4180acb312356909f809979ff88b5d847116b71f70cdf0f50c98b650cf8b7",
+          "observedRetainedSourceSha256": "f7929b2412c13d440bea2b05f343bea7eddce61d88816b82c9243ebe4280c816"
+        },
+        {
+          "path": "scripts/readiness.ts",
+          "recordedPreRedactionSha256": "dc618f7418fa382d0277a8f935149de4b99cc7feeefb4d8cc45123cf48a6314e",
+          "observedRetainedSourceSha256": "92a015976748e921607496daf54c9bb008944c2714bf0a14f4a2f1dcf50ad941"
+        },
+        {
+          "path": "scripts/mcp-host.ts",
+          "recordedPreRedactionSha256": "b09829d7958d5faa4ecb9e4f2adf62b956b4007e0bcf2cf09ef4780b073f8958",
+          "observedRetainedSourceSha256": "b2c39ff8cd5fb42cd26b6410c38112a6588a15cd0b56b69c1febd582793f021f"
+        },
+        {
+          "path": "packages/backend/convex/http.ts",
+          "recordedPreRedactionSha256": "f7a33e2c070ec9cd4431835917a6fd672fd5b5390f636b06c41d3a6beb1315df",
+          "observedRetainedSourceSha256": "505a9476ace347334c949d5eadbf67a3ced2c84c1bee0a362652f387b99f2a12"
+        }
+      ]
+    }
+  ],
+  "fileManifest": {
+    "path": "baa7472-raw.files.tsv",
+    "sha256": "c7a7d8113f0be3769c2d15a1d0ecc9c81c4b9b9e752c24f2c49113a958c8db49",
+    "entries": 221,
+    "fields": [
+      "archivePath",
+      "sourcePath",
+      "originalBytes",
+      "originalSha256",
+      "retainedBytes",
+      "retainedSha256",
+      "transformed",
+      "transformations"
+    ]
+  }
+}
