@@ -9,7 +9,11 @@ import { makeFunctionReference } from 'convex/server';
 import { isSourcePath, sourceDigest } from './source-identity';
 
 export const foundationRoot = resolve(import.meta.dir, '..');
-export type OwnedProcess = { child: ChildProcess; stopped: boolean };
+export type OwnedProcess = {
+  child: ChildProcess;
+  stopped: boolean;
+  closed: boolean;
+};
 export type Runtime = {
   project: string;
   privateDirectory: string;
@@ -158,7 +162,10 @@ export function launch(
     stdio: ['ignore', 'pipe', 'pipe'],
     detached: true,
   });
-  const owned = { child, stopped: false };
+  const owned = { child, stopped: false, closed: false };
+  child.once('close', () => {
+    owned.closed = true;
+  });
   const append = (chunk: Buffer) => {
     logs.push(redact(chunk.toString()));
     if (logs.length > 500) logs.shift();
@@ -171,12 +178,14 @@ export function launch(
 export async function stopProcess(owned: OwnedProcess): Promise<void> {
   if (owned.stopped) return;
   owned.stopped = true;
-  if (owned.child.exitCode !== null || !owned.child.pid) return;
-  const exit = new Promise<void>((done) => {
-    owned.child.once('close', () => {
-      done();
-    });
-  });
+  if (!owned.child.pid) return;
+  const exit = owned.closed
+    ? Promise.resolve()
+    : new Promise<void>((done) => {
+        owned.child.once('close', () => {
+          done();
+        });
+      });
   try {
     process.kill(-owned.child.pid, 'SIGTERM');
   } catch {
