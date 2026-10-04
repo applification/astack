@@ -787,16 +787,24 @@ export async function verify(
         observation: report.error,
       });
   } finally {
-    try {
-      await otherMcp?.close();
-      await mcp?.close();
-      await host?.stop();
-      await browser?.close();
-      await runtime?.stop();
-    } catch (error) {
+    const cleanupErrors: unknown[] = [];
+    for (const cleanup of [
+      () => otherMcp?.close(),
+      () => mcp?.close(),
+      () => host?.stop(),
+      () => browser?.close(),
+      () => runtime?.stop(),
+    ]) {
+      try {
+        await cleanup();
+      } catch (error) {
+        cleanupErrors.push(error);
+      }
+    }
+    if (cleanupErrors.length) {
       report.cleanup = 'failed';
       report.outcome = 'inconclusive';
-      report.error = `${report.error ?? ''}\nCleanup: ${redact(String(error))}`;
+      report.error = `${report.error ?? ''}\nCleanup: ${cleanupErrors.map((error) => redact(String(error))).join('\n')}`;
     }
     if (runtime) {
       await writeFile(
