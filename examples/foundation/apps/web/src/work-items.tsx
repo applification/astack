@@ -31,7 +31,9 @@ function LoginButton() {
         type="button"
         disabled={pending}
         onClick={() => {
-          login().catch((failure: unknown) => setError(errorMessage(failure)));
+          login().catch((failure: unknown) => {
+            setError(errorMessage(failure));
+          });
         }}
       >
         {pending ? 'Opening sign in…' : 'Sign in'}
