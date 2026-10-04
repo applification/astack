@@ -12,6 +12,11 @@ test('source identity changes for untracked inputs but excludes secrets and obse
     await writeFile(join(directory, '.env.staging'), 'EXAMPLE_SECRET=local');
     await mkdir(join(directory, '.proof'));
     await writeFile(join(directory, '.proof', 'report.json'), '{}');
+    await mkdir(join(directory, '.husky', '_'), { recursive: true });
+    await writeFile(
+      join(directory, '.husky', '_', 'pre-commit'),
+      'generated hook wrapper',
+    );
     expect(await sourceDigest(directory)).toBe(initial);
     await writeFile(join(directory, 'new.ts'), 'export const value = 2;');
     expect(await sourceDigest(directory)).not.toBe(initial);

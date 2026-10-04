@@ -3,23 +3,23 @@ import { join, relative } from 'node:path';
 import { createHash } from 'node:crypto';
 
 export function isSourcePath(path: string): boolean {
-  return !path
-    .split('/')
-    .some(
-      (part) =>
-        [
-          'node_modules',
-          '.git',
-          '.convex',
-          '.proof',
-          '.turbo',
-          'dist',
-          'storybook-static',
-          'generated',
-          'evidence',
-        ].includes(part) ||
-        (part.startsWith('.env') && part !== '.env.example'),
-    );
+  const parts = path.split('/');
+  return !parts.some(
+    (part, index) =>
+      [
+        'node_modules',
+        '.git',
+        '.convex',
+        '.proof',
+        '.turbo',
+        'dist',
+        'storybook-static',
+        'generated',
+        'evidence',
+      ].includes(part) ||
+      (part.startsWith('.env') && part !== '.env.example') ||
+      (part === '.husky' && parts[index + 1] === '_'),
+  );
 }
 /** Includes untracked input source and lockfiles; excludes credentials and build/proof output. */
 export async function sourceDigest(project: string): Promise<string> {
