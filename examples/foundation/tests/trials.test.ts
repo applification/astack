@@ -29,6 +29,7 @@ import {
   retainWorkspaceEvidence,
 } from '../scripts/trials';
 import { foundationRoot, waitFor } from '../scripts/runtime';
+import { isSourcePath } from '../scripts/source-identity';
 
 function deferred() {
   let resolve: () => void = () => {
@@ -108,7 +109,7 @@ describe('independent delivery trial gates', () => {
       ),
     ).toBe('[REDACTED PRIVATE KEY]');
   });
-  test('every retained foundation TypeScript file still parses and its recorded hashes match its bytes', async () => {
+  test('retained foundation source still parses and all recorded hashes match the bytes', async () => {
     const directory = await mkdtemp(
       join(tmpdir(), 'astack-trial-source-parse-'),
     );
@@ -143,7 +144,8 @@ describe('independent delivery trial gates', () => {
         );
         expect(metadata.transformed).toBe(!original.equals(retained));
         if (metadata.transformed) transformed++;
-        if (/\.tsx?$/.test(name))
+        // Historical proof artifacts preserve failed deliveries as observed.
+        if (isSourcePath(name) && /\.tsx?$/.test(name))
           paths.push(join(directory, 'delivered', name));
       }
       expect(paths.length).toBeGreaterThan(20);
