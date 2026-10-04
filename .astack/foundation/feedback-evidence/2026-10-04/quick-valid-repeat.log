@@ -1,3 +1,0 @@
-QUICK: typed lint for packages/domain/src/index.ts; not full verification.
-{"mode":"quick","elapsedMs":1228,"outcome":"pass"}
-$ bun scripts/check.ts quick packages/domain/src/index.ts

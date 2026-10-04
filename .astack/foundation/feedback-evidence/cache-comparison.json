@@ -1,0 +1,223 @@
+{
+  "derivative": true,
+  "rawArchiveSha256": "9c2d690e7c5228eae6b464291d804fe1608908eafb91d552dbe11e4d20a0f88c",
+  "originalGlob": {
+    "rawEntries": [
+      "2026-10-04-original-cache/turbo-populate-summary.json",
+      "2026-10-04-original-cache/turbo-warm-repeat-summary.json"
+    ],
+    "globalFilesBefore": {
+      "eslint.config.mjs": "8d3ae1f7d9b00baf0836f071d9382d3945be5b67",
+      "packages/config/eslint.mjs": "3eaa3618eca9d676608a7a93e86ce8285a90f7b3",
+      "packages/config/package.json": "c99d1ddbbb7574776496c60bc89963df0276bf06",
+      "packages/config/typescript.json": "58408abbf22f9095fdfcacd7364a6cb76ca26cfe",
+      "tsconfig.json": "cdcaaf291055d54a04891d6df2e0220679417d24"
+    },
+    "globalFilesAfter": {
+      "eslint.config.mjs": "8d3ae1f7d9b00baf0836f071d9382d3945be5b67",
+      "packages/config/.turbo/turbo-lint.log": "e4899a88263456efda012fb5405b907e7afb79b2",
+      "packages/config/eslint.mjs": "3eaa3618eca9d676608a7a93e86ce8285a90f7b3",
+      "packages/config/package.json": "c99d1ddbbb7574776496c60bc89963df0276bf06",
+      "packages/config/typescript.json": "58408abbf22f9095fdfcacd7364a6cb76ca26cfe",
+      "tsconfig.json": "cdcaaf291055d54a04891d6df2e0220679417d24"
+    },
+    "newlyHashedFiles": ["packages/config/.turbo/turbo-lint.log"],
+    "tasksBefore": {
+      "@foundation/backend#lint": {
+        "status": "MISS",
+        "hash": "fa795fa30f76c8bb"
+      },
+      "@foundation/backend#typecheck": {
+        "status": "MISS",
+        "hash": "085e500e4d40a6a5"
+      },
+      "@foundation/config#lint": {
+        "status": "MISS",
+        "hash": "ee5a6298072c72f0"
+      },
+      "@foundation/domain#lint": {
+        "status": "MISS",
+        "hash": "bead15137469a656"
+      },
+      "@foundation/domain#typecheck": {
+        "status": "MISS",
+        "hash": "f29f5e3984e96c3f"
+      },
+      "@foundation/mcp-ui#lint": {
+        "status": "MISS",
+        "hash": "2aea03a54cadf5f5"
+      },
+      "@foundation/mcp-ui#typecheck": {
+        "status": "MISS",
+        "hash": "279440b1fb243b09"
+      },
+      "@foundation/ui#lint": {
+        "status": "MISS",
+        "hash": "9690736f96200138"
+      },
+      "@foundation/ui#typecheck": {
+        "status": "MISS",
+        "hash": "95943e0af9b2a3bf"
+      },
+      "@foundation/web#lint": {
+        "status": "MISS",
+        "hash": "07d0edd80ba2c491"
+      },
+      "@foundation/web#typecheck": {
+        "status": "MISS",
+        "hash": "abca7ce9de797f75"
+      }
+    },
+    "tasksAfter": {
+      "@foundation/backend#lint": {
+        "status": "MISS",
+        "hash": "12caed1e04620106"
+      },
+      "@foundation/backend#typecheck": {
+        "status": "MISS",
+        "hash": "b4bc666d4af06126"
+      },
+      "@foundation/config#lint": {
+        "status": "MISS",
+        "hash": "e8bcd58746c6b498"
+      },
+      "@foundation/domain#lint": {
+        "status": "MISS",
+        "hash": "457bb67246e4a414"
+      },
+      "@foundation/domain#typecheck": {
+        "status": "MISS",
+        "hash": "2b7589eac7b0e82c"
+      },
+      "@foundation/mcp-ui#lint": {
+        "status": "MISS",
+        "hash": "0cf5af730a442fd3"
+      },
+      "@foundation/mcp-ui#typecheck": {
+        "status": "MISS",
+        "hash": "6dec45954b469424"
+      },
+      "@foundation/ui#lint": {
+        "status": "MISS",
+        "hash": "acf8e6bdfdd304fa"
+      },
+      "@foundation/ui#typecheck": {
+        "status": "MISS",
+        "hash": "b10fa0100a593871"
+      },
+      "@foundation/web#lint": {
+        "status": "MISS",
+        "hash": "6967a33eac0d1515"
+      },
+      "@foundation/web#typecheck": {
+        "status": "MISS",
+        "hash": "57b811364d2c736d"
+      }
+    }
+  },
+  "explicitConfigCandidate": {
+    "rawEntries": [
+      "2026-10-04-candidate/turbo-warm-repeat-summary.json",
+      "2026-10-04-candidate/turbo-shared-config-change-summary.json"
+    ],
+    "globalDependencies": [
+      "packages/config/typescript.json",
+      "packages/config/eslint.mjs",
+      "packages/config/package.json",
+      "eslint.config.mjs",
+      "tsconfig.json"
+    ],
+    "tasksWarm": {
+      "@foundation/backend#lint": {
+        "status": "HIT",
+        "hash": "fa795fa30f76c8bb"
+      },
+      "@foundation/backend#typecheck": {
+        "status": "HIT",
+        "hash": "085e500e4d40a6a5"
+      },
+      "@foundation/config#lint": {
+        "status": "HIT",
+        "hash": "ee5a6298072c72f0"
+      },
+      "@foundation/domain#lint": {
+        "status": "HIT",
+        "hash": "bead15137469a656"
+      },
+      "@foundation/domain#typecheck": {
+        "status": "HIT",
+        "hash": "f29f5e3984e96c3f"
+      },
+      "@foundation/mcp-ui#lint": {
+        "status": "HIT",
+        "hash": "2aea03a54cadf5f5"
+      },
+      "@foundation/mcp-ui#typecheck": {
+        "status": "HIT",
+        "hash": "279440b1fb243b09"
+      },
+      "@foundation/ui#lint": {
+        "status": "HIT",
+        "hash": "9690736f96200138"
+      },
+      "@foundation/ui#typecheck": {
+        "status": "HIT",
+        "hash": "95943e0af9b2a3bf"
+      },
+      "@foundation/web#lint": {
+        "status": "HIT",
+        "hash": "07d0edd80ba2c491"
+      },
+      "@foundation/web#typecheck": {
+        "status": "HIT",
+        "hash": "abca7ce9de797f75"
+      }
+    },
+    "tasksAfterCompilerConfigByteChange": {
+      "@foundation/backend#lint": {
+        "status": "MISS",
+        "hash": "073205faf79b8999"
+      },
+      "@foundation/backend#typecheck": {
+        "status": "MISS",
+        "hash": "53d942328a95ed5b"
+      },
+      "@foundation/config#lint": {
+        "status": "MISS",
+        "hash": "1ecf7bc959358678"
+      },
+      "@foundation/domain#lint": {
+        "status": "MISS",
+        "hash": "d98a43b38f31ab64"
+      },
+      "@foundation/domain#typecheck": {
+        "status": "MISS",
+        "hash": "e60c712978f80a37"
+      },
+      "@foundation/mcp-ui#lint": {
+        "status": "MISS",
+        "hash": "3fab04043f4788f3"
+      },
+      "@foundation/mcp-ui#typecheck": {
+        "status": "MISS",
+        "hash": "99f9dab14138098c"
+      },
+      "@foundation/ui#lint": {
+        "status": "MISS",
+        "hash": "4ded965c9dd56fa9"
+      },
+      "@foundation/ui#typecheck": {
+        "status": "MISS",
+        "hash": "897947d1d108f567"
+      },
+      "@foundation/web#lint": {
+        "status": "MISS",
+        "hash": "eac140ad6cfdb6c3"
+      },
+      "@foundation/web#typecheck": {
+        "status": "MISS",
+        "hash": "850d65560b1e2bdd"
+      }
+    }
+  }
+}
