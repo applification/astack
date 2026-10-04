@@ -158,10 +158,24 @@ export default tseslint.config(
     },
   },
   {
+    files: ['packages/{ui,domain}/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-globals': [
+        'error',
+        'fetch',
+        'WebSocket',
+        'XMLHttpRequest',
+      ],
+    },
+  },
+  {
     files: ['packages/domain/**/*.ts'],
     rules: {
       'no-restricted-globals': [
         'error',
+        'fetch',
+        'WebSocket',
+        'XMLHttpRequest',
         {
           name: 'window',
           message: 'DATA 01: browser capabilities belong in an app adapter.',
