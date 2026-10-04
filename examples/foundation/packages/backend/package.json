@@ -19,8 +19,5 @@
     "@modelcontextprotocol/sdk": "1.32.0",
     "convex": "1.46.0",
     "zod": "4.6.5"
-  },
-  "devDependencies": {
-    "typescript": "5.9.3"
   }
 }

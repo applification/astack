@@ -1,0 +1,9 @@
+node_modules/
+**/dist/
+**/storybook-static/
+.turbo/
+.proof/
+**/.convex/
+**/.env*
+!**/.env.example
+packages/backend/convex/generated/

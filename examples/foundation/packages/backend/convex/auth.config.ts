@@ -1,8 +1,8 @@
-import type { AuthConfig } from "convex/server";
+import type { AuthConfig } from 'convex/server';
 
-import { isLoopbackUrl, localProofEnabled } from "./lib/identity";
+import { isLoopbackUrl, localProofEnabled } from './lib/identity';
 
-const providers: AuthConfig["providers"] = [];
+const providers: AuthConfig['providers'] = [];
 
 if (localProofEnabled()) {
   const issuer = process.env.ASTACK_PROOF_ISSUER;
@@ -11,14 +11,26 @@ if (localProofEnabled()) {
   const mcpAudience = process.env.MCP_RESOURCE_URL;
 
   if (issuer && jwks && webAudience && mcpAudience) {
-    if (!isLoopbackUrl(issuer) || !isLoopbackUrl(mcpAudience) || !jwks.startsWith("data:")) {
-      throw new Error("Local proof issuers and resources must use loopback URLs and an inline public JWKS.");
+    if (
+      !isLoopbackUrl(issuer) ||
+      !isLoopbackUrl(mcpAudience) ||
+      !jwks.startsWith('data:')
+    ) {
+      throw new Error(
+        'Local proof issuers and resources must use loopback URLs and an inline public JWKS.',
+      );
     }
     if (webAudience === mcpAudience) {
-      throw new Error("Web and MCP proof tokens need different audiences.");
+      throw new Error('Web and MCP proof tokens need different audiences.');
     }
     for (const applicationID of [webAudience, mcpAudience]) {
-      providers.push({ type: "customJwt", issuer, jwks, algorithm: "RS256", applicationID });
+      providers.push({
+        type: 'customJwt',
+        issuer,
+        jwks,
+        algorithm: 'RS256',
+        applicationID,
+      });
     }
   }
 } else {
@@ -27,16 +39,16 @@ if (localProofEnabled()) {
     // The official Convex WorkOS integration supports both session-token issuers.
     providers.push(
       {
-        type: "customJwt",
-        issuer: "https://api.workos.com/",
-        algorithm: "RS256",
+        type: 'customJwt',
+        issuer: 'https://api.workos.com/',
+        algorithm: 'RS256',
         jwks: `https://api.workos.com/sso/jwks/${clientId}`,
         applicationID: clientId,
       },
       {
-        type: "customJwt",
+        type: 'customJwt',
         issuer: `https://api.workos.com/user_management/${clientId}`,
-        algorithm: "RS256",
+        algorithm: 'RS256',
         jwks: `https://api.workos.com/sso/jwks/${clientId}`,
       },
     );
@@ -44,14 +56,19 @@ if (localProofEnabled()) {
   const issuer = process.env.WORKOS_AUTHKIT_DOMAIN;
   const applicationID = process.env.MCP_RESOURCE_URL;
   if (issuer && applicationID) {
-    if (new URL(issuer).protocol !== "https:" || new URL(applicationID).protocol !== "https:") {
-      throw new Error("WorkOS MCP authentication requires HTTPS issuer and resource URLs.");
+    if (
+      new URL(issuer).protocol !== 'https:' ||
+      new URL(applicationID).protocol !== 'https:'
+    ) {
+      throw new Error(
+        'WorkOS MCP authentication requires HTTPS issuer and resource URLs.',
+      );
     }
     providers.push({
-      type: "customJwt",
+      type: 'customJwt',
       issuer,
-      algorithm: "RS256",
-      jwks: `${issuer.replace(/\/$/, "")}/oauth2/jwks`,
+      algorithm: 'RS256',
+      jwks: `${issuer.replace(/\/$/, '')}/oauth2/jwks`,
       applicationID,
     });
   }

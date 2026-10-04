@@ -1,0 +1,9 @@
+bun.lock
+**/_generated/
+**/generated/
+node_modules
+**/dist
+**/storybook-static
+.proof
+.convex
+.turbo

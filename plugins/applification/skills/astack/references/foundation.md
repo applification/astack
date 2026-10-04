@@ -17,7 +17,7 @@ apps/
   web/                 WorkOS web session and Convex React adapter
   mcp-ui/              MCP host bridge and HTML resource bundle
 packages/
-  ui/                  portable React presentation and forms
+  ui/                  portable React presentation
   domain/              pure terms, validation, and behavior
   backend/convex/      data, authorization, and HTTP MCP resource server
   config/              shared tooling configuration
@@ -29,7 +29,7 @@ The reference serves `/mcp` from a Convex HTTP action. Its SDK transport is an a
 
 | Scope | Rule and worked use | Exception |
 | --- | --- | --- |
-| `packages/ui` | Receive data and action callbacks through props. A work-item form renders in web and MCP UI without importing Convex, WorkOS, or a host bridge. | Host and data adapters belong to consuming apps. Add a platform-specific component where behavior cannot be shared. |
+| `packages/ui` | Receive data and action callbacks through props. The work-item list renders in web and MCP UI without importing Convex, WorkOS, or a host bridge. | Host and data adapters belong to consuming apps. Add a platform-specific component where behavior cannot be shared. |
 | `packages/domain` | Keep deterministic validation and terms free of React, protocol, database, and environment imports. Normalize a work-item title here when both clients need the rule. | Persisted identity, membership, and transactional checks stay in the backend. |
 | `packages/backend/convex` | Validate public inputs and enforce ownership at the operation that reads or writes. Web and MCP call the same authorized mutations. | External side effects use actions; local presentation state belongs to its UI consumer. |
 | Client data adapters | Let Convex subscriptions own Convex state. A mutation updates the subscribed work-item list. | Use another data library for another source, or the official Convex integration when a router requires it; do not create a second manually invalidated copy. |

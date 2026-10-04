@@ -1,12 +1,14 @@
-import { spawn, type ChildProcess } from "node:child_process";
-import { createServer } from "node:net";
-import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
-import { createHash } from "node:crypto";
-import { generateKeyPair, exportJWK, SignJWT } from "jose";
+import { spawn, type ChildProcess } from 'node:child_process';
+import { createServer } from 'node:net';
+import { cp, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join, resolve, relative } from 'node:path';
+import { generateKeyPair, exportJWK, SignJWT } from 'jose';
+import { ConvexHttpClient } from 'convex/browser';
+import { makeFunctionReference } from 'convex/server';
+import { isSourcePath, sourceDigest } from './source-identity';
 
-export const foundationRoot = resolve(import.meta.dir, "..");
+export const foundationRoot = resolve(import.meta.dir, '..');
 export type OwnedProcess = { child: ChildProcess; stopped: boolean };
 export type Runtime = {
   project: string;
@@ -36,17 +38,17 @@ export function localEnvironment(
   source: NodeJS.ProcessEnv = process.env,
 ): NodeJS.ProcessEnv {
   const allowed = [
-    "PATH",
-    "HOME",
-    "USER",
-    "LOGNAME",
-    "TMPDIR",
-    "TEMP",
-    "TMP",
-    "LANG",
-    "LC_ALL",
-    "TZ",
-    "SYSTEMROOT",
+    'PATH',
+    'HOME',
+    'USER',
+    'LOGNAME',
+    'TMPDIR',
+    'TEMP',
+    'TMP',
+    'LANG',
+    'LC_ALL',
+    'TZ',
+    'SYSTEMROOT',
   ];
   return Object.fromEntries(
     allowed
@@ -58,23 +60,23 @@ export function redact(text: string): string {
   return text
     .replace(
       /\b[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/g,
-      "[REDACTED JWT]",
+      '[REDACTED JWT]',
     )
-    .replace(/Bearer\s+[^\s"']+/gi, "Bearer [REDACTED]")
+    .replace(/Bearer\s+[^\s"']+/gi, 'Bearer [REDACTED]')
     .replace(
       /(CONVEX_SELF_HOSTED_ADMIN_KEY|CONVEX_DEPLOY_KEY|WORKOS_API_KEY)\s*[=:]\s*[^\s]+/gi,
-      "$1=[REDACTED]",
+      '$1=[REDACTED]',
     );
 }
 export async function freePort(): Promise<number> {
   const server = createServer();
   await new Promise<void>((done, fail) => {
-    server.once("error", fail);
-    server.listen(0, "127.0.0.1", done);
+    server.once('error', fail);
+    server.listen(0, '127.0.0.1', done);
   });
   const address = server.address();
-  if (!address || typeof address === "string")
-    throw new Error("Could not allocate local port");
+  if (!address || typeof address === 'string')
+    throw new Error('Could not allocate local port');
   await new Promise<void>((done, fail) =>
     server.close((error) => {
       if (error) fail(error);
@@ -90,35 +92,35 @@ export async function command(
   timeoutMs = 120_000,
 ): Promise<string> {
   const executable = args[0];
-  if (!executable) throw new Error("Command has no executable");
+  if (!executable) throw new Error('Command has no executable');
   const child = spawn(executable, args.slice(1), {
     cwd,
     env,
-    stdio: ["ignore", "pipe", "pipe"],
+    stdio: ['ignore', 'pipe', 'pipe'],
     detached: true,
   });
-  let output = "";
-  child.stdout.on("data", (chunk: Buffer) => {
+  let output = '';
+  child.stdout.on('data', (chunk: Buffer) => {
     output += chunk.toString();
   });
-  child.stderr.on("data", (chunk: Buffer) => {
+  child.stderr.on('data', (chunk: Buffer) => {
     output += chunk.toString();
   });
   const timer = setTimeout(() => {
     if (child.pid) {
       try {
-        process.kill(-child.pid, "SIGTERM");
+        process.kill(-child.pid, 'SIGTERM');
       } catch {}
     }
   }, timeoutMs);
   try {
     const code = await new Promise<number | null>((done, fail) => {
-      child.once("error", fail);
-      child.once("close", done);
+      child.once('error', fail);
+      child.once('close', done);
     });
     if (code !== 0)
       throw new Error(
-        `${args[0]} ${args[1] ?? ""} exited ${code}: ${redact(output).slice(-6000)}`,
+        `${args[0]} ${args[1] ?? ''} exited ${code}: ${redact(output).slice(-6000)}`,
       );
     return redact(output);
   } finally {
@@ -132,11 +134,11 @@ export function launch(
   logs: string[],
 ): OwnedProcess {
   const executable = args[0];
-  if (!executable) throw new Error("Command has no executable");
+  if (!executable) throw new Error('Command has no executable');
   const child = spawn(executable, args.slice(1), {
     cwd,
     env,
-    stdio: ["ignore", "pipe", "pipe"],
+    stdio: ['ignore', 'pipe', 'pipe'],
     detached: true,
   });
   const owned = { child, stopped: false };
@@ -144,9 +146,9 @@ export function launch(
     logs.push(redact(chunk.toString()));
     if (logs.length > 500) logs.shift();
   };
-  child.stdout.on("data", append);
-  child.stderr.on("data", append);
-  child.on("error", (error) => logs.push(error.message));
+  child.stdout.on('data', append);
+  child.stderr.on('data', append);
+  child.on('error', (error) => logs.push(error.message));
   return owned;
 }
 export async function stopProcess(owned: OwnedProcess): Promise<void> {
@@ -154,12 +156,12 @@ export async function stopProcess(owned: OwnedProcess): Promise<void> {
   owned.stopped = true;
   if (owned.child.exitCode !== null || !owned.child.pid) return;
   const exit = new Promise<void>((done) => {
-    owned.child.once("close", () => {
+    owned.child.once('close', () => {
       done();
     });
   });
   try {
-    process.kill(-owned.child.pid, "SIGTERM");
+    process.kill(-owned.child.pid, 'SIGTERM');
   } catch {
     return;
   }
@@ -171,7 +173,7 @@ export async function stopProcess(owned: OwnedProcess): Promise<void> {
   ]);
   if (!hasExited(owned.child)) {
     try {
-      process.kill(-owned.child.pid, "SIGKILL");
+      process.kill(-owned.child.pid, 'SIGKILL');
     } catch {}
     await exit;
   }
@@ -196,32 +198,23 @@ export async function waitFor<T>(
     await new Promise((done) => setTimeout(done, 250));
   }
   throw new Error(
-    `Timed out waiting for ${description}${last ? `: ${redact(last instanceof Error ? last.message : JSON.stringify(last))}` : ""}`,
+    `Timed out waiting for ${description}${last ? `: ${redact(last instanceof Error ? last.message : JSON.stringify(last))}` : ''}`,
   );
 }
 export async function revisionIdentity(project: string): Promise<string> {
-  try {
-    const revision = (
-      await command(["git", "rev-parse", "HEAD"], project)
-    ).trim();
-    const diff = await command(["git", "diff", "HEAD", "--"], project);
-    return (
-      revision +
-      (diff
-        ? `+dirty-${createHash("sha256").update(diff).digest("hex").slice(0, 12)}`
-        : "")
-    );
-  } catch {
-    return `unversioned-${Date.now()}`;
-  }
+  const revision = await command(['git', 'rev-parse', 'HEAD'], project).then(
+    (value) => value.trim(),
+    () => 'unversioned',
+  );
+  return `${revision}@sha256-${await sourceDigest(project)}`;
 }
 
 export async function startRuntime(
   options: { projectRoot?: string } = {},
 ): Promise<Runtime> {
   const source = options.projectRoot ?? foundationRoot;
-  const privateDirectory = await mkdtemp(join(tmpdir(), "astack-foundation-"));
-  const project = join(privateDirectory, "app");
+  const privateDirectory = await mkdtemp(join(tmpdir(), 'astack-foundation-'));
+  const project = join(privateDirectory, 'app');
   const logs: string[] = [],
     processes: OwnedProcess[] = [];
   const stop = async () => {
@@ -231,94 +224,83 @@ export async function startRuntime(
   try {
     await cp(source, project, {
       recursive: true,
-      filter: (path) =>
-        !path
-          .split("/")
-          .some((part) =>
-            [
-              "node_modules",
-              ".git",
-              ".convex",
-              ".env",
-              ".env.local",
-              ".proof",
-              ".turbo",
-              "evidence",
-            ].includes(part),
-          ),
+      filter: (path) => isSourcePath(relative(source, path)),
     });
-    await command(["bun", "install", "--frozen-lockfile"], project);
+    await command(['bun', 'install', '--frozen-lockfile'], project);
     const [cloudPort, sitePort, webPort] = await Promise.all([
       freePort(),
       freePort(),
       freePort(),
     ]);
     if (new Set([cloudPort, sitePort, webPort]).size !== 3)
-      throw new Error("Port allocation collision; retry proof");
+      throw new Error('Port allocation collision; retry proof');
     const convexUrl = `http://127.0.0.1:${cloudPort}`,
       siteUrl = `http://127.0.0.1:${sitePort}`;
     const webUrl = `http://127.0.0.1:${webPort}`,
       mcpUrl = `${siteUrl}/mcp`;
     const issuer = `${siteUrl}/proof-issuer`,
-      webAudience = "astack-work-items-web";
+      webAudience = 'astack-work-items-web';
     const buildId = await revisionIdentity(source);
-    const { privateKey, publicKey } = await generateKeyPair("RS256", {
+    const { privateKey, publicKey } = await generateKeyPair('RS256', {
       modulusLength: 2048,
     });
     const key = {
       ...(await exportJWK(publicKey)),
-      kid: "disposable-proof",
-      alg: "RS256",
-      use: "sig",
+      kid: 'disposable-proof',
+      alg: 'RS256',
+      use: 'sig',
     };
-    const jwks = `data:text/plain;charset=utf-8;base64,${Buffer.from(JSON.stringify({ keys: [key] })).toString("base64")}`;
+    const jwks = `data:text/plain;charset=utf-8;base64,${Buffer.from(JSON.stringify({ keys: [key] })).toString('base64')}`;
     const token = (subject: string, audience: string, expired = false) =>
       new SignJWT({})
-        .setProtectedHeader({ alg: "RS256", typ: "JWT", kid: key.kid })
+        .setProtectedHeader({ alg: 'RS256', typ: 'JWT', kid: key.kid })
         .setIssuer(issuer)
         .setSubject(subject)
         .setAudience(audience)
         .setIssuedAt()
-        .setExpirationTime(expired ? Math.floor(Date.now() / 1000) - 60 : "30m")
+        .setExpirationTime(expired ? Math.floor(Date.now() / 1000) - 60 : '30m')
         .sign(privateKey);
     const [web, mcp, otherWeb, otherMcp, wrongAudience, expired] =
       await Promise.all([
-        token("proof-owner-a", webAudience),
-        token("proof-owner-a", mcpUrl),
-        token("proof-owner-b", webAudience),
-        token("proof-owner-b", mcpUrl),
-        token("proof-owner-a", "wrong-resource"),
-        token("proof-owner-a", mcpUrl, true),
+        token('proof-owner-a', webAudience),
+        token('proof-owner-a', mcpUrl),
+        token('proof-owner-b', webAudience),
+        token('proof-owner-b', mcpUrl),
+        token('proof-owner-a', 'wrong-resource'),
+        token('proof-owner-a', mcpUrl, true),
       ]);
-    const backend = join(project, "packages/backend"),
-      env = { ...localEnvironment(), CONVEX_AGENT_MODE: "anonymous" };
-    logs.push(await command(["bun", "run", "build:mcp-ui"], project));
-    const authConfigPath = join(backend, "convex/auth.config.ts");
-    const configuredAuth = await readFile(authConfigPath, "utf8");
-    await writeFile(authConfigPath, "export default { providers: [] };\n");
+    const backend = join(project, 'packages/backend'),
+      env = { ...localEnvironment(), CONVEX_AGENT_MODE: 'anonymous' };
+    logs.push(await command(['bun', 'run', 'build:mcp-ui'], project));
+    const authConfigPath = join(backend, 'convex/auth.config.ts');
+    const configuredAuth = await readFile(authConfigPath, 'utf8');
+    await writeFile(authConfigPath, 'export default { providers: [] };\n');
     const devArgs = [
-      "bunx",
-      "convex",
-      "dev",
-      "--local-cloud-port",
+      'bunx',
+      '--no-install',
+      'convex',
+      'dev',
+      '--typecheck',
+      'disable',
+      '--local-cloud-port',
       String(cloudPort),
-      "--local-site-port",
+      '--local-site-port',
       String(sitePort),
-      "--tail-logs",
-      "disable",
+      '--tail-logs',
+      'disable',
     ];
     const bootstrap = launch(devArgs, backend, env, logs);
     processes.push(bootstrap);
     await waitFor(async () => {
       const response = await fetch(`${convexUrl}/instance_name`);
       return response.ok ? true : false;
-    }, "anonymous local Convex backend");
+    }, 'anonymous local Convex backend');
     await waitFor(async () => {
-      const content = await readFile(join(backend, ".env.local"), "utf8");
-      return content.includes("CONVEX_DEPLOYMENT") ? true : false;
-    }, "local Convex deployment configuration");
+      const content = await readFile(join(backend, '.env.local'), 'utf8');
+      return content.includes('CONVEX_DEPLOYMENT') ? true : false;
+    }, 'local Convex deployment configuration');
     const settings = {
-      ASTACK_PROOF_MODE: "local",
+      ASTACK_PROOF_MODE: 'local',
       ASTACK_PROOF_JWKS: jwks,
       ASTACK_PROOF_ISSUER: issuer,
       ASTACK_PROOF_WEB_AUDIENCE: webAudience,
@@ -327,7 +309,7 @@ export async function startRuntime(
     };
     for (const [name, value] of Object.entries(settings))
       await command(
-        ["bunx", "convex", "env", "set", name, value],
+        ['bunx', '--no-install', 'convex', 'env', 'set', name, value],
         backend,
         env,
       );
@@ -345,39 +327,49 @@ export async function startRuntime(
       };
       return identity.buildId === buildId &&
         identity.resource === mcpUrl &&
-        identity.authMode === "local-proof"
+        identity.authMode === 'local-proof'
         ? identity
         : false;
-    }, "configured backend build identity");
+    }, 'configured backend build identity');
+    const authenticated = new ConvexHttpClient(convexUrl);
+    authenticated.setAuth(web);
+    await waitFor(async () => {
+      const value: unknown = await authenticated.query(
+        makeFunctionReference<'query'>('workItems:list'),
+        {},
+      );
+      return Array.isArray(value) ? true : false;
+    }, 'deployed auth providers and authenticated backend query');
     const webEnv = {
       ...localEnvironment(),
       VITE_CONVEX_URL: convexUrl,
-      VITE_ASTACK_PROOF_MODE: "local",
+      VITE_ASTACK_PROOF_MODE: 'local',
       VITE_ASTACK_PROOF_TOKEN: web,
       VITE_ASTACK_BUILD_ID: buildId,
     };
     processes.push(
       launch(
         [
-          "bunx",
-          "vite",
-          "--host",
-          "127.0.0.1",
-          "--port",
+          'bunx',
+          '--no-install',
+          'vite',
+          '--host',
+          '127.0.0.1',
+          '--port',
           String(webPort),
-          "--strictPort",
+          '--strictPort',
         ],
-        join(project, "apps/web"),
+        join(project, 'apps/web'),
         webEnv,
         logs,
       ),
     );
     await waitFor(async () => {
       const response = await fetch(webUrl);
-      return response.ok && (await response.text()).includes("root")
+      return response.ok && (await response.text()).includes('root')
         ? true
         : false;
-    }, "web application");
+    }, 'web application');
     return {
       project,
       privateDirectory,
@@ -394,7 +386,7 @@ export async function startRuntime(
       stop,
     };
   } catch (error) {
-    const detail = logs.join("").slice(-8000);
+    const detail = logs.join('').slice(-8000);
     await stop();
     throw new Error(`${redact(String(error))}\n${detail}`);
   }

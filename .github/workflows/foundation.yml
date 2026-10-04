@@ -1,0 +1,54 @@
+name: astack foundation
+on:
+  pull_request:
+    paths:
+      - 'examples/foundation/**'
+      - 'scripts/create-foundation.ts'
+      - '.astack/foundation/**'
+      - 'docs/adr/**'
+      - '.github/workflows/foundation.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'examples/foundation/**'
+      - 'scripts/create-foundation.ts'
+      - '.github/workflows/foundation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+      - uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76
+        with:
+          bun-version: 1.4.0
+      - name: Create a fresh independent profile
+        run: bun scripts/create-foundation.ts "$RUNNER_TEMP/astack-foundation"
+      - name: Install pinned dependencies and browser
+        run: |
+          cd "$RUNNER_TEMP/astack-foundation"
+          bun install --frozen-lockfile
+          bunx --no-install playwright install chromium --with-deps
+      - name: Required workspace and enforcement checks
+        run: |
+          cd "$RUNNER_TEMP/astack-foundation"
+          bun run check:ci
+          bun run enforcement
+      - name: Real backend, browser and MCP readiness
+        run: |
+          cd "$RUNNER_TEMP/astack-foundation"
+          bun run readiness
+      - name: Retain first failure and redacted observations
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: foundation-proof
+          path: ${{ runner.temp }}/astack-foundation/.proof/
+          include-hidden-files: true
+          retention-days: 14
