@@ -104,7 +104,7 @@ export async function command(
     detached: true,
   });
   let output = '';
-  let timedOut = false;
+  const deadline = { exceeded: false };
   let forcedStop: ReturnType<typeof setTimeout> | undefined;
   child.stdout.on('data', (chunk: Buffer) => {
     output += chunk.toString();
@@ -113,7 +113,7 @@ export async function command(
     output += chunk.toString();
   });
   const timer = setTimeout(() => {
-    timedOut = true;
+    deadline.exceeded = true;
     if (child.pid) {
       try {
         process.kill(-child.pid, 'SIGTERM');
@@ -132,9 +132,9 @@ export async function command(
       child.once('error', fail);
       child.once('close', done);
     });
-    if (timedOut || code !== 0)
+    if (deadline.exceeded || code !== 0)
       throw new Error(
-        `${args[0]} ${args[1] ?? ''} ${timedOut ? 'exceeded its deadline' : `exited ${code}`}: ${redact(output).slice(-6000)}`,
+        `${args[0]} ${args[1] ?? ''} ${deadline.exceeded ? 'exceeded its deadline' : `exited ${code}`}: ${redact(output).slice(-6000)}`,
       );
     return redact(output);
   } finally {
