@@ -37,6 +37,18 @@ if (
   throw new Error('Proof authentication is restricted to loopback.');
 const clientId: unknown = import.meta.env['VITE_WORKOS_CLIENT_ID'];
 const redirectUri: unknown = import.meta.env['VITE_WORKOS_REDIRECT_URI'];
+const apiHostname: unknown = import.meta.env['VITE_WORKOS_API_HOSTNAME'];
+const devMode = import.meta.env['VITE_WORKOS_DEV_MODE'] === 'true';
+if (
+  devMode &&
+  !(
+    ['127.0.0.1', 'localhost'].includes(location.hostname) ||
+    location.hostname.endsWith('.localhost')
+  )
+)
+  throw new Error(
+    'AuthKit development mode is restricted to loopback. Configure a custom authentication API hostname for deployed web.',
+  );
 createRoot(root).render(
   <StrictMode>
     {localProof ? (
@@ -44,7 +56,14 @@ createRoot(root).render(
         <RouterProvider router={router} />
       </ConvexProviderWithAuth>
     ) : typeof clientId === 'string' && typeof redirectUri === 'string' ? (
-      <AuthKitProvider clientId={clientId} redirectUri={redirectUri}>
+      <AuthKitProvider
+        clientId={clientId}
+        redirectUri={redirectUri}
+        devMode={devMode}
+        {...(typeof apiHostname === 'string' && apiHostname
+          ? { apiHostname }
+          : {})}
+      >
         <ConvexProviderWithAuthKit client={convex} useAuth={useAuth}>
           <RouterProvider router={router} />
         </ConvexProviderWithAuthKit>
