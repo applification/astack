@@ -403,6 +403,19 @@ export async function verify(
         );
         const secondMcp = await connect(active, active.tokens.otherMcp);
         otherMcp = secondMcp;
+        const otherRead = await secondMcp.callTool({
+          name: 'work_items_list',
+          arguments: {},
+        });
+        assert.notEqual(otherRead.isError, true);
+        const otherItems = z
+          .object({ items: workItemsSchema })
+          .parse(otherRead.structuredContent).items;
+        assert.equal(
+          otherItems.some((value) => value.id === item.id),
+          false,
+          'Another signed MCP user read the owner’s item',
+        );
         await denied(
           () =>
             secondMcp.callTool({
