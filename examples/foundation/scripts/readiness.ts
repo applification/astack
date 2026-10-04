@@ -1,12 +1,14 @@
-import assert from "node:assert/strict";
-import { mkdir, writeFile, access } from "node:fs/promises";
-import { join, resolve } from "node:path";
-import { chromium, type Browser } from "playwright";
-import { ConvexHttpClient } from "convex/browser";
-import { makeFunctionReference } from "convex/server";
-import { z } from "zod";
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { HttpTransport } from "./http-transport";
+import assert from 'node:assert/strict';
+import { mkdir, writeFile, access } from 'node:fs/promises';
+import { join, resolve } from 'node:path';
+import { parseArgs } from 'node:util';
+import { chromium, type Browser } from 'playwright';
+import { ConvexHttpClient } from 'convex/browser';
+import { makeFunctionReference } from 'convex/server';
+import { ConvexError } from 'convex/values';
+import { z } from 'zod';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { HttpTransport } from './http-transport';
 import {
   command,
   foundationRoot,
@@ -15,35 +17,36 @@ import {
   startRuntime,
   waitFor,
   type Runtime,
-} from "./runtime";
-import { startMcpHost } from "./mcp-host";
+} from './runtime';
+import { startMcpHost } from './mcp-host';
 
-type WorkItem = { id: string; title: string; status: "open" | "done" };
+type WorkItem = { id: string; title: string; status: 'open' | 'done' };
 type Check = {
   id: string;
   surface: string;
-  outcome: "pass" | "fail" | "inconclusive" | "skipped";
+  outcome: 'pass' | 'fail' | 'inconclusive' | 'skipped';
   observation: string;
 };
 export type ReadinessReport = {
-  format: "astack-foundation-readiness/v1";
+  format: 'astack-foundation-readiness/v1';
   startedAt: string;
   finishedAt: string;
   revision: string;
-  outcome: "pass" | "fail" | "inconclusive";
+  taskProfile: 'baseline' | 'title-edit';
+  outcome: 'pass' | 'fail' | 'inconclusive';
   environment: Record<string, string>;
   checks: Check[];
   artifacts: string[];
-  cleanup: "complete" | "failed";
+  cleanup: 'complete' | 'failed';
   error?: string;
 };
-const list = makeFunctionReference<"query">("workItems:list");
-const setStatus = makeFunctionReference<"mutation">("workItems:setStatus");
+const list = makeFunctionReference<'query'>('workItems:list');
+const setStatus = makeFunctionReference<'mutation'>('workItems:setStatus');
 const workItemsSchema = z.array(
   z.object({
     id: z.string(),
     title: z.string(),
-    status: z.enum(["open", "done"]),
+    status: z.enum(['open', 'done']),
   }),
 );
 export function items(value: unknown): WorkItem[] {
@@ -51,40 +54,97 @@ export function items(value: unknown): WorkItem[] {
 }
 export function selfContainedResource(html: string): void {
   assert.ok(
-    html.includes("<html") || html.includes("<!doctype"),
-    "UI resource is not an HTML document",
+    html.includes('<html') || html.includes('<!doctype'),
+    'UI resource is not an HTML document',
   );
   assert.ok(
     !/<script\b[^>]*\bsrc\s*=/i.test(html),
-    "UI depends on external script files",
+    'UI depends on external script files',
   );
   assert.ok(
     !/<link\b[^>]*\brel\s*=\s*["']?stylesheet/i.test(html),
-    "UI depends on external CSS files",
+    'UI depends on external CSS files',
   );
   assert.ok(
     !/https?:\/\/[^\s"']+\.(?:js|css)(?:["'\s?]|$)/i.test(html),
-    "UI depends on remote assets",
+    'UI depends on remote assets',
   );
 }
-async function denied(operation: () => Promise<unknown>): Promise<void> {
-  let rejected = false;
+type ExpectedDenial =
+  | { kind: 'code'; code: 'FORBIDDEN' | 'UNAUTHENTICATED' | 'INVALID_TITLE' }
+  | { kind: 'arguments'; tool: string; field: string }
+  | { kind: 'jwt' };
+const denialCodeSchema = z.object({ code: z.string() });
+const toolErrorSchema = z.object({
+  isError: z.literal(true),
+  content: z.array(z.object({ type: z.literal('text'), text: z.string() })),
+});
+/** Accept only the expected application or validator denial, never a transport failure. */
+export async function denied(
+  operation: () => Promise<unknown>,
+  expected: ExpectedDenial,
+): Promise<void> {
+  let value: unknown;
+  let failure: unknown;
   try {
-    const value = await operation();
-    rejected =
-      !!value &&
-      typeof value === "object" &&
-      "isError" in value &&
-      value.isError === true;
-  } catch {
-    rejected = true;
+    value = await operation();
+  } catch (error) {
+    failure = error;
   }
-  assert.ok(rejected, "Unauthorized operation unexpectedly succeeded");
+  const toolError = toolErrorSchema.safeParse(value);
+  if (failure === undefined && !toolError.success)
+    assert.fail('Operation expected to be denied unexpectedly succeeded');
+  let matched = false;
+  let observation: string;
+  if (failure !== undefined) {
+    observation =
+      failure instanceof Error ? failure.message : JSON.stringify(failure);
+    if (expected.kind === 'code' && failure instanceof ConvexError) {
+      const data = denialCodeSchema.safeParse(failure.data);
+      matched = data.success && data.data.code === expected.code;
+    } else if (expected.kind === 'jwt' && failure instanceof Error) {
+      try {
+        const data = z
+          .object({ code: z.literal('NoAuthProvider'), message: z.string() })
+          .parse(JSON.parse(failure.message));
+        matched = data.message.includes(
+          "JWT's issuer and audience match one of your configured providers:",
+        );
+      } catch {
+        matched = false;
+      }
+    }
+  } else {
+    assert.ok(toolError.success);
+    observation = toolError.data.content.map((part) => part.text).join('\n');
+    if (expected.kind === 'code') {
+      const serialized = /(?:Uncaught )?ConvexError: (\{[^\n]*\})/.exec(
+        observation,
+      )?.[1];
+      if (serialized) {
+        try {
+          const data = denialCodeSchema.parse(JSON.parse(serialized));
+          matched = data.code === expected.code;
+        } catch {
+          matched = false;
+        }
+      }
+    } else if (expected.kind === 'arguments') {
+      matched =
+        observation.startsWith(
+          `MCP error -32602: Input validation error: Invalid arguments for tool ${expected.tool}:`,
+        ) && observation.endsWith(` at ${expected.field}`);
+    }
+  }
+  if (!matched)
+    throw new Error(
+      `Expected denial ${JSON.stringify(expected)}; observed an unrelated failure: ${redact(observation)}`,
+    );
 }
 async function connect(runtime: Runtime, bearer: string): Promise<Client> {
   const client = new Client({
-    name: "astack-foundation-proof",
-    version: "1.0.0",
+    name: 'astack-foundation-proof',
+    version: '1.0.0',
   });
   await client.connect(
     new HttpTransport(new URL(runtime.mcpUrl), {
@@ -96,31 +156,47 @@ async function connect(runtime: Runtime, bearer: string): Promise<Client> {
 
 export async function doctor(projectRoot = foundationRoot) {
   const results = await Promise.allSettled([
-    command(["bun", "--version"], projectRoot),
-    command(["node", "--version"], projectRoot),
-    access(join(projectRoot, "node_modules")),
-    access(join(projectRoot, "bun.lock")),
+    command(['bun', '--version'], projectRoot),
+    command(['node', '--version'], projectRoot),
+    access(join(projectRoot, 'node_modules')),
+    access(join(projectRoot, 'bun.lock')),
   ]);
+  const observations = results.map((result, index) => {
+    const detail =
+      result.status === 'fulfilled'
+        ? (result.value ?? 'present').trim()
+        : redact(String(result.reason));
+    const supported =
+      result.status === 'fulfilled' &&
+      (index === 0
+        ? /^1\.4\./.test(detail)
+        : index === 1
+          ? /^v24\./.test(detail)
+          : true);
+    return {
+      prerequisite: [
+        'Bun',
+        'Node',
+        'installed dependencies',
+        'frozen dependency lock',
+      ][index],
+      outcome: supported ? 'pass' : 'fail',
+      detail,
+      ...(index === 0
+        ? { required: 'Bun 1.4.x' }
+        : index === 1
+          ? { required: 'Node 24.x' }
+          : {}),
+    };
+  });
   return {
     checkout: resolve(projectRoot),
     revision: await revisionIdentity(projectRoot),
-    ready: results.every((result) => result.status === "fulfilled"),
+    ready: observations.every((observation) => observation.outcome === 'pass'),
     target: null,
-    observations: results.map((result, index) => ({
-      prerequisite: [
-        "Bun",
-        "Node",
-        "installed dependencies",
-        "frozen dependency lock",
-      ][index],
-      outcome: result.status === "fulfilled" ? "pass" : "fail",
-      detail:
-        result.status === "fulfilled"
-          ? (result.value ?? "present").trim()
-          : redact(String(result.reason)),
-    })),
+    observations,
     scope:
-      "Read-only checkout inspection. A live disposable target is created only by verify.",
+      'Read-only checkout inspection. A live disposable target is created only by verify.',
   };
 }
 
@@ -128,6 +204,7 @@ export async function verify(
   options: {
     projectRoot?: string;
     evidenceDirectory?: string | undefined;
+    taskProfile?: 'baseline' | 'title-edit';
   } = {},
 ): Promise<ReadinessReport> {
   const projectRoot = options.projectRoot ?? foundationRoot;
@@ -135,21 +212,22 @@ export async function verify(
     options.evidenceDirectory ??
       join(
         projectRoot,
-        ".proof",
-        new Date().toISOString().replace(/[:.]/g, "-"),
+        '.proof',
+        new Date().toISOString().replace(/[:.]/g, '-'),
       ),
   );
   await mkdir(evidence, { recursive: true });
   const report: ReadinessReport = {
-    format: "astack-foundation-readiness/v1",
+    format: 'astack-foundation-readiness/v1',
     startedAt: new Date().toISOString(),
-    finishedAt: "",
+    finishedAt: '',
     revision: await revisionIdentity(projectRoot),
-    outcome: "inconclusive",
+    taskProfile: options.taskProfile ?? 'baseline',
+    outcome: 'inconclusive',
     environment: {},
     checks: [],
     artifacts: [],
-    cleanup: "complete",
+    cleanup: 'complete',
   };
   let runtime: Runtime | undefined,
     browser: Browser | undefined,
@@ -164,13 +242,14 @@ export async function verify(
   ): Promise<T> => {
     try {
       const value = await action();
-      report.checks.push({ id, surface, outcome: "pass", observation });
+      report.checks.push({ id, surface, outcome: 'pass', observation });
       return value;
     } catch (error) {
       report.checks.push({
         id,
         surface,
-        outcome: "fail",
+        outcome:
+          error instanceof assert.AssertionError ? 'fail' : 'inconclusive',
         observation: redact(String(error)),
       });
       throw error;
@@ -179,35 +258,36 @@ export async function verify(
   try {
     runtime = await startRuntime({ projectRoot });
     const active = runtime;
+    report.revision = active.buildId;
     report.environment = {
-      kind: "disposable local Convex + Vite + Chromium",
+      kind: 'disposable local Convex + Vite + Chromium',
       buildId: runtime.buildId,
       web: runtime.webUrl,
       convex: runtime.convexUrl,
       mcp: runtime.mcpUrl,
-      actors: "proof-owner-a, proof-owner-b",
+      actors: 'proof-owner-a, proof-owner-b',
       credentialPolicy:
-        "Ephemeral signed RS256 JWTs; no token or private key written to evidence",
+        'Ephemeral signed RS256 JWTs; no token or private key written to evidence',
     };
     browser = await chromium.launch();
     const liveBrowser = browser;
     const page = await liveBrowser.newPage();
     const consoleErrors: string[] = [];
-    page.on("pageerror", (error) => consoleErrors.push(error.message));
+    page.on('pageerror', (error) => consoleErrors.push(error.message));
     await check(
-      "R1",
-      "identity",
-      "Running backend health and web identify this revision and local proof environment.",
+      'R1',
+      'identity',
+      'Running backend health and web identify this revision and local proof environment.',
       async () => {
         const health = (await (
           await fetch(`${active.siteUrl}/health`)
         ).json()) as { buildId: string; resource: string; authMode: string };
         assert.equal(health.buildId, active.buildId);
         assert.equal(health.resource, active.mcpUrl);
-        assert.equal(health.authMode, "local-proof");
+        assert.equal(health.authMode, 'local-proof');
         await page.goto(active.webUrl);
         await page
-          .getByRole("heading", { name: "Work items", exact: true })
+          .getByRole('heading', { name: 'Work items', exact: true })
           .waitFor();
         await page.locator(`[data-build-id="${active.buildId}"]`).waitFor();
       },
@@ -216,13 +296,13 @@ export async function verify(
     const owner = new ConvexHttpClient(runtime.convexUrl);
     owner.setAuth(runtime.tokens.web);
     const item = await check(
-      "R2",
-      "web → persistence",
-      "Creating through the web is visible in a fresh authenticated Convex read.",
+      'R2',
+      'web → persistence',
+      'Creating through the web is visible in a fresh authenticated Convex read.',
       async () => {
-        await page.getByLabel("Title", { exact: true }).fill(title);
+        await page.getByLabel('Title', { exact: true }).fill(title);
         await page
-          .getByRole("button", { name: "Add work item", exact: true })
+          .getByRole('button', { name: 'Add work item', exact: true })
           .click();
         await page.getByText(title, { exact: true }).waitFor();
         return waitFor(
@@ -230,50 +310,84 @@ export async function verify(
             items(await owner.query(list, {})).find(
               (item) => item.title === title,
             ) ?? false,
-          "persisted web item",
+          'persisted web item',
         );
       },
     );
     mcp = await connect(runtime, runtime.tokens.mcp);
     const ownerMcp = mcp;
     await check(
-      "R3",
-      "MCP → web",
-      "A status change through the actual MCP endpoint survives a fresh read and web reload.",
+      'R3',
+      'web ↔ MCP status persistence',
+      'Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload.',
       async () => {
         const tools = await ownerMcp.listTools();
         for (const name of [
-          "work_items_list",
-          "work_items_create",
-          "work_items_set_status",
-          "work_items_delete",
+          'work_items_list',
+          'work_items_create',
+          'work_items_set_status',
+          'work_items_delete',
         ])
           assert.ok(
             tools.tools.some((tool) => tool.name === name),
             `Missing ${name}`,
           );
+        await page
+          .getByRole('button', { name: 'Mark done', exact: true })
+          .click();
+        await page
+          .getByRole('button', { name: 'Reopen', exact: true })
+          .waitFor();
+        assert.equal(
+          items(await owner.query(list, {})).find(
+            (value) => value.id === item.id,
+          )?.status,
+          'done',
+        );
+        await page.getByRole('button', { name: 'Reopen', exact: true }).click();
+        await page
+          .getByRole('button', { name: 'Mark done', exact: true })
+          .waitFor();
+        assert.equal(
+          items(await owner.query(list, {})).find(
+            (value) => value.id === item.id,
+          )?.status,
+          'open',
+        );
+        const reopened = await ownerMcp.callTool({
+          name: 'work_items_list',
+          arguments: {},
+        });
+        assert.notEqual(reopened.isError, true);
+        const content = z
+          .object({ items: workItemsSchema })
+          .parse(reopened.structuredContent);
+        assert.equal(
+          content.items.find((value) => value.id === item.id)?.status,
+          'open',
+        );
         const result = await ownerMcp.callTool({
-          name: "work_items_set_status",
-          arguments: { id: item.id, status: "done" },
+          name: 'work_items_set_status',
+          arguments: { id: item.id, status: 'done' },
         });
         assert.notEqual(result.isError, true);
         assert.equal(
           items(await owner.query(list, {})).find(
             (value) => value.id === item.id,
           )?.status,
-          "done",
+          'done',
         );
         await page.reload();
         await page.getByText(title, { exact: true }).waitFor();
         await page
-          .getByRole("button", { name: "Reopen", exact: true })
+          .getByRole('button', { name: 'Reopen', exact: true })
           .waitFor();
       },
     );
     await check(
-      "R4",
-      "authorization",
-      "Another signed user cannot read or mutate the first user’s item through Convex or MCP.",
+      'R4',
+      'authorization',
+      'Another signed user cannot read or mutate the first user’s item through Convex or MCP.',
       async () => {
         const other = new ConvexHttpClient(active.convexUrl);
         other.setAuth(active.tokens.otherWeb);
@@ -283,35 +397,40 @@ export async function verify(
           ),
           false,
         );
-        await denied(() =>
-          other.mutation(setStatus, { id: item.id, status: "open" }),
+        await denied(
+          () => other.mutation(setStatus, { id: item.id, status: 'open' }),
+          { kind: 'code', code: 'FORBIDDEN' },
         );
         const secondMcp = await connect(active, active.tokens.otherMcp);
         otherMcp = secondMcp;
-        await denied(() =>
-          secondMcp.callTool({
-            name: "work_items_set_status",
-            arguments: { id: item.id, status: "open" },
-          }),
+        await denied(
+          () =>
+            secondMcp.callTool({
+              name: 'work_items_set_status',
+              arguments: { id: item.id, status: 'open' },
+            }),
+          { kind: 'code', code: 'FORBIDDEN' },
         );
-        await denied(() =>
-          secondMcp.callTool({
-            name: "work_items_delete",
-            arguments: { id: item.id },
-          }),
+        await denied(
+          () =>
+            secondMcp.callTool({
+              name: 'work_items_delete',
+              arguments: { id: item.id },
+            }),
+          { kind: 'code', code: 'FORBIDDEN' },
         );
         assert.equal(
           items(await owner.query(list, {})).find(
             (value) => value.id === item.id,
           )?.status,
-          "done",
+          'done',
         );
       },
     );
     await check(
-      "R5",
-      "authentication",
-      "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads.",
+      'R5',
+      'authentication',
+      'MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads.',
       async () => {
         for (const bearer of [
           undefined,
@@ -320,90 +439,319 @@ export async function verify(
           active.tokens.expired,
         ]) {
           const response = await fetch(active.mcpUrl, {
-            method: "POST",
+            method: 'POST',
             headers: {
-              "content-type": "application/json",
-              accept: "application/json, text/event-stream",
+              'content-type': 'application/json',
+              accept: 'application/json, text/event-stream',
               ...(bearer ? { authorization: `Bearer ${bearer}` } : {}),
             },
             body: JSON.stringify({
-              jsonrpc: "2.0",
+              jsonrpc: '2.0',
               id: 1,
-              method: "initialize",
+              method: 'initialize',
               params: {
-                protocolVersion: "2025-03-26",
+                protocolVersion: '2025-03-26',
                 capabilities: {},
-                clientInfo: { name: "negative-proof", version: "1" },
+                clientInfo: { name: 'negative-proof', version: '1' },
               },
             }),
           });
           assert.equal(
             response.status,
             401,
-            "MCP did not reject invalid identity",
+            'MCP did not reject invalid identity',
           );
         }
-        await denied(() =>
-          new ConvexHttpClient(active.convexUrl).query(list, {}),
+        await denied(
+          () => new ConvexHttpClient(active.convexUrl).query(list, {}),
+          { kind: 'code', code: 'UNAUTHENTICATED' },
         );
         const wrong = new ConvexHttpClient(active.convexUrl);
         wrong.setAuth(active.tokens.wrongAudience);
-        await denied(() => wrong.query(list, {}));
+        await denied(() => wrong.query(list, {}), { kind: 'jwt' });
       },
     );
     await check(
-      "R6",
-      "MCP contracts",
-      "Malformed status arguments are rejected and the UI resource contains its required JS/CSS.",
+      'R6',
+      'MCP contracts',
+      'Malformed status arguments are rejected and the UI resource contains its required JS/CSS.',
       async () => {
-        await denied(() =>
-          ownerMcp.callTool({
-            name: "work_items_set_status",
-            arguments: { id: item.id, status: "unknown" },
-          }),
+        for (const method of ['GET', 'DELETE']) {
+          const response = await fetch(active.mcpUrl, {
+            method,
+            headers: { authorization: `Bearer ${active.tokens.mcp}` },
+          });
+          assert.equal(response.status, 405);
+          assert.equal(response.headers.get('allow'), 'POST');
+        }
+        await denied(
+          () =>
+            ownerMcp.callTool({
+              name: 'work_items_set_status',
+              arguments: { id: item.id, status: 'unknown' },
+            }),
+          { kind: 'arguments', tool: 'work_items_set_status', field: 'status' },
         );
         const resource = await ownerMcp.readResource({
-          uri: "ui://foundation/work-items.html",
+          uri: 'ui://foundation/work-items.html',
         });
         const content = resource.contents[0];
-        assert.ok(content && "text" in content);
-        assert.equal(content.mimeType, "text/html;profile=mcp-app");
+        assert.ok(content && 'text' in content);
+        assert.equal(content.mimeType, 'text/html;profile=mcp-app');
         selfContainedResource(content.text);
       },
     );
     await page.screenshot({
-      path: join(evidence, "web-persisted.png"),
+      path: join(evidence, 'web-persisted.png'),
       fullPage: true,
     });
-    report.artifacts.push("web-persisted.png");
+    report.artifacts.push('web-persisted.png');
     await check(
-      "R7",
-      "local MCP App host",
-      "The real MCP resource renders inside a sandboxed iframe through AppBridge connected to the running MCP endpoint.",
+      'R7',
+      'local MCP App host',
+      'The real MCP resource renders and changes persisted status through AppBridge; a web reload observes that change.',
       async () => {
         host = await startMcpHost(active);
-        const appPage = await liveBrowser.newPage();
-        await appPage.goto(host.url);
-        await appPage
-          .getByRole("status")
-          .filter({ hasText: "Connected to the running MCP server" })
-          .waitFor();
-        await appPage
-          .frameLocator("#app")
-          .getByText(title, { exact: true })
-          .waitFor();
-        await appPage.screenshot({
-          path: join(evidence, "mcp-app-host.png"),
-          fullPage: true,
+        const forbiddenProxy = await fetch(`${host.url}/mcp`, {
+          method: 'POST',
+          headers: { origin: 'http://foreign.invalid' },
+          body: '{}',
         });
-        report.artifacts.push("mcp-app-host.png");
-        await appPage.close();
+        assert.equal(forbiddenProxy.status, 403);
+        const appPage = await liveBrowser.newPage();
+        const hostMessages: string[] = [];
+        appPage.on('pageerror', (error) => {
+          hostMessages.push(error.message);
+        });
+        appPage.on('console', (message) => {
+          if (message.type() === 'error') hostMessages.push(message.text());
+        });
+        appPage.on('requestfailed', (request) => {
+          hostMessages.push(
+            `${request.url()}: ${request.failure()?.errorText ?? 'failed'}`,
+          );
+        });
+        try {
+          await appPage.goto(host.url);
+          await appPage
+            .getByRole('status')
+            .filter({ hasText: 'Connected to the running MCP server' })
+            .waitFor();
+          await appPage
+            .frameLocator('#app')
+            .getByText(title, { exact: true })
+            .waitFor();
+          await appPage
+            .frameLocator('#app')
+            .getByRole('button', { name: 'Reopen', exact: true })
+            .click();
+          await waitFor(
+            async () =>
+              items(await owner.query(list, {})).find(
+                (value) => value.id === item.id,
+              )?.status === 'open'
+                ? true
+                : false,
+            'persisted MCP App status change',
+          );
+          await page.reload();
+          await page.getByText(title, { exact: true }).waitFor();
+          await page
+            .getByRole('button', { name: 'Mark done', exact: true })
+            .waitFor();
+          await appPage
+            .frameLocator('#app')
+            .getByRole('button', { name: 'Mark done', exact: true })
+            .waitFor();
+          await appPage.screenshot({
+            path: join(evidence, 'mcp-app-host.png'),
+            fullPage: true,
+          });
+          report.artifacts.push('mcp-app-host.png');
+        } catch (error) {
+          hostMessages.push(await appPage.getByRole('status').innerText());
+          await appPage.screenshot({
+            path: join(evidence, 'mcp-app-host-failure.png'),
+            fullPage: true,
+          });
+          await writeFile(
+            join(evidence, 'mcp-host.log'),
+            redact(hostMessages.join('\n')),
+          );
+          report.artifacts.push('mcp-app-host-failure.png', 'mcp-host.log');
+          throw error;
+        } finally {
+          await appPage.close();
+        }
       },
     );
+    if (report.taskProfile === 'title-edit') {
+      await check(
+        'F0',
+        'title edit contract',
+        'The requested title-edit MCP tool is available.',
+        async () => {
+          const tools = await ownerMcp.listTools();
+          assert.ok(
+            tools.tools.some((tool) => tool.name === 'work_items_update_title'),
+            'Missing requested work_items_update_title tool',
+          );
+        },
+      );
+      const webEditedTitle = `${title} edited in web`;
+      const mcpEditedTitle = `${title} edited through MCP`;
+      await check(
+        'F1',
+        'web title edit → persistence → MCP',
+        'A title edited through the web is independently visible through Convex and MCP.',
+        async () => {
+          await page
+            .getByRole('button', { name: `Edit ${title}`, exact: true })
+            .click();
+          const dialog = page.getByRole('dialog', {
+            name: 'Edit work item',
+            exact: true,
+          });
+          await dialog
+            .getByRole('textbox', { name: 'Title', exact: true })
+            .fill(webEditedTitle);
+          await dialog
+            .getByRole('button', { name: 'Save changes', exact: true })
+            .click();
+          await page.getByText(webEditedTitle, { exact: true }).waitFor();
+          assert.equal(
+            items(await owner.query(list, {})).find(
+              (value) => value.id === item.id,
+            )?.title,
+            webEditedTitle,
+          );
+          const result = await ownerMcp.callTool({
+            name: 'work_items_list',
+            arguments: {},
+          });
+          assert.notEqual(result.isError, true);
+          const content = z
+            .object({ items: workItemsSchema })
+            .parse(result.structuredContent);
+          assert.equal(
+            content.items.find((value) => value.id === item.id)?.title,
+            webEditedTitle,
+          );
+        },
+      );
+      await check(
+        'F2',
+        'MCP title edit → persistence → web',
+        'A title edited through MCP survives an independent Convex read and a web reload.',
+        async () => {
+          const result = await ownerMcp.callTool({
+            name: 'work_items_update_title',
+            arguments: { id: item.id, title: mcpEditedTitle },
+          });
+          assert.notEqual(result.isError, true);
+          assert.equal(
+            items(await owner.query(list, {})).find(
+              (value) => value.id === item.id,
+            )?.title,
+            mcpEditedTitle,
+          );
+          await page.reload();
+          await page.getByText(mcpEditedTitle, { exact: true }).waitFor();
+        },
+      );
+      await check(
+        'F3',
+        'title validation and ownership',
+        'Empty titles and another user’s title edit are specifically denied; the owner’s persisted title stays unchanged.',
+        async () => {
+          const updateTitle = makeFunctionReference<'mutation'>(
+            'workItems:updateTitle',
+          );
+          await denied(
+            () => owner.mutation(updateTitle, { id: item.id, title: '' }),
+            { kind: 'code', code: 'INVALID_TITLE' },
+          );
+          await denied(
+            () =>
+              ownerMcp.callTool({
+                name: 'work_items_update_title',
+                arguments: { id: item.id, title: '   ' },
+              }),
+            { kind: 'code', code: 'INVALID_TITLE' },
+          );
+          const other = new ConvexHttpClient(active.convexUrl);
+          other.setAuth(active.tokens.otherWeb);
+          await denied(
+            () =>
+              other.mutation(updateTitle, {
+                id: item.id,
+                title: 'Intruder edit',
+              }),
+            { kind: 'code', code: 'FORBIDDEN' },
+          );
+          const secondMcp = otherMcp;
+          assert.ok(secondMcp);
+          await denied(
+            () =>
+              secondMcp.callTool({
+                name: 'work_items_update_title',
+                arguments: { id: item.id, title: 'Intruder edit' },
+              }),
+            { kind: 'code', code: 'FORBIDDEN' },
+          );
+          await page
+            .getByRole('button', {
+              name: `Edit ${mcpEditedTitle}`,
+              exact: true,
+            })
+            .click();
+          const dialog = page.getByRole('dialog', {
+            name: 'Edit work item',
+            exact: true,
+          });
+          const input = dialog.getByRole('textbox', {
+            name: 'Title',
+            exact: true,
+          });
+          const save = dialog.getByRole('button', {
+            name: 'Save changes',
+            exact: true,
+          });
+          await input.fill('');
+          if (await save.isEnabled()) await save.click();
+          await waitFor(
+            async () =>
+              !(await save.isEnabled()) ||
+              (await input.evaluate(
+                (element) =>
+                  element instanceof HTMLInputElement &&
+                  !element.validity.valid,
+              )) ||
+              (await dialog
+                .locator('[role="alert"], [aria-invalid="true"]')
+                .count()) > 0
+                ? true
+                : false,
+            'visible empty-title validation',
+          );
+          assert.equal(
+            items(await owner.query(list, {})).find(
+              (value) => value.id === item.id,
+            )?.title,
+            mcpEditedTitle,
+          );
+          await page.screenshot({
+            path: join(evidence, 'title-edit.png'),
+            fullPage: true,
+          });
+          report.artifacts.push('title-edit.png');
+        },
+      );
+    }
     await check(
-      "R8",
-      "web runtime",
-      "No uncaught web JavaScript error was observed during the create/reload journey.",
+      'R8',
+      'web runtime',
+      'No uncaught web JavaScript error was observed during the create/reload journey.',
       () =>
         Promise.resolve().then(() => {
           assert.deepEqual(consoleErrors, []);
@@ -411,31 +759,31 @@ export async function verify(
     );
     report.checks.push(
       {
-        id: "G1",
-        surface: "WorkOS",
-        outcome: "skipped",
+        id: 'G1',
+        surface: 'WorkOS',
+        outcome: 'skipped',
         observation:
-          "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant.",
+          'Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant.',
       },
       {
-        id: "G2",
-        surface: "ChatGPT",
-        outcome: "skipped",
+        id: 'G2',
+        surface: 'ChatGPT',
+        outcome: 'skipped',
         observation:
-          "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run.",
+          'Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run.',
       },
     );
-    report.outcome = "pass";
+    report.outcome = 'pass';
   } catch (error) {
     report.error = redact(String(error));
-    report.outcome = report.checks.some((check) => check.outcome === "fail")
-      ? "fail"
-      : "inconclusive";
+    report.outcome = report.checks.some((check) => check.outcome === 'fail')
+      ? 'fail'
+      : 'inconclusive';
     if (!runtime)
       report.checks.push({
-        id: "setup",
-        surface: "runtime",
-        outcome: "inconclusive",
+        id: 'setup',
+        surface: 'runtime',
+        outcome: 'inconclusive',
         observation: report.error,
       });
   } finally {
@@ -446,35 +794,48 @@ export async function verify(
       await browser?.close();
       await runtime?.stop();
     } catch (error) {
-      report.cleanup = "failed";
-      report.outcome = "inconclusive";
-      report.error = `${report.error ?? ""}\nCleanup: ${redact(String(error))}`;
+      report.cleanup = 'failed';
+      report.outcome = 'inconclusive';
+      report.error = `${report.error ?? ''}\nCleanup: ${redact(String(error))}`;
     }
     if (runtime) {
       await writeFile(
-        join(evidence, "runtime.log"),
-        redact(runtime.logs.join("")),
+        join(evidence, 'runtime.log'),
+        redact(runtime.logs.join('')),
       );
-      report.artifacts.push("runtime.log");
+      report.artifacts.push('runtime.log');
     }
     report.finishedAt = new Date().toISOString();
     await writeFile(
-      join(evidence, "report.json"),
-      JSON.stringify(report, null, 2) + "\n",
+      join(evidence, 'report.json'),
+      JSON.stringify(report, null, 2) + '\n',
     );
   }
   return report;
 }
 
 if (import.meta.main) {
-  if (process.argv.includes("--doctor")) {
-    console.log(JSON.stringify(await doctor(), null, 2));
+  const { values } = parseArgs({
+    args: process.argv.slice(2),
+    options: {
+      doctor: { type: 'boolean' },
+      evidence: { type: 'string' },
+      'project-root': { type: 'string' },
+      'task-profile': { type: 'string', default: 'baseline' },
+    },
+  });
+  const projectRoot = values['project-root'] ?? foundationRoot;
+  if (values.doctor) {
+    console.log(JSON.stringify(await doctor(projectRoot), null, 2));
   } else {
-    const index = process.argv.indexOf("--evidence");
     const report = await verify({
-      evidenceDirectory: index >= 0 ? process.argv[index + 1] : undefined,
+      projectRoot,
+      evidenceDirectory: values.evidence,
+      taskProfile: z
+        .enum(['baseline', 'title-edit'])
+        .parse(values['task-profile']),
     });
     console.log(JSON.stringify(report, null, 2));
-    if (report.outcome !== "pass") process.exitCode = 1;
+    if (report.outcome !== 'pass') process.exitCode = 1;
   }
 }
