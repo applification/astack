@@ -9,6 +9,8 @@ import {
   writeFile,
 } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
+import { gzipSync } from 'node:zlib';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import * as ts from 'typescript';
@@ -27,8 +29,14 @@ import {
   redactTrial,
   retainProject,
   retainWorkspaceEvidence,
+  retainTrialDiff,
 } from '../scripts/trials';
-import { foundationRoot, waitFor } from '../scripts/runtime';
+import {
+  command,
+  commandBytes,
+  foundationRoot,
+  waitFor,
+} from '../scripts/runtime';
 import { isSourcePath } from '../scripts/source-identity';
 
 function deferred() {
@@ -75,6 +83,112 @@ const completed = (final: unknown) => ({
 });
 
 describe('independent delivery trial gates', () => {
+  test('actual Git diff acquisition hashes original stdout bytes and sanitizes source only once', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'astack-trial-diff-test-'));
+    const hash = (bytes: Buffer) =>
+      createHash('sha256').update(bytes).digest('hex');
+    try {
+      await command(['git', 'init'], directory);
+      await writeFile(
+        join(directory, 'main.ts'),
+        'export const authorization = "";\n',
+      );
+      await command(['git', 'add', 'main.ts'], directory);
+      await command(
+        [
+          'git',
+          '-c',
+          'core.hooksPath=/dev/null',
+          '-c',
+          'user.name=Trial',
+          '-c',
+          'user.email=trial@example.invalid',
+          'commit',
+          '-m',
+          'Baseline',
+        ],
+        directory,
+      );
+      const baseline = (
+        await command(['git', 'rev-parse', 'HEAD'], directory)
+      ).trim();
+      const source =
+        'export const authorization = `Bearer ${token}`;\nexport const fixture = "WORKOS_API_KEY=do-not-retain";\n// café 🦊\n';
+      await writeFile(join(directory, 'main.ts'), source);
+      const independent = spawnSync('git', ['diff', baseline, '--'], {
+        cwd: directory,
+      });
+      expect(independent.status).toBe(0);
+      const expected = independent.stdout;
+      const destination = join(directory, 'change.diff');
+      const hashes = await retainTrialDiff(directory, baseline, destination);
+      const retained = await readFile(destination);
+      expect(hashes).toEqual({
+        originalSha256: hash(expected),
+        retainedSha256: hash(retained),
+        transformed: true,
+      });
+      expect(retained.toString('utf8')).toBe(
+        redactTrial(expected.toString('utf8')),
+      );
+      expect(retained.toString('utf8')).toContain('`Bearer ${token}`;');
+      expect(retained.toString('utf8')).toContain(
+        '"WORKOS_API_KEY=[REDACTED]";',
+      );
+      expect(retained.toString('utf8')).toContain('café 🦊');
+      expect(retained.toString('utf8')).not.toContain('do-not-retain');
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+  test('raw command output separates stderr, redacts failures and enforces its deadline', async () => {
+    const directory = await mkdtemp(
+      join(tmpdir(), 'astack-trial-command-test-'),
+    );
+    try {
+      const stdout = 'café 🦊 Bearer ${token}';
+      const raw = await commandBytes(
+        [
+          'bun',
+          '-e',
+          `process.stdout.write(${JSON.stringify(stdout)}); process.stderr.write("separate diagnostic");`,
+        ],
+        directory,
+      );
+      expect(raw.equals(Buffer.from(stdout))).toBe(true);
+      for (const [script, deadline] of [
+        [
+          'process.stdout.write("WORKOS_API_KEY=private-stdout"); process.stderr.write(" Bearer private-stderr"); process.exit(1);',
+          2000,
+        ],
+        [
+          'process.stdout.write("WORKOS_API_KEY=private-stdout"); process.stderr.write(" Bearer private-stderr"); setInterval(() => {}, 1000);',
+          100,
+        ],
+      ] as const) {
+        let failure: unknown;
+        try {
+          await commandBytes(
+            ['bun', '-e', script],
+            directory,
+            undefined,
+            deadline,
+          );
+        } catch (error) {
+          failure = error;
+        }
+        expect(failure).toBeInstanceOf(Error);
+        const message = failure instanceof Error ? failure.message : '';
+        expect(message).toContain('[REDACTED]');
+        expect(message).not.toContain('private-stdout');
+        expect(message).not.toContain('private-stderr');
+        if (deadline === 100)
+          expect(message).toContain('exceeded its deadline');
+      }
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
   test('source interpolation survives retention while actual credentials stay redacted', () => {
     const source = 'authorization: `Bearer ${runtime.tokens.mcp}`';
     expect(redactTrial(source)).toBe(source);
@@ -82,6 +196,11 @@ describe('independent delivery trial gates', () => {
       'for (const bearer of tokens) bearer ? use(bearer) : null;';
     expect(redactTrial(variable)).toBe(variable);
     expect(redactTrial('bearer private-api-value')).toBe('Bearer [REDACTED]');
+    const coloredBearer = 'Bearer \u001b[32mprivate-colored-value\u001b[0m';
+    expect(redactTrial(coloredBearer)).not.toContain('private-colored-value');
+    const coloredEvent = redactTrial(JSON.stringify({ output: coloredBearer }));
+    expect(() => JSON.parse(coloredEvent) as unknown).not.toThrow();
+    expect(coloredEvent).not.toContain('private-colored-value');
     expect(redactTrial('Bearer private-api-value')).toBe('Bearer [REDACTED]');
     const jwt = 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJvd25lci1hIn0.abcdefghijklmnop';
     expect(redactTrial(jwt)).toBe('[REDACTED JWT]');
@@ -263,6 +382,123 @@ describe('independent delivery trial gates', () => {
         expect(await Bun.file(join(sibling, 'delivered', name)).exists()).toBe(
           false,
         );
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+  test('binary evidence is omitted honestly while supported image bytes stay exact', async () => {
+    const directory = await mkdtemp(
+      join(tmpdir(), 'astack-trial-binary-test-'),
+    );
+    const project = join(directory, 'project'),
+      retained = join(directory, 'retained');
+    const hash = (bytes: Buffer) =>
+      createHash('sha256').update(bytes).digest('hex');
+    try {
+      await mkdir(join(project, '.proof'), { recursive: true });
+      const png = Buffer.from(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9lQAAAAASUVORK5CYII=',
+        'base64',
+      );
+      const jwt =
+        'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJvd25lci1hIn0.abcdefghijklmnop';
+      const secondJwt =
+        'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJvd25lci1iIn0.abcdefghijklmnop';
+      const binaries: Record<string, Buffer> = {
+        '.proof/trace.zip': Buffer.from([80, 75, 3, 4, 0, 255]),
+        '.proof/report.gz': gzipSync('WORKOS_API_KEY=compressed-private-value'),
+        '.proof/font.woff2': Buffer.from([119, 79, 70, 50, 0, 255]),
+        '.proof/custom.data': Buffer.from([0, 255, 128]),
+        '.proof/fake.png': Buffer.from('Bearer private-value'),
+        [`.proof/${jwt}.zip`]: Buffer.from([80, 75, 3, 4]),
+        [`.proof/${secondJwt}.zip`]: Buffer.from([80, 75, 3, 4, 8]),
+      };
+      for (const [name, bytes] of Object.entries(binaries))
+        await writeFile(join(project, name), bytes);
+      await writeFile(join(project, '.proof/screenshot.png'), png);
+      await writeFile(
+        join(project, '.proof/private-key.zip'),
+        Buffer.from('private key material'),
+      );
+      await writeFile(
+        join(project, '.proof/report.md'),
+        'Observed persistence.\n',
+      );
+      const coloredLog =
+        '\u001b[32mObserved persistence\u001b[0m\nWORKOS_API_KEY=private-log-value\nBearer \u001b[32mprivate-colored-value\u001b[0m\n';
+      await writeFile(join(project, '.proof/runtime.log'), coloredLog);
+      const hashes = await retainProject(project, retained);
+      expect(hashes['.proof/screenshot.png']).toBe(hash(png));
+      expect(
+        (
+          await readFile(join(retained, 'delivered/.proof/screenshot.png'))
+        ).equals(png),
+      ).toBe(true);
+      const retainedLog = await readFile(
+        join(retained, 'delivered/.proof/runtime.log'),
+        'utf8',
+      );
+      expect(retainedLog).toContain('\u001b[32mObserved persistence\u001b[0m');
+      expect(retainedLog).toContain('WORKOS_API_KEY=[REDACTED]');
+      expect(retainedLog).not.toContain('private-log-value');
+      expect(retainedLog).not.toContain('private-colored-value');
+      expect(hashes['.proof/runtime.log']).toBe(hash(Buffer.from(coloredLog)));
+      const manifestText = await readFile(
+        join(retained, 'retention.json'),
+        'utf8',
+      );
+      const manifest = z
+        .object({
+          omittedFiles: z.array(
+            z.object({
+              path: z.string(),
+              originalSha256: z.string(),
+              sizeBytes: z.number(),
+              reason: z.string(),
+            }),
+          ),
+          excludedPaths: z.object({
+            privateOrCredentialPaths: z.number(),
+            namesRetained: z.boolean(),
+          }),
+        })
+        .parse(JSON.parse(manifestText) as unknown);
+      expect(manifest.excludedPaths).toEqual({
+        privateOrCredentialPaths: 1,
+        namesRetained: false,
+      });
+      expect(manifest.omittedFiles).toHaveLength(Object.keys(binaries).length);
+      for (const [name, bytes] of Object.entries(binaries)) {
+        const omission = manifest.omittedFiles.find(
+          (file) =>
+            file.originalSha256 === hash(bytes) &&
+            file.path === redactTrial(name),
+        );
+        expect(omission).toMatchObject({
+          path: redactTrial(name),
+          originalSha256: hash(bytes),
+          sizeBytes: bytes.length,
+        });
+        expect(omission?.reason).toContain('omitted');
+        expect(await Bun.file(join(retained, 'delivered', name)).exists()).toBe(
+          false,
+        );
+        expect(hashes[name]).toBeUndefined();
+      }
+      expect(manifestText).not.toContain(jwt);
+      expect(manifestText).not.toContain(secondJwt);
+      expect(
+        manifest.omittedFiles.filter(
+          (file) => file.path === '.proof/[REDACTED JWT].zip',
+        ),
+      ).toHaveLength(2);
+      expect(manifestText).not.toContain('private-key.zip');
+      expect(manifestText).not.toContain('compressed-private-value');
+      expect(
+        await Bun.file(
+          join(retained, 'delivered/.proof/private-key.zip'),
+        ).exists(),
+      ).toBe(false);
     } finally {
       await rm(directory, { recursive: true, force: true });
     }
@@ -479,6 +715,9 @@ if (prompt.includes('cap-probe')) {
   while (!(await Bun.file(new URL('release', import.meta.url).pathname).exists())) await Bun.sleep(10);
   writeFileSync(finalPath, JSON.stringify(${JSON.stringify(delivery)}));
   process.stdout.write(JSON.stringify({type:'turn.completed',usage:{input_tokens:20,output_tokens:5}}));
+} else if (prompt.includes('final-secret-probe')) {
+  writeFileSync(finalPath, JSON.stringify({...${JSON.stringify(delivery)}, summary:'Checked WORKOS_API_KEY=private-final-value and quoted "result".', checks:['Bearer private-final-bearer'], ...(prompt.includes('invalid') ? {WORKOS_API_KEY:'private-extra-value'} : {})}));
+  console.log(JSON.stringify({type:'turn.completed',usage:{input_tokens:20,output_tokens:5}}));
 } else {
   writeFileSync(finalPath, JSON.stringify(args[args.indexOf('-s') + 1] === 'read-only' ? ${JSON.stringify(review)} : ${JSON.stringify(delivery)}));
   console.log(JSON.stringify({type:'turn.completed',usage:{input_tokens:20,output_tokens:5}}));
@@ -507,6 +746,36 @@ if (prompt.includes('cap-probe')) {
       expect(
         await readFile(join(directory, 'completed/events.jsonl'), 'utf8'),
       ).toContain('turn.completed');
+      for (const invalid of [false, true]) {
+        const name = invalid ? 'invalid-final' : 'valid-final';
+        const result = await runAgent({
+          cwd: directory,
+          directory: join(directory, name),
+          prompt: `${invalid ? 'invalid-' : ''}final-secret-probe`,
+          config: [],
+          model: 'fixture-model',
+          timeoutMs: 2000,
+        });
+        expect(result.outcome).toBe(invalid ? 'inconclusive' : 'completed');
+        const retained = await readFile(
+          join(directory, name, 'final.json'),
+          'utf8',
+        );
+        expect(() => JSON.parse(retained) as unknown).not.toThrow();
+        expect(retained).not.toContain('private-final-value');
+        expect(retained).not.toContain('private-final-bearer');
+        expect(retained).not.toContain('private-extra-value');
+        expect(result.outputHashes.final?.retainedSha256).toBe(
+          createHash('sha256').update(retained).digest('hex'),
+        );
+        if (!invalid)
+          expect(result.final).toEqual({
+            ...delivery,
+            summary: 'Checked WORKOS_API_KEY=[REDACTED] and quoted "result".',
+            checks: ['Bearer [REDACTED]'],
+          });
+        else expect(result.final).toBeNull();
+      }
       await writeFile(
         join(directory, 'ps'),
         '#!/usr/bin/env bun\nprocess.stderr.write("EPERM"); process.exit(1);\n',

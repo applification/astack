@@ -11,10 +11,11 @@ import {
 } from 'node:fs/promises';
 import { homedir, tmpdir, platform, release, arch } from 'node:os';
 import { createHash } from 'node:crypto';
+import { isUtf8 } from 'node:buffer';
 import { join, resolve, relative, extname } from 'node:path';
 import { z } from 'zod';
 import { StringDecoder } from 'node:string_decoder';
-import { command, foundationRoot, redact } from './runtime';
+import { command, commandBytes, foundationRoot, redact } from './runtime';
 import { isSourcePath, sourceDigest } from './source-identity';
 
 type Usage = {
@@ -117,7 +118,7 @@ type AgentRun = {
   outputHashes: Record<
     'events' | 'stderr',
     { originalSha256: string; retainedSha256: string }
-  >;
+  > & { final: { originalSha256: string; retainedSha256: string } | null };
   processCleanup: {
     descendantEnumeration: 'available' | 'limited' | 'not-observed';
     observations: string[];
@@ -452,11 +453,29 @@ export async function runAgent(options: {
   await writeFile(eventsPath, retainedEvents);
   await writeFile(stderrPath, retainedStderr);
   let final: unknown = null;
+  let finalHashes: AgentRun['outputHashes']['final'] = null;
   try {
-    const finalText = redact(await readFile(finalPath, 'utf8'));
-    await writeFile(finalPath, finalText);
-    const parsed = outputSchema.safeParse(JSON.parse(finalText));
-    if (parsed.success) final = parsed.data;
+    const originalBytes = await readFile(finalPath);
+    let retainedText: string;
+    let validatedFinal: unknown = null;
+    try {
+      const original: unknown = JSON.parse(originalBytes.toString('utf8'));
+      const sanitized = sanitizeTrialJson(original);
+      retainedText = JSON.stringify(sanitized, null, 2);
+      const originalParsed = outputSchema.safeParse(original);
+      const retainedParsed = outputSchema.safeParse(sanitized);
+      if (originalParsed.success && retainedParsed.success)
+        validatedFinal = retainedParsed.data;
+    } catch {
+      // Malformed output cannot complete a trial, but must still be sanitized.
+      retainedText = redactTrial(originalBytes.toString('utf8'));
+    }
+    await writeFile(finalPath, retainedText);
+    final = validatedFinal;
+    finalHashes = {
+      originalSha256: digest(originalBytes),
+      retainedSha256: digest(retainedText),
+    };
   } catch {}
   return {
     outcome:
@@ -494,6 +513,7 @@ export async function runAgent(options: {
         originalSha256: digest(stderr),
         retainedSha256: digest(retainedStderr),
       },
+      final: finalHashes,
     },
     processCleanup: {
       descendantEnumeration: enumerations.some((entry) => !entry.available)
@@ -539,8 +559,9 @@ export function redactTrial(text: string): string {
     protectedText
       // Credentials start with a token character. Excluding JavaScript loop
       // keywords also preserves `for (const bearer of ...)` in archived source.
+      // ANSI SGR can precede a colored token directly or escaped in JSON/source.
       .replace(
-        /Bearer\s+(?!of\b|in\b)[A-Za-z0-9_~+/.\-][^\s"'`\\,;)}\]]*/gi,
+        /Bearer\s+(?:(?:\u001b|\\+u001b|\\+x1b)\[[\d;:]*m)*(?!of\b|in\b)[A-Za-z0-9_~+/.\-][^\s"'`\\,;)}\]]*/gi,
         'Bearer [REDACTED]',
       )
       .replace(
@@ -548,6 +569,39 @@ export function redactTrial(text: string): string {
         (marker: string, index: string) => symbolic[Number(index)] ?? marker,
       )
   );
+}
+/** Sanitize decoded JSON values, then serialize; replacement cannot break JSON syntax. */
+function sanitizeTrialJson(value: unknown): unknown {
+  if (typeof value === 'string') return redactTrial(value);
+  if (Array.isArray(value)) return value.map(sanitizeTrialJson);
+  if (value && typeof value === 'object')
+    return Object.fromEntries(
+      Object.entries(value).map(([key, child]) => [
+        redactTrial(key),
+        /^(?:CONVEX_SELF_HOSTED_ADMIN_KEY|CONVEX_DEPLOY_KEY|WORKOS_API_KEY)$/i.test(
+          key,
+        )
+          ? '[REDACTED]'
+          : sanitizeTrialJson(child),
+      ]),
+    );
+  return value;
+}
+
+/** Acquire Git stdout as bytes privately and retain a single source-safe redaction. */
+export async function retainTrialDiff(
+  project: string,
+  baseline: string,
+  destination: string,
+) {
+  const original = await commandBytes(['git', 'diff', baseline, '--'], project);
+  const retained = Buffer.from(redactTrial(original.toString('utf8')));
+  await writeFile(destination, retained);
+  return {
+    originalSha256: digest(original),
+    retainedSha256: digest(retained),
+    transformed: !original.equals(retained),
+  };
 }
 async function fileDigests(
   directory: string,
@@ -704,8 +758,17 @@ export async function retainProject(
     string,
     { originalSha256: string; retainedSha256: string; transformed: boolean }
   > = {};
+  const omittedFiles: {
+    path: string;
+    originalSha256: string;
+    sizeBytes: number;
+    reason: string;
+  }[] = [];
+  let privateOrCredentialPaths = 0;
   async function visit(directory: string): Promise<void> {
-    for (const entry of await readdir(directory, { withFileTypes: true })) {
+    for (const entry of (
+      await readdir(directory, { withFileTypes: true })
+    ).sort((a, b) => a.name.localeCompare(b.name))) {
       const path = join(directory, entry.name),
         name = relative(project, path);
       const proof = proofArtifacts || name.startsWith('.proof/');
@@ -720,8 +783,10 @@ export async function retainProject(
               /\.(?:pem|key|p12|pfx)$/i.test(part) ||
               /^id_(?:rsa|ed25519)$/.test(part),
           )
-      )
+      ) {
+        privateOrCredentialPaths++;
         continue;
+      }
       if (!isSourcePath(name) && name !== '.proof' && !proof) continue;
       if (
         proof &&
@@ -737,12 +802,43 @@ export async function retainProject(
       if (entry.isDirectory()) await visit(path);
       else if (entry.isFile()) {
         const bytes = await readFile(path);
+        const extension = extname(name).toLowerCase();
+        const binaryImage =
+          extension === '.png'
+            ? bytes
+                .subarray(0, 8)
+                .equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
+            : extension === '.jpg' || extension === '.jpeg'
+              ? bytes.subarray(0, 3).equals(Buffer.from([255, 216, 255]))
+              : extension === '.webp' &&
+                bytes.subarray(0, 4).toString('ascii') === 'RIFF' &&
+                bytes.subarray(8, 12).toString('ascii') === 'WEBP';
+        const imageExtension = ['.png', '.jpg', '.jpeg', '.webp'].includes(
+          extension,
+        );
+        const unsupported =
+          /\.(?:zip|gz|gzip|bz2|xz|7z|rar|tar|pdf|woff2?|ttf|otf|eot|wasm|db|sqlite|mp[34]|mov|webm|wav)$/i.test(
+            name,
+          ) ||
+          !isUtf8(bytes) ||
+          // ANSI ESC is expected in terminal logs; other binary controls are not.
+          /[\u0000-\u0008\u000b\u000c\u000e-\u001a\u001c-\u001f\u007f]/.test(
+            bytes.toString('utf8'),
+          );
+        if (!binaryImage && (imageExtension || unsupported)) {
+          omittedFiles.push({
+            path: redactTrial(name),
+            originalSha256: digest(bytes),
+            sizeBytes: bytes.length,
+            reason: imageExtension
+              ? 'Image bytes do not match a supported image format; omitted without decoding.'
+              : 'Unsupported binary or compressed artifact; omitted without decoding or copying because its contents cannot be safely sanitized.',
+          });
+          continue;
+        }
         hashes[name] = digest(bytes);
         const destination = join(retained, 'delivered', name);
         await mkdir(resolve(destination, '..'), { recursive: true });
-        const binaryImage = ['.png', '.jpg', '.jpeg', '.webp'].includes(
-          extname(name),
-        );
         const retainedBytes = binaryImage
           ? bytes
           : Buffer.from(redactTrial(bytes.toString('utf8')));
@@ -767,8 +863,10 @@ export async function retainProject(
       {
         format: 'astack-trial-retention/v1',
         files: retainedHashes,
+        omittedFiles,
+        excludedPaths: { privateOrCredentialPaths, namesRetained: false },
         policy:
-          'Source digests describe original delivered bytes. Retained byte digests describe sanitized artifacts; transformed files are explicitly marked. Credentials, private key artifacts, environments, dependencies and symlinks are excluded.',
+          'Source digests describe original delivered bytes. Retained byte digests describe sanitized UTF-8 text or byte-exact supported PNG/JPEG/WebP images; transformed files are marked. Unsupported binaries and archives are omitted with hashes/reasons and sanitized display paths, including proof trace ZIPs whose contents can contain credentials. Separate omission entries preserve all artifacts even when display paths redact identically. Credential/private paths are excluded without recording their names; environments, dependencies and symlinks are excluded.',
       },
       null,
       2,
@@ -1151,9 +1249,11 @@ export async function runTrials(options: {
           JSON.stringify(acceptance, null, 2),
         );
         await command(['git', 'add', '-N', '.'], workspace);
-        const diff = await command(['git', 'diff', baseline, '--'], workspace);
-        const retainedDiff = redactTrial(diff);
-        await writeFile(join(retained, 'change.diff'), retainedDiff);
+        const diffHashes = await retainTrialDiff(
+          workspace,
+          baseline,
+          join(retained, 'change.diff'),
+        );
         let deliveredFiles: Record<string, string> = {},
           workspaceEvidence: Record<string, string> = {},
           retentionManifest: string | null = null,
@@ -1201,11 +1301,7 @@ export async function runTrials(options: {
           retentionManifest,
           workspaceEvidence,
           workspaceEvidenceManifest,
-          diffHashes: {
-            originalSha256: digest(diff),
-            retainedSha256: digest(retainedDiff),
-            transformed: diff !== retainedDiff,
-          },
+          diffHashes,
           agent,
           reviewer,
           before,

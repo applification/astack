@@ -95,6 +95,24 @@ export async function command(
   env = localEnvironment(),
   timeoutMs = 120_000,
 ): Promise<string> {
+  const output = await captureCommand(args, cwd, env, timeoutMs);
+  return redact(output.combined.toString('utf8'));
+}
+/** Raw stdout is private input for hashing and one deliberate sanitization pass. */
+export async function commandBytes(
+  args: string[],
+  cwd: string,
+  env = localEnvironment(),
+  timeoutMs = 120_000,
+): Promise<Buffer> {
+  return (await captureCommand(args, cwd, env, timeoutMs)).stdout;
+}
+async function captureCommand(
+  args: string[],
+  cwd: string,
+  env: NodeJS.ProcessEnv,
+  timeoutMs: number,
+): Promise<{ stdout: Buffer; combined: Buffer }> {
   const executable = args[0];
   if (!executable) throw new Error('Command has no executable');
   const child = spawn(executable, args.slice(1), {
@@ -103,14 +121,16 @@ export async function command(
     stdio: ['ignore', 'pipe', 'pipe'],
     detached: true,
   });
-  let output = '';
+  const stdout: Buffer[] = [],
+    combined: Buffer[] = [];
   const deadline = { exceeded: false };
   let forcedStop: ReturnType<typeof setTimeout> | undefined;
   child.stdout.on('data', (chunk: Buffer) => {
-    output += chunk.toString();
+    stdout.push(chunk);
+    combined.push(chunk);
   });
   child.stderr.on('data', (chunk: Buffer) => {
-    output += chunk.toString();
+    combined.push(chunk);
   });
   const timer = setTimeout(() => {
     deadline.exceeded = true;
@@ -134,9 +154,9 @@ export async function command(
     });
     if (deadline.exceeded || code !== 0)
       throw new Error(
-        `${args[0]} ${args[1] ?? ''} ${deadline.exceeded ? 'exceeded its deadline' : `exited ${code}`}: ${redact(output).slice(-6000)}`,
+        `${args[0]} ${args[1] ?? ''} ${deadline.exceeded ? 'exceeded its deadline' : `exited ${code}`}: ${redact(Buffer.concat(combined).toString('utf8')).slice(-6000)}`,
       );
-    return redact(output);
+    return { stdout: Buffer.concat(stdout), combined: Buffer.concat(combined) };
   } finally {
     // A wrapper can exit while descendants still own this detached process group.
     if (child.pid) {
