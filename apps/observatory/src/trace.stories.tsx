@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { eventSchema } from "@astack/agent-observability";
 import { Trace } from "./trace";
+import { ObservatoryLayout } from "./app";
 
 const start = Date.parse("2026-10-05T20:14:00Z");
 const events = [
@@ -72,6 +73,13 @@ const meta = {
   title: "Observatory/Trace",
   component: Trace,
   args: { events },
+  decorators: [
+    (Story) => (
+      <ObservatoryLayout>
+        <Story />
+      </ObservatoryLayout>
+    ),
+  ],
 } satisfies Meta<typeof Trace>;
 export default meta;
 type Story = StoryObj<typeof meta>;

@@ -16,6 +16,7 @@ import {
 import { Button, Badge, Input } from "@astack/ui";
 import { Activity, ArrowLeft, ShieldCheck } from "lucide-react";
 import { Trace } from "./trace";
+import { Brand, ThemeControl } from "./theme";
 
 type Filter = { dimension: string; value: string };
 const duration = (run: AgentRun) => {
@@ -87,70 +88,81 @@ function Status({ run }: { run: AgentRun }) {
 }
 export function RunTable({ runs }: { runs: readonly AgentRun[] }) {
   return (
-    <div className="table-scroll">
-      <table>
-        <thead>
-          <tr>
-            <th>Run / repository</th>
-            <th>Agent / machine</th>
-            <th>Duration</th>
-            <th>Status</th>
-            <th>Evidence</th>
-          </tr>
-        </thead>
-        <tbody>
-          {runs.map((run) => (
-            <tr key={run.id}>
-              <td>
-                <a className="row-title" href={runLink(run.id)}>
-                  {run.title}
-                </a>
-                <span className="secondary">{run.repo ?? run.cwd}</span>
-                <span className="secondary">
-                  {!run.startTimeKnown && "Session date · "}
-                  {date(run.startedAt)}
-                  {run.branch ? ` · ${run.branch}` : ""}
-                </span>
-                {run.work && (
-                  <a className="secondary" href={listLink("work", run.work.id)}>
-                    Work {run.work.id}
-                  </a>
-                )}
-              </td>
-              <td>
-                {run.agent}
-                <span className="secondary">
-                  {run.agentVersion ?? "Version unknown"} · {run.machineName}
-                </span>
-              </td>
-              <td>{duration(run)}</td>
-              <td>
-                <Status run={run} />
-                <span className="secondary">Work outcome: {run.outcome}</span>
-              </td>
-              <td>
-                {run.findings.filter((f) => f.severity !== "info").length ? (
-                  <span className="negative">
-                    {run.findings.filter((f) => f.severity !== "info").length}{" "}
-                    problems
-                  </span>
-                ) : (
-                  <span className="neutral">No problem detected</span>
-                )}
-                <div className="tag-list">
-                  {run.skills
-                    .filter((s) => s.kind === "skill")
-                    .slice(0, 3)
-                    .map((skill, i) => (
-                      <Badge key={`${skill.name}:${i}`}>{skill.name}</Badge>
-                    ))}
-                </div>
-              </td>
+    <>
+      <p className="table-hint">Scroll horizontally to see all columns.</p>
+      <div
+        className="table-scroll"
+        tabIndex={0}
+        role="region"
+        aria-label="Agent runs table"
+      >
+        <table>
+          <thead>
+            <tr>
+              <th>Run / repository</th>
+              <th>Agent / machine</th>
+              <th>Duration</th>
+              <th>Status</th>
+              <th>Evidence</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {runs.map((run) => (
+              <tr key={run.id}>
+                <td>
+                  <a className="row-title" href={runLink(run.id)}>
+                    {run.title}
+                  </a>
+                  <span className="secondary">{run.repo ?? run.cwd}</span>
+                  <span className="secondary">
+                    {!run.startTimeKnown && "Session date · "}
+                    {date(run.startedAt)}
+                    {run.branch ? ` · ${run.branch}` : ""}
+                  </span>
+                  {run.work && (
+                    <a
+                      className="secondary"
+                      href={listLink("work", run.work.id)}
+                    >
+                      Work {run.work.id}
+                    </a>
+                  )}
+                </td>
+                <td>
+                  {run.agent}
+                  <span className="secondary">
+                    {run.agentVersion ?? "Version unknown"} · {run.machineName}
+                  </span>
+                </td>
+                <td>{duration(run)}</td>
+                <td>
+                  <Status run={run} />
+                  <span className="secondary">Work outcome: {run.outcome}</span>
+                </td>
+                <td>
+                  {run.findings.filter((f) => f.severity !== "info").length ? (
+                    <span className="negative">
+                      {run.findings.filter((f) => f.severity !== "info").length}{" "}
+                      problems
+                    </span>
+                  ) : (
+                    <span className="neutral">No problem detected</span>
+                  )}
+                  <div className="tag-list">
+                    {run.skills
+                      .filter((s) => s.kind === "skill")
+                      .slice(0, 3)
+                      .map((skill, i) => (
+                        <Badge key={`${skill.name}:${i}`}>{skill.name}</Badge>
+                      ))}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
 
@@ -708,30 +720,33 @@ export function ObservatoryLayout({
 }) {
   return (
     <div className="app-shell">
-      <aside className="sidebar">
-        <a className="brand" href="#runs">
-          astack<span className="secondary">Agent Observatory</span>
-        </a>
-        <span className="sidebar-label">Private feedback loop</span>
-        <nav className="navigation" aria-label="Observatory">
-          {[
-            ["runs", "Runs"],
-            ["work", "Work"],
-            ["skills", "Skills & workflows"],
-            ["problems", "Problems"],
-            ["health", "Capture health"],
-          ].map(([key, label]) => (
-            <a
-              href={`#${key}`}
-              key={key}
-              aria-current={section === key ? "page" : undefined}
-            >
-              {label}
-            </a>
-          ))}
-        </nav>
-      </aside>
-      <main className="workspace">
+      <header className="app-header">
+        <div className="header-inner">
+          <div className="brand-lockup">
+            <Brand />
+            <span className="product-label">Observatory</span>
+          </div>
+          <nav className="navigation" aria-label="Observatory">
+            {[
+              ["runs", "Runs"],
+              ["work", "Work"],
+              ["skills", "Skills & workflows"],
+              ["problems", "Problems"],
+              ["health", "Capture health"],
+            ].map(([key, label]) => (
+              <a
+                href={`#${key}`}
+                key={key}
+                aria-current={section === key ? "page" : undefined}
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+          <ThemeControl />
+        </div>
+      </header>
+      <main className="workspace" id="main">
         <div className="status-strip">
           <ShieldCheck size={15} aria-hidden="true" />
           Private over Tailscale · <Activity size={15} aria-hidden="true" />

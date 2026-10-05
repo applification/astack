@@ -6,6 +6,7 @@ test("trace expands failure evidence, preserves unknown times and filters failur
   browser,
 }) => {
   await app.open("/iframe.html?id=observatory-trace--mixed&viewMode=story");
+  await screen.getByLabel("Color theme").selectOption({ value: "light" });
   await expect(screen.getByRole("heading", "Activity trace")).toBeVisible();
   await screen.getByText("Test/check result", { exact: true }).tap();
   await expect(
@@ -21,6 +22,8 @@ test("trace expands failure evidence, preserves unknown times and filters failur
   ).toHaveCount(0);
   await screen.getByLabel("Failures and interventions only").uncheck();
   await app.screenshot("trace-failure-expanded");
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  await app.screenshot("trace-failure-dark");
   await browser.setViewport({ width: 390, height: 844 });
   await expect(screen.getByRole("heading", "Activity trace")).toBeVisible();
   expect(
@@ -51,6 +54,7 @@ test("runs design renders readable status, work links and machine context", asyn
   browser,
 }) => {
   await app.open("/iframe.html?id=observatory-runs--mixed&viewMode=story");
+  await screen.getByLabel("Color theme").selectOption({ value: "light" });
   await expect(screen.getByRole("heading", "Agent runs")).toBeVisible();
   await expect(screen.getByText("Turn completed")).toBeVisible();
   await expect(screen.getByText("No completion observed")).toBeVisible();
@@ -64,4 +68,49 @@ test("runs design renders readable status, work links and machine context", asyn
     ),
   ).toBe(true);
   await app.screenshot("runs-narrow");
+});
+
+test("theme choice survives reload and system mode follows the browser", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open("/iframe.html?id=observatory-runs--mixed&viewMode=story");
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  expect(
+    await browser.evaluate(() =>
+      document.documentElement.getAttribute("data-theme"),
+    ),
+  ).toBe("dark");
+  await expect(screen.getByText("Turn completed")).toBeVisible();
+  await app.screenshot("runs-dark");
+  await app.restart();
+  await app.open("/iframe.html?id=observatory-runs--mixed&viewMode=story");
+  expect(
+    await browser.evaluate(() =>
+      document.documentElement.getAttribute("data-theme"),
+    ),
+  ).toBe("dark");
+  await browser.setViewport({ width: 390, height: 844 });
+  await app.screenshot("runs-narrow-dark");
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await screen.getByLabel("Color theme").selectOption({ value: "system" });
+  expect(
+    await browser.evaluate(
+      () =>
+        document.documentElement.getAttribute("data-theme") ===
+        (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"),
+    ),
+  ).toBe(true);
+  expect(
+    await browser.evaluate(() =>
+      Object.keys(localStorage).filter(
+        (key) => key !== "@storybook/manager/store",
+      ),
+    ),
+  ).toEqual(["astack-observatory-theme"]);
 });

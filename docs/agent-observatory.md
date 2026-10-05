@@ -22,6 +22,8 @@ pbcopy < "$HOME/.local/share/astack/observatory/viewer-access-key"
 
 Paste it into the private access form. The UI keeps it in memory and stores neither keys nor JWTs in localStorage. The machine ingestion key cannot open the UI or query telemetry.
 
+The header's **Color theme** control offers System, Light and Dark on both the access screen and authenticated views. System follows your OS appearance; explicit choices persist across reloads. Only the `astack-observatory-theme` preference is stored locally. Typography and colors follow the public Astack site; fonts are bundled with the private UI and require no third-party font requests.
+
 Otis is already installed. The runtime is at `~/.local/share/astack/observatory`, the collector state at `~/.agentlog`, and two user LaunchAgents supervise capture and start the Docker deployment at login. The permanent runtime is independent of a disposable Codex worktree. Convex uses a named Docker volume and pinned backend/nginx images. Docker ports bind to loopback; Tailscale Serve exposes HTTPS ports 8450–8452 privately. Existing Serve routes are preserved; no Funnel is configured.
 
 ```sh

@@ -10,6 +10,12 @@ test("private deployment gates access and supports live run/trace/work/skills na
     screen.getByRole("heading", "Private Observatory"),
   ).toBeVisible();
   await expect(screen.getByRole("heading", "Agent runs")).toHaveCount(0);
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  expect(
+    await browser.evaluate(() =>
+      document.documentElement.getAttribute("data-theme"),
+    ),
+  ).toBe("dark");
   await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
   await screen.getByRole("button", "Open Observatory").tap();
   await expect(screen.getByRole("heading", "Agent runs")).toBeVisible();
@@ -48,7 +54,13 @@ test("private deployment gates access and supports live run/trace/work/skills na
   await expect(
     screen.getByRole("heading", "Machines with ingested records"),
   ).toBeVisible();
-  expect(await browser.evaluate(() => Object.keys(localStorage).length)).toBe(
-    0,
-  );
+  await screen.getByLabel("Color theme").selectOption({ value: "light" });
+  expect(
+    await browser.evaluate(() =>
+      document.documentElement.getAttribute("data-theme"),
+    ),
+  ).toBe("light");
+  expect(await browser.evaluate(() => Object.keys(localStorage))).toEqual([
+    "astack-observatory-theme",
+  ]);
 });

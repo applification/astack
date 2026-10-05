@@ -27,3 +27,12 @@ A session contains turns; a turn is an execution attempt/run. Session identity a
 ## Observed decisions and limits
 
 The initial Pen exploration did not save a .pen artifact: its connection references a removed foundation checkout. The required design comparison is unavailable and is named in the draft PR. Storybook and actual private UI behavior were exercised separately. MacBook installation is intentionally an owner action for later; only Otis is installed now. See [evidence](evidence.md) for results and scope.
+
+## Astack appearance refinement, 2026-10-05
+
+Owner-selected visual reference: [the live Astack site](https://astack.applification.net). Before implementation, inspected its actual light/dark rendering and palette: slate paper, blue links, Newsreader headings, Geist body text, IBM Plex Mono labels, thin dividers, pill controls and a compact top navigation. Reuse those roles at dashboard scale, including the sign-in screen. Fonts are bundled locally.
+
+- APPEARANCE: Runs, Work, Skills, Problems, health and expandable traces share the selected typography and light/dark roles; warning/success states remain distinct. Desktop and narrow views retain reachable navigation and no document overflow.
+- THEME: Offer System, Light and Dark before and after sign-in. System follows live OS changes; an explicit preference survives page reload. Persist only that preference, never access keys/JWTs. Theme control remains keyboard accessible.
+
+Storybook is selected for isolated light/dark fixture captures and theme interactions, plus a deployed UI check. The owner’s rendered site supplies the visual direction for this refinement; the already unavailable Pen connection is not retried. No Pen artifact/comparison is claimed. Record actual reference-to-browser comparison separately from that original gap.

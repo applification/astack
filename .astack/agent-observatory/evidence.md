@@ -10,11 +10,13 @@ Environment: Otis/macOS arm64, Bun 1.4.0, Node 24.21, Codex CLI 0.160.0, Convex 
 | OFFLINE | A real local HTTP 503 followed by success retains/replays a SQLite queue across close/reopen. Concurrent revision updates survive old acknowledgements; unchanged replays deduplicate. A wrapper test preserves agent stdout and exit code 3 while associating work. |
 | PRIVATE | Actual self-hosted functions pushed successfully. Missing/wrong viewer credentials, absent machine credentials and machine-key UI access were denied. Anonymous native queries were denied; the owner received a verified UUID-subject JWT and read stored traces. Tailscale stripped a forged owner identity header (401). Docker ports bind only loopback; Serve endpoints are tailnet-only. |
 | LINKS | Tests bind work/project context to completed runs immediately and preserve it across later snapshots. JSON launch events bind automatically. Workflow/outcome annotations queue locally. Current Astack has no actual COS launcher/work store; no real work-store integration is claimed. |
-| TRACE | Three deterministic Storybook browser tests cover expansion, failures/interventions filtering, missing timing/privacy, empty state and desktop/narrow rendering. A separate actual private UI test covers auth gating, filtered run → trace, Work, Skills, exact-version drill-down, Problems and Capture health. localStorage remains empty. |
+| TRACE | Four deterministic Storybook browser tests cover expansion, failures/interventions filtering, missing timing/privacy, empty state, desktop/narrow light/dark rendering and theme persistence. A separate actual private UI test covers auth gating, filtered run → trace, Work, Skills, exact-version drill-down, Problems and Capture health. Only the theme preference appears in production localStorage; authentication remains in memory. |
 | FEEDBACK | Function/domain tests establish matching-failure thresholds, unknown outcome, no inferred intervention from ordinary prompts, exact version grouping, idempotent rollups, stale revisions, pagination and independent machine credentials. Legacy unknown start times are not measured as long-running work. |
 | PERSISTENCE | Restarted the actual backend and confirmed the identical completed run remained queryable. Container health recovered, collector forwarding resumed, and the recent-history queue drained to zero before full historical backfill was enabled. The deployment starts via a user LaunchAgent/OrbStack at login; machine reboot was not exercised. |
 
-The final local check set is `bun run check`, `bun run observatory:check` (19 tests), `bun run observatory:lint`, production UI/collector builds, Storybook build and 3 browser tests, native private-service proof and 1 deployed UI browser test. CI runs the public/synthetic subset without private credentials; its remote result belongs to the PR checks, not this local observation.
+The local check set is `bun run check`, `bun run observatory:check` (19 tests), `bun run observatory:lint`, production UI/collector builds, Storybook build and 4 browser tests, native private-service proof and 1 deployed UI browser test. CI runs the public/synthetic subset without private credentials; its remote result belongs to the PR checks, not this local observation.
+
+The owner-requested appearance refinement matches the actual Astack reference in light/dark tokens, bundled type families and compact top navigation. Theme persistence and system-mode changes were observed in a real browser; explicit dark before sign-in and light on authenticated Capture health passed on the deployed UI. The first Storybook theme test failed because restarting opened Storybook's manager, which stores its own `@storybook/manager/store` entry; that known fixture-host key is now excluded from the component check. The production check strictly permits only the theme preference. A missing font-subset import initially failed the build; corrected to the actual pinned package exports, after which font loading/build/lint passed. Raw first-failure runner output stayed ignored.
 
 ## Review and remaining limits
 
@@ -27,6 +29,8 @@ Installed-host MCP loading and editor save diagnostics were unavailable in this 
 ## Retained review captures
 
 ![Synthetic desktop runs](evidence/runs-mixed.png)
+
+![Synthetic dark desktop runs](evidence/runs-dark.png)
 
 ![Synthetic failure trace](evidence/trace-failure-expanded.png)
 
