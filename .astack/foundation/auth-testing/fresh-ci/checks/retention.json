@@ -1,0 +1,42 @@
+{
+  "format": "astack-trial-retention/v1",
+  "scope": {
+    "kind": "project",
+    "sourceSelection": "isSourcePath",
+    "proofRoots": [
+      ".astack",
+      ".proof"
+    ]
+  },
+  "files": {
+    "auth-ci.log": {
+      "originalSha256": "8e406f23a641b70b01ff6052ac7bd8b1d65a1625b5d0cbc4e1bd1775863436ff",
+      "retainedSha256": "4a23dbc25df6656372196d1583395785a2027b03e9c075f36fbe7a9eecb0a4dc",
+      "transformed": true,
+      "retainedPath": "delivered/auth-ci.log",
+      "transforms": [
+        "credential-redaction"
+      ]
+    },
+    "auth-root-check.log": {
+      "originalSha256": "7a251aa153eb94329a1129d81271f9859017cc919bd970502caf9dd6f8de4890",
+      "retainedSha256": "7a251aa153eb94329a1129d81271f9859017cc919bd970502caf9dd6f8de4890",
+      "transformed": false,
+      "retainedPath": "delivered/auth-root-check.log",
+      "transforms": []
+    },
+    "auth-scaffold-test.log": {
+      "originalSha256": "1b07224a3e58db1d8fa7abe6ff80b77faf31f37f90c524637dca3eb00d887de7",
+      "retainedSha256": "1b07224a3e58db1d8fa7abe6ff80b77faf31f37f90c524637dca3eb00d887de7",
+      "transformed": false,
+      "retainedPath": "delivered/auth-scaffold-test.log",
+      "transforms": []
+    }
+  },
+  "omittedFiles": [],
+  "excludedPaths": {
+    "privateOrCredentialPaths": 0,
+    "namesRetained": false
+  },
+  "policy": "Source digest selection is unchanged. Lifecycle metadata/docs and nested proof under .astack/.proof are additionally retained as evidence. Original/retained byte digests and observed transforms describe every artifact. UTF-8 non-NUL .log output has VT sequences removed before credential redaction and remaining controls displayed as Unicode escapes; other source text is unchanged except credential redaction. PNG/JPEG/WebP images remain byte-exact. Unsupported binaries/archives are omitted with hashes/reasons and sanitized display paths, including proof trace ZIPs. Separate omission entries preserve colliding display paths. Credential/private paths are excluded without names; environments, dependencies and symlinks are excluded."
+}

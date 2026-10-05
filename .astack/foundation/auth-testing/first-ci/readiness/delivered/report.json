@@ -1,0 +1,112 @@
+{
+  "format": "astack-foundation-readiness/v1",
+  "startedAt": "2026-10-05T11:17:29.209Z",
+  "finishedAt": "2026-10-05T11:17:51.649Z",
+  "revision": "unversioned@sha256-46778e585f1422603cf741d232375e911f421cbefd162b68b33e597b230470de",
+  "taskProfile": "baseline",
+  "outcome": "pass",
+  "environment": {
+    "kind": "disposable local Convex + Vite + Chromium",
+    "buildId": "unversioned@sha256-46778e585f1422603cf741d232375e911f421cbefd162b68b33e597b230470de",
+    "web": "http://127.0.0.1:38437",
+    "convex": "http://127.0.0.1:37395",
+    "mcp": "http://127.0.0.1:34835/mcp",
+    "actors": "Emulate seeded owner and other user",
+    "credentialPolicy": "WorkOS Emulate AuthKit/Connect tokens; synthetic expired/wrong-audience negative controls only; no credentials retained"
+  },
+  "checks": [
+    {
+      "id": "R1",
+      "surface": "identity",
+      "outcome": "pass",
+      "observation": "Running backend health and web identify this revision and WorkOS Emulate environment."
+    },
+    {
+      "id": "R10",
+      "surface": "WorkOS Emulate AuthKit/session",
+      "outcome": "pass",
+      "observation": "SDK login, linked identity, refresh rotation, replay denial and session revocation pass in Emulate; browser uses the official AuthKit/Convex adapter."
+    },
+    {
+      "id": "R2",
+      "surface": "web → persistence",
+      "outcome": "pass",
+      "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+    },
+    {
+      "id": "R3",
+      "surface": "web ↔ MCP status persistence",
+      "outcome": "pass",
+      "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+    },
+    {
+      "id": "R4",
+      "surface": "authorization",
+      "outcome": "pass",
+      "observation": "Another signed user cannot read or mutate the first user’s item through Convex or MCP."
+    },
+    {
+      "id": "R5",
+      "surface": "authentication",
+      "outcome": "pass",
+      "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+    },
+    {
+      "id": "R6",
+      "surface": "MCP contracts",
+      "outcome": "pass",
+      "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+    },
+    {
+      "id": "R7",
+      "surface": "local MCP App host",
+      "outcome": "pass",
+      "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+    },
+    {
+      "id": "R8",
+      "surface": "web runtime",
+      "outcome": "pass",
+      "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+    },
+    {
+      "id": "R9",
+      "surface": "standalone MCP development preview",
+      "outcome": "pass",
+      "observation": "Opening the development URL shows a connection action without host errors; an Emulate-issued token loads the actual MCP resource, changes persisted status, refreshes and disconnects. OAuth state mismatch is rejected. Live WorkOS remains separate."
+    },
+    {
+      "id": "R11",
+      "surface": "Emulate development preview",
+      "outcome": "pass",
+      "observation": "Connect with Emulate loads persisted work, renews local tokens on reconnect and enforces same-origin/method/content-type guards. It does not exercise real OAuth consent."
+    },
+    {
+      "id": "G1",
+      "surface": "WorkOS",
+      "outcome": "skipped",
+      "observation": "Emulate proves local AuthKit behavior. Manual Hosted AuthKit login/redirect/refresh/subject continuity requires a temporary astack Staging identity. Real staging SDK proof is a separate auth:staging run."
+    },
+    {
+      "id": "G2",
+      "surface": "real MCP OAuth",
+      "outcome": "skipped",
+      "observation": "Real MCP consent, exact-resource issuance and same WorkOS identity across web/MCP require manual staging acceptance. Emulate Connect has no DCR/PKCE/consent/refresh coverage."
+    },
+    {
+      "id": "H1",
+      "surface": "installed ChatGPT host",
+      "outcome": "skipped",
+      "observation": "The local AppBridge host passed. Installed ChatGPT OAuth, tool selection and App behavior require a separate authorized host acceptance run and public HTTPS resource."
+    }
+  ],
+  "artifacts": [
+    "web-persisted.png",
+    "mcp-app-host.png",
+    "mcp-host-observations.json",
+    "development-mcp-preview.png",
+    "emulate-mcp-preview.png",
+    "runtime.log"
+  ],
+  "cleanup": "complete"
+}

@@ -1,0 +1,47 @@
+{
+  "format": "astack-trial-retention/v1",
+  "scope": {
+    "kind": "project",
+    "sourceSelection": "isSourcePath",
+    "proofRoots": [
+      ".astack",
+      ".proof"
+    ]
+  },
+  "files": {
+    "first-run-mcp-preview.png": {
+      "originalSha256": "0590de31dc9ee76b7b7078d47ab92501829e50ffdeffe8ab491466abb4cb6c93",
+      "retainedSha256": "0590de31dc9ee76b7b7078d47ab92501829e50ffdeffe8ab491466abb4cb6c93",
+      "transformed": false,
+      "retainedPath": "delivered/first-run-mcp-preview.png",
+      "transforms": []
+    },
+    "first-run-web.png": {
+      "originalSha256": "e56c4221bc728d735a1f0e37f1e52e0c048308057983abe6411660d32605be68",
+      "retainedSha256": "e56c4221bc728d735a1f0e37f1e52e0c048308057983abe6411660d32605be68",
+      "transformed": false,
+      "retainedPath": "delivered/first-run-web.png",
+      "transforms": []
+    },
+    "report.json": {
+      "originalSha256": "b622fb6c280f4afb7d607b34c2f2966e2e4e6779c00a787200d40d5c927f3b5e",
+      "retainedSha256": "b622fb6c280f4afb7d607b34c2f2966e2e4e6779c00a787200d40d5c927f3b5e",
+      "transformed": false,
+      "retainedPath": "delivered/report.json",
+      "transforms": []
+    },
+    "terminal.log": {
+      "originalSha256": "d6a8263bc493918d45352559ded0790a7e26efffe8290e591d0380ab7f39d22a",
+      "retainedSha256": "d6a8263bc493918d45352559ded0790a7e26efffe8290e591d0380ab7f39d22a",
+      "transformed": false,
+      "retainedPath": "delivered/terminal.log",
+      "transforms": []
+    }
+  },
+  "omittedFiles": [],
+  "excludedPaths": {
+    "privateOrCredentialPaths": 0,
+    "namesRetained": false
+  },
+  "policy": "Source digest selection is unchanged. Lifecycle metadata/docs and nested proof under .astack/.proof are additionally retained as evidence. Original/retained byte digests and observed transforms describe every artifact. UTF-8 non-NUL .log output has VT sequences removed before credential redaction and remaining controls displayed as Unicode escapes; other source text is unchanged except credential redaction. PNG/JPEG/WebP images remain byte-exact. Unsupported binaries/archives are omitted with hashes/reasons and sanitized display paths, including proof trace ZIPs. Separate omission entries preserve colliding display paths. Credential/private paths are excluded without names; environments, dependencies and symlinks are excluded."
+}

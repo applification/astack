@@ -1,0 +1,48 @@
+$ bun run --cwd apps/mcp-ui build && bun scripts/embed-ui.ts
+$ vite build
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 2064 modules transformed.
+rendering chunks...
+[plugin vite:singlefile] 
+
+[plugin vite:singlefile] Inlining: index-DjxX_oD3.js
+[plugin vite:singlefile] Inlining: style-D0czOyNE.css
+computing gzip size...
+dist/index.html  784.42 kB │ gzip: 243.61 kB
+
+✓ built in 365ms
+Embedded self-contained MCP UI for the Convex resource server.
+CONVEX_AGENT_MODE=anonymous mode is in beta, functionality may change in the future.
+✔ Configured a local deployment for http://127.0.0.1:53928 and saved its:
+    name as CONVEX_DEPLOYMENT
+    client URL as CONVEX_URL
+    HTTP actions URL as CONVEX_SITE_URL
+ to .env.local
+
+Write your Convex functions in convex/
+Give us feedback at https://convex.dev/community or support@convex.dev
+View the Convex dashboard at null
+
+▌ Developing against deployment:
+▌ [Local] Port 53928 • No Convex account (run npx convex login to link to a project)
+▌ └─ http://127.0.0.1:53928
+- Preparing Convex functions...
+
+✖ Hit an error while pushing:
+Environment variables have changed during push
+Failed due to network error, retrying in 650.71ms...
+- Preparing Convex functions...
+
+✔ 11:54:24 Convex functions ready! (343.55ms)
+CONVEX_AGENT_MODE=anonymous mode is in beta, functionality may change in the future.
+▌ Developing against deployment:
+▌ [Local] Port 53928 • No Convex account (run npx convex login to link to a project)
+▌ └─ http://127.0.0.1:53928
+- Preparing Convex functions...
+
+✔ 11:54:26 Convex functions ready! (383.5ms)
+
+  VITE v8.3.2  ready in 128 ms
+
+  ➜  Local:   http://127.0.0.1:53930/

@@ -1,0 +1,13 @@
+{
+  "outcome": "fail",
+  "observations": {
+    "sourceIdentity": "unversioned@sha256-46778e585f1422603cf741d232375e911f421cbefd162b68b33e597b230470de",
+    "processEnumeration": "Derived 14 descendant process IDs from a ps snapshot; the CLI process ID is separately known.",
+    "cleanup": "complete"
+  },
+  "error": "waitFor: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('iframe').contentFrame().getByText('Emulate browser development', { exact: true }) to be visible\n",
+  "limits": [
+    "No cloud project/deployment was created.",
+    "No data transfer or hosted behavior was exercised."
+  ]
+}
