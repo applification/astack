@@ -3,6 +3,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva } from 'class-variance-authority';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { Circle, CircleCheck, ClipboardList } from 'lucide-react';
 import type { WorkItem } from '@foundation/domain';
 
 // shadcn's button/input pattern, with styling kept in the portable package.
@@ -35,12 +36,14 @@ export function Input({ className, ...props }: ComponentProps<'input'>) {
 export function Workspace({
   actions,
   children,
+  embedded = false,
 }: {
   actions?: ReactNode;
   children: ReactNode;
+  embedded?: boolean;
 }) {
   return (
-    <main className="workspace">
+    <main className={clsx('workspace', embedded && 'workspace-embedded')}>
       <header className="page-header">
         <div>
           <p className="eyebrow">ASTACK REFERENCE</p>
@@ -53,9 +56,18 @@ export function Workspace({
     </main>
   );
 }
-export function Notice({ children }: { children: ReactNode }) {
+export function Notice({
+  children,
+  tone = 'info',
+}: {
+  children: ReactNode;
+  tone?: 'info' | 'error';
+}) {
   return (
-    <p className="notice" role="status">
+    <p
+      className={clsx('notice', tone === 'error' && 'notice-error')}
+      role={tone === 'error' ? 'alert' : 'status'}
+    >
       {children}
     </p>
   );
@@ -64,23 +76,30 @@ export function WorkItemList({
   items,
   pendingId,
   onStatusChange,
+  emptyMessage = 'Add a work item to get started.',
 }: {
   items: WorkItem[];
   pendingId?: string;
   onStatusChange: (item: WorkItem) => void;
+  emptyMessage?: string;
 }) {
   if (items.length === 0)
     return (
       <div className="empty">
+        <ClipboardList size={28} aria-hidden="true" />
         <h2>Nothing here yet</h2>
-        <p>Add a work item to get started.</p>
+        <p>{emptyMessage}</p>
       </div>
     );
   return (
     <ul className="work-list">
       {items.map((item) => (
         <li className="work-item" key={item.id}>
-          <span className={`status-dot ${item.status}`} aria-hidden="true" />
+          {item.status === 'done' ? (
+            <CircleCheck className="status-icon" size={20} aria-hidden="true" />
+          ) : (
+            <Circle className="status-icon" size={20} aria-hidden="true" />
+          )}
           <div className="item-copy">
             <h2>{item.title}</h2>
             <span className="item-state">

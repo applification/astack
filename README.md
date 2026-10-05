@@ -61,6 +61,8 @@ The [foundation profile](plugins/applification/skills/astack/references/foundati
 
 The [measured feedback and provisional local budget](.astack/foundation/feedback-proof.md#provisional-local-feedback-budget) describe when to investigate slower checks on the observed host. The [foundation backlog](.astack/foundation/backlog.md) records later specialist and chief-of-staff integration requirements.
 
+The generated profile carries its [Pen visual design](examples/foundation/.astack/design/README.md): semantic tokens, shared components, web/MCP layouts and frame-to-story links. `design:verify` builds the generated project's Storybook and records design-derived comparisons and screenshots. Use this alongside running-product proof; fixture rendering does not establish persisted effects or live OAuth.
+
 Reference execution, live WorkOS OAuth, installed MCP host behavior, and delivery trials by fresh agents are separate claims. Read the reference's retained evidence and gaps before relying on a result; deterministic checks or local signed identities cannot establish the other layers.
 
 For Convex work, install the companion `convex@openai-curated-remote` plugin. astack uses `@Convex` for general guidance, `$convex:quickstart` where its new-app scaffold fits, `$convex:convex-expert` for backend edits, and `$convex:add` for capabilities in an existing Convex + Next.js app. [Convex PR review](plugins/applification/skills/astack/references/pr.md) requires `$convex:convex-reviewer` before the PR is ready. astack itself does not bundle the Convex plugin.

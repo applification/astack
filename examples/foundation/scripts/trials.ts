@@ -604,7 +604,7 @@ export async function retainTrialDiff(
     transformed: !original.equals(retained),
   };
 }
-async function fileDigests(
+export async function fileDigests(
   directory: string,
   prefix = '',
 ): Promise<Record<string, string>> {
@@ -624,7 +624,7 @@ async function fileDigests(
   }
   return hashes;
 }
-async function installedCandidate(
+export async function installedCandidate(
   marketplace: string,
   expected: Record<string, string>,
 ) {

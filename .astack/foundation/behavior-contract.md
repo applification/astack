@@ -21,12 +21,13 @@ A fresh checkout creates a repeatable project in which an agent can make, observ
 | F7 | WorkOS web login and MCP OAuth preserve the same subject but validate their distinct issuer/audience contracts. | Official provider wiring, deployment checks, live provider checks when configured. Local keys do not prove WorkOS OAuth. |
 | F8 | Fresh agents using the candidate entry create the foundation, deliver a feature and fix a seeded defect; another agent reviews; repeat with the same rubric. | Candidate digest/revision, prompts, result, proof and independent scored review. |
 | F9 | Existing plugin, site and relevant reference validations pass; evidence survives cleanup. | Existing checks and retained redacted proof. |
+| F10 | The generated reference follows an explicit Pen visual design: tokens, shared components, desktop/narrow layouts and consequential web/MCP states. Frame/story links, rendered comparisons and a fresh generation trial preserve the selected design as an input. | Portable `.pen`, exported handoff/frames, `design:verify`, visual review, new creation-trial evidence. The original v1 trial scores do not establish design fidelity. |
 
 ## Principles and decisions
 
 TS 01–10, UI 01, DATA 01, STATE 01, EFFECT 01, API 01, COMPOSE 01, DESIGN 01, COMP 01, TEST 01, LOOP 01, WORK 01, ADR 01–02, FEEDBACK 01, LINT 01–02, TURBO 01 and HOOK 01 apply with the scopes and exceptions in the brief. See [ADR register](../../docs/adr/README.md). Mechanical checks establish detectable violations; review owns semantic composition, test quality and product judgement.
 
-Pencil: skipped for this worked engineering profile; no existing visual design to reconcile. Storybook: selected for the shared UI and form states. Real browser and protocol checks establish integration; an emulated host is labelled local bridge evidence.
+On 5 October the owner selected Pen (pen.dev) for this reference. The original decision to skip design because none existed was insufficient for a worked visual reference. Pen and Storybook are both selected: the portable source is `examples/foundation/.astack/design/work-items.pen`, with exported frames and an MCP-extracted `spec.json` beside it. The [design record](design/README.md) maps named frames to stories and proof. Real browser and protocol checks continue to establish integration; an emulated host is labelled local bridge evidence.
 
 ## Baseline and first slice
 

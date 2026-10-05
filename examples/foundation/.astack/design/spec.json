@@ -1,0 +1,3179 @@
+{
+  "format": "astack-pen-handoff/v1",
+  "variables": {
+    "variables": {
+      "background": {
+        "type": "color",
+        "value": [
+          {
+            "value": "#F5F3EE",
+            "theme": {
+              "mode": "light"
+            }
+          },
+          {
+            "value": "#161F19",
+            "theme": {
+              "mode": "dark"
+            }
+          }
+        ]
+      },
+      "surface": {
+        "type": "color",
+        "value": [
+          {
+            "value": "#FFFFFF",
+            "theme": {
+              "mode": "light"
+            }
+          },
+          {
+            "value": "#202D24",
+            "theme": {
+              "mode": "dark"
+            }
+          }
+        ]
+      },
+      "foreground": {
+        "type": "color",
+        "value": [
+          {
+            "value": "#1B3A28",
+            "theme": {
+              "mode": "light"
+            }
+          },
+          {
+            "value": "#E6EFE5",
+            "theme": {
+              "mode": "dark"
+            }
+          }
+        ]
+      },
+      "muted": {
+        "type": "color",
+        "value": [
+          {
+            "value": "#4A6B52",
+            "theme": {
+              "mode": "light"
+            }
+          },
+          {
+            "value": "#B1C3AE",
+            "theme": {
+              "mode": "dark"
+            }
+          }
+        ]
+      },
+      "border": {
+        "type": "color",
+        "value": [
+          {
+            "value": "#D6DDD0",
+            "theme": {
+              "mode": "light"
+            }
+          },
+          {
+            "value": "#3E5141",
+            "theme": {
+              "mode": "dark"
+            }
+          }
+        ]
+      },
+      "primary": {
+        "type": "color",
+        "value": [
+          {
+            "value": "#2D5E3A",
+            "theme": {
+              "mode": "light"
+            }
+          },
+          {
+            "value": "#A8C99F",
+            "theme": {
+              "mode": "dark"
+            }
+          }
+        ]
+      },
+      "primary-foreground": {
+        "type": "color",
+        "value": [
+          {
+            "value": "#FFFFFF",
+            "theme": {
+              "mode": "light"
+            }
+          },
+          {
+            "value": "#18241B",
+            "theme": {
+              "mode": "dark"
+            }
+          }
+        ]
+      },
+      "selected": {
+        "type": "color",
+        "value": [
+          {
+            "value": "#E8EEE2",
+            "theme": {
+              "mode": "light"
+            }
+          },
+          {
+            "value": "#314431",
+            "theme": {
+              "mode": "dark"
+            }
+          }
+        ]
+      },
+      "danger": {
+        "type": "color",
+        "value": [
+          {
+            "value": "#A42E29",
+            "theme": {
+              "mode": "light"
+            }
+          },
+          {
+            "value": "#FFBBB3",
+            "theme": {
+              "mode": "dark"
+            }
+          }
+        ]
+      },
+      "danger-surface": {
+        "type": "color",
+        "value": [
+          {
+            "value": "#FFF2EF",
+            "theme": {
+              "mode": "light"
+            }
+          },
+          {
+            "value": "#482A29",
+            "theme": {
+              "mode": "dark"
+            }
+          }
+        ]
+      },
+      "font": {
+        "type": "string",
+        "value": "Inter"
+      },
+      "space-1": {
+        "type": "number",
+        "value": 4
+      },
+      "space-2": {
+        "type": "number",
+        "value": 8
+      },
+      "space-3": {
+        "type": "number",
+        "value": 12
+      },
+      "space-4": {
+        "type": "number",
+        "value": 16
+      },
+      "space-6": {
+        "type": "number",
+        "value": 24
+      },
+      "space-8": {
+        "type": "number",
+        "value": 32
+      },
+      "radius": {
+        "type": "number",
+        "value": 8
+      },
+      "control-border": {
+        "type": "color",
+        "value": [
+          {
+            "value": "#849882",
+            "theme": {
+              "mode": "light"
+            }
+          },
+          {
+            "value": "#73937B",
+            "theme": {
+              "mode": "dark"
+            }
+          }
+        ]
+      }
+    },
+    "themes": {
+      "mode": ["light", "dark"]
+    }
+  },
+  "frames": [
+    {
+      "id": "Hhign",
+      "name": "02 · Web · mixed",
+      "story": "work-items-workspace--web-mixed",
+      "nodes": [
+        {
+          "id": "Hhign",
+          "name": "02 · Web · mixed",
+          "type": "frame",
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1040,
+            "height": 800
+          },
+          "fill": "#F5F3EE"
+        },
+        {
+          "id": "e6PK9h",
+          "name": "Workspace header",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 64,
+            "width": 720,
+            "height": 108
+          }
+        },
+        {
+          "id": "e6PK9h/kGi80",
+          "name": "Product label",
+          "type": "text",
+          "bounds": {
+            "x": 160,
+            "y": 64,
+            "width": 131,
+            "height": 17
+          },
+          "content": "ASTACK REFERENCE",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "e6PK9h/bk71k",
+          "name": "Page title",
+          "type": "text",
+          "bounds": {
+            "x": 160,
+            "y": 93,
+            "width": 185,
+            "height": 43
+          },
+          "content": "Work items",
+          "fontFamily": "Inter",
+          "fontSize": 36,
+          "fontWeight": "600",
+          "lineHeight": 1.2,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "e6PK9h/Sc7Z3",
+          "name": "Page subtitle",
+          "type": "text",
+          "bounds": {
+            "x": 160,
+            "y": 148,
+            "width": 720,
+            "height": 24
+          },
+          "content": "Keep a clear record of what needs doing.",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "s9F9g9",
+          "name": "Create work item",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 204,
+            "width": 720,
+            "height": 120
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "s9F9g9/v1Z6I",
+          "name": "Title field",
+          "type": "frame",
+          "bounds": {
+            "x": 184,
+            "y": 228,
+            "width": 530,
+            "height": 72
+          }
+        },
+        {
+          "id": "s9F9g9/lqb3W",
+          "name": "Title label",
+          "type": "text",
+          "bounds": {
+            "x": 184,
+            "y": 228,
+            "width": 30,
+            "height": 20
+          },
+          "content": "Title",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "s9F9g9/e4JbP",
+          "name": "Title input",
+          "type": "frame",
+          "bounds": {
+            "x": 184,
+            "y": 256,
+            "width": 530,
+            "height": 44
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "s9F9g9/e4JbP/m5MOJ",
+          "name": "Input text",
+          "type": "text",
+          "bounds": {
+            "x": 196,
+            "y": 266,
+            "width": 146,
+            "height": 24
+          },
+          "content": "What needs doing?",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "s9F9g9/fxj0w",
+          "name": "Add action",
+          "type": "frame",
+          "bounds": {
+            "x": 726,
+            "y": 256,
+            "width": 130,
+            "height": 44
+          },
+          "fill": "#2D5E3A"
+        },
+        {
+          "id": "s9F9g9/fxj0w/VBxtG",
+          "name": "Button label",
+          "type": "text",
+          "bounds": {
+            "x": 742,
+            "y": 268,
+            "width": 98,
+            "height": 20
+          },
+          "content": "Add work item",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "ZHMOk",
+          "name": "Work list section",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 356,
+            "width": 720,
+            "height": 228
+          }
+        },
+        {
+          "id": "D54vA",
+          "name": "All filters",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 356,
+            "width": 720,
+            "height": 52
+          }
+        },
+        {
+          "id": "D54vA/xb60L",
+          "name": "All items filter",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 356,
+            "width": 91,
+            "height": 40
+          },
+          "fill": "#E8EEE2"
+        },
+        {
+          "id": "D54vA/Twqr5",
+          "name": "All items label",
+          "type": "text",
+          "bounds": {
+            "x": 176,
+            "y": 365.5,
+            "width": 59,
+            "height": 21
+          },
+          "content": "All items",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "D54vA/ndqOS",
+          "name": "Open filter",
+          "type": "frame",
+          "bounds": {
+            "x": 259,
+            "y": 356,
+            "width": 68,
+            "height": 40
+          },
+          "fill": "#F5F3EE"
+        },
+        {
+          "id": "D54vA/X7UXK",
+          "name": "Open label",
+          "type": "text",
+          "bounds": {
+            "x": 275,
+            "y": 365.5,
+            "width": 36,
+            "height": 21
+          },
+          "content": "Open",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "D54vA/F3VolM",
+          "name": "Done filter",
+          "type": "frame",
+          "bounds": {
+            "x": 335,
+            "y": 356,
+            "width": 67,
+            "height": 40
+          },
+          "fill": "#F5F3EE"
+        },
+        {
+          "id": "D54vA/U9dD9W",
+          "name": "Done label",
+          "type": "text",
+          "bounds": {
+            "x": 351,
+            "y": 365.5,
+            "width": 35,
+            "height": 21
+          },
+          "content": "Done",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "N6DmR4",
+          "name": "Open work item",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 408,
+            "width": 720,
+            "height": 88
+          }
+        },
+        {
+          "id": "N6DmR4/x8e1s1",
+          "name": "Status · circle",
+          "type": "icon",
+          "bounds": {
+            "x": 160,
+            "y": 442,
+            "width": 20,
+            "height": 20
+          },
+          "fill": "#2D5E3A"
+        },
+        {
+          "id": "N6DmR4/gDxTo",
+          "name": "Item text",
+          "type": "frame",
+          "bounds": {
+            "x": 196,
+            "y": 428,
+            "width": 563,
+            "height": 48
+          }
+        },
+        {
+          "id": "N6DmR4/lshDi",
+          "name": "Item title",
+          "type": "text",
+          "bounds": {
+            "x": 196,
+            "y": 428,
+            "width": 563,
+            "height": 24
+          },
+          "content": "Confirm the acceptance cases",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "N6DmR4/A3kWrB",
+          "name": "Item status",
+          "type": "text",
+          "bounds": {
+            "x": 196,
+            "y": 456,
+            "width": 108,
+            "height": 20
+          },
+          "content": "Ready to work on",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "N6DmR4/ifRaD",
+          "name": "Status action",
+          "type": "frame",
+          "bounds": {
+            "x": 775,
+            "y": 430,
+            "width": 105,
+            "height": 44
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "N6DmR4/ifRaD/VBxtG",
+          "name": "Button label",
+          "type": "text",
+          "bounds": {
+            "x": 791,
+            "y": 442,
+            "width": 73,
+            "height": 20
+          },
+          "content": "Mark done",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "M3AZ3",
+          "name": "Completed work item",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 496,
+            "width": 720,
+            "height": 88
+          }
+        },
+        {
+          "id": "M3AZ3/x8e1s1",
+          "name": "Status · circle",
+          "type": "icon",
+          "bounds": {
+            "x": 160,
+            "y": 530,
+            "width": 20,
+            "height": 20
+          },
+          "fill": "#2D5E3A"
+        },
+        {
+          "id": "M3AZ3/gDxTo",
+          "name": "Item text",
+          "type": "frame",
+          "bounds": {
+            "x": 196,
+            "y": 516,
+            "width": 584,
+            "height": 48
+          }
+        },
+        {
+          "id": "M3AZ3/lshDi",
+          "name": "Item title",
+          "type": "text",
+          "bounds": {
+            "x": 196,
+            "y": 516,
+            "width": 584,
+            "height": 24
+          },
+          "content": "Retain the running-product evidence",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "M3AZ3/A3kWrB",
+          "name": "Item status",
+          "type": "text",
+          "bounds": {
+            "x": 196,
+            "y": 544,
+            "width": 68,
+            "height": 20
+          },
+          "content": "Completed",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "M3AZ3/ifRaD",
+          "name": "Status action",
+          "type": "frame",
+          "bounds": {
+            "x": 796,
+            "y": 518,
+            "width": 84,
+            "height": 44
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "M3AZ3/ifRaD/VBxtG",
+          "name": "Button label",
+          "type": "text",
+          "bounds": {
+            "x": 812,
+            "y": 530,
+            "width": 52,
+            "height": 20
+          },
+          "content": "Reopen",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#1B3A28"
+        }
+      ]
+    },
+    {
+      "id": "l5CZRK",
+      "name": "03 · Web · narrow",
+      "story": "work-items-workspace--web-narrow",
+      "nodes": [
+        {
+          "id": "l5CZRK",
+          "name": "03 · Web · narrow",
+          "type": "frame",
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 390,
+            "height": 800
+          },
+          "fill": "#F5F3EE"
+        },
+        {
+          "id": "U13irL",
+          "name": "Workspace header",
+          "type": "frame",
+          "bounds": {
+            "x": 24,
+            "y": 32,
+            "width": 342,
+            "height": 101
+          }
+        },
+        {
+          "id": "U13irL/kGi80",
+          "name": "Product label",
+          "type": "text",
+          "bounds": {
+            "x": 24,
+            "y": 32,
+            "width": 131,
+            "height": 17
+          },
+          "content": "ASTACK REFERENCE",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "U13irL/bk71k",
+          "name": "Page title",
+          "type": "text",
+          "bounds": {
+            "x": 24,
+            "y": 61,
+            "width": 156,
+            "height": 36
+          },
+          "content": "Work items",
+          "fontFamily": "Inter",
+          "fontSize": 30,
+          "fontWeight": "600",
+          "lineHeight": 1.2,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "U13irL/Sc7Z3",
+          "name": "Page subtitle",
+          "type": "text",
+          "bounds": {
+            "x": 24,
+            "y": 109,
+            "width": 342,
+            "height": 24
+          },
+          "content": "Keep a clear record of what needs doing.",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "wocwn",
+          "name": "Create work item",
+          "type": "frame",
+          "bounds": {
+            "x": 24,
+            "y": 165,
+            "width": 342,
+            "height": 172
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "wocwn/v1Z6I",
+          "name": "Title field",
+          "type": "frame",
+          "bounds": {
+            "x": 44,
+            "y": 185,
+            "width": 302,
+            "height": 72
+          }
+        },
+        {
+          "id": "wocwn/lqb3W",
+          "name": "Title label",
+          "type": "text",
+          "bounds": {
+            "x": 44,
+            "y": 185,
+            "width": 30,
+            "height": 20
+          },
+          "content": "Title",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "wocwn/e4JbP",
+          "name": "Title input",
+          "type": "frame",
+          "bounds": {
+            "x": 44,
+            "y": 213,
+            "width": 302,
+            "height": 44
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "wocwn/e4JbP/m5MOJ",
+          "name": "Input text",
+          "type": "text",
+          "bounds": {
+            "x": 56,
+            "y": 224.5,
+            "width": 128,
+            "height": 21
+          },
+          "content": "What needs doing?",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "wocwn/fxj0w",
+          "name": "Add action",
+          "type": "frame",
+          "bounds": {
+            "x": 44,
+            "y": 273,
+            "width": 302,
+            "height": 44
+          },
+          "fill": "#2D5E3A"
+        },
+        {
+          "id": "wocwn/fxj0w/VBxtG",
+          "name": "Button label",
+          "type": "text",
+          "bounds": {
+            "x": 146,
+            "y": 285,
+            "width": 98,
+            "height": 20
+          },
+          "content": "Add work item",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "q6Mds0",
+          "name": "Work list section",
+          "type": "frame",
+          "bounds": {
+            "x": 24,
+            "y": 369,
+            "width": 342,
+            "height": 276
+          }
+        },
+        {
+          "id": "ykEGD",
+          "name": "All filters",
+          "type": "frame",
+          "bounds": {
+            "x": 24,
+            "y": 369,
+            "width": 342,
+            "height": 52
+          }
+        },
+        {
+          "id": "ykEGD/xb60L",
+          "name": "All items filter",
+          "type": "frame",
+          "bounds": {
+            "x": 24,
+            "y": 369,
+            "width": 91,
+            "height": 40
+          },
+          "fill": "#E8EEE2"
+        },
+        {
+          "id": "ykEGD/Twqr5",
+          "name": "All items label",
+          "type": "text",
+          "bounds": {
+            "x": 40,
+            "y": 378.5,
+            "width": 59,
+            "height": 21
+          },
+          "content": "All items",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "ykEGD/ndqOS",
+          "name": "Open filter",
+          "type": "frame",
+          "bounds": {
+            "x": 123,
+            "y": 369,
+            "width": 68,
+            "height": 40
+          },
+          "fill": "#F5F3EE"
+        },
+        {
+          "id": "ykEGD/X7UXK",
+          "name": "Open label",
+          "type": "text",
+          "bounds": {
+            "x": 139,
+            "y": 378.5,
+            "width": 36,
+            "height": 21
+          },
+          "content": "Open",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "ykEGD/F3VolM",
+          "name": "Done filter",
+          "type": "frame",
+          "bounds": {
+            "x": 199,
+            "y": 369,
+            "width": 67,
+            "height": 40
+          },
+          "fill": "#F5F3EE"
+        },
+        {
+          "id": "ykEGD/U9dD9W",
+          "name": "Done label",
+          "type": "text",
+          "bounds": {
+            "x": 215,
+            "y": 378.5,
+            "width": 35,
+            "height": 21
+          },
+          "content": "Done",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "F3fmGb",
+          "name": "Open work item",
+          "type": "frame",
+          "bounds": {
+            "x": 24,
+            "y": 421,
+            "width": 342,
+            "height": 112
+          }
+        },
+        {
+          "id": "F3fmGb/x8e1s1",
+          "name": "Status · circle",
+          "type": "icon",
+          "bounds": {
+            "x": 24,
+            "y": 467,
+            "width": 20,
+            "height": 20
+          },
+          "fill": "#2D5E3A"
+        },
+        {
+          "id": "F3fmGb/gDxTo",
+          "name": "Item text",
+          "type": "frame",
+          "bounds": {
+            "x": 60,
+            "y": 441,
+            "width": 185,
+            "height": 72
+          }
+        },
+        {
+          "id": "F3fmGb/lshDi",
+          "name": "Item title",
+          "type": "text",
+          "bounds": {
+            "x": 60,
+            "y": 441,
+            "width": 185,
+            "height": 48
+          },
+          "content": "Confirm the acceptance cases",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "F3fmGb/A3kWrB",
+          "name": "Item status",
+          "type": "text",
+          "bounds": {
+            "x": 60,
+            "y": 493,
+            "width": 108,
+            "height": 20
+          },
+          "content": "Ready to work on",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "F3fmGb/ifRaD",
+          "name": "Status action",
+          "type": "frame",
+          "bounds": {
+            "x": 261,
+            "y": 455,
+            "width": 105,
+            "height": 44
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "F3fmGb/ifRaD/VBxtG",
+          "name": "Button label",
+          "type": "text",
+          "bounds": {
+            "x": 277,
+            "y": 467,
+            "width": 73,
+            "height": 20
+          },
+          "content": "Mark done",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "YvxXE",
+          "name": "Completed work item",
+          "type": "frame",
+          "bounds": {
+            "x": 24,
+            "y": 533,
+            "width": 342,
+            "height": 112
+          }
+        },
+        {
+          "id": "YvxXE/x8e1s1",
+          "name": "Status · circle",
+          "type": "icon",
+          "bounds": {
+            "x": 24,
+            "y": 579,
+            "width": 20,
+            "height": 20
+          },
+          "fill": "#2D5E3A"
+        },
+        {
+          "id": "YvxXE/gDxTo",
+          "name": "Item text",
+          "type": "frame",
+          "bounds": {
+            "x": 60,
+            "y": 553,
+            "width": 206,
+            "height": 72
+          }
+        },
+        {
+          "id": "YvxXE/lshDi",
+          "name": "Item title",
+          "type": "text",
+          "bounds": {
+            "x": 60,
+            "y": 553,
+            "width": 206,
+            "height": 48
+          },
+          "content": "Retain the running-product evidence",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "YvxXE/A3kWrB",
+          "name": "Item status",
+          "type": "text",
+          "bounds": {
+            "x": 60,
+            "y": 605,
+            "width": 68,
+            "height": 20
+          },
+          "content": "Completed",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "YvxXE/ifRaD",
+          "name": "Status action",
+          "type": "frame",
+          "bounds": {
+            "x": 282,
+            "y": 567,
+            "width": 84,
+            "height": 44
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "YvxXE/ifRaD/VBxtG",
+          "name": "Button label",
+          "type": "text",
+          "bounds": {
+            "x": 298,
+            "y": 579,
+            "width": 52,
+            "height": 20
+          },
+          "content": "Reopen",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#1B3A28"
+        }
+      ]
+    },
+    {
+      "id": "azIBu",
+      "name": "04 · MCP · mixed",
+      "story": "work-items-workspace--mcp-mixed",
+      "nodes": [
+        {
+          "id": "azIBu",
+          "name": "04 · MCP · mixed",
+          "type": "frame",
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 720,
+            "height": 520
+          },
+          "fill": "#F5F3EE"
+        },
+        {
+          "id": "c30jYv",
+          "name": "MCP header",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 32,
+            "width": 656,
+            "height": 101
+          }
+        },
+        {
+          "id": "c30jYv/kGi80",
+          "name": "Product label",
+          "type": "text",
+          "bounds": {
+            "x": 32,
+            "y": 32,
+            "width": 131,
+            "height": 17
+          },
+          "content": "ASTACK REFERENCE",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "c30jYv/bk71k",
+          "name": "Page title",
+          "type": "text",
+          "bounds": {
+            "x": 32,
+            "y": 61,
+            "width": 156,
+            "height": 36
+          },
+          "content": "Work items",
+          "fontFamily": "Inter",
+          "fontSize": 30,
+          "fontWeight": "600",
+          "lineHeight": 1.2,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "c30jYv/Sc7Z3",
+          "name": "Page subtitle",
+          "type": "text",
+          "bounds": {
+            "x": 32,
+            "y": 109,
+            "width": 656,
+            "height": 24
+          },
+          "content": "Keep a clear record of what needs doing.",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "tAb4T",
+          "name": "MCP list",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 157,
+            "width": 656,
+            "height": 176
+          }
+        },
+        {
+          "id": "wPDUC",
+          "name": "MCP open work",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 157,
+            "width": 656,
+            "height": 88
+          }
+        },
+        {
+          "id": "wPDUC/x8e1s1",
+          "name": "Status · circle",
+          "type": "icon",
+          "bounds": {
+            "x": 32,
+            "y": 191,
+            "width": 20,
+            "height": 20
+          },
+          "fill": "#2D5E3A"
+        },
+        {
+          "id": "wPDUC/gDxTo",
+          "name": "Item text",
+          "type": "frame",
+          "bounds": {
+            "x": 68,
+            "y": 177,
+            "width": 499,
+            "height": 48
+          }
+        },
+        {
+          "id": "wPDUC/lshDi",
+          "name": "Item title",
+          "type": "text",
+          "bounds": {
+            "x": 68,
+            "y": 177,
+            "width": 499,
+            "height": 24
+          },
+          "content": "Confirm the acceptance cases",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "wPDUC/A3kWrB",
+          "name": "Item status",
+          "type": "text",
+          "bounds": {
+            "x": 68,
+            "y": 205,
+            "width": 108,
+            "height": 20
+          },
+          "content": "Ready to work on",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "wPDUC/ifRaD",
+          "name": "Status action",
+          "type": "frame",
+          "bounds": {
+            "x": 583,
+            "y": 179,
+            "width": 105,
+            "height": 44
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "wPDUC/ifRaD/VBxtG",
+          "name": "Button label",
+          "type": "text",
+          "bounds": {
+            "x": 599,
+            "y": 191,
+            "width": 73,
+            "height": 20
+          },
+          "content": "Mark done",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "LWrPv",
+          "name": "MCP completed work",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 245,
+            "width": 656,
+            "height": 88
+          }
+        },
+        {
+          "id": "LWrPv/x8e1s1",
+          "name": "Status · circle",
+          "type": "icon",
+          "bounds": {
+            "x": 32,
+            "y": 279,
+            "width": 20,
+            "height": 20
+          },
+          "fill": "#2D5E3A"
+        },
+        {
+          "id": "LWrPv/gDxTo",
+          "name": "Item text",
+          "type": "frame",
+          "bounds": {
+            "x": 68,
+            "y": 265,
+            "width": 520,
+            "height": 48
+          }
+        },
+        {
+          "id": "LWrPv/lshDi",
+          "name": "Item title",
+          "type": "text",
+          "bounds": {
+            "x": 68,
+            "y": 265,
+            "width": 520,
+            "height": 24
+          },
+          "content": "Retain the running-product evidence",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "LWrPv/A3kWrB",
+          "name": "Item status",
+          "type": "text",
+          "bounds": {
+            "x": 68,
+            "y": 293,
+            "width": 68,
+            "height": 20
+          },
+          "content": "Completed",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "LWrPv/ifRaD",
+          "name": "Status action",
+          "type": "frame",
+          "bounds": {
+            "x": 604,
+            "y": 267,
+            "width": 84,
+            "height": 44
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "LWrPv/ifRaD/VBxtG",
+          "name": "Button label",
+          "type": "text",
+          "bounds": {
+            "x": 620,
+            "y": 279,
+            "width": 52,
+            "height": 20
+          },
+          "content": "Reopen",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#1B3A28"
+        }
+      ]
+    },
+    {
+      "id": "mcpFP",
+      "name": "05 · MCP · host dark theme",
+      "story": "work-items-workspace--mcp-dark",
+      "nodes": [
+        {
+          "id": "mcpFP",
+          "name": "05 · MCP · host dark theme",
+          "type": "frame",
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 720,
+            "height": 520
+          },
+          "fill": "#161F19"
+        },
+        {
+          "id": "T29fv",
+          "name": "MCP header",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 32,
+            "width": 656,
+            "height": 101
+          }
+        },
+        {
+          "id": "T29fv/kGi80",
+          "name": "Product label",
+          "type": "text",
+          "bounds": {
+            "x": 32,
+            "y": 32,
+            "width": 131,
+            "height": 17
+          },
+          "content": "ASTACK REFERENCE",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#B1C3AE"
+        },
+        {
+          "id": "T29fv/bk71k",
+          "name": "Page title",
+          "type": "text",
+          "bounds": {
+            "x": 32,
+            "y": 61,
+            "width": 156,
+            "height": 36
+          },
+          "content": "Work items",
+          "fontFamily": "Inter",
+          "fontSize": 30,
+          "fontWeight": "600",
+          "lineHeight": 1.2,
+          "fill": "#E6EFE5"
+        },
+        {
+          "id": "T29fv/Sc7Z3",
+          "name": "Page subtitle",
+          "type": "text",
+          "bounds": {
+            "x": 32,
+            "y": 109,
+            "width": 656,
+            "height": 24
+          },
+          "content": "Keep a clear record of what needs doing.",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#B1C3AE"
+        },
+        {
+          "id": "cOs7l",
+          "name": "MCP list",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 157,
+            "width": 656,
+            "height": 176
+          }
+        },
+        {
+          "id": "b4lPkN",
+          "name": "MCP open work",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 157,
+            "width": 656,
+            "height": 88
+          }
+        },
+        {
+          "id": "b4lPkN/x8e1s1",
+          "name": "Status · circle",
+          "type": "icon",
+          "bounds": {
+            "x": 32,
+            "y": 191,
+            "width": 20,
+            "height": 20
+          },
+          "fill": "#A8C99F"
+        },
+        {
+          "id": "b4lPkN/gDxTo",
+          "name": "Item text",
+          "type": "frame",
+          "bounds": {
+            "x": 68,
+            "y": 177,
+            "width": 499,
+            "height": 48
+          }
+        },
+        {
+          "id": "b4lPkN/lshDi",
+          "name": "Item title",
+          "type": "text",
+          "bounds": {
+            "x": 68,
+            "y": 177,
+            "width": 499,
+            "height": 24
+          },
+          "content": "Confirm the acceptance cases",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#E6EFE5"
+        },
+        {
+          "id": "b4lPkN/A3kWrB",
+          "name": "Item status",
+          "type": "text",
+          "bounds": {
+            "x": 68,
+            "y": 205,
+            "width": 108,
+            "height": 20
+          },
+          "content": "Ready to work on",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#B1C3AE"
+        },
+        {
+          "id": "b4lPkN/ifRaD",
+          "name": "Status action",
+          "type": "frame",
+          "bounds": {
+            "x": 583,
+            "y": 179,
+            "width": 105,
+            "height": 44
+          },
+          "fill": "#202D24"
+        },
+        {
+          "id": "b4lPkN/ifRaD/VBxtG",
+          "name": "Button label",
+          "type": "text",
+          "bounds": {
+            "x": 599,
+            "y": 191,
+            "width": 73,
+            "height": 20
+          },
+          "content": "Mark done",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#E6EFE5"
+        },
+        {
+          "id": "JMj7R",
+          "name": "MCP completed work",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 245,
+            "width": 656,
+            "height": 88
+          }
+        },
+        {
+          "id": "JMj7R/x8e1s1",
+          "name": "Status · circle",
+          "type": "icon",
+          "bounds": {
+            "x": 32,
+            "y": 279,
+            "width": 20,
+            "height": 20
+          },
+          "fill": "#A8C99F"
+        },
+        {
+          "id": "JMj7R/gDxTo",
+          "name": "Item text",
+          "type": "frame",
+          "bounds": {
+            "x": 68,
+            "y": 265,
+            "width": 520,
+            "height": 48
+          }
+        },
+        {
+          "id": "JMj7R/lshDi",
+          "name": "Item title",
+          "type": "text",
+          "bounds": {
+            "x": 68,
+            "y": 265,
+            "width": 520,
+            "height": 24
+          },
+          "content": "Retain the running-product evidence",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#E6EFE5"
+        },
+        {
+          "id": "JMj7R/A3kWrB",
+          "name": "Item status",
+          "type": "text",
+          "bounds": {
+            "x": 68,
+            "y": 293,
+            "width": 68,
+            "height": 20
+          },
+          "content": "Completed",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#B1C3AE"
+        },
+        {
+          "id": "JMj7R/ifRaD",
+          "name": "Status action",
+          "type": "frame",
+          "bounds": {
+            "x": 604,
+            "y": 267,
+            "width": 84,
+            "height": 44
+          },
+          "fill": "#202D24"
+        },
+        {
+          "id": "JMj7R/ifRaD/VBxtG",
+          "name": "Button label",
+          "type": "text",
+          "bounds": {
+            "x": 620,
+            "y": 279,
+            "width": 52,
+            "height": 20
+          },
+          "content": "Reopen",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#E6EFE5"
+        }
+      ]
+    },
+    {
+      "id": "XSTWb",
+      "name": "06 · Web · empty",
+      "story": "work-items-workspace--web-empty",
+      "nodes": [
+        {
+          "id": "XSTWb",
+          "name": "06 · Web · empty",
+          "type": "frame",
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1040,
+            "height": 800
+          },
+          "fill": "#F5F3EE"
+        },
+        {
+          "id": "tBsoE",
+          "name": "Workspace header",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 64,
+            "width": 720,
+            "height": 108
+          }
+        },
+        {
+          "id": "tBsoE/kGi80",
+          "name": "Product label",
+          "type": "text",
+          "bounds": {
+            "x": 160,
+            "y": 64,
+            "width": 131,
+            "height": 17
+          },
+          "content": "ASTACK REFERENCE",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "tBsoE/bk71k",
+          "name": "Page title",
+          "type": "text",
+          "bounds": {
+            "x": 160,
+            "y": 93,
+            "width": 185,
+            "height": 43
+          },
+          "content": "Work items",
+          "fontFamily": "Inter",
+          "fontSize": 36,
+          "fontWeight": "600",
+          "lineHeight": 1.2,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "tBsoE/Sc7Z3",
+          "name": "Page subtitle",
+          "type": "text",
+          "bounds": {
+            "x": 160,
+            "y": 148,
+            "width": 720,
+            "height": 24
+          },
+          "content": "Keep a clear record of what needs doing.",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "i0mQA9",
+          "name": "Create work item",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 204,
+            "width": 720,
+            "height": 120
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "i0mQA9/v1Z6I",
+          "name": "Title field",
+          "type": "frame",
+          "bounds": {
+            "x": 184,
+            "y": 228,
+            "width": 530,
+            "height": 72
+          }
+        },
+        {
+          "id": "i0mQA9/lqb3W",
+          "name": "Title label",
+          "type": "text",
+          "bounds": {
+            "x": 184,
+            "y": 228,
+            "width": 30,
+            "height": 20
+          },
+          "content": "Title",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "i0mQA9/e4JbP",
+          "name": "Title input",
+          "type": "frame",
+          "bounds": {
+            "x": 184,
+            "y": 256,
+            "width": 530,
+            "height": 44
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "i0mQA9/e4JbP/m5MOJ",
+          "name": "Input text",
+          "type": "text",
+          "bounds": {
+            "x": 196,
+            "y": 266,
+            "width": 146,
+            "height": 24
+          },
+          "content": "What needs doing?",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "i0mQA9/fxj0w",
+          "name": "Add action",
+          "type": "frame",
+          "bounds": {
+            "x": 726,
+            "y": 256,
+            "width": 130,
+            "height": 44
+          },
+          "fill": "#2D5E3A"
+        },
+        {
+          "id": "i0mQA9/fxj0w/VBxtG",
+          "name": "Button label",
+          "type": "text",
+          "bounds": {
+            "x": 742,
+            "y": 268,
+            "width": 98,
+            "height": 20
+          },
+          "content": "Add work item",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "sVjyM",
+          "name": "Work list section",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 356,
+            "width": 720,
+            "height": 238
+          }
+        },
+        {
+          "id": "n0cRJ",
+          "name": "All filters",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 356,
+            "width": 720,
+            "height": 52
+          }
+        },
+        {
+          "id": "n0cRJ/xb60L",
+          "name": "All items filter",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 356,
+            "width": 91,
+            "height": 40
+          },
+          "fill": "#E8EEE2"
+        },
+        {
+          "id": "n0cRJ/Twqr5",
+          "name": "All items label",
+          "type": "text",
+          "bounds": {
+            "x": 176,
+            "y": 365.5,
+            "width": 59,
+            "height": 21
+          },
+          "content": "All items",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "n0cRJ/ndqOS",
+          "name": "Open filter",
+          "type": "frame",
+          "bounds": {
+            "x": 259,
+            "y": 356,
+            "width": 68,
+            "height": 40
+          },
+          "fill": "#F5F3EE"
+        },
+        {
+          "id": "n0cRJ/X7UXK",
+          "name": "Open label",
+          "type": "text",
+          "bounds": {
+            "x": 275,
+            "y": 365.5,
+            "width": 36,
+            "height": 21
+          },
+          "content": "Open",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "n0cRJ/F3VolM",
+          "name": "Done filter",
+          "type": "frame",
+          "bounds": {
+            "x": 335,
+            "y": 356,
+            "width": 67,
+            "height": 40
+          },
+          "fill": "#F5F3EE"
+        },
+        {
+          "id": "n0cRJ/U9dD9W",
+          "name": "Done label",
+          "type": "text",
+          "bounds": {
+            "x": 351,
+            "y": 365.5,
+            "width": 35,
+            "height": 21
+          },
+          "content": "Done",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "R5md3K",
+          "name": "Empty work list",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 408,
+            "width": 720,
+            "height": 186
+          }
+        },
+        {
+          "id": "R5md3K/SLq8D",
+          "name": "Empty list icon",
+          "type": "icon",
+          "bounds": {
+            "x": 506,
+            "y": 456,
+            "width": 28,
+            "height": 28
+          },
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "R5md3K/KS17O",
+          "name": "Empty heading",
+          "type": "text",
+          "bounds": {
+            "x": 447.5,
+            "y": 492,
+            "width": 145,
+            "height": 25
+          },
+          "content": "Nothing here yet",
+          "fontFamily": "Inter",
+          "fontSize": 18,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "R5md3K/l0yMS",
+          "name": "Empty instruction",
+          "type": "text",
+          "bounds": {
+            "x": 417.5,
+            "y": 525,
+            "width": 205,
+            "height": 21
+          },
+          "content": "Add a work item to get started.",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        }
+      ]
+    },
+    {
+      "id": "FrMvz",
+      "name": "07 · Web · loading",
+      "story": "work-items-workspace--web-loading",
+      "nodes": [
+        {
+          "id": "FrMvz",
+          "name": "07 · Web · loading",
+          "type": "frame",
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 1040,
+            "height": 800
+          },
+          "fill": "#F5F3EE"
+        },
+        {
+          "id": "F2weo",
+          "name": "Workspace header",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 64,
+            "width": 720,
+            "height": 108
+          }
+        },
+        {
+          "id": "F2weo/kGi80",
+          "name": "Product label",
+          "type": "text",
+          "bounds": {
+            "x": 160,
+            "y": 64,
+            "width": 131,
+            "height": 17
+          },
+          "content": "ASTACK REFERENCE",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "F2weo/bk71k",
+          "name": "Page title",
+          "type": "text",
+          "bounds": {
+            "x": 160,
+            "y": 93,
+            "width": 185,
+            "height": 43
+          },
+          "content": "Work items",
+          "fontFamily": "Inter",
+          "fontSize": 36,
+          "fontWeight": "600",
+          "lineHeight": 1.2,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "F2weo/Sc7Z3",
+          "name": "Page subtitle",
+          "type": "text",
+          "bounds": {
+            "x": 160,
+            "y": 148,
+            "width": 720,
+            "height": 24
+          },
+          "content": "Keep a clear record of what needs doing.",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "N6dNX",
+          "name": "Create work item",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 204,
+            "width": 720,
+            "height": 120
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "N6dNX/v1Z6I",
+          "name": "Title field",
+          "type": "frame",
+          "bounds": {
+            "x": 184,
+            "y": 228,
+            "width": 530,
+            "height": 72
+          }
+        },
+        {
+          "id": "N6dNX/lqb3W",
+          "name": "Title label",
+          "type": "text",
+          "bounds": {
+            "x": 184,
+            "y": 228,
+            "width": 30,
+            "height": 20
+          },
+          "content": "Title",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "N6dNX/e4JbP",
+          "name": "Title input",
+          "type": "frame",
+          "bounds": {
+            "x": 184,
+            "y": 256,
+            "width": 530,
+            "height": 44
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "N6dNX/e4JbP/m5MOJ",
+          "name": "Input text",
+          "type": "text",
+          "bounds": {
+            "x": 196,
+            "y": 266,
+            "width": 146,
+            "height": 24
+          },
+          "content": "What needs doing?",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "N6dNX/fxj0w",
+          "name": "Add action",
+          "type": "frame",
+          "bounds": {
+            "x": 726,
+            "y": 256,
+            "width": 130,
+            "height": 44
+          },
+          "fill": "#2D5E3A"
+        },
+        {
+          "id": "N6dNX/fxj0w/VBxtG",
+          "name": "Button label",
+          "type": "text",
+          "bounds": {
+            "x": 742,
+            "y": 268,
+            "width": 98,
+            "height": 20
+          },
+          "content": "Add work item",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "jBuZW",
+          "name": "Work list section",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 356,
+            "width": 720,
+            "height": 105
+          }
+        },
+        {
+          "id": "IYXCk",
+          "name": "All filters",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 356,
+            "width": 720,
+            "height": 52
+          }
+        },
+        {
+          "id": "IYXCk/xb60L",
+          "name": "All items filter",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 356,
+            "width": 91,
+            "height": 40
+          },
+          "fill": "#E8EEE2"
+        },
+        {
+          "id": "IYXCk/Twqr5",
+          "name": "All items label",
+          "type": "text",
+          "bounds": {
+            "x": 176,
+            "y": 365.5,
+            "width": 59,
+            "height": 21
+          },
+          "content": "All items",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "IYXCk/ndqOS",
+          "name": "Open filter",
+          "type": "frame",
+          "bounds": {
+            "x": 259,
+            "y": 356,
+            "width": 68,
+            "height": 40
+          },
+          "fill": "#F5F3EE"
+        },
+        {
+          "id": "IYXCk/X7UXK",
+          "name": "Open label",
+          "type": "text",
+          "bounds": {
+            "x": 275,
+            "y": 365.5,
+            "width": 36,
+            "height": 21
+          },
+          "content": "Open",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "IYXCk/F3VolM",
+          "name": "Done filter",
+          "type": "frame",
+          "bounds": {
+            "x": 335,
+            "y": 356,
+            "width": 67,
+            "height": 40
+          },
+          "fill": "#F5F3EE"
+        },
+        {
+          "id": "IYXCk/U9dD9W",
+          "name": "Done label",
+          "type": "text",
+          "bounds": {
+            "x": 351,
+            "y": 365.5,
+            "width": 35,
+            "height": 21
+          },
+          "content": "Done",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "aaOVA",
+          "name": "Loading work list",
+          "type": "frame",
+          "bounds": {
+            "x": 160,
+            "y": 408,
+            "width": 720,
+            "height": 53
+          },
+          "fill": "#E8EEE2"
+        },
+        {
+          "id": "aaOVA/V8oNth",
+          "name": "Notice label",
+          "type": "text",
+          "bounds": {
+            "x": 180,
+            "y": 424,
+            "width": 680,
+            "height": 21
+          },
+          "content": "Loading work items…",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        }
+      ]
+    },
+    {
+      "id": "dcVZh",
+      "name": "08 · MCP · saving",
+      "story": "work-items-workspace--mcp-saving",
+      "nodes": [
+        {
+          "id": "dcVZh",
+          "name": "08 · MCP · saving",
+          "type": "frame",
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 720,
+            "height": 520
+          },
+          "fill": "#F5F3EE"
+        },
+        {
+          "id": "qWe5f",
+          "name": "MCP header",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 32,
+            "width": 656,
+            "height": 101
+          }
+        },
+        {
+          "id": "qWe5f/kGi80",
+          "name": "Product label",
+          "type": "text",
+          "bounds": {
+            "x": 32,
+            "y": 32,
+            "width": 131,
+            "height": 17
+          },
+          "content": "ASTACK REFERENCE",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "qWe5f/bk71k",
+          "name": "Page title",
+          "type": "text",
+          "bounds": {
+            "x": 32,
+            "y": 61,
+            "width": 156,
+            "height": 36
+          },
+          "content": "Work items",
+          "fontFamily": "Inter",
+          "fontSize": 30,
+          "fontWeight": "600",
+          "lineHeight": 1.2,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "qWe5f/Sc7Z3",
+          "name": "Page subtitle",
+          "type": "text",
+          "bounds": {
+            "x": 32,
+            "y": 109,
+            "width": 656,
+            "height": 24
+          },
+          "content": "Keep a clear record of what needs doing.",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "LLurn",
+          "name": "MCP list",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 157,
+            "width": 656,
+            "height": 176
+          }
+        },
+        {
+          "id": "aq6gG",
+          "name": "MCP open work",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 157,
+            "width": 656,
+            "height": 88
+          }
+        },
+        {
+          "id": "aq6gG/x8e1s1",
+          "name": "Status · circle",
+          "type": "icon",
+          "bounds": {
+            "x": 32,
+            "y": 191,
+            "width": 20,
+            "height": 20
+          },
+          "fill": "#2D5E3A"
+        },
+        {
+          "id": "aq6gG/gDxTo",
+          "name": "Item text",
+          "type": "frame",
+          "bounds": {
+            "x": 68,
+            "y": 177,
+            "width": 512,
+            "height": 48
+          }
+        },
+        {
+          "id": "aq6gG/lshDi",
+          "name": "Item title",
+          "type": "text",
+          "bounds": {
+            "x": 68,
+            "y": 177,
+            "width": 512,
+            "height": 24
+          },
+          "content": "Confirm the acceptance cases",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "aq6gG/A3kWrB",
+          "name": "Item status",
+          "type": "text",
+          "bounds": {
+            "x": 68,
+            "y": 205,
+            "width": 108,
+            "height": 20
+          },
+          "content": "Ready to work on",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "aq6gG/ifRaD",
+          "name": "Status action",
+          "type": "frame",
+          "bounds": {
+            "x": 596,
+            "y": 179,
+            "width": 92,
+            "height": 44
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "aq6gG/ifRaD/VBxtG",
+          "name": "Button label",
+          "type": "text",
+          "bounds": {
+            "x": 612,
+            "y": 191,
+            "width": 60,
+            "height": 20
+          },
+          "content": "Saving…",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "E32X4X",
+          "name": "MCP completed work",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 245,
+            "width": 656,
+            "height": 88
+          }
+        },
+        {
+          "id": "E32X4X/x8e1s1",
+          "name": "Status · circle",
+          "type": "icon",
+          "bounds": {
+            "x": 32,
+            "y": 279,
+            "width": 20,
+            "height": 20
+          },
+          "fill": "#2D5E3A"
+        },
+        {
+          "id": "E32X4X/gDxTo",
+          "name": "Item text",
+          "type": "frame",
+          "bounds": {
+            "x": 68,
+            "y": 265,
+            "width": 520,
+            "height": 48
+          }
+        },
+        {
+          "id": "E32X4X/lshDi",
+          "name": "Item title",
+          "type": "text",
+          "bounds": {
+            "x": 68,
+            "y": 265,
+            "width": 520,
+            "height": 24
+          },
+          "content": "Retain the running-product evidence",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "E32X4X/A3kWrB",
+          "name": "Item status",
+          "type": "text",
+          "bounds": {
+            "x": 68,
+            "y": 293,
+            "width": 68,
+            "height": 20
+          },
+          "content": "Completed",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "E32X4X/ifRaD",
+          "name": "Status action",
+          "type": "frame",
+          "bounds": {
+            "x": 604,
+            "y": 267,
+            "width": 84,
+            "height": 44
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "E32X4X/ifRaD/VBxtG",
+          "name": "Button label",
+          "type": "text",
+          "bounds": {
+            "x": 620,
+            "y": 279,
+            "width": 52,
+            "height": 20
+          },
+          "content": "Reopen",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#1B3A28"
+        }
+      ]
+    },
+    {
+      "id": "uJu1t",
+      "name": "09 · MCP · save error",
+      "story": "work-items-workspace--mcp-error",
+      "nodes": [
+        {
+          "id": "uJu1t",
+          "name": "09 · MCP · save error",
+          "type": "frame",
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 720,
+            "height": 520
+          },
+          "fill": "#F5F3EE"
+        },
+        {
+          "id": "E5gdX",
+          "name": "MCP header",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 32,
+            "width": 656,
+            "height": 101
+          }
+        },
+        {
+          "id": "E5gdX/kGi80",
+          "name": "Product label",
+          "type": "text",
+          "bounds": {
+            "x": 32,
+            "y": 32,
+            "width": 131,
+            "height": 17
+          },
+          "content": "ASTACK REFERENCE",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "E5gdX/bk71k",
+          "name": "Page title",
+          "type": "text",
+          "bounds": {
+            "x": 32,
+            "y": 61,
+            "width": 156,
+            "height": 36
+          },
+          "content": "Work items",
+          "fontFamily": "Inter",
+          "fontSize": 30,
+          "fontWeight": "600",
+          "lineHeight": 1.2,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "E5gdX/Sc7Z3",
+          "name": "Page subtitle",
+          "type": "text",
+          "bounds": {
+            "x": 32,
+            "y": 109,
+            "width": 656,
+            "height": 24
+          },
+          "content": "Keep a clear record of what needs doing.",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "ZCIvP",
+          "name": "Saving error",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 157,
+            "width": 656,
+            "height": 53
+          },
+          "fill": "#FFF2EF"
+        },
+        {
+          "id": "ZCIvP/V8oNth",
+          "name": "Notice label",
+          "type": "text",
+          "bounds": {
+            "x": 52,
+            "y": 173,
+            "width": 616,
+            "height": 21
+          },
+          "content": "Saving failed. Your work item has not been confirmed as changed.",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#A42E29"
+        },
+        {
+          "id": "mRpGW",
+          "name": "MCP list",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 234,
+            "width": 656,
+            "height": 176
+          }
+        },
+        {
+          "id": "FlMs4",
+          "name": "MCP open work",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 234,
+            "width": 656,
+            "height": 88
+          }
+        },
+        {
+          "id": "FlMs4/x8e1s1",
+          "name": "Status · circle",
+          "type": "icon",
+          "bounds": {
+            "x": 32,
+            "y": 268,
+            "width": 20,
+            "height": 20
+          },
+          "fill": "#2D5E3A"
+        },
+        {
+          "id": "FlMs4/gDxTo",
+          "name": "Item text",
+          "type": "frame",
+          "bounds": {
+            "x": 68,
+            "y": 254,
+            "width": 499,
+            "height": 48
+          }
+        },
+        {
+          "id": "FlMs4/lshDi",
+          "name": "Item title",
+          "type": "text",
+          "bounds": {
+            "x": 68,
+            "y": 254,
+            "width": 499,
+            "height": 24
+          },
+          "content": "Confirm the acceptance cases",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "FlMs4/A3kWrB",
+          "name": "Item status",
+          "type": "text",
+          "bounds": {
+            "x": 68,
+            "y": 282,
+            "width": 108,
+            "height": 20
+          },
+          "content": "Ready to work on",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "FlMs4/ifRaD",
+          "name": "Status action",
+          "type": "frame",
+          "bounds": {
+            "x": 583,
+            "y": 256,
+            "width": 105,
+            "height": 44
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "FlMs4/ifRaD/VBxtG",
+          "name": "Button label",
+          "type": "text",
+          "bounds": {
+            "x": 599,
+            "y": 268,
+            "width": 73,
+            "height": 20
+          },
+          "content": "Mark done",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "xTfzQ",
+          "name": "MCP completed work",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 322,
+            "width": 656,
+            "height": 88
+          }
+        },
+        {
+          "id": "xTfzQ/x8e1s1",
+          "name": "Status · circle",
+          "type": "icon",
+          "bounds": {
+            "x": 32,
+            "y": 356,
+            "width": 20,
+            "height": 20
+          },
+          "fill": "#2D5E3A"
+        },
+        {
+          "id": "xTfzQ/gDxTo",
+          "name": "Item text",
+          "type": "frame",
+          "bounds": {
+            "x": 68,
+            "y": 342,
+            "width": 520,
+            "height": 48
+          }
+        },
+        {
+          "id": "xTfzQ/lshDi",
+          "name": "Item title",
+          "type": "text",
+          "bounds": {
+            "x": 68,
+            "y": 342,
+            "width": 520,
+            "height": 24
+          },
+          "content": "Retain the running-product evidence",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "xTfzQ/A3kWrB",
+          "name": "Item status",
+          "type": "text",
+          "bounds": {
+            "x": 68,
+            "y": 370,
+            "width": 68,
+            "height": 20
+          },
+          "content": "Completed",
+          "fontFamily": "Inter",
+          "fontSize": 13,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "xTfzQ/ifRaD",
+          "name": "Status action",
+          "type": "frame",
+          "bounds": {
+            "x": 604,
+            "y": 344,
+            "width": 84,
+            "height": 44
+          },
+          "fill": "#FFFFFF"
+        },
+        {
+          "id": "xTfzQ/ifRaD/VBxtG",
+          "name": "Button label",
+          "type": "text",
+          "bounds": {
+            "x": 620,
+            "y": 356,
+            "width": 52,
+            "height": 20
+          },
+          "content": "Reopen",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#1B3A28"
+        }
+      ]
+    },
+    {
+      "id": "ZZhmK",
+      "name": "10 · MCP · empty",
+      "story": "work-items-workspace--mcp-empty",
+      "nodes": [
+        {
+          "id": "ZZhmK",
+          "name": "10 · MCP · empty",
+          "type": "frame",
+          "bounds": {
+            "x": 0,
+            "y": 0,
+            "width": 720,
+            "height": 520
+          },
+          "fill": "#F5F3EE"
+        },
+        {
+          "id": "JD7un",
+          "name": "MCP header",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 32,
+            "width": 656,
+            "height": 101
+          }
+        },
+        {
+          "id": "JD7un/kGi80",
+          "name": "Product label",
+          "type": "text",
+          "bounds": {
+            "x": 32,
+            "y": 32,
+            "width": 131,
+            "height": 17
+          },
+          "content": "ASTACK REFERENCE",
+          "fontFamily": "Inter",
+          "fontSize": 11,
+          "fontWeight": "600",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "JD7un/bk71k",
+          "name": "Page title",
+          "type": "text",
+          "bounds": {
+            "x": 32,
+            "y": 61,
+            "width": 156,
+            "height": 36
+          },
+          "content": "Work items",
+          "fontFamily": "Inter",
+          "fontSize": 30,
+          "fontWeight": "600",
+          "lineHeight": 1.2,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "JD7un/Sc7Z3",
+          "name": "Page subtitle",
+          "type": "text",
+          "bounds": {
+            "x": 32,
+            "y": 109,
+            "width": 656,
+            "height": 24
+          },
+          "content": "Keep a clear record of what needs doing.",
+          "fontFamily": "Inter",
+          "fontSize": 16,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "xEGoG",
+          "name": "MCP list",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 157,
+            "width": 656,
+            "height": 186
+          }
+        },
+        {
+          "id": "dj3OE",
+          "name": "MCP empty list",
+          "type": "frame",
+          "bounds": {
+            "x": 32,
+            "y": 157,
+            "width": 656,
+            "height": 186
+          }
+        },
+        {
+          "id": "dj3OE/SLq8D",
+          "name": "Empty list icon",
+          "type": "icon",
+          "bounds": {
+            "x": 346,
+            "y": 205,
+            "width": 28,
+            "height": 28
+          },
+          "fill": "#4A6B52"
+        },
+        {
+          "id": "dj3OE/KS17O",
+          "name": "Empty heading",
+          "type": "text",
+          "bounds": {
+            "x": 287.5,
+            "y": 241,
+            "width": 145,
+            "height": 25
+          },
+          "content": "Nothing here yet",
+          "fontFamily": "Inter",
+          "fontSize": 18,
+          "fontWeight": "600",
+          "lineHeight": 1.4,
+          "fill": "#1B3A28"
+        },
+        {
+          "id": "dj3OE/l0yMS",
+          "name": "Empty instruction",
+          "type": "text",
+          "bounds": {
+            "x": 234,
+            "y": 274,
+            "width": 252,
+            "height": 21
+          },
+          "content": "Ask your assistant to add a work item.",
+          "fontFamily": "Inter",
+          "fontSize": 14,
+          "fontWeight": "normal",
+          "lineHeight": 1.5,
+          "fill": "#4A6B52"
+        }
+      ]
+    }
+  ]
+}

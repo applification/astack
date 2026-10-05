@@ -2,6 +2,8 @@
 
 The foundation PR establishes a supported project, executable checks and observed delivery trials. These later capabilities remain separate work under the [iteration plan](https://chatgpt.com/space/page_b11134b1d1708191adcbfc59518d1580). Their implementation and integration behavior are unverified.
 
+These milestones span both loops. Specialist selection, coordination, role guidance and portable assignment/result contracts belong to astack. The external chief-of-staff host owns persistent signal collection, prioritisation, deduplication, dispatch and outcome follow-up. An astack assignment can use Slack/PostHog evidence; ongoing monitoring and commissioning live in the outer host. Deferred from this PR does not mean outside the kitchen's goal or, for specialist guidance, outside astack's remit.
+
 | Later milestone | Required result and integration evidence |
 | --- | --- |
 | Specialist selection and portable handoffs | Preserve the public entry and delivery routes. Define each specialist's trigger, scope, context, permitted actions, proof, report and escalation. Keep references behind the entry unless an independent skill has a concrete use. Define assignment, specialist contribution and consolidated result contracts with stable work identity, acceptance, revision, environment, findings, gaps and permitted autonomy. Support hosts with and without delegation and retain independent-review gaps. |

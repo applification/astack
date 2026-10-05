@@ -44,6 +44,10 @@ jobs:
         run: |
           cd "$RUNNER_TEMP/astack-foundation"
           bun run readiness
+      - name: Render against the Pen design
+        run: |
+          cd "$RUNNER_TEMP/astack-foundation"
+          bun run design:verify
       - name: Retain first failure and redacted observations
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

@@ -2,6 +2,8 @@
 
 Use this profile for a new product that needs persistent shared behavior on web and MCP. The [work-item reference](https://github.com/applification/astack/tree/main/examples/foundation) makes the profile concrete: React + TypeScript + Vite, Convex persistence and MCP serving, WorkOS authentication, and portable presentation components. It is a worked starting point, not a requirement to add every surface to a small tool. An existing product retains its working stack unless migration is requested. Follow [project setup](project-setup.md), [database](database.md), [web UI](web-feature.md), and [MCP](mcp-server.md) guidance only at the boundaries the task changes.
 
+The reference includes a Pen (pen.dev) visual design in `.astack/design/` inside the generated project. Read its design record, selected frames and exported handoff before implementing UI. Its shared components and web/MCP states demonstrate design → code → rendered proof. `bun run design:verify` builds the generated project's own Storybook, compares dimensions, typography and semantic surfaces against the MCP-extracted specification and retains screenshots for visual review. Keep those fixture observations separate from `readiness` persistence, authorization and host-lifecycle results. For a new product, select its visual direction before extending the reference; preserve an existing project's chosen design system.
+
 ## Start from the reference
 
 From an astack checkout, generate a separate project:

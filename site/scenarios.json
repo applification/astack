@@ -46,7 +46,7 @@
   },
   {
     "request": "Start a persistent work-item app on web and MCP with no chosen stack",
-    "decision": "Use the foundation reference: Bun/Turbo, React + TypeScript + Vite, portable UI, pure domain rules, Convex data and HTTP MCP serving, and WorkOS web sessions plus Connect OAuth. Generate a separate project, exercise its scoped commands and readiness, and keep live OAuth, installed-host and fresh-agent trial gaps explicit.",
+    "decision": "Use the foundation reference: Bun/Turbo, React + TypeScript + Vite, portable UI, pure domain rules, Convex data and HTTP MCP serving, and WorkOS web sessions plus Connect OAuth. Generate a separate project, consume its selected Pen frames and exported design specification before UI changes, run design:verify with visual comparison and the scoped readiness commands, and keep live OAuth, installed-host and fresh-agent trial gaps explicit.",
     "route": "feature"
   },
   {

@@ -82,6 +82,7 @@ function CreateForm({
             <Input
               id="title"
               name="title"
+              placeholder="What needs doing?"
               value={field.state.value}
               onBlur={field.handleBlur}
               onChange={(event) => {

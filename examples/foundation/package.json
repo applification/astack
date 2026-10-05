@@ -22,6 +22,7 @@
     "readiness": "bun scripts/readiness.ts",
     "trials": "bun scripts/trials.ts",
     "storybook": "bun run --cwd packages/ui storybook",
+    "design:verify": "bun scripts/design-proof.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "verify": "bun scripts/readiness.ts",

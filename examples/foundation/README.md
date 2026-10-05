@@ -1,5 +1,7 @@
 # Convex, WorkOS and MCP foundation
 
+The shared interface is implemented from the [Pen visual design](.astack/design/README.md). Generation carries the editable `.pen`, exported frames and MCP-extracted specification into the new project. Read those inputs before changing its UI; run `bun run design:verify` for a fresh local Storybook build and nine design-derived comparisons, then inspect the retained screenshots. Running-product checks remain separate.
+
 A worked profile for a private work-item app with standalone React/Vite and MCP Apps presentation. This is a reference and repeatable starting point. The Applification plugin remains the engineering method; this app supplies a concrete environment.
 
 From a fresh checkout, use Node 24 and Bun 1.4.0:

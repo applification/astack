@@ -136,15 +136,12 @@ function McpWorkItems() {
     }
   }
   return (
-    <Workspace>
-      {error && (
-        <p role="alert" className="error">
-          {error}
-        </p>
-      )}
+    <Workspace embedded>
+      {error && <Notice tone="error">{error}</Notice>}
       {items ? (
         <WorkItemList
           items={items}
+          emptyMessage="Ask your assistant to add a work item."
           {...(pendingId ? { pendingId } : {})}
           onStatusChange={(item) => {
             toggle(item).catch((failure: unknown) => {
