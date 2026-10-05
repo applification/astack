@@ -4,6 +4,8 @@ Independent review reported no actionable findings at commit `baa74729f5c2b120be
 
 R1–R8 passed against an isolated local Convex deployment, disposable signed RS256 identities, Vite, Chromium and the standard AppBridge host. The checks cover running revision identity, independent persisted reads after web and MCP actions, owner isolation, invalid credentials and arguments, self-contained resource packaging, host styles/remount/teardown and runtime errors. Cleanup is recorded as complete.
 
+Historical coverage correction: the original R4 observation overstates second-user MCP read coverage. This verifier checked another user's Convex read isolation and MCP mutation denial; it did not call MCP list as that second user. The original report and scores remain preserved. Its R4 pass does not establish that additional read case.
+
 G1 remains skipped: live WorkOS sign-in, refresh and organization lifecycle were not exercised. G2 remains skipped: installed ChatGPT OAuth, tool selection and UI behavior were not exercised.
 
 [Host observations](mcp-host-observations.json) record two mounts, two teardown acknowledgements, four closed owned connections and no uncaught App errors. The browser's 405 messages are expected responses to unsupported SSE GET requests on this stateless JSON transport; aborted requests accompany owned connection teardown. These messages are retained separately from uncaught App errors.
