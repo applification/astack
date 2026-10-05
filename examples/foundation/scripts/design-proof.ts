@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve, sep } from 'node:path';
 import { parseArgs } from 'node:util';
-import { chromium, type Browser } from 'playwright';
+import { chromium, type Browser, type Page } from 'playwright';
 import { z } from 'zod';
 import { foundationRoot, revisionIdentity } from './runtime';
 import { sourceDigest } from './source-identity';
@@ -133,7 +133,7 @@ export async function designProof(options: {
     for (const frame of spec.frames) {
       const size = frame.nodes[0];
       assert.ok(size);
-      const page = await browser.newPage({
+      const page: Page = await browser.newPage({
         viewport: { width: size.bounds.width, height: size.bounds.height },
       });
       const errors: string[] = [];
