@@ -901,6 +901,7 @@ if (prompt.includes('cap-probe')) {
   writeFileSync(finalPath, JSON.stringify({...${JSON.stringify(delivery)}, summary:'Checked WORKOS_API_KEY=private-final-value and quoted "result".', checks:['Bearer private-final-bearer'], ...(prompt.includes('invalid') ? {WORKOS_API_KEY:'private-extra-value'} : {})}));
   console.log(JSON.stringify({type:'turn.completed',usage:{input_tokens:20,output_tokens:5}}));
 } else {
+  if (prompt.includes('plugin-startup-probe')) console.error('failed to load plugin: invalid plugin name');
   writeFileSync(finalPath, JSON.stringify(args[args.indexOf('-s') + 1] === 'read-only' ? ${JSON.stringify(review)} : ${JSON.stringify(delivery)}));
   console.log(JSON.stringify({type:'turn.completed',usage:{input_tokens:20,output_tokens:5}}));
 }
@@ -928,6 +929,21 @@ if (prompt.includes('cap-probe')) {
       expect(
         await readFile(join(directory, 'completed/events.jsonl'), 'utf8'),
       ).toContain('turn.completed');
+      const failedPlugin = await runAgent({
+        cwd: directory,
+        directory: join(directory, 'failed-plugin'),
+        prompt: 'plugin-startup-probe',
+        config: ['-c', 'plugins={"applification@fixture"={enabled=true}}'],
+        model: 'fixture-model',
+        timeoutMs: 2000,
+      });
+      expect(failedPlugin.exitCode).toBe(0);
+      expect(failedPlugin.final).toEqual(delivery);
+      expect(failedPlugin.outcome).toBe('inconclusive');
+      expect(
+        reviewGate(failedPlugin, completed(review), { outcome: 'pass' })
+          .outcome,
+      ).toBe('inconclusive');
       for (const invalid of [false, true]) {
         const name = invalid ? 'invalid-final' : 'valid-final';
         const result = await runAgent({

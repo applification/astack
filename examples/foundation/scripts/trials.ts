@@ -480,7 +480,12 @@ export async function runAgent(options: {
   } catch {}
   return {
     outcome:
-      termination !== 'normal' || !events.started || !events.completed || !final
+      termination !== 'normal' ||
+      !events.started ||
+      !events.completed ||
+      !final ||
+      (options.config.some((entry) => entry.startsWith('plugins')) &&
+        stderr.includes('failed to load plugin'))
         ? 'inconclusive'
         : exitCode === 0 && !events.failed
           ? 'completed'
@@ -1150,7 +1155,7 @@ export async function runTrials(options: {
       '-c',
       `marketplaces.${marketplace}.source=${JSON.stringify(snapshot)}`,
       '-c',
-      `plugins."applification@${marketplace}".enabled=true`,
+      `plugins={"applification@${marketplace}"={enabled=true}}`,
     ];
     const expected = await fileDigests(join(snapshot, 'plugins/applification'));
     const versionEntries = await Promise.all(
