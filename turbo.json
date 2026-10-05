@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "storybook-static/**"]
+    },
+    "dev": { "cache": false, "persistent": true }
+  }
+}

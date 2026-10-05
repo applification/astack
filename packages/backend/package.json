@@ -1,0 +1,20 @@
+{
+  "name": "@astack/observatory-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./api": "./convex/_generated/api.ts",
+    "./types": "./convex/_generated/dataModel.ts"
+  },
+  "dependencies": {
+    "@astack/agent-observability": "workspace:*",
+    "convex": "1.46.0",
+    "jose": "6.2.12",
+    "zod": "4.6.5"
+  },
+  "scripts": {
+    "codegen": "convex codegen",
+    "deploy": "convex dev --once"
+  }
+}

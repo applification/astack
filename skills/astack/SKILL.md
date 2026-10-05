@@ -24,3 +24,7 @@ Carry outcome, scope, acceptance, authority and completed observations between s
 For actual delegation, use [specialist contributions](references/specialists.md) to bound the question, context, actions, proof and escalation. Keep one writer per worktree; assess returned findings before integrating. Without delegation, apply the selected expertise sequentially and disclose self-review where independence matters.
 
 Use [portable handoffs](references/handoffs.md) and [examples](references/handoff-examples.md) for delegated briefs or COS assignments/results. Preserve supplied work/attempt identities, revision/environment, authority and execution limits. Ordinary direct requests need no separate contract record or role roster. astack owns the engineering method and handoff meanings; the external COS host owns durable records, priorities, dispatch, deduplication and follow-up. Skill selection does not grant messaging, merge, release or destructive-action authority.
+
+## Agent feedback when Observatory is installed
+
+Use [Observatory context](references/observatory.md) for stable work/session correlation and explicit workflow/outcome annotations. Automatic capture is independent of this method; telemetry must never block delivery. Keep external work ownership and capture provenance intact when using observed behavior to improve the harness.

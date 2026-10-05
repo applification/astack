@@ -1,0 +1,109 @@
+# Agent Observatory
+
+Agent Observatory is Astack’s private feedback system for coding-agent behavior. It captures persisted Codex desktop, CLI and T3-backed Codex turns, groups them by optional external work references, and shows traces and skill-version correlations. It lives in this repository. There is no COS work store or agent dispatcher in Astack today; Observatory does not create either.
+
+```mermaid
+flowchart LR
+  C[Codex homes] --> A[Codex adapter]
+  A --> L[agentlog: metadata, redaction, SQLite queue]
+  L -->|private HTTPS over Tailscale| I[Authenticated ingestion on Otis]
+  I --> V[Self-hosted Convex]
+  V --> U[Observatory: Work, Runs, Trace, Skills, Problems]
+  W[External work identity or launch context] --> L
+```
+
+## Use on Otis
+
+Open **https://otis.tail12a0a0.ts.net:8450** while connected to Tailscale. A permitted Tailscale identity can obtain a short-lived native Convex JWT. Same-host requests do not receive Tailscale identity headers; use the separate owner access key in that case:
+
+```sh
+pbcopy < "$HOME/.local/share/astack/observatory/viewer-access-key"
+```
+
+Paste it into the private access form. The UI keeps it in memory and stores neither keys nor JWTs in localStorage. The machine ingestion key cannot open the UI or query telemetry.
+
+Otis is already installed. The runtime is at `~/.local/share/astack/observatory`, the collector state at `~/.agentlog`, and two user LaunchAgents supervise capture and start the Docker deployment at login. The permanent runtime is independent of a disposable Codex worktree. Convex uses a named Docker volume and pinned backend/nginx images. Docker ports bind to loopback; Tailscale Serve exposes HTTPS ports 8450–8452 privately. Existing Serve routes are preserved; no Funnel is configured.
+
+```sh
+"$HOME/.local/share/astack/observatory/bin/agentlog" status
+docker compose --project-directory "$HOME/.local/share/astack/observatory" ps
+```
+
+The status command reports queued records, source health and forwarding health. A stopped backend does not stop the coding agent: the independent collector retains its SQLite queue and retries with backoff. Restarting the collector preserves identity, checkpoints, signatures and undelivered revisions.
+
+## What the data means
+
+| Concept | Meaning in v1 |
+| --- | --- |
+| Run | An execution attempt; one persisted Codex turn. Session and parent-session identities remain available. |
+| Completion | The agent turn ended. Engineering outcome remains `unknown` until explicitly supplied. |
+| Trace | Native item order, augmented by separately labelled hook observations. Persisted items usually have no wall-clock time. |
+| Start / duration | Native turn time when present. Legacy session-date fallbacks are labelled and have unknown run duration. |
+| Skill or instruction | Direct read action or explicit skill input. Availability in a catalog is not evidence of use. |
+| Skill hash | File content at first observation, preserved across later polls. A historical run's original version may be unavailable. |
+| Workflow | Explicitly declared workflow step. Conversation text is not guessed into a workflow. |
+| Problem | Deterministic evidence of repeated failures, failed turns, or no completion with stale persisted session activity. Interventions and long runs are additional informational findings. |
+
+The Skills view groups by kind, name, hash and provenance. Its counts span all ingested runs; drill-down selects that exact group. Run-list and Work-view totals describe loaded pages. Filters use exact values and indexed candidate pages; combined filters may need **Load more** to scan further candidates.
+
+## Privacy and coverage
+
+V1 is **metadata-only**. Prompt text, assistant text, command text/output, code, MCP arguments/results, environment dumps and hidden reasoning are withheld. The collector rejects `captureContent: true`. Tool names, exit status, durations when available, changed/read paths, skill hashes and keyed command signatures remain useful. Redaction runs again before every durable record write. Record detail and network batches have byte budgets; omission is explicit.
+
+Capture reads supported app-server methods without resuming or starting turns. It requests every source kind and separately enumerates archived threads. All persisted history is captured by default. Separate T3/Codex homes must be configured. Ephemeral, cloud-only and unpersisted sessions have no recoverable local history. Persisted token usage is unavailable. The paginated full-item API is experimental and verified with Codex **0.160.0**; inspect source health after upgrading Codex.
+
+Capability hashes skip special files, remote/cloud/protected macOS locations and reads exceeding the deadline; their hashes stay unknown. Skill reads exposed only inside an opaque composite tool call may not have direct native read evidence. Hash provenance is visible rather than reconstructed from a current checkout's commit. The system does not infer ignored/late skills without an expected-skill declaration, prove causation from correlations, or compare agents in v1.
+
+## External work and future COS integration
+
+The parent identity belongs to the external work system. It can bind a session without creating a parallel task:
+
+```sh
+agentlog link --session SESSION_ID --work AST-142 --project PROJECT_ID --url https://your-work-system.example/work/AST-142
+```
+
+Bindings update already-captured runs immediately and apply to later turns. An Astack launcher should call that binding when it receives the session identity. The optional JSON launch wrapper does this automatically from `thread.started`:
+
+```sh
+agentlog run --work AST-142 --project PROJECT_ID -- codex exec --json "Your work request"
+```
+
+The wrapper forwards stdout and the agent's exit status unchanged. Other launchers can propagate `ASTACK_WORK_ID` and `ASTACK_PROJECT_ID` through trusted hooks. Missing telemetry never changes the child exit status. This is an integration contract for a future COS; there is no existing Astack launch path to retrofit today.
+
+Explicit annotations are local and queued:
+
+```sh
+agentlog workflow --session SESSION_ID --turn TURN_ID --name implement --step verify
+agentlog outcome --session SESSION_ID --turn TURN_ID --value success
+```
+
+## Optional hooks
+
+Automatic persisted capture needs no hooks. For near-use skill hashes, intervention observations and more timing/context, install the optional asynchronous definitions and **review/trust them through Codex `/hooks`**. Native exact-hash trust is never bypassed. SessionEnd is excluded because it is synchronous even when marked async.
+
+```sh
+agentlog hooks --executable "$HOME/.local/share/astack/observatory/bin/agentlog" --install
+```
+
+Hooks write only local metadata, emit inert `{}` and fail open. Async observation times are not exact tool-start timestamps. Hooks are prepared but were not installed or trusted on Otis.
+
+## Development and operations
+
+See [MacBook setup](agent-observatory-macbook.md), [architecture decision](adr/0007-agent-observatory.md), [research](../.astack/agent-observatory/research.md), [contract](../.astack/agent-observatory/behavior-contract.md), and [verification](../.astack/agent-observatory/evidence.md).
+
+```sh
+bun install --frozen-lockfile
+bun run observatory:check
+bun run observatory:lint
+bun run observatory:build
+bun run observatory:build:storybook
+bun run observatory:test:e2e
+```
+
+`bun infra/observatory/bootstrap.ts` initializes or restores the private Otis configuration without printing credentials. `bun infra/observatory/deploy.ts` copies the UI build, atomically installs the signed collector, and registers supervision. These are Otis-specific operator scripts. The standalone collector installer is portable across machines.
+
+`bun packages/backend/scripts/verify-live.ts` checks actual native auth and stored traces. Set `OBSERVATORY_RESTART_PROOF=1` to include a backend restart/persistence check. `bun run observatory:test:live` exercises the deployed UI using the owner's key file; its private runner outputs stay ignored. Retained public screenshots use synthetic fixtures.
+
+For a changed facet projection, `bun packages/backend/scripts/rebuild-facets.ts` performs bounded internal repairs without changing source records or capability counts. For historical recapture, stop the collector, run `agentlog backfill` (or `--since ISO_DATE`), then reinstall its service. Capture keys and the durable queue are preserved.
+
+For backups use the installed Convex CLI's `convex export --path /private/backup.zip`, and separately protect the runtime configuration/signing files and collector identity/token/SQLite directory. Do not put exports in the public repository. To stop this deployment, boot out its two LaunchAgents, disable only Serve ports 8450–8452, and run `docker compose down` in the runtime directory. Keep the named volume for recovery.

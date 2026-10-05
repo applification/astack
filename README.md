@@ -125,3 +125,7 @@ astack draws on [pstack](https://github.com/cursor/plugins/tree/main/pstack), [F
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Agent Observatory
+
+[Agent Observatory](docs/agent-observatory.md) adds Astack’s private agent feedback loop: automatic persisted Codex capture, a portable metadata-only collector with offline buffering, private self-hosted Convex on Otis, and Work → Runs → Trace plus skill-version/problem views. External COS work remains optional parent context. [MacBook setup](docs/agent-observatory-macbook.md) installs only the collector on another machine; [evidence](.astack/agent-observatory/evidence.md) distinguishes live deployment, synthetic tests and remaining gaps.
