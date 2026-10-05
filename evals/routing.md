@@ -93,4 +93,17 @@ These are interpretation cases; posted explanation inspection and delivery proof
 | "Explain a proposed UI layout in a PR using an HTML illustration" | Use a focused illustration only when simpler views are inadequate; render and inspect it, label it as proposed, and include an accessible capture/artifact and text equivalent in the PR. A local path is not a shareable PR artifact; illustrative rendering does not prove product behavior. |
 | "The PR diagram describes the earlier diff after a later implementation change" | Refresh the view and source links from the current diff, inspect the posted explanation, and rerun only proof the later change could affect. Keep the explanation current without relabeling old observations as new proof. |
 
+## Domain language selection
+
+These interpretation cases cover terminology, scope and document ownership; they do not establish observed agent delivery.
+
+| Request | Expected decision |
+| --- | --- |
+| "The glossary defines cancellation for one reservation but the code cancels the whole visit" | Surface the glossary/code contradiction with source evidence and a distinguishing case. Investigate whether it is a defect or a product choice; resolve material meaning with the owner before dependent edits. Do not silently redefine cancellation to match code. |
+| "We agreed our first domain term but this project has no glossary" | Reuse any established term location; otherwise create root GLOSSARY.md now with the agreed concise definition and useful relationships or confusing alternatives. Keep acceptance and implementation detail elsewhere; do not create an empty context map or a routine ADR. |
+| "Change the billing Account concept in a repo with a GLOSSARY-MAP.md" | Follow the map to the billing glossary and relevant decisions, inspect affected code and cases, and preserve distinct meanings in other contexts. Resolve material ambiguity and reconcile changed definitions and acceptance within scope; do not flatten context glossaries. |
+| "Fix punctuation in a label that already uses the agreed domain term" | Keep the fix lightweight and use settled terminology. Run proportionate checks and prepare a concise PR; no new glossary, ADR or separate modeling session is needed. |
+| "While fixing this one screen, we agreed Reservation is the canonical term" | Record the agreed meaning promptly, then keep code changes within the authorized scope. Surface the wider rename and affected public or persisted consumers as a separate scope decision; terminology agreement alone does not authorize a repository-wide migration. |
+| "Put our cache expiry and retry implementation in GLOSSARY.md" | Keep the glossary focused on agreed domain meanings. Put operational detail in relevant project documentation; use the existing decision register only for a consequential tradeoff whose rationale merits retention. Link acceptance cases separately. |
+
 After a trial, record whether astack chose the right route, found an important missing decision, selected checks proportionately, and reported proof honestly. Fix an observed failure narrowly rather than adding more universal gates.

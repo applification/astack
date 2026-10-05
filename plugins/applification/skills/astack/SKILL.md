@@ -35,6 +35,8 @@ Read [app control and feature map](references/app-control.md) when setting up or
 
 Use [the behavior contract](references/behavior-contract.md) for substantial behavior changes. When a web design pass uses Pencil or Storybook, the contract links the chosen frames or stories to implementation and proof in a tracked `.astack/<feature>/` folder. Given/When/Then can clarify a case but is not required. Small fixes may keep the contract and the Pencil/Storybook decision in the conversation and PR.
 
+When work introduces or changes domain concepts, or terminology is ambiguous, use [domain language guidance](references/domain-modeling.md). Read the relevant existing glossary or context map, test meanings against code and concrete cases, and record agreed definitions in the project's authoritative home. Surface contradictions and unresolved choices; keep acceptance in the behavior contract and consequential rationale in the existing decision register. Create glossary or ADR files only when needed. Settled terminology in a small fix needs no separate modeling pass.
+
 ## Shared decisions
 
 - Use Bun for JavaScript dependency management and scripts in astack's greenfield default. In an existing repository, use its package manager and scripts. astack adoption does not require a package manager or workspace migration; [project setup](references/project-setup.md) covers the default and requested migrations.

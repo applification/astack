@@ -9,6 +9,8 @@ Before opening or updating a PR, inspect the full diff against the agreed intent
 
 For a change to a shared contract, persisted shape, event, or lifecycle, trace affected consumers beyond direct callers. State the fact that must hold for the change to be safe and the evidence supporting it; mark that fact unverified when the available source cannot establish it.
 
+When domain meaning changes or ambiguity was resolved, check the affected request, code, glossary, behavior contract and review explanation for consistent terms. Use [domain language guidance](domain-modeling.md); link relevant definitions and consequential decisions without putting implementation specifications in the glossary. Report unresolved meaning or residual naming drift. A routine PR using settled terms needs no glossary edit or ADR.
+
 When the PR changes Convex schema, functions, configuration, or client integration, invoke `$convex:convex-reviewer` on the completed diff before marking it ready. Check its findings against the code, fix confirmed security, authorization, validator, index, pagination, reactivity, and type-safety issues, then rerun affected checks. Record the reviewer result and any unresolved finding in the PR. If the reviewer skill is unavailable, keep the PR in draft and name that missing review; astack cannot claim the Convex review gate passed.
 
 Use an additional independent reviewer or subagent only when the change's risk or breadth justifies the extra pass and the project permits it. This is separate from the required Convex reviewer skill. Independent review remains advisory; the lead assesses each finding against actual code and intent.

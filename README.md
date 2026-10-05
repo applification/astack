@@ -51,6 +51,10 @@ When a design sprint uses Pencil, its artifacts live together in `.astack/`, whi
 
 When used, Storybook stories stay with their components in `apps/` or `packages/` and are referenced from the contract. astack does not create separate root `design/` and `docs/` folders for feature work.
 
+## Domain language
+
+When a change introduces or changes domain concepts, astack uses the project's existing glossary and concrete code/user cases to resolve ambiguous terms. It records agreed meanings promptly, keeps observable acceptance in the behavior contract, and puts consequential rationale in the existing decision register. Without an established glossary, create `GLOSSARY.md` only when the first term is agreed; follow an existing `GLOSSARY-MAP.md` for multiple contexts. Small fixes using settled terms need no extra modeling pass. See [domain language guidance](plugins/applification/skills/astack/references/domain-modeling.md).
+
 ## App control
 
 The [app control route](plugins/applification/skills/astack/references/app-control.md) creates a project-local `astack-<app>` CLI that can launch or connect to a running product, check its identity, exercise user actions, inspect results, and capture evidence. Its skill and executable script live in `.codex/skills/astack-<app>/`; a short feature map in `.astack/feature-map/<app>/` records how users reach each feature and which CLI commands drive it. Agents can invoke the script directly by path from the checkout; a package script is optional convenience, and global `PATH` setup belongs to the user. New Bun CLIs use Commander for command parsing. The CLI is built from the project's existing browser, simulator, terminal, or protocol tools; astack does not bundle one driver for every product. Setup proves the direct invocation and one mapped path end to end, and later changes update the command and map when that path changes.

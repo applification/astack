@@ -44,6 +44,8 @@ When adopting astack in an existing repository, keep its package manager, framew
 
 Inspect the actual repository first: entry points and user surfaces, package scripts or task runner, local startup and fixture commands, existing tests and CI, authentication and safe data environments, project instructions, issue/PR workflow, and the current home for durable domain terms or decisions. Reuse working paths. Confirm a proposed command from its source or by running a safe check; do not invent a command that merely sounds conventional.
 
+For domain terms, discover any existing glossary or root `GLOSSARY-MAP.md` and follow its context links. Preserve that location and format. [Domain language guidance](domain-modeling.md) covers clarifying concepts and recording agreed definitions; setup alone does not justify an empty glossary or decision register.
+
 Create or update a tracked `.astack/project.md` with only what a later agent cannot cheaply infer. For a web UI design sprint, keep the behavior contract and retained evidence under `.astack/<feature>/`, alongside the Pencil file and supporting assets when selected; Storybook stories, when selected, stay with their components and are referenced from the contract. Do not make separate root `design/` and `docs/` folders for the sprint. Check the repository's ignore rules, remove or override any rule that ignores `.astack/`, and verify the files appear in Git before treating setup as complete.
 
 ```markdown
@@ -71,6 +73,7 @@ effects such as backend changes exposed through another client.
 Where durable domain terms and consequential decisions live; which feature
 folders are active under `.astack/`; PR and release rules; actions reserved
 for the owner.
+Link the existing glossary/context map and decision register when present.
 ```
 
 Write concise paths and commands, with pointers to feature contracts and authoritative project sources. Do not copy long procedures or secrets into the profile or feature folders. astack does not prescribe an issue tracker or a universal test runner. A project may replace old guidance while adopting astack; reconcile conflicting instructions rather than leaving two active processes.
