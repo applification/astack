@@ -1,0 +1,14 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/auth.test.ts:
+(pass) official Emulate exercises seeded identity, password/session and token contracts [107.80ms]
+(pass) disposable fixtures are unique and clean up even when the test fails [72.08ms]
+(pass) a lost create response is recovered by owned external ID and cleaned up [95.56ms]
+(pass) provider runner requires explicit astack staging and rejects production credentials [0.16ms]
+(pass) Emulate cannot be enabled against cloud Convex or a remote/credentialed issuer [0.14ms]
+(pass) an authentication outage cannot be counted as rejected credentials [0.03ms]
+
+ 6 pass
+ 0 fail
+ 24 expect() calls
+Ran 6 tests across 1 file. [348.00ms]

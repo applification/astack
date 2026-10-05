@@ -47,10 +47,12 @@ export async function createDisposableUser(
 ) {
   const runId = randomUUID();
   const password = `Aa1!${randomBytes(24).toString('base64url')}`;
+  // Avoid provider domain routing (e.g. the seeded example.com SSO connection).
+  // This reserved domain has no mailbox; verification/email delivery is not under test.
   const lease = {
     runId,
     ...astackStaging,
-    email: `astack-proof+${runId}@example.com`,
+    email: `astack-proof+${runId}@auth.astack.example`,
     externalId: `astack-proof:${runId}`,
     expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
     ...(manual ? { password } : {}),
@@ -105,7 +107,7 @@ export async function recoverDisposableUser(
       JSON.stringify({
         runId,
         ...astackStaging,
-        email: `astack-proof+${runId}@example.com`,
+        email: `astack-proof+${runId}@auth.astack.example`,
         externalId: `astack-proof:${runId}`,
         expiresAt: new Date().toISOString(),
       }),
@@ -126,7 +128,7 @@ export async function cleanupDisposableUser(api: FixtureApi, path: string) {
     lease.environmentId !== astackStaging.environmentId ||
     lease.clientId !== astackStaging.clientId ||
     lease.externalId !== `astack-proof:${lease.runId}` ||
-    lease.email !== `astack-proof+${lease.runId}@example.com`
+    lease.email !== `astack-proof+${lease.runId}@auth.astack.example`
   )
     throw new Error(
       'Refusing cleanup of an identity that is not owned by this acceptance/proof run.',
