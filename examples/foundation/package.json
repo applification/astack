@@ -11,6 +11,7 @@
     "prepare": "bun scripts/install-hooks.ts",
     "hooks:install": "bun scripts/install-hooks.ts",
     "dev": "bun scripts/development.ts",
+    "setup:workos": "bun scripts/workos-setup.ts",
     "dev:backend": "bun scripts/development.ts backend",
     "development:verify": "bun scripts/development-proof.ts",
     "convex:local": "bun scripts/development.ts convex",

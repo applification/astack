@@ -16,7 +16,11 @@ export function isSourcePath(path: string): boolean {
         'storybook-static',
         'generated',
         'evidence',
+        '.agents',
+        '.claude',
+        'skills-lock.json',
       ].includes(part) ||
+      (part === '_generated' && parts[index + 1] === 'ai') ||
       (part.startsWith('.env') && part !== '.env.example') ||
       (part === '.husky' && parts[index + 1] === '_'),
   );

@@ -19,6 +19,7 @@ import {
   type Runtime,
 } from './runtime';
 import { startMcpHost } from './mcp-host';
+import { startMcpPreview } from './mcp-preview';
 
 type WorkItem = { id: string; title: string; status: 'open' | 'done' };
 type Check = {
@@ -286,6 +287,7 @@ export async function verify(
     mcp: Client | undefined,
     otherMcp: Client | undefined;
   let host: Awaited<ReturnType<typeof startMcpHost>> | undefined;
+  let preview: Awaited<ReturnType<typeof startMcpPreview>> | undefined;
   const check = async <T>(
     id: string,
     surface: string,
@@ -971,6 +973,104 @@ export async function verify(
           assert.deepEqual(consoleErrors, []);
         }),
     );
+    await check(
+      'R9',
+      'standalone MCP development preview',
+      'Opening the development URL shows a connection action without host errors; a signed local fixture loads the actual MCP resource, changes persisted status, refreshes and disconnects. OAuth state mismatch is rejected. Live WorkOS remains separate.',
+      async () => {
+        preview = await startMcpPreview(active);
+        const errors: string[] = [];
+        const previewPage = await liveBrowser.newPage();
+        previewPage.on('pageerror', (error) => errors.push(error.message));
+        await previewPage.goto(preview.url);
+        await previewPage
+          .getByRole('button', { name: 'Connect with WorkOS', exact: true })
+          .waitFor();
+        assert.ok(
+          !(await previewPage.locator('body').innerText()).includes(
+            'Method not found',
+          ),
+        );
+        assert.ok(
+          !(await previewPage.locator('body').innerText()).includes(
+            'Waiting for the host',
+          ),
+        );
+        const foreign = await fetch(`${preview.url}/__mcp/mcp`, {
+          method: 'POST',
+          headers: { origin: 'http://foreign.invalid' },
+          body: '{}',
+        });
+        assert.equal(foreign.status, 403);
+        await previewPage.goto(
+          `${preview.url}/?code=untrusted-callback&state=wrong`,
+        );
+        await previewPage
+          .getByRole('status')
+          .filter({ hasText: 'Sign-in state did not match' })
+          .waitFor();
+        assert.equal(new URL(previewPage.url()).search, '');
+        await previewPage.evaluate(
+          ({ endpoint, token }) => {
+            sessionStorage.setItem(
+              `astack-mcp-preview:${endpoint}:tokens`,
+              JSON.stringify({ access_token: token, token_type: 'Bearer' }),
+            );
+          },
+          { endpoint: active.mcpUrl, token: active.tokens.mcp },
+        );
+        await previewPage.reload();
+        await previewPage
+          .getByRole('status')
+          .filter({ hasText: 'Connected to local Convex through MCP' })
+          .waitFor();
+        const frame = previewPage.frameLocator('iframe');
+        const before = items(await owner.query(list, {})).find(
+          (value) => value.id === item.id,
+        );
+        assert.ok(before);
+        await frame.getByText(before.title, { exact: true }).waitFor();
+        await frame
+          .getByRole('button', {
+            name: before.status === 'open' ? 'Mark done' : 'Reopen',
+            exact: true,
+          })
+          .click();
+        await waitFor(
+          async () =>
+            items(await owner.query(list, {})).find(
+              (value) => value.id === item.id,
+            )?.status === (before.status === 'open' ? 'done' : 'open')
+              ? true
+              : false,
+          'persisted standalone preview change',
+        );
+        await previewPage
+          .getByRole('button', { name: 'Refresh work items', exact: true })
+          .click();
+        await frame
+          .getByRole('button', {
+            name: before.status === 'open' ? 'Reopen' : 'Mark done',
+            exact: true,
+          })
+          .waitFor();
+        await previewPage.screenshot({
+          path: join(evidence, 'development-mcp-preview.png'),
+          fullPage: true,
+        });
+        report.artifacts.push('development-mcp-preview.png');
+        await previewPage
+          .getByRole('button', { name: 'Disconnect', exact: true })
+          .click();
+        await previewPage
+          .getByRole('status')
+          .filter({ hasText: 'Disconnected.' })
+          .waitFor();
+        assert.equal(await previewPage.locator('iframe').count(), 0);
+        assert.deepEqual(errors, []);
+        await previewPage.close();
+      },
+    );
     report.checks.push(
       {
         id: 'G1',
@@ -1006,6 +1106,7 @@ export async function verify(
       () => otherMcp?.close(),
       () => mcp?.close(),
       () => host?.stop(),
+      () => preview?.stop(),
       () => browser?.close(),
       () => runtime?.stop(),
     ]) {

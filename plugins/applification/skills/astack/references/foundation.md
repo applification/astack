@@ -44,6 +44,8 @@ For new React forms, consult [TanStack Form validation](https://tanstack.com/for
 
 ## Identity across web and MCP
 
+For local startup, use `bun run setup:workos --client-id client_... --authkit-domain https://YOUR-DOMAIN.authkit.app` to save public configuration; `bun dev` applies it to local Convex and supplies client URLs. With authorized WorkOS tools, automate staging sandbox selection and dashboard settings first: inspect existing values, preserve unrelated URLs, register the printed web/preview callbacks and CORS origins, enable DCR and register the exact local MCP resource. Use the default AuthKit application's ID with application-specific redirect/logout mutations, then verify with a fresh query. No browser API key is required. The generated README specifies the ports and setup details. Port 5174 opens a development AppBridge host with real MCP OAuth, rather than a bare App resource. Exact loopback local resources are supported; external access uses HTTPS. Setup and a rendered connection action alone do not prove completed provider OAuth.
+
 Use WorkOS AuthKit for the web session and [WorkOS Connect for MCP OAuth](https://workos.com/docs/authkit/mcp). They share the user identity system, but have different token contracts. Follow [Convex's AuthKit integration](https://docs.convex.dev/auth/authkit/add-to-app) for the selected web framework. Gate authenticated Convex reads on Convex's validated authentication state.
 
 For MCP, configure the actual resource URL, discovery metadata, issuer, keys, and audience. Validate the resource token where the HTTP request enters, then run backend operations with that authenticated identity. Recheck ownership at the data operation. Do not forward a bearer token to another resource or substitute a web session token. Scopes and user permissions are separate checks; follow [WorkOS's Connect token claims](https://workos.com/docs/authkit/connect/token-claims) for the chosen permission model.
@@ -62,6 +64,7 @@ These are the reference project's commands, run from its root. Existing projects
 | `bun run development:verify` | Check ordinary local startup, the served frontend URL, data/configuration after restart and private export in an owned copy; CLI test identity does not establish provider login. |
 | `bun run readiness` | Exercise a disposable local deployment with signed proof identities and real reference behavior. Read the retained evidence and missing layers. |
 | `bun run dev` | Start persistent local Convex and clients; preserve state and reject cloud targets. Follow local WorkOS setup. |
+| `bun run setup:workos --client-id <id> --authkit-domain <issuer>` | Save a selected sandbox's public configuration to ignored local files; preserve other settings and refuse conflicts. Dashboard configuration remains a WorkOS tool/account step. |
 | `bun run dev:backend` | Start persistent local Convex without clients for configuration/data operations. |
 | `bun run convex:local -- <command>` | Guard local env/run/data/export/import commands against target overrides; requires the backend running. |
 

@@ -30,4 +30,7 @@ export class HttpTransport implements Transport {
   close(): Promise<void> {
     return this.transport.close();
   }
+  finishAuth(code: string): Promise<void> {
+    return this.transport.finishAuth(code);
+  }
 }

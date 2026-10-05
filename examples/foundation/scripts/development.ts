@@ -40,7 +40,7 @@ function assertLoopback(value: string): string {
   return value;
 }
 
-async function readSettings(path: string): Promise<NodeJS.ProcessEnv> {
+export async function readSettings(path: string): Promise<NodeJS.ProcessEnv> {
   try {
     return parseEnv(await readFile(path, 'utf8'));
   } catch (error) {
@@ -76,7 +76,54 @@ export async function localClientEnvironment(
     throw new Error(
       'Start the local backend before its clients; its .env.local must identify the local deployment and CONVEX_URL.',
     );
-  return { ...env, VITE_CONVEX_URL: assertLoopback(url) };
+  const web = await readSettings(join(root, 'apps/web/.env.local'));
+  const site = values.CONVEX_SITE_URL;
+  return {
+    ...env,
+    ...(web.VITE_WORKOS_CLIENT_ID
+      ? { VITE_WORKOS_CLIENT_ID: web.VITE_WORKOS_CLIENT_ID }
+      : {}),
+    VITE_CONVEX_URL: assertLoopback(url),
+    ...(site ? { VITE_MCP_URL: `${assertLoopback(site)}/mcp` } : {}),
+  };
+}
+
+export async function ensureConvexAiFiles(
+  directory: string,
+  env: NodeJS.ProcessEnv,
+): Promise<void> {
+  const state = Bun.file(
+    join(directory, 'convex/_generated/ai/ai-files.state.json'),
+  );
+  if (
+    (await state.exists()) &&
+    (await Bun.file(
+      join(directory, 'convex/_generated/ai/guidelines.md'),
+    ).exists())
+  )
+    return;
+  const config: unknown = JSON.parse(
+    await readFile(join(directory, 'convex.json'), 'utf8'),
+  );
+  if (
+    typeof config === 'object' &&
+    config !== null &&
+    'aiFiles' in config &&
+    typeof config.aiFiles === 'object' &&
+    config.aiFiles !== null &&
+    'enabled' in config.aiFiles &&
+    config.aiFiles.enabled === false
+  )
+    return;
+  const code = await run(
+    ['bunx', '--no-install', 'convex', 'ai-files', 'install'],
+    directory,
+    env,
+  );
+  if (code !== 0 || !(await state.exists()))
+    throw new Error(
+      'Convex AI setup did not complete. Retry bunx convex ai-files install in packages/backend.',
+    );
 }
 
 export function localCommand(args: string[]): string[] {
@@ -222,6 +269,23 @@ async function initializeLocalAuth(env: NodeJS.ProcessEnv): Promise<void> {
   })) {
     if (!names.has(name)) await capture(['env', 'set', name, value]);
   }
+  const settings = await readSettings(join(backend, '.env.local'));
+  if (settings.WORKOS_CLIENT_ID && settings.WORKOS_AUTHKIT_DOMAIN) {
+    const site = settings.CONVEX_SITE_URL;
+    if (!site)
+      throw new Error('The local deployment must save CONVEX_SITE_URL.');
+    for (const [name, value] of Object.entries({
+      WORKOS_CLIENT_ID: settings.WORKOS_CLIENT_ID,
+      WORKOS_AUTHKIT_DOMAIN: settings.WORKOS_AUTHKIT_DOMAIN,
+      MCP_RESOURCE_URL: `${assertLoopback(site)}/mcp`,
+      WEB_ORIGIN: 'http://127.0.0.1:5173',
+      ASTACK_PROOF_MODE: 'disabled',
+    }))
+      await capture(['env', 'set', name, value]);
+  } else
+    console.log(
+      'WorkOS is not configured. Run bun run setup:workos --client-id client_... --authkit-domain https://YOUR-DOMAIN.authkit.app, or ask astack to configure a staging sandbox.',
+    );
   const revision =
     Bun.spawnSync(['git', 'rev-parse', 'HEAD'], { cwd: root })
       .stdout.toString()
@@ -266,6 +330,7 @@ if (import.meta.main) {
     if (args.length)
       throw new Error('Local startup takes no deployment overrides.');
     const env = await localEnvironment(backend);
+    await ensureConvexAiFiles(backend, env);
     const saved = await readSettings(join(backend, '.env.local'));
     if (saved.CONVEX_URL && (await backendListening(saved.CONVEX_URL)))
       throw new Error(

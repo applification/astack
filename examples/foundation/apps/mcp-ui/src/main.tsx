@@ -158,4 +158,15 @@ function McpWorkItems() {
 }
 const root = document.getElementById('root');
 if (!root) throw new Error('Missing MCP UI root.');
-createRoot(root).render(<McpWorkItems />);
+createRoot(root).render(
+  window.parent === window ? (
+    <Workspace embedded>
+      <Notice>
+        Open this MCP App in a host. For local development, run bun dev and open
+        the MCP App preview at http://127.0.0.1:5174/.
+      </Notice>
+    </Workspace>
+  ) : (
+    <McpWorkItems />
+  ),
+);

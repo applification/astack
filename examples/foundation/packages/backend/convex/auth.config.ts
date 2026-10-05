@@ -1,6 +1,10 @@
 import type { AuthConfig } from 'convex/server';
 
-import { isLoopbackUrl, localProofEnabled } from './lib/identity';
+import {
+  isLoopbackUrl,
+  isLocalMcpResource,
+  localProofEnabled,
+} from './lib/identity';
 
 const providers: AuthConfig['providers'] = [];
 
@@ -58,10 +62,11 @@ if (localProofEnabled()) {
   if (issuer && applicationID) {
     if (
       new URL(issuer).protocol !== 'https:' ||
-      new URL(applicationID).protocol !== 'https:'
+      (new URL(applicationID).protocol !== 'https:' &&
+        !isLocalMcpResource(process.env.CONVEX_SITE_URL, applicationID))
     ) {
       throw new Error(
-        'WorkOS MCP authentication requires HTTPS issuer and resource URLs.',
+        'WorkOS requires an HTTPS issuer and an HTTPS resource, or the exact loopback origin of a local Convex deployment.',
       );
     }
     providers.push({

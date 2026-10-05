@@ -7,3 +7,7 @@ node_modules/
 **/.env*
 !**/.env.example
 packages/backend/convex/generated/
+packages/backend/convex/_generated/ai/
+packages/backend/.agents/
+packages/backend/.claude/
+packages/backend/skills-lock.json

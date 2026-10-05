@@ -24,6 +24,7 @@ import {
 } from './runtime';
 import { isSourcePath } from './source-identity';
 import { descendants } from './trials';
+import { chromium, type Browser } from 'playwright';
 
 // This owns a copy, never the developer's persistent database or environment.
 const privateDirectory = await mkdtemp(
@@ -37,6 +38,7 @@ const env = localEnvironment();
 const observations: Record<string, unknown> = {};
 let owned: ReturnType<typeof launch> | undefined;
 let failure: unknown;
+let browser: Browser | undefined;
 const describe = (error: unknown): string =>
   error instanceof Error
     ? error.message
@@ -141,6 +143,53 @@ try {
     await command(['bun', 'install', '--frozen-lockfile'], project, env),
   );
   await start();
+  browser = await chromium.launch();
+  const page = await browser.newPage();
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.goto('http://127.0.0.1:5173/');
+  await page
+    .getByText(
+      'Connect a WorkOS staging sandbox to sign in to your private work items.',
+      { exact: true },
+    )
+    .waitFor();
+  if (
+    !(await page.locator('body').innerText()).includes('bun run setup:workos')
+  )
+    throw new Error('First-run web did not explain the setup action.');
+  await page.screenshot({
+    path: join(output, 'first-run-web.png'),
+    fullPage: true,
+  });
+  await page.goto('http://127.0.0.1:5174/');
+  await page
+    .getByRole('button', { name: 'Connect with WorkOS', exact: true })
+    .waitFor();
+  const text = await page.locator('body').innerText();
+  if (
+    text.includes('Method not found') ||
+    text.includes('Waiting for the host') ||
+    errors.length
+  )
+    throw new Error(
+      'First-run clients still report a missing host or runtime error.',
+    );
+  await page.screenshot({
+    path: join(output, 'first-run-mcp-preview.png'),
+    fullPage: true,
+  });
+  observations.firstRunSurfaces =
+    'Unconfigured web gives the one-time WorkOS setup action; MCP preview opens its connection host without protocol/runtime errors.';
+  const aiState = await Bun.file(
+    join(project, 'packages/backend/convex/_generated/ai/ai-files.state.json'),
+  ).exists();
+  if (!aiState)
+    throw new Error('First startup did not install Convex AI files.');
+  observations.aiSetup =
+    'Managed AI files installed automatically without an interactive prompt; scoped instructions preserved.';
+  await browser.close();
+  browser = undefined;
   observations.firstStartup =
     'persistent local Convex; clients received loopback URL; no Convex account or deploy key supplied';
   const created = WorkItemSchema.parse(
@@ -220,6 +269,7 @@ try {
   failure = error;
 } finally {
   try {
+    await browser?.close();
     await stop();
     await rm(privateDirectory, { recursive: true, force: true });
     observations.cleanup = 'complete';

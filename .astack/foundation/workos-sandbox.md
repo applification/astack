@@ -1,6 +1,6 @@
 # astack WorkOS sandbox
 
-Observed on 2026-10-04 through the connected WorkOS management operations and public OAuth discovery. This is provider configuration evidence; live login and MCP OAuth have not been completed.
+Observed on 2026-10-04 and updated on 2026-10-05 through connected WorkOS management operations and public OAuth discovery. Configuration and browser authorization entry were observed; completed live login and MCP OAuth remain unverified.
 
 | Resource | Verified value |
 | --- | --- |
@@ -23,6 +23,10 @@ A disposable public OAuth client registered through `/oauth2/register` with HTTP
 
 The web sandbox has no custom authentication API domain. [WorkOS's React guidance](https://workos.com/docs/authkit/react) requires `AuthKitProvider devMode={true}` for that development setup; the AuthKit hosted issuer is not itself a custom authentication API domain. The SPA must explicitly opt into that development mode and use the registered callback. Access-token refresh, logout and the actual Convex user identity still need live verification.
 
-[WorkOS's MCP guidance](https://workos.com/docs/authkit/mcp) requires the deployed MCP endpoint as a Resource Indicator so tokens carry its exact audience. CIMD is enabled following WorkOS's current recommendation, with DCR retained for client compatibility. Configure the resource only once its actual public HTTPS URL exists. No loopback HTTPS resource was invented. Consent, token refresh, exact-audience verification and installed-host behavior remain gaps.
+[WorkOS's MCP guidance](https://workos.com/docs/authkit/mcp) requires the actual MCP endpoint as a Resource Indicator so tokens carry its exact audience. CIMD is enabled following WorkOS's current recommendation, with DCR retained for client compatibility. On 5 October, the provider accepted and read back the exact local resource `http://127.0.0.1:3211/mcp`, marked default. External access still requires the chosen HTTPS resource. The reference permits HTTP only at the local Convex site's exact loopback origin and `/mcp`. Consent, token refresh, exact-audience token issuance and installed-host behavior remain gaps.
+
+The default AuthKit application `app_01M44GM0YB4RMXZQFRSDQ84AB7` now preserves both 5173 callbacks/logout URLs and adds both 5174 callbacks/logout URLs, with matching localhost and 127.0.0.1 CORS origins. Environment-level `setRedirectUris` rejected the existing IDs; the application-specific mutation succeeded using the exact application ID. Fresh readback confirmed the saved settings. The public client ID and issuer were saved to ignored browser/backend local files through `setup:workos`; startup applied them to persistent local Convex, whose health reports WorkOS mode and the loopback resource. No cloud Convex deployment was created.
+
+Actual Chromium visits to web 5173 and MCP preview 5174 showed the sign-in/connection actions and reached this sandbox's hosted sign-in page without uncaught page errors. The MCP preview's disposable public DCR client was `client_01M45R09FHS43C4BTE43B8TD3Y` / `app_01M45R09FHEY687WRDCSB27J45`; it was removed after the smoke check. This establishes browser discovery/registration/authorization entry, not successful login, consent, token issuance or refresh. Owner-operated sign-in is pending.
 
 For controlled live tests, [WorkOS's staging recipe](https://workos.com/docs/authkit/testing) uses a scoped API key and dedicated verified test identity. The management connector exposes key metadata rather than the SDK key secret, and its `createUser` operation has no `emailVerified` parameter. Such credentials must stay in ignored local configuration or a secret store. Owner-operated hosted/social login is another way to establish a real sandbox session. Neither path was performed in this setup.

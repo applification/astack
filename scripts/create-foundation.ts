@@ -31,11 +31,11 @@ while (true) {
 }
 const relation = relative(source, destination);
 if (!relation || !(relation === '..' || relation.startsWith(`..${sep}`) || isAbsolute(relation))) throw new Error('Choose a destination outside the reference source.');
-const excluded = new Set(['node_modules', '.git', '.convex', '.turbo', '.proof', 'dist', 'storybook-static']);
+const excluded = new Set(['node_modules', '.git', '.convex', '.turbo', '.proof', 'dist', 'storybook-static', '.agents', '.claude', 'skills-lock.json']);
 await mkdir(destination, { recursive: true });
 await cp(source, destination, { recursive: true, filter(path) {
   const parts = relative(source, path).split('/');
-  return !parts.some((part, index) => excluded.has(part) || (part.startsWith('.env') && part !== '.env.example') || (part === '.husky' && parts[index + 1] === '_')) && !parts.includes('generated');
+  return !parts.some((part, index) => excluded.has(part) || (part === '_generated' && parts[index + 1] === 'ai') || (part.startsWith('.env') && part !== '.env.example') || (part === '.husky' && parts[index + 1] === '_')) && !parts.includes('generated');
 } });
 const revision = Bun.spawnSync(['git', 'rev-parse', 'HEAD'], { cwd: source }).stdout.toString().trim() ||
   await Bun.file(new URL('../.astack/candidate-revision', import.meta.url)).text().then(value => value.trim(), () => 'unversioned');

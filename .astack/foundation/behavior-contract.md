@@ -26,6 +26,8 @@ A fresh checkout creates a repeatable project in which an agent can make, observ
 
 ## Principles and decisions
 
+First-run regression on 5 October: F7/F11 include idempotent Convex AI setup, automated selected WorkOS staging configuration and a useful web sign-in entry. F6 includes a standalone development host at port 5174 with a real server resource, bridge and persistent interactions, rather than a bare iframe App that waits indefinitely or self-initializes. Exact local OAuth resource validation must preserve web/MCP audience isolation; plain HTTP remains limited to the local Convex origin. R9 establishes the preview path with signed fixtures; completed live WorkOS flows and installed ChatGPT remain separate observations.
+
 TS 01–10, UI 01, DATA 01, STATE 01, EFFECT 01, API 01, COMPOSE 01, DESIGN 01, COMP 01, TEST 01, LOOP 01, WORK 01, ADR 01–02, FEEDBACK 01, LINT 01–02, TURBO 01 and HOOK 01 apply with the scopes and exceptions in the brief. See [ADR register](../../docs/adr/README.md). Mechanical checks establish detectable violations; review owns semantic composition, test quality and product judgement.
 
 On 5 October the owner selected Pen (pen.dev) for this reference. The original decision to skip design because none existed was insufficient for a worked visual reference. Pen and Storybook are both selected: the portable source is `examples/foundation/.astack/design/work-items.pen`, with exported frames and an MCP-extracted `spec.json` beside it. The [design record](design/README.md) maps named frames to stories and proof. Real browser and protocol checks continue to establish integration; an emulated host is labelled local bridge evidence.

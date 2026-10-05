@@ -65,6 +65,8 @@ F11 makes persistent local Convex the generated app's starting point. The [local
 
 ## Remaining external proof
 
-Live WorkOS sign-in/refresh/subject continuity and installed ChatGPT OAuth/tool/UI behavior were skipped, explicitly recorded as G1 and G2. A real public HTTPS MCP endpoint is still needed before configuring its exact WorkOS Resource Indicator and testing the provider flow. Sandbox configuration and local JWT boundary checks do not establish those outcomes.
+The [first-run repair record](startup-preview/README.md) retains the owner's reported defects, automated Convex/WorkOS setup, R1–R9 local readiness and the standalone MCP development host regression. Current sandbox/browser authorization entry is recorded separately from fixture persistence and from completed provider login. Historical scores and archives were preserved.
+
+Live WorkOS sign-in/refresh/subject continuity and installed ChatGPT OAuth/tool/UI behavior remain unverified, explicitly recorded as G1 and G2 in fixture readiness. The sandbox now accepts the exact local loopback MCP Resource Indicator and both local browser actions reach hosted sign-in. A public HTTPS MCP resource is needed for external host access. Configuration, authorization entry and local JWT boundary checks do not establish completed provider flows.
 
 The branch is available for owner review. No merge, release, production deployment, COS, Slack or PostHog integration is included.

@@ -24,6 +24,22 @@ export function localProofEnabled(): boolean {
   return true;
 }
 
+export function isLocalMcpResource(
+  site: string | undefined,
+  resource: string,
+): boolean {
+  if (!isLoopbackUrl(site) || !isLoopbackUrl(resource)) return false;
+  const url = new URL(resource);
+  return (
+    url.origin === new URL(site ?? '').origin &&
+    url.pathname === '/mcp' &&
+    !url.username &&
+    !url.password &&
+    !url.search &&
+    !url.hash
+  );
+}
+
 export async function requireUser(auth: Auth): Promise<UserIdentity> {
   const identity = await auth.getUserIdentity();
   if (

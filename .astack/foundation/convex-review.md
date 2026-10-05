@@ -62,3 +62,12 @@ These are disposable Convex/JWT/browser/AppBridge observations, supported by sou
 | `examples/foundation/packages/backend/package.json`                   | `31b5657d4efecc5dfa7ba55e3d1b88a366950649e1b40e407808888a7c40b655` | 580   |
 | `examples/foundation/packages/backend/tsconfig.json`                  | `4fd3e7337d33f357829d7bb17c24e8c46c5bed068caac3035f7703320a8a5f27` | 128   |
 | `examples/foundation/packages/domain/src/index.ts`                    | `5b1e707a9bdab248b40f1414a646c96d3d2fc9651b363bee3d6c1d657d200479` | 650   |
+
+
+## First-run setup and preview follow-up — 5 October 2026
+
+Applied the installed Convex reviewer skill to the completed auth/configuration and client diff. The only backend changes permit a WorkOS resource at the exact local Convex loopback origin and `/mcp` without credentials, query or fragment. The issuer remains HTTPS and the existing `/mcp` route still checks the validated issuer, subject and exact audience before dispatch. Existing ownership, validators, bounded owner-indexed reads, schema and mutations remain unchanged. WorkOS web/MCP subjects intentionally share one configured WorkOS environment; their different issuer/tokenIdentifier contracts must not create separate owners. A multi-provider/environment expansion would need an explicit identity mapping.
+
+The local setup stores public client/issuer values in ignored files and applies them only through the guarded local CLI. Cloud overrides still fail before startup; ordinary setup disables disposable proof identities. The development proxy is serve-only, rejects foreign origins and forwards only known routes at a validated loopback MCP target. It does not add another token issuer or substitute web credentials at `/mcp`. The new browser host uses DCR, PKCE, session/resource-scoped storage and one-use OAuth state. Handwritten types and dependency boundaries remain checked; the MCP UI's declaration-only exception addresses SDK 1.32's known Transport/sessionId mismatch.
+
+No actionable auth, ownership, validator, index, reactivity or type-safety issue remained in this scoped review. Focused setup/resource/callback regressions passed; fresh local readiness R1–R9 pushed and exercised the actual functions, including all denial cases and preview persistence. The persistent WorkOS-mode instance exposes the selected local resource and both browser actions reached hosted sign-in. Completed provider login/consent, refresh and installed-host proof are pending and are not inferred from these observations.

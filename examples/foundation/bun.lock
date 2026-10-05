@@ -48,6 +48,7 @@
         "@foundation/domain": "workspace:*",
         "@foundation/ui": "workspace:*",
         "@modelcontextprotocol/ext-apps": "1.7.5",
+        "@modelcontextprotocol/sdk": "1.32.0",
         "react": "19.3.0",
         "react-dom": "19.3.0",
       },

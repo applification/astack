@@ -5,6 +5,7 @@ import { ConvexProviderWithAuthKit } from '@convex-dev/workos';
 import { ConvexProviderWithAuth, ConvexReactClient } from 'convex/react';
 import { RouterProvider } from '@tanstack/react-router';
 import { router } from './router';
+import { Notice, Workspace } from '@foundation/ui';
 import '@foundation/ui/styles.css';
 
 const url: unknown = import.meta.env['VITE_CONVEX_URL'];
@@ -36,7 +37,8 @@ if (
 )
   throw new Error('Proof authentication is restricted to loopback.');
 const clientId: unknown = import.meta.env['VITE_WORKOS_CLIENT_ID'];
-const redirectUri: unknown = import.meta.env['VITE_WORKOS_REDIRECT_URI'];
+const redirectUri: unknown =
+  import.meta.env['VITE_WORKOS_REDIRECT_URI'] || `${location.origin}/`;
 const apiHostname: unknown = import.meta.env['VITE_WORKOS_API_HOSTNAME'];
 const devMode = import.meta.env['VITE_WORKOS_DEV_MODE'] === 'true';
 if (
@@ -55,7 +57,9 @@ createRoot(root).render(
       <ConvexProviderWithAuth client={convex} useAuth={useProofAuth}>
         <RouterProvider router={router} />
       </ConvexProviderWithAuth>
-    ) : typeof clientId === 'string' && typeof redirectUri === 'string' ? (
+    ) : typeof clientId === 'string' &&
+      /^client_[A-Za-z0-9]+$/.test(clientId) &&
+      typeof redirectUri === 'string' ? (
       <AuthKitProvider
         clientId={clientId}
         redirectUri={redirectUri}
@@ -69,7 +73,25 @@ createRoot(root).render(
         </ConvexProviderWithAuthKit>
       </AuthKitProvider>
     ) : (
-      <p>Configure WorkOS using apps/web/.env.example.</p>
+      <Workspace>
+        <Notice>
+          Connect a WorkOS staging sandbox to sign in to your private work
+          items.
+        </Notice>
+        <p>
+          Ask astack to configure WorkOS, or run this once in the reference
+          directory:
+        </p>
+        <pre style={{ whiteSpace: 'pre-wrap' }}>
+          bun run setup:workos --client-id client_... --authkit-domain
+          https://YOUR-DOMAIN.authkit.app
+        </pre>
+        <p>
+          The client ID identifies your app; the AuthKit domain issues MCP OAuth
+          tokens. No API key is needed in the browser. Restart bun dev after
+          setup. See README.md for the allowed local redirects and origins.
+        </p>
+      </Workspace>
     )}
   </StrictMode>,
 );

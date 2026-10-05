@@ -1,6 +1,7 @@
 {
   "extends": "../../packages/config/typescript.json",
   "compilerOptions": {
+    "skipLibCheck": true,
     "types": ["vite/client", "node"]
   },
   "include": ["src/**/*", "vite.config.ts"]

@@ -8,3 +8,6 @@ node_modules
 .convex
 .turbo
 **/*.pen
+packages/backend/.agents
+packages/backend/.claude
+packages/backend/skills-lock.json
