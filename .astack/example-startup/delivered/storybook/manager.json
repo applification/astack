@@ -1,0 +1,52 @@
+[
+  {
+    "target": "main",
+    "sourceRoot": "/Users/rufus/Apps/astack/examples/chatgpt-plugin",
+    "configSha256": "dc03da51c343fc2eee091a192b66ce3e579a3c0b4e3d86c289860fdbb7249a0d",
+    "revision": "f29f52dc5ee5b73feb1b24d301cb61f1a578549f",
+    "outcome": "expected-reproduction",
+    "observations": [
+      {
+        "story": "normal",
+        "rendered": false
+      }
+    ],
+    "errors": [
+      "The requested module '/node_modules/react/index.js?v=9be41a34' does not provide an export named 'default'"
+    ],
+    "warnings": [
+      "The 'ariaLabel' prop on 'PopoverProvider' will become mandatory in Storybook 11. Provide a concise, accessible label describing the popover's purpose."
+    ],
+    "cleanup": "complete"
+  },
+  {
+    "target": "pr15",
+    "sourceRoot": "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/chatgpt-plugin",
+    "configSha256": "79ef967c32947e00d3f87291f9ddf018b1297f26cb7f81b2ea7b000917a80cbb",
+    "revision": "f6c74c11a9be87f92f129efaa4a96c2962c7bbca",
+    "outcome": "pass",
+    "observations": [
+      {
+        "story": "normal",
+        "rendered": true
+      },
+      {
+        "story": "selected",
+        "rendered": true
+      },
+      {
+        "story": "empty",
+        "rendered": true
+      },
+      {
+        "story": "error",
+        "rendered": true
+      }
+    ],
+    "errors": [],
+    "warnings": [
+      "The 'ariaLabel' prop on 'PopoverProvider' will become mandatory in Storybook 11. Provide a concise, accessible label describing the popover's purpose."
+    ],
+    "cleanup": "complete"
+  }
+]

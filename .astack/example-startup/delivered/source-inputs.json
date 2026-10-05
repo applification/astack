@@ -1,0 +1,109 @@
+{
+  "observedBaseRevision": "f6c74c11a9be87f92f129efaa4a96c2962c7bbca",
+  "dirtyDuringProof": true,
+  "files": {
+    "examples/chatgpt-plugin/.storybook/main.ts": "79ef967c32947e00d3f87291f9ddf018b1297f26cb7f81b2ea7b000917a80cbb",
+    "examples/chatgpt-plugin/.storybook/preview.ts": "62d70e43deebe4789ab2f57bcbf34d0620f7837459b280a09471a12e5f1a3111",
+    "examples/chatgpt-plugin/src/ui/RecordList.tsx": "0eda7d6e762379e1a4154cc79febfcd7f7719b455a9d38175c9474a0e5803018",
+    "examples/chatgpt-plugin/src/ui/RecordList.stories.tsx": "5e57c46b55f82fa4fc660697c068b00fc2914256fb9cae09a88826ca828d7a06",
+    "examples/chatgpt-plugin/src/ui/style.css": "c9d31d59b7eef1f1eb867e22e7f1b6463fcd61e6dde1ada948d76bc87d6630af",
+    "examples/chatgpt-plugin/src/records.ts": "64d22a3e5ecd541a6c04662c44db9813cc03acba50c81c15e7a7e5be84fb27e0",
+    "examples/chatgpt-plugin/tsconfig.json": "5de814b67efc1f1638067a3abfbc3fa89ce5ef652e0351d4147a163a8f2fa774",
+    "examples/chatgpt-plugin/package.json": "c68cf18921f59aa78d1bffe731347dec23badee564cdc902c09c1de567378edc",
+    "examples/chatgpt-plugin/bun.lock": "38143a6b83d0c67e8472347644adef17a09b2cdf3c5b37fb58132c157e98416c",
+    "examples/chatgpt-plugin/scripts/verify-storybook.ts": "1720467d68e68bee32fe050de688c1f18307528d7b64c8912d11e7d607becd1f",
+    "examples/e2e-proof/scripts/run.ts": "075e2e3a614aa37314e2af876fa3dda8588b02035a1665ce17b87fae7a54ca7a",
+    "examples/e2e-proof/scripts/verify.ts": "cfcbf81e45395ce1381773bcebf6c9a95f77fc9ab344bd467f60c6f9c4db4122",
+    ".github/workflows/site.yml": "d009c6c0d3ef71657d602c96d64d3acc6073e64e09a30f572fb84409cd37c604"
+  },
+  "media": [
+    {
+      "observation": "Original blank canvas in PR 16 investigation",
+      "originalSha256": "3878570f4a62a0d65f57cf1754e0269e56ec797f4e36e26b44c172eb6e800401",
+      "retainedPath": "storybook/original-failure.png"
+    },
+    {
+      "observation": "dev Storybook: normal",
+      "originalSha256": "e9f2da5347a08fdd05b05fb678347a37ecbab40a29f0495b6f4f6c7380e8d182",
+      "retainedPath": "storybook/normal.png"
+    },
+    {
+      "observation": "dev Storybook: selected",
+      "originalSha256": "700e9768def22728483e7386b3391f07fbb9ca541595090a5dbb7234deb8aa04",
+      "retainedPath": "storybook/selected.png"
+    },
+    {
+      "observation": "dev Storybook: empty",
+      "originalSha256": "9714858a8c89ebe2430804ec4af410cd1c24345b22306c15e330d3a413a6d436",
+      "retainedPath": "storybook/empty.png"
+    },
+    {
+      "observation": "dev Storybook: error",
+      "originalSha256": "ec223a0b296557538d8f79010ff335144ae049ed1de82e2b69e822c70937fb62",
+      "retainedPath": "storybook/error.png"
+    },
+    {
+      "observation": "built Storybook: normal",
+      "originalSha256": "e9f2da5347a08fdd05b05fb678347a37ecbab40a29f0495b6f4f6c7380e8d182",
+      "retainedPath": "storybook/normal.png"
+    },
+    {
+      "observation": "built Storybook: selected",
+      "originalSha256": "700e9768def22728483e7386b3391f07fbb9ca541595090a5dbb7234deb8aa04",
+      "retainedPath": "storybook/selected.png"
+    },
+    {
+      "observation": "built Storybook: empty",
+      "originalSha256": "9714858a8c89ebe2430804ec4af410cd1c24345b22306c15e330d3a413a6d436",
+      "retainedPath": "storybook/empty.png"
+    },
+    {
+      "observation": "built Storybook: error",
+      "originalSha256": "ec223a0b296557538d8f79010ff335144ae049ed1de82e2b69e822c70937fb62",
+      "retainedPath": "storybook/error.png"
+    },
+    {
+      "observation": "Cold installed main manager: normal",
+      "originalSha256": "9933ab30a0de21f349d6acd0bad71dfb808f360bcfc783e93e000161963eb89a",
+      "retainedPath": "storybook/main-normal.png"
+    },
+    {
+      "observation": "Cold installed pr15 manager: normal",
+      "originalSha256": "d791937a04d12748700961114251ea7d8ff74d0f6723d92d32e0bc84e2f3a521",
+      "retainedPath": "storybook/pr15-normal.png"
+    },
+    {
+      "observation": "Cold installed pr15 manager: selected",
+      "originalSha256": "6cdc9fe2b19f9a8b9b41d02aa69bb71dc89023451666fd9ec3ed57a33fd9615a",
+      "retainedPath": "storybook/pr15-selected.png"
+    },
+    {
+      "observation": "Cold installed pr15 manager: empty",
+      "originalSha256": "7067dd5e8ff4b39612baf3a78e879400f30a11d6e926447428d0a6f05c435ea9",
+      "retainedPath": "storybook/pr15-empty.png"
+    },
+    {
+      "observation": "Cold installed pr15 manager: error",
+      "originalSha256": "aef52a44021e3d1ebcd6bad33ac7d767c1da426edd5c4aea6c40d71c48af070d",
+      "retainedPath": "storybook/pr15-error.png"
+    },
+    {
+      "observation": "before: probe-ebd6c3f0-33e9-429a-8d24-73b726e13780",
+      "originalSha256": "8de75d9be956f226ea97b39f78b253da46883de32c0e748dc1a0c6d935a3c8a7",
+      "retainedPath": "e2e/001-failure.png"
+    },
+    {
+      "observation": "after: regression-cbe2594e-d141-4543-9ad4-aafd1c58c494",
+      "originalSha256": "6b20daaba56a8cd4103b1f3d85b2285ec1e669f8737b322efdde39084ec9427a",
+      "retainedPath": "e2e/001-selected-state-paused.png"
+    },
+    {
+      "observation": "rerun: probe-925b21b4-f550-41eb-a786-3eb5955d303e",
+      "originalSha256": "8de75d9be956f226ea97b39f78b253da46883de32c0e748dc1a0c6d935a3c8a7",
+      "retainedPath": "e2e/001-failure.png"
+    }
+  ],
+  "retention": "Selected reports and byte-identical deduplicated media; raw reruns, logs, traces, JUnit and duplicate summaries remain local/CI. Original PR 16 archive is linked from README.",
+  "e2eSourceSha256": "fd0339cc25c1003ec184c415b3eaf24492f8bb3efcfae2dca251d03b200127d0",
+  "storybookSourceSha256": "984e116d434e03114c1bdca28fdd04dded7d4a258b74462206bc16595167113e"
+}

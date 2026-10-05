@@ -55,7 +55,23 @@ jobs:
         working-directory: examples/chatgpt-plugin
         env:
           STORYBOOK_DISABLE_TELEMETRY: "1"
-        run: bun install --frozen-lockfile && bun run build && bun run typecheck && bun test && bun run build:storybook
+        run: bun install --frozen-lockfile && bun run build && bun run typecheck && bun test
+      - name: Render and interact with Storybook stories
+        working-directory: examples/chatgpt-plugin
+        env:
+          STORYBOOK_DISABLE_TELEMETRY: "1"
+        run: |
+          bunx --no-install playwright install chromium --with-deps
+          bun run verify:storybook dev
+          bun run verify:storybook built
+      - name: Retain Storybook browser observations
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: chatgpt-storybook-proof
+          path: examples/chatgpt-plugin/.proof/
+          include-hidden-files: true
+          retention-days: 14
       - name: Validate built portable artifact
         run: bun scripts/check-plugins.ts examples/chatgpt-plugin/dist/plugin
 

@@ -1,0 +1,70 @@
+{
+  "acceptance": {
+    "A1": {
+      "outcome": "pass",
+      "observed": "Exact repro fails against buggy variant and passes as retained regression against fixed variant",
+      "before": "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/e2e-proof/.e2e/runs/probe-ebd6c3f0-33e9-429a-8d24-73b726e13780",
+      "after": "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/e2e-proof/.e2e/runs/regression-cbe2594e-d141-4543-9ad4-aafd1c58c494"
+    },
+    "A2": {
+      "outcome": "pass",
+      "observed": "Original evidence digests unchanged after reruns; startup failure keeps selection seed separate",
+      "rerun": "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/e2e-proof/.e2e/runs/probe-925b21b4-f550-41eb-a786-3eb5955d303e",
+      "startupFailure": "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/e2e-proof/.e2e/runs/probe-ecdeda78-8c5a-4698-9288-8fed4d045bc8"
+    },
+    "A3": {
+      "outcome": "pass",
+      "observed": "Wrong run identity rejected as inconclusive setup failure",
+      "report": "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/e2e-proof/.e2e/runs/probe-21819c56-7b3a-4da3-a913-a831583fe64b"
+    },
+    "A4": {
+      "outcome": "pass",
+      "observed": "Recorded green exploration interpreted as inconclusive",
+      "source": "fixtures/green-exploration.json"
+    }
+  },
+  "finding": {
+    "id": "selected-state",
+    "acceptance": "A1",
+    "status": "regression",
+    "history": [
+      {
+        "status": "candidate",
+        "source": "Deliberately seeded teaching defect"
+      },
+      {
+        "status": "confirmed",
+        "evidence": "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/e2e-proof/.e2e/runs/probe-ebd6c3f0-33e9-429a-8d24-73b726e13780",
+        "reason": "selection.ts asserts Play sequence after choosing Idle"
+      },
+      {
+        "status": "fixed",
+        "evidence": "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/e2e-proof/.e2e/runs/regression-cbe2594e-d141-4543-9ad4-aafd1c58c494"
+      },
+      {
+        "status": "regression",
+        "test": "tests/selected-state.e2e.ts"
+      }
+    ]
+  },
+  "exploration": {
+    "outcome": "inconclusive",
+    "reason": "Exploration ended step-limit; 1 incomplete steps. Findings need reproduction; no acceptance proof.",
+    "flaky": false,
+    "candidates": 0,
+    "ready": false
+  },
+  "firstFailureDigests": {
+    "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/e2e-proof/.e2e/runs/probe-ebd6c3f0-33e9-429a-8d24-73b726e13780/failures/tests_selected-state.probe.ts-_A1__choosing_the_selected_state_stops_playback-f49eceae-e941eb8d.md": "cb2f48f40d3c1db2a875837603fe74cef41ab1d2d74ff1086d9d4ea4524756df",
+    "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/e2e-proof/.e2e/runs/probe-ebd6c3f0-33e9-429a-8d24-73b726e13780/artifacts/desktop/tests_selected-state.probe.ts___5BA1_5D_20choosing_20the_20selected_20state_20stops_20playback-4af48ae5/default/attempt-0/screenshots/001-failure.png": "8de75d9be956f226ea97b39f78b253da46883de32c0e748dc1a0c6d935a3c8a7",
+    "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/e2e-proof/.e2e/runs/probe-ebd6c3f0-33e9-429a-8d24-73b726e13780/artifacts/desktop/tests_selected-state.probe.ts___5BA1_5D_20choosing_20the_20selected_20state_20stops_20playback-4af48ae5/default/attempt-0/trace/trace.zip": "66abf21b40e78b6cf65344849ec932d9e51d6560bf991b269d563b10a5a0972a",
+    "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/e2e-proof/.e2e/runs/probe-ebd6c3f0-33e9-429a-8d24-73b726e13780/artifacts/desktop/tests_selected-state.probe.ts___5BA1_5D_20choosing_20the_20selected_20state_20stops_20playback-4af48ae5/default/attempt-0/failure/screen.txt": "8031855e5d19e6355c072f8bb09daf00ce725174c21afc19be6613a9bafe1651",
+    "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/e2e-proof/.e2e/runs/probe-ebd6c3f0-33e9-429a-8d24-73b726e13780/runner.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/e2e-proof/.e2e/runs/probe-ebd6c3f0-33e9-429a-8d24-73b726e13780/report.json": "5e2c7eeb4539afebf3028c0268538be18d3cae65fb2cb98dcd6b2ec41566bdce",
+    "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/e2e-proof/.e2e/runs/probe-ebd6c3f0-33e9-429a-8d24-73b726e13780/summary.md": "0a3da37bdf27d35a5736ad107ce1d0477a6ee039273d4c5f248cb830ca8c97ca",
+    "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/e2e-proof/.e2e/runs/probe-ebd6c3f0-33e9-429a-8d24-73b726e13780/identity.json": "f3a8cf32f5a1948c7365762f0850a6ada7352154a18b519b2ec30536abfadc8b",
+    "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/e2e-proof/.e2e/runs/probe-ebd6c3f0-33e9-429a-8d24-73b726e13780/runner.stdout.log": "8dc74276e0ade57e95e1af163ce31c1fa7a51e92c356b8443b5a8d96c8a3e2ea",
+    "/Users/rufus/.codex/worktrees/foundation-reference/astack/examples/e2e-proof/.e2e/runs/probe-ebd6c3f0-33e9-429a-8d24-73b726e13780/junit.xml": "5702639272172414ead02f61dac00abd715035f8463beb618880ead81ab473d6"
+  },
+  "scope": "Real Chromium, no model calls. Exploration fixture is recorded, not a fresh run."
+}

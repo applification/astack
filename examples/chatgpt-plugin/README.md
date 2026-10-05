@@ -16,6 +16,16 @@ bun run storybook
 
 Storybook at http://localhost:6006 shows the same RecordList component used by the MCP App, including normal, selected, empty and error states. `bun run build:storybook` builds it. It validates presentation independently of the host bridge.
 
+To check actual browser rendering and selection in both development and the built Storybook:
+
+```sh
+bunx --no-install playwright install chromium
+bun run verify:storybook dev
+bun run verify:storybook built
+```
+
+Each check owns a server on a free loopback port and a Chromium browser, checks all four stories and selection updates, then stops both. Reports, screenshots and terminal logs stay in `.proof/storybook/`. Linux may also need `playwright install-deps chromium`. The Storybook configuration explicitly prebundles React's CommonJS roots for the development browser; a successful static build alone does not check this path. Restart an existing Storybook session after changing `.storybook/main.ts`.
+
 The build produces `dist/plugin/` with portable root `plugin.json`, `mcp.json`, a setup skill, self-contained Node server scripts, inline UI HTML and dependency license notices. Copy that entire folder to prove relocation. It needs Node at runtime, without the source tree, Bun or node_modules. Persistent data belongs in `${PLUGIN_DATA}`, not in the package. Root validation is `bun run check`; `bun scripts/check-plugins.ts examples/chatgpt-plugin/dist/plugin` also validates the built artifact.
 
 ## Two explicit SDK profiles
