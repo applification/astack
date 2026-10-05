@@ -1,0 +1,61 @@
+{
+  "format": "astack-trial-retention/v1",
+  "scope": {
+    "kind": "project",
+    "sourceSelection": "isSourcePath",
+    "proofRoots": [
+      ".astack",
+      ".proof"
+    ]
+  },
+  "files": {
+    "empty.png": {
+      "originalSha256": "9714858a8c89ebe2430804ec4af410cd1c24345b22306c15e330d3a413a6d436",
+      "retainedSha256": "9714858a8c89ebe2430804ec4af410cd1c24345b22306c15e330d3a413a6d436",
+      "transformed": false,
+      "retainedPath": "delivered/empty.png",
+      "transforms": []
+    },
+    "error.png": {
+      "originalSha256": "ec223a0b296557538d8f79010ff335144ae049ed1de82e2b69e822c70937fb62",
+      "retainedSha256": "ec223a0b296557538d8f79010ff335144ae049ed1de82e2b69e822c70937fb62",
+      "transformed": false,
+      "retainedPath": "delivered/error.png",
+      "transforms": []
+    },
+    "normal.png": {
+      "originalSha256": "e9f2da5347a08fdd05b05fb678347a37ecbab40a29f0495b6f4f6c7380e8d182",
+      "retainedSha256": "e9f2da5347a08fdd05b05fb678347a37ecbab40a29f0495b6f4f6c7380e8d182",
+      "transformed": false,
+      "retainedPath": "delivered/normal.png",
+      "transforms": []
+    },
+    "report.json": {
+      "originalSha256": "50966687ff6c47a109d0c223c93055e42ff06c82910f44058caa4a12bf53d2b5",
+      "retainedSha256": "50966687ff6c47a109d0c223c93055e42ff06c82910f44058caa4a12bf53d2b5",
+      "transformed": false,
+      "retainedPath": "delivered/report.json",
+      "transforms": []
+    },
+    "runtime.log": {
+      "originalSha256": "b110fb152a50efe9067a28e1d77337515511e9d90bb8ebb0b6285e258715f0e4",
+      "retainedSha256": "b110fb152a50efe9067a28e1d77337515511e9d90bb8ebb0b6285e258715f0e4",
+      "transformed": false,
+      "retainedPath": "delivered/runtime.log",
+      "transforms": []
+    },
+    "selected.png": {
+      "originalSha256": "700e9768def22728483e7386b3391f07fbb9ca541595090a5dbb7234deb8aa04",
+      "retainedSha256": "700e9768def22728483e7386b3391f07fbb9ca541595090a5dbb7234deb8aa04",
+      "transformed": false,
+      "retainedPath": "delivered/selected.png",
+      "transforms": []
+    }
+  },
+  "omittedFiles": [],
+  "excludedPaths": {
+    "privateOrCredentialPaths": 0,
+    "namesRetained": false
+  },
+  "policy": "Source digest selection is unchanged. Lifecycle metadata/docs and nested proof under .astack/.proof are additionally retained as evidence. Original/retained byte digests and observed transforms describe every artifact. UTF-8 non-NUL .log output has VT sequences removed before credential redaction and remaining controls displayed as Unicode escapes; other source text is unchanged except credential redaction. PNG/JPEG/WebP images remain byte-exact. Unsupported binaries/archives are omitted with hashes/reasons and sanitized display paths, including proof trace ZIPs. Separate omission entries preserve colliding display paths. Credential/private paths are excluded without names; environments, dependencies and symlinks are excluded."
+}

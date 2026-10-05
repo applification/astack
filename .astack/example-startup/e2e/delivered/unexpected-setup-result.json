@@ -1,0 +1,5 @@
+{
+  "control": "Browser cache deliberately points to an owned regular file for this process only",
+  "exitCode": 1,
+  "observed": "Verification FAILED; captured runner diagnostics retained; no false pass"
+}

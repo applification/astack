@@ -1,0 +1,18 @@
+
+ RUN  e2e v0.15.1 /Users/rufus/.codex/worktrees/example-startup/astack/examples/e2e-proof
+      run 01a10ba3-5e9b-74e1-95ad-44f3977901a6 · targets: desktop
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Run Errors 1 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ ERROR  configuration error UNKNOWN_TARGET (collection)
+unknown target ID "missing-target"; the config declares "desktop"
+
+
+ Test Files  no test files
+      Tests  no tests executed
+     Errors  1 error
+   Start at  11:36:58
+   Duration  4ms
+     Report  (not written)
+

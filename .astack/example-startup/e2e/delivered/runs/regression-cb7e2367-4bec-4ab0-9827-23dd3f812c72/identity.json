@@ -1,0 +1,15 @@
+{
+  "commit": "f29f52dc5ee5b73feb1b24d301cb61f1a578549f",
+  "dirty": true,
+  "checkout": "/Users/rufus/.codex/worktrees/example-startup/astack/examples/e2e-proof",
+  "digest": "fd0339cc25c1003ec184c415b3eaf24492f8bb3efcfae2dca251d03b200127d0",
+  "runId": "cb7e2367-4bec-4ab0-9827-23dd3f812c72",
+  "variant": "fixed",
+  "mode": "regression",
+  "startedAt": "2026-10-05T10:36:58.719Z",
+  "actor": "anonymous",
+  "fixture": "disposable selection preview",
+  "target": "desktop",
+  "exitCode": 0,
+  "reportSha256": "d8f2ad8614247e12d35ecc32d679ac69c6972f4602884becbbc132741781075d"
+}

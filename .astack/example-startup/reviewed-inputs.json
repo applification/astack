@@ -1,0 +1,15 @@
+{
+  "examples/chatgpt-plugin/.storybook/main.ts": "79ef967c32947e00d3f87291f9ddf018b1297f26cb7f81b2ea7b000917a80cbb",
+  "examples/chatgpt-plugin/.storybook/preview.ts": "62d70e43deebe4789ab2f57bcbf34d0620f7837459b280a09471a12e5f1a3111",
+  "examples/chatgpt-plugin/src/ui/RecordList.tsx": "0eda7d6e762379e1a4154cc79febfcd7f7719b455a9d38175c9474a0e5803018",
+  "examples/chatgpt-plugin/src/ui/RecordList.stories.tsx": "5e57c46b55f82fa4fc660697c068b00fc2914256fb9cae09a88826ca828d7a06",
+  "examples/chatgpt-plugin/src/ui/style.css": "c9d31d59b7eef1f1eb867e22e7f1b6463fcd61e6dde1ada948d76bc87d6630af",
+  "examples/chatgpt-plugin/src/records.ts": "64d22a3e5ecd541a6c04662c44db9813cc03acba50c81c15e7a7e5be84fb27e0",
+  "examples/chatgpt-plugin/tsconfig.json": "5de814b67efc1f1638067a3abfbc3fa89ce5ef652e0351d4147a163a8f2fa774",
+  "examples/chatgpt-plugin/package.json": "c68cf18921f59aa78d1bffe731347dec23badee564cdc902c09c1de567378edc",
+  "examples/chatgpt-plugin/bun.lock": "38143a6b83d0c67e8472347644adef17a09b2cdf3c5b37fb58132c157e98416c",
+  "examples/chatgpt-plugin/scripts/verify-storybook.ts": "1720467d68e68bee32fe050de688c1f18307528d7b64c8912d11e7d607becd1f",
+  "examples/e2e-proof/scripts/run.ts": "075e2e3a614aa37314e2af876fa3dda8588b02035a1665ce17b87fae7a54ca7a",
+  "examples/e2e-proof/scripts/verify.ts": "cfcbf81e45395ce1381773bcebf6c9a95f77fc9ab344bd467f60c6f9c4db4122",
+  ".github/workflows/site.yml": "d009c6c0d3ef71657d602c96d64d3acc6073e64e09a30f572fb84409cd37c604"
+}

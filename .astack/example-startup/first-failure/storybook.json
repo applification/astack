@@ -1,0 +1,7 @@
+{
+  "url": "http://127.0.0.1:6011/iframe.html?id=reference-records--normal&viewMode=story",
+  "body": "",
+  "errors": [
+    "The requested module '/node_modules/react/index.js?v=8bdc332d' does not provide an export named 'default'"
+  ]
+}

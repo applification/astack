@@ -1,0 +1,161 @@
+$ bun scripts/verify.ts --verbose
+[1/5] Seeded defect: an exact assertion failure is expected.
+
+ RUN  e2e v0.15.1 /Users/rufus/.codex/worktrees/example-startup/astack/examples/e2e-proof
+      run 01a10ba4-804d-742a-afa0-c11f249ebd29 · targets: desktop
+
+ ✓ target "desktop" command ready 41ms
+ ❯ |desktop| tests/selected-state.probe.ts (1 test | 1 failed) 1.91s
+   × [A1] choosing the selected state stops playback 1.91s
+     → expect.toBeVisible failed
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |desktop| tests/selected-state.probe.ts > [A1] choosing the selected state stops playback
+ASSERTION_FAILED: expect.toBeVisible failed
+locator: getByRole("button", name: "Play sequence")
+expected: visible
+observed: no node (match count 0)
+ ❯ tests/selection.ts:8:3
+      6|   await expect(screen.getByRole("button", "Idle")).toHaveAttribute("a…
+      7|   await screen.getByRole("button", "Idle").tap();
+      8|   await expect(screen.getByRole("button", "Play sequence")).toBeVisib…
+       |   ^
+      9|   await app.screenshot("selected-state-paused");
+     10| }
+ ❯ at http://127.0.0.1:51601/
+ ❯ screen .e2e/runs/probe-73b616f3-dcb7-491e-9734-05aa7c20dbf6/artifacts/desktop/tests_selected-state.probe.ts___5BA1_5D_20choosing_20the_20selected_20state_20stops_20playback-4af48ae5/default/attempt-0/failure/screen.txt
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 0 passed (1)
+      Tests  1 failed | 0 passed (1)
+   Start at  11:38:12
+   Duration  2.32s (startup 41ms)
+     Report  .e2e/runs/probe-73b616f3-dcb7-491e-9734-05aa7c20dbf6/report.json
+
+   Markdown  .e2e/runs/probe-73b616f3-dcb7-491e-9734-05aa7c20dbf6/summary.md
+   Failures  .e2e/runs/probe-73b616f3-dcb7-491e-9734-05aa7c20dbf6/failures/ (1 page)
+      JUnit  .e2e/runs/probe-73b616f3-dcb7-491e-9734-05aa7c20dbf6/junit.xml
+
+PASS: the seeded defect failed exactly as expected.
+[2/5] Evidence preservation: assertion and invalid-target failures are expected.
+
+ RUN  e2e v0.15.1 /Users/rufus/.codex/worktrees/example-startup/astack/examples/e2e-proof
+      run 01a10ba4-8b6f-722d-bafa-d422a8c068ba · targets: desktop
+
+ ✓ target "desktop" command ready 41ms
+ ❯ |desktop| tests/selected-state.probe.ts (1 test | 1 failed) 1.92s
+   × [A1] choosing the selected state stops playback 1.92s
+     → expect.toBeVisible failed
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |desktop| tests/selected-state.probe.ts > [A1] choosing the selected state stops playback
+ASSERTION_FAILED: expect.toBeVisible failed
+locator: getByRole("button", name: "Play sequence")
+expected: visible
+observed: no node (match count 0)
+ ❯ tests/selection.ts:8:3
+      6|   await expect(screen.getByRole("button", "Idle")).toHaveAttribute("a…
+      7|   await screen.getByRole("button", "Idle").tap();
+      8|   await expect(screen.getByRole("button", "Play sequence")).toBeVisib…
+       |   ^
+      9|   await app.screenshot("selected-state-paused");
+     10| }
+ ❯ at http://127.0.0.1:51622/
+ ❯ screen .e2e/runs/probe-e9c7f66c-5b22-4e99-bfa1-929d972cdc3f/artifacts/desktop/tests_selected-state.probe.ts___5BA1_5D_20choosing_20the_20selected_20state_20stops_20playback-4af48ae5/default/attempt-0/failure/screen.txt
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 0 passed (1)
+      Tests  1 failed | 0 passed (1)
+   Start at  11:38:15
+   Duration  2.34s (startup 41ms)
+     Report  .e2e/runs/probe-e9c7f66c-5b22-4e99-bfa1-929d972cdc3f/report.json
+
+   Markdown  .e2e/runs/probe-e9c7f66c-5b22-4e99-bfa1-929d972cdc3f/summary.md
+   Failures  .e2e/runs/probe-e9c7f66c-5b22-4e99-bfa1-929d972cdc3f/failures/ (1 page)
+      JUnit  .e2e/runs/probe-e9c7f66c-5b22-4e99-bfa1-929d972cdc3f/junit.xml
+
+
+ RUN  e2e v0.15.1 /Users/rufus/.codex/worktrees/example-startup/astack/examples/e2e-proof
+      run 01a10ba4-96a5-7252-bcb6-a3cfa7cd1c9b · targets: desktop
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Run Errors 1 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ ERROR  configuration error UNKNOWN_TARGET (collection)
+unknown target ID "missing-target"; the config declares "desktop"
+
+
+ Test Files  no test files
+      Tests  no tests executed
+     Errors  1 error
+   Start at  11:38:18
+   Duration  4ms
+     Report  (not written)
+
+PASS: reruns preserved the original failure evidence.
+[3/5] Fixed app: the retained regression must pass.
+
+ RUN  e2e v0.15.1 /Users/rufus/.codex/worktrees/example-startup/astack/examples/e2e-proof
+      run 01a10ba4-98b1-73dc-af1f-61eda55327a0 · targets: desktop
+
+ ✓ target "desktop" command ready 42ms
+ ✓ |desktop| tests/selected-state.e2e.ts (1 test) 371ms
+   ✓ [A1] choosing the selected state stops playback 371ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  11:38:19
+   Duration  786ms (startup 42ms)
+     Report  .e2e/runs/regression-0fe8d528-f2be-49a5-aaa4-a86f21929d28/report.json
+
+   Markdown  .e2e/runs/regression-0fe8d528-f2be-49a5-aaa4-a86f21929d28/summary.md
+      JUnit  .e2e/runs/regression-0fe8d528-f2be-49a5-aaa4-a86f21929d28/junit.xml
+
+PASS: the fixed app passed the same browser assertion.
+[4/5] Wrong app instance: identity rejection is expected.
+
+ RUN  e2e v0.15.1 /Users/rufus/.codex/worktrees/example-startup/astack/examples/e2e-proof
+      run 01a10ba4-9dca-78ba-ad58-b23e9a6c33d1 · targets: desktop
+
+ ✓ target "desktop" command ready 41ms
+ ❯ |desktop| tests/selected-state.probe.ts (1 test | 1 failed) 150ms
+   × [A1] choosing the selected state stops playback 150ms
+     → expected "another-run" to be "2186a040-86c0-40ac-9c88-b0feb18201bc"
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |desktop| tests/selected-state.probe.ts > [A1] choosing the selected state stops playback
+ASSERTION_FAILED: expected "another-run" to be "2186a040-86c0-40ac-9c88-b0feb18201bc"
+ ❯ tests/helpers.ts:8:51
+      6|   const response = await fetch(app.baseUrl!);
+      7|   expect(response.ok).toBe(true);
+      8|   expect(response.headers.get("x-reference-run")).toBe(runId);
+       |                                                   ^
+      9|   expect(response.headers.get("x-reference-source")).toBe(source.dige…
+     10|   await app.open("/");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 0 passed (1)
+      Tests  1 failed | 0 passed (1)
+   Start at  11:38:20
+   Duration  562ms (startup 41ms)
+     Report  .e2e/runs/probe-2186a040-86c0-40ac-9c88-b0feb18201bc/report.json
+
+   Markdown  .e2e/runs/probe-2186a040-86c0-40ac-9c88-b0feb18201bc/summary.md
+   Failures  .e2e/runs/probe-2186a040-86c0-40ac-9c88-b0feb18201bc/failures/ (1 page)
+      JUnit  .e2e/runs/probe-2186a040-86c0-40ac-9c88-b0feb18201bc/junit.xml
+
+PASS: the wrong instance was rejected without confirming a product defect.
+[5/5] Recorded exploration: incomplete evidence must remain inconclusive.
+PASS: the recorded exploration remains inconclusive.
+Verification PASSED (A1–A4). Expected negative checks matched; the fixed-app regression passed.
+Proof summary: .e2e/verification.json
+Runner logs and raw reports are retained in .e2e/runs/. Use bun run verify --verbose to stream them.

@@ -1,0 +1,26 @@
+$ bun scripts/verify.ts
+[1/5] Seeded defect: an exact assertion failure is expected.
+Verification FAILED: an expected observation did not match.
+Runner logs and report: /Users/rufus/.codex/worktrees/example-startup/astack/examples/e2e-proof/.e2e/runs/probe-b6c58f5e-6165-488a-ab88-553f3a1f8945
+37 | }
+38 | 
+39 | try {
+40 |   console.log("[1/5] Seeded defect: an exact assertion failure is expected.");
+41 |   const broken = await run("probe", { variant: "buggy" });
+42 |   assert.equal(broken.exitCode, 1);
+              ^
+AssertionError: Expected values to be strictly equal:
+
+3 !== 1
+
+ generatedMessage: true,
+     actual: 3,
+   expected: 1,
+   operator: "strictEqual",
+       diff: "simple",
+       code: "ERR_ASSERTION"
+
+      at /Users/rufus/.codex/worktrees/example-startup/astack/examples/e2e-proof/scripts/verify.ts:42:10
+
+Bun v1.4.0 (macOS arm64)
+error: script "verify" exited with code 1

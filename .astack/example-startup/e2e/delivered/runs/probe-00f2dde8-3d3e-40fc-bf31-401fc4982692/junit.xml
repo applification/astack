@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="e2e" tests="1" failures="1" errors="0" skipped="0" time="1.893">
+  <testsuite name="tests/selected-state.probe.ts" tests="1" failures="1" errors="0" skipped="0" time="1.893">
+    <testcase name="[A1] choosing the selected state stops playback [desktop]" classname="tests/selected-state.probe.ts" time="1.893">
+      <failure message="expect.toBeVisible failed&#10;locator: getByRole(&quot;button&quot;, name: &quot;Play sequence&quot;)&#10;expected: visible&#10;observed: no node (match count 0)" type="ASSERTION_FAILED">ASSERTION_FAILED (body): expect.toBeVisible failed
+locator: getByRole(&quot;button&quot;, name: &quot;Play sequence&quot;)
+expected: visible
+observed: no node (match count 0)</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

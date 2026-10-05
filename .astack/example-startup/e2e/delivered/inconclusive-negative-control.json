@@ -1,0 +1,5 @@
+{
+  "control": "An empty browser-cache directory",
+  "outcome": "inconclusive",
+  "reason": "The e2e engine automatically installed Chromium, so browser unavailability was not induced; ordinary verification passed."
+}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="e2e" tests="1" failures="0" errors="0" skipped="0" time="0.345">
+  <testsuite name="tests/selected-state.e2e.ts" tests="1" failures="0" errors="0" skipped="0" time="0.345">
+    <testcase name="[A1] choosing the selected state stops playback [desktop]" classname="tests/selected-state.e2e.ts" time="0.345"/>
+  </testsuite>
+</testsuites>

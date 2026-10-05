@@ -1,0 +1,32 @@
+{
+  "mode": "dev",
+  "sourceSha256": "984e116d434e03114c1bdca28fdd04dded7d4a258b74462206bc16595167113e",
+  "revision": "f29f52dc5ee5b73feb1b24d301cb61f1a578549f",
+  "dirty": true,
+  "scope": "Chromium Storybook rendering and story selection; no MCP or installed-host claim.",
+  "outcome": "pass",
+  "cleanup": "complete",
+  "stories": [
+    {
+      "id": "reference-records--normal",
+      "outcome": "pass",
+      "screenshot": "normal.png"
+    },
+    {
+      "id": "reference-records--selected",
+      "outcome": "pass",
+      "screenshot": "selected.png"
+    },
+    {
+      "id": "reference-records--empty",
+      "outcome": "pass",
+      "screenshot": "empty.png"
+    },
+    {
+      "id": "reference-records--error",
+      "outcome": "pass",
+      "screenshot": "error.png"
+    }
+  ],
+  "errors": []
+}

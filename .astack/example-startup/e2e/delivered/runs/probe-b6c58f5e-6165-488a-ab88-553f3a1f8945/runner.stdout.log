@@ -1,0 +1,21 @@
+
+ RUN  e2e v0.15.1 /Users/rufus/.codex/worktrees/example-startup/astack/examples/e2e-proof
+      run 01a10ba5-b0ee-7018-8457-201e71f8873e · targets: desktop
+
+ℹ Downloading missing Playwright browsers (first run): chromium...
+ℹ Failed to install browsers
+ℹ Error: EEXIST: file already exists, mkdir '/Users/rufus/.codex/worktrees/example-startup/astack/examples/e2e-proof/.e2e/browser-cache-is-a-file'
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Run Errors 1 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ ERROR  infrastructure error BROWSER_INSTALL_FAILED (launch)
+playwright install chromium exited with code 1; run "npx playwright install chromium" manually
+
+
+ Test Files  no test files
+      Tests  no tests executed
+     Errors  1 error
+   Start at  11:39:30
+   Duration  328ms
+     Report  (not written)
+

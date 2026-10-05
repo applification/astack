@@ -1,0 +1,13 @@
+
+┌  storybook v10.6.0
+│
+●  Starting...
+│ ╭──────────────────────────────────────────────────────╮
+│ │   Storybook ready!                                   │
+│ │                                                      │
+│ │   - Local:                http://localhost:51131/    │
+│ │   - On your network:      http://127.0.0.1:51131/    │
+│ │                                                      │
+│ ╰──────────────────────────────────────────────────────╯
+│
+●  97 ms for manager and 72 ms for preview
