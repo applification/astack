@@ -4,7 +4,12 @@ import { sourceDigest } from './source-identity';
 
 const probe = 'packages/ui/src/enforcement-probe.tsx';
 const domainProbe = 'packages/domain/src/enforcement-probe.ts';
-if ((await Bun.file(probe).exists()) || (await Bun.file(domainProbe).exists()))
+const domainBrowserProbe = 'packages/domain/src/enforcement-probe.tsx';
+if (
+  (await Bun.file(probe).exists()) ||
+  (await Bun.file(domainProbe).exists()) ||
+  (await Bun.file(domainBrowserProbe).exists())
+)
   throw new Error('Refusing to replace an existing enforcement probe file.');
 const configPath = 'packages/ui/tsconfig.json';
 const originalConfig = await Bun.file(configPath).text();
@@ -127,6 +132,19 @@ try {
     domainProbe,
   );
   await rm(domainProbe, { force: true });
+  await lint(
+    'domain TSX window capability',
+    'export const browser = window;\n',
+    'no-restricted-globals',
+    domainBrowserProbe,
+  );
+  await lint(
+    'domain TSX document capability',
+    'export const browser = document;\n',
+    'no-restricted-globals',
+    domainBrowserProbe,
+  );
+  await rm(domainBrowserProbe, { force: true });
   await writeFile(
     configPath,
     originalConfig.replace(
@@ -166,6 +184,7 @@ try {
 } finally {
   await rm(probe, { force: true });
   await rm(domainProbe, { force: true });
+  await rm(domainBrowserProbe, { force: true });
   await writeFile(configPath, originalConfig);
   await mkdir('.proof/enforcement', { recursive: true });
   await writeFile(

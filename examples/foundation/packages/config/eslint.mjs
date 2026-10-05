@@ -169,7 +169,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['packages/domain/**/*.ts'],
+    files: ['packages/domain/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-globals': [
         'error',
