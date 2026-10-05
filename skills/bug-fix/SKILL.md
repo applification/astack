@@ -7,7 +7,11 @@ metadata:
 
 # Bug fix
 
-Use this skill directly for the requested outcome, or as the selected astack delivery route. Read relevant project instructions and working commands; user scope and project constraints take precedence.
+Apply [fix root causes](../principle-fix-root-causes/SKILL.md) for the reproduction and supported repair.
+
+For a demonstrated recurring failure, apply [encode lessons in structure](../principle-encode-lessons-in-structure/SKILL.md) to prevent recurrence at its owning boundary within scope.
+
+Use this skill directly for the requested outcome, or as the selected astack delivery route. Read relevant project instructions, `.astack/project.md` when present and working commands; user scope and project constraints take precedence.
 
 Reproduce the reported symptom on its real surface or build the closest runnable signal that can fail on that symptom. Make the loop as fast and deterministic as practical. Use code and history to distinguish causes, then change the smallest mechanism supported by evidence. Rerun the original signal after the fix; a neighboring unit test alone does not establish that the reported symptom is gone. Add a regression check at a meaningful seam when it earns its maintenance cost. Findings from exploration follow the [candidate confirmation and regression loop](../testing/references/e2e.md) when e2e is in use; setup or locator failures do not confirm a bug. End with a [pull request](../pr/SKILL.md) that names the original symptom, cause, fix, and observed before/after proof.
 

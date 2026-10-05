@@ -1,4 +1,4 @@
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -44,4 +44,21 @@ for (const match of html.matchAll(/https:\/\/github\.com\/applification\/astack\
 for (const asset of ['styles.css', 'app.js', 'scenarios.json', 'favicon.svg']) {
   if (!existsSync(path.join(root, 'site', asset))) throw new Error('Missing site asset: ' + asset);
 }
-console.log(`Site routes, ${scenarios.length} eval examples, and source links match this checkout.`);
+
+for (const folder of readdirSync(path.join(root, 'skills')).filter((name) => name.startsWith('principle-'))) {
+  if (!skill.includes(`../${folder}/SKILL.md`) || !html.includes(`skills/${folder}/SKILL.md`)) {
+    throw new Error(`Principle leaf is missing from the coordinator or site index: ${folder}`);
+  }
+}
+
+const guideFiles = readdirSync(path.join(root, 'docs/guide')).filter((name) => name.endsWith('.md'));
+for (const file of ['README.md', 'docs/project-install.md', ...guideFiles.map((name) => `docs/guide/${name}`)]) {
+  const source = read(file).replace(/^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1\s*$/gm, '');
+  for (const match of source.matchAll(/!?\[[^\]]*\]\(([^)]+)\)/g)) {
+    const url = match[1];
+    if (/^[a-z][a-z0-9+.-]*:/i.test(url) || url.startsWith('#')) continue;
+    const target = path.resolve(root, path.dirname(file), decodeURIComponent(url.split('#')[0]));
+    if (!existsSync(target)) throw new Error(`Broken documentation link: ${file} -> ${url}`);
+  }
+}
+console.log(`Site routes, ${scenarios.length} eval examples, principle indexes and guide links match this checkout.`);

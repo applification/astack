@@ -7,6 +7,10 @@ metadata:
 
 # Verify the outcome
 
+Read [prove it works](../principle-prove-it-works/SKILL.md) before claiming the named outcome.
+
+Read `.astack/project.md` when present for the project's runtime, control and verification commands; use the requested scope without requiring the astack coordinator or a setup pass.
+
 Use this directly to verify a named change or claim, or during astack delivery. Start from the request or acceptance cases, affected diff and the project's actual commands and surfaces. Do not replace the intended outcome with whatever the existing suite happens to check.
 
 1. Identify the failure each material case must distinguish. Choose the cheapest useful check and any running-product observation needed for data, identity, timing or integration. Trace affected consumers; a backend change can require a browser check.

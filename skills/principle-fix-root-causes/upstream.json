@@ -1,0 +1,18 @@
+{
+  "repository": "https://github.com/cursor/plugins",
+  "revision": "4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Lauren Tan",
+  "files": [
+    {
+      "source_path": "pstack/skills/principle-fix-root-causes/SKILL.md",
+      "source_sha256": "ba4cd38da1dcc8fe5432feb64457cba95594736a9b21b2ebf8f8c52aee068707",
+      "local_path": "SKILL.md"
+    }
+  ],
+  "adaptations": [
+    "Replace Cursor-only invocation policy with directly callable Codex identity and UI metadata.",
+    "Resolve principle composition to packaged skills; keep checks proportional and actions within caller authority.",
+    "Preserve legitimate boundary guards, recorded constraints, scope and persistent data during diagnosis."
+  ]
+}

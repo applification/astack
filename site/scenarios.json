@@ -146,13 +146,13 @@
   },
   {
     "request": "Adopt astack in an existing pnpm app",
-    "decision": "Inspect scripts and CI; keep pnpm and the current layout, document working proof commands, and add project-owned app control only where repeatable driving is useful. Do not migrate the package manager as part of adoption; open a PR.",
+    "decision": "Project setup; inspect scripts, CI and a safe baseline, compare gaps with astack defaults, and integrate useful runtime, control and verification upgrades. Reuse sound pnpm tooling when it meets the loop; assess a package-manager migration as a scoped upgrade rather than silently enforcing either preservation or replacement. Record the working loop and agent pointer, prove a real path and retain evidence through cleanup; open a PR.",
     "route": "setup"
   },
   {
     "request": "Set up astack to verify our existing web app",
-    "decision": "Inspect its current drivers, framework, package manager, and scripts; create or adopt a project-owned executable `astack-<app>` CLI in `.codex/skills/` and feature map in `.astack/feature-map/<app>/`, prove its direct invocation and one real user path through the CLI, and open a PR. The command must drive the app, not merely wrap lint and tests; keep the working stack.",
-    "route": "control"
+    "decision": "Inspect its current drivers, framework, package manager, and scripts; create or adopt a project-owned executable `astack-<app>` CLI in `.codex/skills/` and feature map in `.astack/feature-map/<app>/`, prove its direct invocation and one real user path through the CLI, and open a PR. The command must drive the app, not merely wrap lint and tests; integrate useful loop upgrades and record the actual commands and remaining gaps.",
+    "route": "setup"
   },
   {
     "request": "The app control script has a Bun shebang but only `bun run` works",
@@ -296,7 +296,7 @@
   },
   {
     "request": "Adopt astack in an app with working Playwright regressions",
-    "decision": "Preserve Playwright and the package manager. Map acceptance to existing checks, retain evidence and use the candidate confirmation loop; do not migrate the runner without a request.",
+    "decision": "Reuse proven Playwright regressions as the verification part of project setup. Add missing instance identity, safe fixtures, control and evidence/reporting capabilities, prove the integrated loop and record chosen upgrades; a working runner need not be replaced to adopt astack.",
     "route": "setup"
   },
   {
@@ -477,6 +477,86 @@
   {
     "request": "Resume COS-42 after a repeated signal and an expired execution budget",
     "decision": "Inspect the durable assignment/latest result, actual checkout, existing PR, owners and proof under the same work ID. Reconcile stale scope, authority and remaining limits with the host/owner before mutation; a new attempt cannot silently reset the budget. Host replay/deduplication still needs actual integration proof.",
+    "route": "investigation"
+  },
+  {
+    "request": "Set up astack in a new project with no selected stack",
+    "decision": "Project setup; apply the new-product defaults to actual surfaces, establish local startup and a project-owned control CLI/map, add a meaningful regression, prove one real path through cleanup and record the profile plus agent pointer. Ask only for material product or scope choices; no tracker or model-role questionnaire.",
+    "route": "setup"
+  },
+  {
+    "request": "Upgrade our existing app to Bun and astack runtime verification",
+    "decision": "Project setup; honor the selected Bun upgrade, capture a baseline, update coupled scripts, lockfile, CI and runtime/control guidance, and verify the same real behavior after the upgrade. Resolve other major migration choices only when still missing; retain evidence and report recovery and gaps.",
+    "route": "setup"
+  },
+  {
+    "request": "Re-run setup after our startup script and saved-items route changed",
+    "decision": "Project setup; read the existing profile, control skill and feature map, update stale commands and handles in place, preserve custom instructions and repair the mapped path. Re-run startup, identity, action, fresh observation and cleanup; retain evidence without creating a second loop.",
+    "route": "setup"
+  },
+  {
+    "request": "Set up the runtime loop, but our auth credentials are unavailable",
+    "decision": "Complete independent startup/control/check work, retain the first auth failure and mark the affected runtime path partial with its exact prerequisite. Use GitHub or the established tracker only if useful and issue creation is authorized; a ticket and generated files do not establish a completed loop.",
+    "route": "setup"
+  },
+  {
+    "request": "Set up astack for a pure parsing library",
+    "decision": "Project setup; exercise a real executable consumer/example and exact parsing assertions, record actual commands and evidence in the project profile and add an agent pointer. Mark browser sessions and app feature maps not applicable; do not fabricate a running UI.",
+    "route": "setup"
+  },
+  {
+    "request": "Fix this small CLI message; this repo has no astack project profile",
+    "decision": "Use the relevant delivery skill and actual project instructions/commands. Missing project guidance does not force setup, a stack upgrade or unrelated files; verify the narrow outcome and finish through pr.",
+    "route": "feature"
+  },
+  {
+    "request": "Use project-setup directly to integrate our existing app",
+    "decision": "Apply project-setup and its runtime-loop guidance directly, compose app-control, testing and verify as needed, improve weak tooling toward astack opinions and finish kept changes through pr. Do not require entry through the astack coordinator.",
+    "route": "setup"
+  },
+  {
+    "request": "Use principle-type-system-discipline to review a Swift state enum",
+    "decision": "Read the language-independent principle leaf in full and assess the actual variants, illegal states and signature using Swift constructs. Return the decision and observed checks or limits; no TypeScript dependency, project setup or unrelated PR.",
+    "route": "investigation"
+  },
+  {
+    "request": "Use principle-boundary-discipline to assess this MCP adapter",
+    "decision": "Read the leaf and actual adapter, identify where external arguments and identity become domain values, and assess validation and pure logic at that boundary. Return a scoped assessment; do not initiate implementation or require astack routing.",
+    "route": "investigation"
+  },
+  {
+    "request": "This same invalid configuration keeps breaking startup",
+    "decision": "Select bug-fix for the reported failure and read principle-encode-lessons-in-structure for its recurrence. Reproduce it, place a structural fix at the owning configuration boundary, retain a distinguishing regression and finish through verify/pr; another reminder is insufficient.",
+    "route": "bug"
+  },
+  {
+    "request": "Set up the runtime loop, then repair the lost-save bug",
+    "decision": "Compose project-setup before bug-fix where the loop is missing, carrying one scope and proof record. Establish identity and fixtures, reproduce the bug, fix its cause and re-drive the same persisted user path. Reuse completed setup proof and finish in the designated PR.",
+    "route": "setup"
+  },
+  {
+    "request": "Audit the full feature map; repair only control tooling and report product defects",
+    "decision": "Use app-control for maintenance; compare every scoped map entry and command with source and the live product, report a result or gap per path, repair stale control handles and guidance only, and re-drive repaired paths. Report product regressions without changing product code under this bounded request.",
+    "route": "control"
+  },
+  {
+    "request": "Apply prove it works; the save test only checked a success toast",
+    "decision": "Read principle-prove-it-works and use verify to inspect the actual persisted value through a fresh authoritative read on the identified instance. Keep the earlier toast observation limited to UI feedback and report any remaining data-proof gap.",
+    "route": "feature"
+  },
+  {
+    "request": "Use principle-test-behavior-not-implementation to assess our negative tests",
+    "decision": "Read the leaf, exercise the actual subject and assess whether the assertions distinguish the rejected behavior. A meaningful absence or rejection is legitimate; pair with a success/control case when useful instead of deleting negative coverage blindly.",
+    "route": "investigation"
+  },
+  {
+    "request": "Continue the migration from the retained task record; do not repeat completed work",
+    "decision": "Read the current checkout, scope, decisions and existing PR, verify inherited claims that still matter, and resume the next incomplete phase. Apply principle-sequence-verifiable-units to dependent slices and preserve the original finish condition.",
+    "route": "refactor"
+  },
+  {
+    "request": "New task: explain retry ownership without changing code",
+    "decision": "Rematch the explicit new outcome to investigate instead of continuing an earlier implementation route. Read current source and decision history, separate evidence from inference, and return a read-only answer.",
     "route": "investigation"
   }
 ]

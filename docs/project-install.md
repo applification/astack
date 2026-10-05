@@ -45,7 +45,36 @@ codex plugin add applification@my-project-applification
 
 The CLI installation also enables the plugin at user level. If astack should run only in this project, set the same plugin ID to `enabled = false` in the user Codex configuration and keep `enabled = true` in this project's configuration. Project settings take precedence in trusted projects. Confirm the effective state with `codex plugin list --marketplace my-project-applification --json` from the project and from another directory.
 
-Ask Codex to use `$applification:astack` to set up the project. It inspects the repository and writes `.astack/project.md` for project-specific proof paths and decision locations. For a runnable product that needs repeatable app driving, setup creates or adopts a project-owned `astack-<app>` control CLI in `.codex/skills/astack-<app>/` and feature map in `.astack/feature-map/<app>/`, then proves the script runs directly by path and drives one mapped user path. A package script can be a convenience alias; global `PATH` setup is left to the user. Behavior contracts, selected Pencil files, and retained evidence go into tracked `.astack/<feature>/` folders. An existing project's framework, package manager, and working tools remain in place unless a migration is requested. Check that `.astack/` and the project control skill are visible to Git when present. Keep any `AGENTS.md` pointer short; it should opt into the workflow rather than duplicate it.
+## Establish or upgrade the project loop
+
+Invoke setup directly after installation, or ask the coordinator for the same outcome:
+
+```text
+$applification:project-setup Set up this new project for astack
+$applification:project-setup Integrate and upgrade this existing project for astack
+```
+
+Setup inspects the product and runs a safe baseline where available. It applies astack's [new-product defaults](../skills/project-setup/references/profile.md) or upgrades existing development, control and verification tooling through [runtime loop setup](../skills/project-setup/references/runtime-loop.md). Routine defaults are inferred; questions resolve material product, data or scope decisions. Working drivers and regressions can become part of the loop. Framework, database and auth migrations need a concrete scope and recovery; setup is not restricted to preserving the status quo.
+
+The resulting project owns:
+
+- Tracked `.astack/project.md` with actual runtime, control and verification commands, selected defaults, upgrades, observed evidence and gaps.
+- A short pointer in its agent instructions, updated in place on re-runs.
+- A project-owned `astack-<app>` control skill/CLI in `.codex/skills/astack-<app>/` and feature map in `.astack/feature-map/<app>/` for runnable user surfaces, reusing an existing driver where sound.
+- A meaningful regression and a demonstrated loop: start/connect, identify the intended instance, drive a mapped action, inspect its result, check, capture evidence and clean up owned resources.
+
+Prove direct CLI invocation and one safe real user path; retain evidence through cleanup. For a library, exercise a consumer/example and appropriate checks. Record missing prerequisites and untested surfaces honestly; generated configuration alone does not complete setup. Keep runtime and credentials in the project, and keep secrets out of tracked guidance. Use GitHub Issues when deferred work needs tracking and no established tracker applies; no issue-tracker or model-role questionnaire is required.
+
+## Use the coordinator or a focused skill
+
+```text
+$applification:astack Fix edits disappearing after save and reopen
+$applification:bug-fix Fix edits disappearing after save and reopen
+$applification:verify Check this change without repairing it
+$applification:principle-boundary-discipline Review this adapter's validation boundary
+```
+
+The coordinator selects workflows, platform skills and applicable principle leaves. Every skill is independently callable and can compose other relevant skills without returning to astack. Both paths read project guidance when it applies. A missing project profile does not force a setup pass for a narrow job. Keep project-specific CLI skills in the project and reusable engineering instructions in this plugin.
 
 For a project that uses Convex, also install and enable `convex@openai-curated-remote` in Codex. astack calls on its `@Convex` app and `convex:*` skills for setup, backend changes, and the required Convex PR review. Check that the plugin is available in a new task before starting Convex work; astack's plugin installation does not install companion plugins.
 

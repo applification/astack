@@ -7,6 +7,8 @@ metadata:
 
 # PR and review
 
+Read `.astack/project.md` when present for the project's runtime, control and verification commands; use the requested scope without requiring the astack coordinator or a setup pass.
+
 Use this skill directly for a review or PR, or when astack delivery reaches review. Read the request, current diff, project PR rules and available proof first. Repository changes meant to be kept finish in a PR, whether they came from a feature, bug fix, refactor, performance change, or project setup. Carry the owner-selected PR through later additions and revisions. Continue it when it covers the task; coherent slices can be separate commits within it. A new capability or skill does not by itself authorize a second PR. A read-only investigation or review needs no new PR. If required design or proof is blocked after independent work is complete, open a draft PR that names the blocker and unverified claims; do not describe the change as finished. A missing remote or base branch must be resolved before a PR can exist.
 
 For a read-only review, return findings with source locations and proof gaps. For PR preparation, inspect the full diff against the agreed intent. Review two questions separately:

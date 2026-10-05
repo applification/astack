@@ -7,6 +7,8 @@ metadata:
 
 # Move an app to cloud
 
+Read `.astack/project.md` when present for the project's runtime, control and verification commands; use the requested scope without requiring the astack coordinator or a setup pass.
+
 New astack apps start with local development. A user request such as “move this app to cloud” initiates this delivery workflow; building an app, provisioning an auth sandbox or finding an integration that needs a public URL does not initiate it. Preserve an existing app's accepted deployment until its user requests a transition. Cloud delivery belongs inside astack, including configuration, data decisions, deployment, actual hosted proof and recovery.
 
 ## Establish the transition

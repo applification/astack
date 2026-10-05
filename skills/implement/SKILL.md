@@ -7,7 +7,9 @@ metadata:
 
 # Feature
 
-Use this skill directly for the requested outcome, or as the selected astack delivery route. Read relevant project instructions and working commands; user scope and project constraints take precedence.
+For multi-step delivery, apply [sequence verifiable units](../principle-sequence-verifiable-units/SKILL.md).
+
+Use this skill directly for the requested outcome, or as the selected astack delivery route. Read relevant project instructions, `.astack/project.md` when present and working commands; user scope and project constraints take precedence.
 
 Clarify the observable outcome through a [behavior contract](references/behavior-contract.md). For a web UI feature, use [the web feature path](../web-feature/SKILL.md) to decide independently whether Pencil and Storybook are useful before production wiring. For a new app without a chosen stack, use [the astack greenfield default](../project-setup/SKILL.md); if it needs a database, follow [the Convex path](../convex/SKILL.md). In an existing app, work with its current stack. Trace affected entry points from trigger through data, ownership, and side effects. Check history before removing an unusual constraint; distinguish recorded intent from an inference based on current code. Sketch data shape and module boundaries before promoting prototype state or changing a costly interface. Implement in coherent slices, use fast checks, and [prove](../verify/SKILL.md) the integrated behavior on applicable surfaces. End with a [pull request](../pr/SKILL.md) linking the contract and proof result, including any unresolved gaps.
 

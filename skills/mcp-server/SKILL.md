@@ -7,6 +7,10 @@ metadata:
 
 # MCP server path
 
+Read `.astack/project.md` when present for the project's runtime, control and verification commands; use the requested scope without requiring the astack coordinator or a setup pass.
+
+Apply [boundary discipline](../principle-boundary-discipline/SKILL.md) to protocol inputs and adapters alongside the serving guidance.
+
 Use this skill directly or during astack delivery when building or changing an MCP server. Start from the project's existing transport, host requirements and authentication model. Keep domain authorization in the domain service even when an MCP gateway has authenticated the caller. An MCP-only change has no web design sprint; an MCP App with visible UI also follows the [web feature path](../web-feature/SKILL.md) for its UI states.
 
 For ChatGPT MCP Apps, OpenAI extensions, portable packaging or events, also use [ChatGPT plugin engineering](../chatgpt-plugin/SKILL.md). Its [compatibility ledger](../chatgpt-plugin/references/compatibility.md) overrides the generic v2 default when using the released OpenAI helper; do not mix incompatible SDK majors.
