@@ -1,6 +1,6 @@
 # Milestones after the foundation
 
-The [iteration plan](https://chatgpt.com/space/page_b11134b1d1708191adcbfc59518d1580) remains the design brief; this record holds implementation scope and unresolved choices. Each coherent kept slice ends in a PR. Follow-up PRs require owner approval to merge.
+The [iteration plan](https://chatgpt.com/space/page_b11134b1d1708191adcbfc59518d1580) remains the design brief; this record holds implementation scope and unresolved choices. Preserve the owner-selected PR across additions; coherent slices can be separate commits within it. A separate review target needs an owner decision. Follow-up PRs require owner approval to merge.
 
 | Slice | Outcome and required evidence | State |
 | --- | --- | --- |
@@ -31,4 +31,4 @@ Pending owner choices: actual Codex/T3 Code arrangement and durable work system;
 
 ## Consolidation into PR 18
 
-Owner direction on 5 October 2026 moves all PR 17 changes into PR 18 and closes PR 17 after verifying migration. The combined PR owns specialist guidance, portable handoffs, callable skill composition, domain language and review explanations. Original PR 17 evidence remains tied to its tested source; later metadata and installed-candidate checks have their own revision. The wider specialist/COS delivery trials and bounded host pilot remain next milestones, with the existing proof gaps preserved.
+Owner direction on 5 October 2026 moves all PR 17 changes into PR 18. GitHub confirmed the migrated files and merge ancestry before PR 17 was closed on that direction. The combined PR owns specialist guidance, portable handoffs, callable skill composition, domain language and review explanations. Original PR 17 evidence remains tied to its tested source; later metadata and installed-candidate checks have their own revision. The wider specialist/COS delivery trials and bounded host pilot remain next milestones, with the existing proof gaps preserved.
