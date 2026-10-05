@@ -77,6 +77,7 @@ async function waitUntil(
   throw new Error(`Timed out waiting for ${description}.`);
 }
 async function start(clients = true): Promise<void> {
+  const logOffset = logs.length;
   owned = launch(
     ['bun', 'run', clients ? 'dev' : 'dev:backend'],
     project,
@@ -84,6 +85,11 @@ async function start(clients = true): Promise<void> {
     logs,
   );
   await waitUntil(async () => {
+    // On restart, env initialization briefly starts an administrative backend
+    // with the previous build ID. Wait for this session's successful push so
+    // that its persisted health response cannot masquerade as dev readiness.
+    if (!logs.slice(logOffset).join('').includes('Convex functions ready!'))
+      return false;
     const response = await fetch('http://127.0.0.1:3211/health');
     if (!response.ok) return false;
     const health: unknown = await response.json();

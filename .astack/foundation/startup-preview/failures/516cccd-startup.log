@@ -1,0 +1,22 @@
+reference	Persistent local development and restart	﻿2026-10-05T10:09:58.5486262Z ##[group]Run cd "$RUNNER_TEMP/astack-foundation"
+reference	Persistent local development and restart	2026-10-05T10:09:58.5486668Z ^[[36;1mcd "$RUNNER_TEMP/astack-foundation"^[[0m
+reference	Persistent local development and restart	2026-10-05T10:09:58.5486986Z ^[[36;1mbun run development:verify^[[0m
+reference	Persistent local development and restart	2026-10-05T10:09:58.5523295Z shell: /usr/bin/bash -e {0}
+reference	Persistent local development and restart	2026-10-05T10:09:58.5523585Z ##[endgroup]
+reference	Persistent local development and restart	2026-10-05T10:09:58.5596769Z $ bun scripts/development-proof.ts
+reference	Persistent local development and restart	2026-10-05T10:10:04.0643904Z 294 |       2,
+reference	Persistent local development and restart	2026-10-05T10:10:04.0644379Z 295 |     ) + '\n',
+reference	Persistent local development and restart	2026-10-05T10:10:04.0644730Z 296 |   );
+reference	Persistent local development and restart	2026-10-05T10:10:04.0645039Z 297 | }
+reference	Persistent local development and restart	2026-10-05T10:10:04.0645363Z 298 | if (failure)
+reference	Persistent local development and restart	2026-10-05T10:10:04.0645625Z 299 |   throw new Error(
+reference	Persistent local development and restart	2026-10-05T10:10:04.0645902Z                   ^
+reference	Persistent local development and restart	2026-10-05T10:10:04.0646938Z error: Persistent development proof failed; see /home/runner/work/_temp/astack-foundation/.proof/development-1791194998904: Development exited before persistent local functions.
+reference	Persistent local development and restart	2026-10-05T10:10:04.0648064Z       at /home/runner/work/_temp/astack-foundation/scripts/development-proof.ts:299:13
+reference	Persistent local development and restart	2026-10-05T10:10:04.0648538Z 
+reference	Persistent local development and restart	2026-10-05T10:10:04.0672404Z ##[error]
+reference	Persistent local development and restart	      at /home/runner/work/_temp/astack-foundation/scripts/development-proof.ts:299:13
+reference	Persistent local development and restart	2026-10-05T10:10:04.0681055Z 
+reference	Persistent local development and restart	2026-10-05T10:10:04.0681367Z Bun v1.4.0 (Linux x64)
+reference	Persistent local development and restart	2026-10-05T10:10:04.0732464Z error: script "development:verify" exited with code 1
+reference	Persistent local development and restart	2026-10-05T10:10:04.0741211Z ##[error]Process completed with exit code 1.
