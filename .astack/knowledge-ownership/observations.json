@@ -1,0 +1,349 @@
+{
+  "candidate_revision": "4f72c608b575bef7c931ccfb48e7040326cce724",
+  "installed_plugin_digest": "9536914954369e2ea2758719a1898eb0507f1100ef148fa437388e408424a305",
+  "installed_file_hashes": {
+    "LICENSE": "676999dee7671a3588394aa0e1c5e24ea798697134085f654c67e355b19efb17",
+    "plugin.json": "8a956a2666c186092f93d160fd509874bedb7bf0652832f018ce8cffd14abb78",
+    "NOTICE.md": "3939843ffd6a4fa17125a41a05d5ebd5b9334aa4e0df0e48d43587900c53b261",
+    "mcp.json": "1788697eb2d3aa1caa8da59a62331a92529e24885f0e7151418f915000fbf7fd",
+    "assets/applification-mark-dark.svg": "b0c248fdc73fcd03f8817ba759fbfd40989eb7c733bfc85af96108c8303dcd10",
+    "assets/applification-mark-light.svg": "c7be591106ba2dd9a27436586d1894f992a19e68235857656937161baf0d0aaa",
+    "skills/domain-modeling/LICENSE": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+    "skills/domain-modeling/GLOSSARY-FORMAT.md": "21dcc40cdec8e151a829b98ab1517c1867bc444e3665134a98c6983411996801",
+    "skills/domain-modeling/SKILL.md": "fc06c57519f53fb4546fc7e31bc394ff7c4105cc5c1ee419605f0c67b77f9c71",
+    "skills/domain-modeling/upstream.json": "e2bbe3934b0c7e25fa7966ee5d3c20e9a17979b0eb2b619a5e55e624b1c630ae",
+    "skills/domain-modeling/ADR-FORMAT.md": "944c92aa790e8fbdc9199640b170979abb8a34ba8d0fe18c2a01a63bce140ca0",
+    "skills/astack/SKILL.md": "f1ab88c368bfc33d2a60552d720cd6d1f49acd0ba207cccf30fb81b7dcb090ed",
+    "skills/verify/SKILL.md": "f4c9793e49f8e98afed6f2f49c1b58f37ceb7bab3179f0a1daef4db8700813a9",
+    "skills/investigate/SKILL.md": "b2d28a9e03a7776fa73b1d716a59814d022b2ec430cf030907201bc372c30f49",
+    "skills/workos-auth/SKILL.md": "b6017f810f40452e5f675fb2055cc2015f7206e80852448a73f654bf61ab2d8a",
+    "skills/mcp-server/SKILL.md": "4238bfeb02e931f2e4a01a2571ef10f2e0952111ed90436ab39e7dc105a7161d",
+    "skills/chatgpt-plugin/SKILL.md": "d5fb6d4a953a37564226c82e1a1c89b16af6dff848df2d349c7031cf1e2ee2d0",
+    "skills/convex/SKILL.md": "c16949b7151cde225c5bbce8e4b04bfa5b162668f10eb579309e1a0e5859a84b",
+    "skills/pr/SKILL.md": "59698a75afd13d9d7fb17cf094965ab50dfb72406d4fe55f813faed34d659878",
+    "skills/testing/SKILL.md": "2d217dd64dabc4518192a3e329b3c5adf8bc034ee0b32a64463451030a0c2e4b",
+    "skills/project-setup/SKILL.md": "5abbde594b5ed85b900f65b734b2cd18fe23aca625973548b063d7480c757ea5",
+    "skills/web-feature/SKILL.md": "5851653e1b5ddb89a13e3178bef3075fe55c4aafaf307dc1fb4136b3121b7008",
+    "skills/typescript-best-practices/LICENSE": "bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e",
+    "skills/typescript-best-practices/SKILL.md": "da8bc7085621b95106d6985e1a16f02a3055f499bf07e0cce79053d1b2054a7b",
+    "skills/typescript-best-practices/upstream.json": "95af3dc3a3ad5daca8a302ba80ab104e20b914075cf6bfc883a3481bbc42233b",
+    "skills/cloud-transition/SKILL.md": "6fa4c5face3673425cac027f8bf48f57b212384b8a49132864a7cf20c378665d",
+    "skills/implement/SKILL.md": "44dcc9195f65588a42208081bace630f1b0b9e804100043e451282b7703881b7",
+    "skills/app-control/SKILL.md": "bdc3fcab29446537222ce47632679c78d24d0182eea76a8fb8c784fdfd689326",
+    "skills/performance/SKILL.md": "e61941a7c23dfddc2d6ea34fe671fa65157f6819ef6774baf5dc1d93706973a7",
+    "skills/show-me/LICENSE": "5f13c18ea00ea5c1384f41745feeca774079164f7f59a92e4ac0899ad217b26f",
+    "skills/show-me/SKILL.md": "01971ce0797127bb9cb1490c9a2649bb9c5d672278720cc81d55caa7275bf53b",
+    "skills/show-me/upstream.json": "1eb53a5d333ece0cddeb13ef886e2a7ebcccc71542d30d913206a66958f26c40",
+    "skills/react/SKILL.md": "9a6c82eb1882202082ff3523e9caaecc95d62651f05fd881c097028d80d6aafb",
+    "skills/refactor/SKILL.md": "7a550cd70e84208d4b0c95319c49f337464ac493c54a05e836f04db4af6705d3",
+    "skills/bug-fix/SKILL.md": "c73e95de728329f1e3974afca8e94a764aeb65db61c0bf8f0b4711e6922e2ea6",
+    "skills/bug-fix/agents/openai.yaml": "b200058a451f7f57a002b1f4616138cebcb1ee791cda9c3a045bac446c8c1286",
+    "skills/refactor/agents/openai.yaml": "9152593d799d69ad010edd06ebda5d680c363711d01d091a2e8f1c436af21cd5",
+    "skills/react/references/state-and-adapters.md": "997ebae0412a467243e1f02a0bc214d156dca6194b920f17c5dd9cd43e940dba",
+    "skills/react/references/shadcn-lint.md": "8c4869109ba207b26caf689141557202479f22d25c743bec00fcfb80a13f905f",
+    "skills/react/agents/openai.yaml": "ddcb83a913fc7c3fbf123ba7909f5dea3cc5e16c722f677a1183c59a15266b42",
+    "skills/show-me/agents/openai.yaml": "7cf510404ca0ec499fb110fc1bef0c0ae6a8a66468a5333a6844bc6dc5783d20",
+    "skills/performance/agents/openai.yaml": "7cb4dbd508b9fb4101384bf53ae64f3af030c0c39bab0dfaa4876d069d62da6c",
+    "skills/app-control/references/control-contract.md": "be4cce9a261ca40e0df3e56fa332fc394f97933db342e95cbe91b9e0626856a9",
+    "skills/app-control/agents/openai.yaml": "8ac39714bf40df935268940b22d4da9597316db0295b3c45989bb28d420cd2dd",
+    "skills/implement/references/behavior-contract.md": "6cea03e905c3d9bc83cb1f71e942555e600566bd3421b1d5b72e44e7a6ee0009",
+    "skills/implement/agents/openai.yaml": "81a550cd9befa41ef8d44f910809030016c82e0a79f452e9d4fb0fe9bb4b6219",
+    "skills/cloud-transition/agents/openai.yaml": "7bd77341c443550edd40bf07eaa519092a78baac6419151439e2317e9f0ad773",
+    "skills/typescript-best-practices/references/type-system-discipline.md": "1c52c3f205583c4da0d0ff39890dd039434f4703596834d8abf6d06d4af30b90",
+    "skills/typescript-best-practices/references/encode-lessons-in-structure.md": "a0c725352ba3a18183274b8625827e4328ed56d9311e9fa3de0610c57664b529",
+    "skills/typescript-best-practices/references/patterns.md": "0fa214a66a99824a6b43676f355a3764c4d8477ffa56f3707d0a1443b792ecc0",
+    "skills/typescript-best-practices/references/boundary-discipline.md": "d9aa44e83e005e099e0598264f2b73e284c145035e69539fd46a4f58a75d4911",
+    "skills/typescript-best-practices/agents/openai.yaml": "527ad08dca7bff0bf7178f55ff95a6154d829e4a406ba4d52fcf80129979e041",
+    "skills/web-feature/agents/openai.yaml": "1000272c0889f00cb62b1469afa02878bd770ff57dde11e404cc91df03b06f42",
+    "skills/project-setup/references/profile.md": "607367b692b8809c2da8d957fecdfffbca79ff0351c46f0b71eaacb4d308c145",
+    "skills/project-setup/agents/openai.yaml": "05a3986450d650e6fe657d6a9e3e17491bff0e611c6ead1d2a30816f7f6368c9",
+    "skills/testing/references/e2e.md": "bce9953f2304ce18df70ab5a02923e3a83883d9102b9d919495f65954b2998d5",
+    "skills/testing/agents/openai.yaml": "0c0119111522a195018f1f91f69f5f0fa3d6c38cafac323187eb838bcd94ff0b",
+    "skills/pr/references/explanation-delivery.md": "523c3233ff75f48daf92fbab4a90b11a554f414d07b3bbc0b97f8ad769b69d97",
+    "skills/pr/agents/openai.yaml": "764ae713fe8be48526931996a8174c3f16b1892dbad0a972ea02b0ec33c1e339",
+    "skills/convex/references/integration.md": "ae44f6e7555dc58c8f1d581d9b75868364994e2cf6871cb8051536413bdeacc2",
+    "skills/convex/agents/openai.yaml": "a4592ad9139898d8b3f1657a2c55973ba49a0d1666e58aa80a8bb2093ee9eec8",
+    "skills/chatgpt-plugin/references/mcp-events.md": "7c5df0d52ea50690875867b0c267e588e76562506f975b635027cdfbbda561d4",
+    "skills/chatgpt-plugin/references/openai-extensions.md": "8591e521f058066341abf3b93c2deb3fd827a623c36e3f68e8a0be99014d15de",
+    "skills/chatgpt-plugin/references/mcp-app-ui.md": "ace5703b402c2dace7c7f5b613fb349f87e3dadab45f93d2eb866e9f80d41adf",
+    "skills/chatgpt-plugin/references/compatibility.md": "beafde340baf0dc74b6d4657f5901059293cfbc1f94b0da457251ef6c71b29d0",
+    "skills/chatgpt-plugin/references/plugin-local-install.md": "832f2745a6ec935419181695755c3967fd5cdc799447feeb5ec55669bff1ef63",
+    "skills/chatgpt-plugin/agents/openai.yaml": "a8edaf98c73e4eed8a2eaf235c3b748b93188ed820a8dd4a9b29872d5691eab0",
+    "skills/mcp-server/agents/openai.yaml": "7ca8901adf825af7964c73dddc55419bd1f9e18f915928ca358cb8c03c09bf31",
+    "skills/workos-auth/references/testing.md": "bd7afcc110feb7ffdb8f668368e7e950636afbde68734b899ef6bff0529e2026",
+    "skills/workos-auth/agents/openai.yaml": "b15c5ff150a812a969aceaa20af43223245f7ae32c4bb1e78256d470c5c9f0f0",
+    "skills/investigate/agents/openai.yaml": "d23179ffcd35bd2672bb2e7ee9ebb81f81295c6322583766255ec66ba5ea9953",
+    "skills/verify/references/proof-policy.md": "1f6ddf0b5409a5aa83f35fcdff8c1af1d4399a2080f08aca0e3e063fcf9efe1d",
+    "skills/verify/agents/openai.yaml": "80eec84a4293e8927d684e9a15233c41f4c51b8d1434532df55a054f1fb31cb1",
+    "skills/astack/references/handoff-examples.md": "a9a6388d785170453bec4a1adb360fec18c2ff6e14ec34fe974ebbc5a0ba0522",
+    "skills/astack/references/handoffs.md": "2faacde2eff21bdf789eb22f320f355c4d236e1509d9d74b9596733631481a98",
+    "skills/astack/references/specialists.md": "9dc3b8f82cde8d966f472179a89990d4b97809e74a40c5e7096751fc91b4a14f",
+    "skills/astack/agents/openai.yaml": "d10ad488786135cdf2f9808654f90e35c9aaf94b30139ce20e28b81786f6412f",
+    "skills/domain-modeling/agents/openai.yaml": "f136cdce3146e54fbfe91132dfeb3ec423f253dd2888464fdcc3de512139aa0b"
+  },
+  "marketplace": "astack-knowledge-4f72c608-1791210928",
+  "catalog_adaptation": "Unique ignored marketplace name only; plugin package bytes unmodified.",
+  "environment": {
+    "codexVersion": "codex-cli 0.160.0",
+    "bunVersion": "1.4.0",
+    "nodeVersion": "v22.14.0",
+    "model": "gpt-6.1-sol",
+    "reasoning": "high"
+  },
+  "system": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "fixture_dependency_versions": {
+    "zod": "4.6.5",
+    "typescript": "7.0.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "happy-dom": "20.14.5"
+  },
+  "raw_output_location": ".proof/knowledge-ownership/ (ignored; selected outcomes and identities only retained here)",
+  "limits": {
+    "seconds_per_trial": 300,
+    "tool_actions_per_trial": 30,
+    "max_concurrency": 2,
+    "writers_per_fixture": 1,
+    "recursive_delegation": false,
+    "external_effects": false,
+    "termination_proof": "All observed actions and elapsed time stayed below the ceiling; threshold termination/retry behavior was not exercised. The process timer and command/MCP/web counter were enforced; file-change items were audited separately."
+  },
+  "runs": [
+    {
+      "name": "catalog",
+      "candidate": "4f72c608b575bef7c931ccfb48e7040326cce724",
+      "model": "gpt-6.1-sol",
+      "durationSeconds": 15.7,
+      "exitCode": 0,
+      "actions": 0,
+      "turnCompleted": true,
+      "termination": "normal",
+      "pluginLoadingError": false,
+      "usage": [
+        {
+          "input_tokens": 14019,
+          "cached_input_tokens": 0,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 298,
+          "reasoning_output_tokens": 88
+        }
+      ],
+      "gitStatus": "",
+      "fixtureRevision": "158743f14893506da312860f0c518c3f77d08afe",
+      "observation": "Advertised all 21 native skill identities; no file/tool actions.",
+      "changed_paths": [],
+      "tests_and_config_unchanged": true,
+      "fixture_file_hashes_after": {
+        "bun.lock": "cad8613c6f375980a079d9d0347dbaf9c14ec1207a81d96866d32640f4bbe2e9",
+        ".gitignore": "4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
+        "package.json": "3d0db43685783cc648899720770adea7c91e5c4df86e39e90fb2f4f6369ec599",
+        "tsconfig.json": "42550e83c5fc7d8e63256c63b4d5615deb1f490f86c3156fff1bdd5daeb86d1d",
+        "AGENTS.md": "e623996ad36142fe79fcf5d1a2cbf476c787daa8ed8a6a3d5644f1f17c78181b",
+        "test/reply.test.ts": "ddab5e153b12c610bc7a4e58574ce09f585ffcfc0737b7997271fb509ee8f598",
+        "src/schema.ts": "4fc99f556b9866d5082b97e236e20091ec2d9ccb6fc200d305b15b7adc428c5a",
+        "src/reply.ts": "7f780a15a83e4fc89576d2954629c687ff7041876873ee3abf09774da6c3d377"
+      },
+      "raw": {
+        "prompt.txt": "535e1c78cfc218d7a1d7df5e79a52cd99ddc0eb54afe4e192b5544ea46e18c3b",
+        "events.jsonl": "e28074ba888e5ddd3b28e51ef65664343b58c09f0076099c069e9e7788fcb537",
+        "stderr.log": "2893fae23bd885734c53e894a7d06c97b9c7476bec7258b43b1544266dc9f5ac",
+        "final.md": "7e798dd501746ce7a493663060f8c027b9a9c27753a4dfcbc43a384ab9c4082c",
+        "baseline-tests.log": "15bdb0122c8c43eb4ab484b1432397cbe52a0c267b5c1192b684f1fd8fc9fbc9",
+        "baseline-types.log": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92"
+      },
+      "skill_reads": [],
+      "rechecks": {}
+    },
+    {
+      "name": "direct-typescript",
+      "candidate": "4f72c608b575bef7c931ccfb48e7040326cce724",
+      "model": "gpt-6.1-sol",
+      "durationSeconds": 62.2,
+      "exitCode": 0,
+      "turnCompleted": true,
+      "termination": "normal",
+      "pluginLoadingError": false,
+      "usage": [
+        {
+          "input_tokens": 102760,
+          "cached_input_tokens": 90368,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1387,
+          "reasoning_output_tokens": 95
+        }
+      ],
+      "gitStatus": " M src/reply.ts\n",
+      "fixtureRevision": "d837d7410d5d6ee795fb2cf6f290cf22f49bccea",
+      "observation": "Read installed TypeScript entry, type-system/boundary principles and patterns. Reused ReplySchema, derived Reply, validated unknown at parse and removed unsafe assertions. Existing tests 1 pass/4 fail before; 5 pass after.",
+      "changed_paths": [
+        "src/reply.ts"
+      ],
+      "tests_and_config_unchanged": true,
+      "fixture_file_hashes_after": {
+        "bun.lock": "cad8613c6f375980a079d9d0347dbaf9c14ec1207a81d96866d32640f4bbe2e9",
+        ".gitignore": "4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
+        "package.json": "33bb4ba287cc1f73df948c739c15d0b3cc56e618c01df39d63847d07fcc130c7",
+        "tsconfig.json": "42550e83c5fc7d8e63256c63b4d5615deb1f490f86c3156fff1bdd5daeb86d1d",
+        "AGENTS.md": "e623996ad36142fe79fcf5d1a2cbf476c787daa8ed8a6a3d5644f1f17c78181b",
+        "test/reply.test.ts": "ddab5e153b12c610bc7a4e58574ce09f585ffcfc0737b7997271fb509ee8f598",
+        "src/schema.ts": "4fc99f556b9866d5082b97e236e20091ec2d9ccb6fc200d305b15b7adc428c5a",
+        "src/reply.ts": "169b5855e65a72a7b84cbe037feeab40b6e6442953a24d426762c9ecdc39fe2b"
+      },
+      "raw": {
+        "prompt.txt": "6e8eafd412b3dbe0edcd0b760d49ffd496efd4f99f08c8968433103c9cbb2890",
+        "events.jsonl": "2efb41fe083e30ea5e47f2c58379558b86d0e2f03767cdd9630ae2c33e8a1a18",
+        "stderr.log": "bfcac7ccbedfc127c81cbedd22f5da60509db2640690729fb75e701381b1dd78",
+        "final.md": "5515e44c97287b5b83a05a642dbe0022c12d995dc60460411d9d72e164ceb24d",
+        "baseline-tests.log": "2040a956b0b3712ed3dda7baec283a1842e520384d07b7cc55e9717b571297ff",
+        "baseline-types.log": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92"
+      },
+      "skill_reads": [
+        {
+          "paths": [
+            "skills/typescript-best-practices/references/type-system-discipline.md",
+            "skills/typescript-best-practices/references/boundary-discipline.md",
+            "skills/typescript-best-practices/references/patterns.md"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rechecks": {
+        "recheck-tests.log": "4d27e833e63485d5a0f0cd2de0629624767a28c9ddcdad182ebbe3dec03cb83d",
+        "recheck-typecheck.log": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92"
+      },
+      "command_mcp_web_actions": 8,
+      "file_edit_actions": 1,
+      "total_observed_tool_actions": 9
+    },
+    {
+      "name": "direct-react",
+      "candidate": "4f72c608b575bef7c931ccfb48e7040326cce724",
+      "model": "gpt-6.1-sol",
+      "durationSeconds": 52.0,
+      "exitCode": 0,
+      "turnCompleted": true,
+      "termination": "normal",
+      "pluginLoadingError": false,
+      "usage": [
+        {
+          "input_tokens": 111558,
+          "cached_input_tokens": 101760,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1006,
+          "reasoning_output_tokens": 89
+        }
+      ],
+      "gitStatus": " M src/ItemPicker.tsx\n",
+      "fixtureRevision": "e175c5fd9a291d172719223627903764deed73da",
+      "observation": "Explicit React invocation; actor states React use and reads installed TypeScript/testing companions. Stores selected ID and derives current record. Existing mounted React/Happy DOM tests 1 pass/2 fail before; 3 pass after. No coordinator read or delegation.",
+      "changed_paths": [
+        "src/ItemPicker.tsx"
+      ],
+      "tests_and_config_unchanged": true,
+      "fixture_file_hashes_after": {
+        "bun.lock": "cad8613c6f375980a079d9d0347dbaf9c14ec1207a81d96866d32640f4bbe2e9",
+        ".gitignore": "4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
+        "package.json": "4be424171ae7beeced33011c013dadd668a7776cad7a11edd103c580d3b5fa9d",
+        "tsconfig.json": "42550e83c5fc7d8e63256c63b4d5615deb1f490f86c3156fff1bdd5daeb86d1d",
+        "AGENTS.md": "e623996ad36142fe79fcf5d1a2cbf476c787daa8ed8a6a3d5644f1f17c78181b",
+        "test/picker.test.mjs": "328b193f068d7d37c518bb37d2179c1a978d4fb668858ffa994e69b0455dabeb",
+        "src/ItemPicker.tsx": "5e53e900778a6e1c4bafd38e4730e67eb4a3fee6fbcad3bd32acec06ded8cce0"
+      },
+      "raw": {
+        "prompt.txt": "80f7571faba1a386abdf3ad506019523920ce6303e51dabd2aecd2dcfba37f8c",
+        "events.jsonl": "4be58f3e737a09494f448c115898f3d26346116a1b2db0c009485ca3e367d54e",
+        "stderr.log": "4ecdb16951f1366b36d16ce03e593a6dc9c2fc33c97bae8d0889ea6100f74af8",
+        "final.md": "72493636eb82bd25f7452f8fb1726e46a385737f417dbe6caacc755be4016da1",
+        "baseline-tests.log": "15cc0a5efe1d81367cac7105d8903fc145c82d91ecc40ec67986cb9e1e2f2bb3",
+        "baseline-types.log": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92"
+      },
+      "skill_reads": [
+        {
+          "paths": [],
+          "exit_code": 0
+        },
+        {
+          "paths": [
+            "skills/typescript-best-practices/references/type-system-discipline.md"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rechecks": {
+        "recheck-tests.log": "889ee219cbf095d5ca8aec6b34f3570da30dccc9bf8228dd3675d76a526e5628",
+        "recheck-typecheck.log": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92"
+      },
+      "command_mcp_web_actions": 7,
+      "file_edit_actions": 1,
+      "total_observed_tool_actions": 8
+    },
+    {
+      "name": "composed",
+      "candidate": "4f72c608b575bef7c931ccfb48e7040326cce724",
+      "model": "gpt-6.1-sol",
+      "durationSeconds": 92.5,
+      "exitCode": 0,
+      "turnCompleted": true,
+      "termination": "normal",
+      "pluginLoadingError": false,
+      "usage": [
+        {
+          "input_tokens": 162959,
+          "cached_input_tokens": 146048,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 2086,
+          "reasoning_output_tokens": 335
+        }
+      ],
+      "gitStatus": " M src/reply.ts\n",
+      "fixtureRevision": "89048c3ab3fbabe373650ce18cfee2434c8c3447",
+      "observation": "Read installed astack, bug-fix, TypeScript and verify, relevant principles/patterns/proof policy. Reproduced parse-to-display crash; schema-derived boundary repair preserved API/output. Existing tests 1 pass/4 fail before; 5 pass after.",
+      "changed_paths": [
+        "src/reply.ts"
+      ],
+      "tests_and_config_unchanged": true,
+      "fixture_file_hashes_after": {
+        "bun.lock": "cad8613c6f375980a079d9d0347dbaf9c14ec1207a81d96866d32640f4bbe2e9",
+        ".gitignore": "4d56952b0fb13bf8f9b6c13a6d4c34a075bac3af447636a1df4335d7576e2f97",
+        "package.json": "e93c7a1038fb791249db299a9024de2864cb178f3aa9731a6ecdcee42f07716d",
+        "tsconfig.json": "42550e83c5fc7d8e63256c63b4d5615deb1f490f86c3156fff1bdd5daeb86d1d",
+        "AGENTS.md": "e623996ad36142fe79fcf5d1a2cbf476c787daa8ed8a6a3d5644f1f17c78181b",
+        "test/reply.test.ts": "ddab5e153b12c610bc7a4e58574ce09f585ffcfc0737b7997271fb509ee8f598",
+        "src/schema.ts": "4fc99f556b9866d5082b97e236e20091ec2d9ccb6fc200d305b15b7adc428c5a",
+        "src/reply.ts": "169b5855e65a72a7b84cbe037feeab40b6e6442953a24d426762c9ecdc39fe2b"
+      },
+      "raw": {
+        "prompt.txt": "f2692d07a133b168ea77737c82fe92198a9702ff1b1f24d613b6c11771eb2524",
+        "events.jsonl": "c4df7b5f93d462dfb52eef3c04d817f37ea4fa552ff9438adf4278b4401b9691",
+        "stderr.log": "03a3ec46319fea2f09434d0d8b2261380f72ef1aa70f490289425aea8c62f6c6",
+        "final.md": "d0784208b7cc7ae562600d1e184a0b99bb5c82cb79b2686eddaa70d66ab19b19",
+        "baseline-tests.log": "a7285ebc2f0f81d856c58c2ec5426c9e5d1446e0320cc5a3d895054f1030c70e",
+        "baseline-types.log": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92"
+      },
+      "skill_reads": [
+        {
+          "paths": [],
+          "exit_code": 0
+        },
+        {
+          "paths": [
+            "skills/typescript-best-practices/references/type-system-discipline.md",
+            "skills/typescript-best-practices/references/boundary-discipline.md",
+            "skills/typescript-best-practices/references/patterns.md",
+            "skills/verify/references/proof-policy.md"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rechecks": {
+        "recheck-tests.log": "bad36198814203a98df0216c303a3dc438a39a879f5a84621a377dec1aaeaf9d",
+        "recheck-typecheck.log": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92"
+      },
+      "command_mcp_web_actions": 10,
+      "file_edit_actions": 1,
+      "total_observed_tool_actions": 11
+    }
+  ]
+}

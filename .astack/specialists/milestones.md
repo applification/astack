@@ -40,3 +40,5 @@ The owner corrected knowledge ownership after the initial callable-folder change
 Import pstack TypeScript with its full rules/examples, pinned source, MIT licence and bundled principle dependencies. Reuse HumanLayer show-me and Matt Pocock domain-modeling with narrow recorded adaptations. Worked foundation commands and fixed SDK experiment records live under their examples. Follow [the architecture contract](../knowledge-ownership/behavior-contract.md) for direct technical and composed delivery observations; do not promote metadata/build checks into behavioral proof.
 
 PR 18 remains the sole review target and requires owner approval to merge. Broader foundation/host milestones above remain open; no adopting project is a prerequisite for this collection.
+
+Focused direct TypeScript, direct React and composed astack delivery were observed on `4f72c608b575bef7c931ccfb48e7040326cce724`; see [engineering collection evidence](../knowledge-ownership/evidence.md). Those local fixture observations leave the broader specialist/foundation and host milestones above open.
