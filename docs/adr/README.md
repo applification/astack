@@ -12,3 +12,5 @@ Read accepted decisions relevant to a change before implementing it. Decisions a
 | [0005](0005-authentication-proof-hierarchy.md) | Emulate for local/CI; disposable Staging users; explicit manual and installed-host acceptance | accepted | Auth testing |
 
 Owner confirmation: this chat on 4 October 2026 establishes the core profile and delegates selection of supported platform patterns. The implementation choices below apply that instruction. Existing products preserve their own accepted stack and policy. Future records use the next number and `proposed`, `accepted`, `rejected`, `deprecated` or `superseded` status. The owner reviews decisions through the PR; agents do not weaken their own judging policy.
+
+6. [Composable engineering skills](0006-composable-engineering-skills.md) — astack coordinates independently callable workflows, with explicit direct/composed ownership.

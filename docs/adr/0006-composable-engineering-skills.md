@@ -1,4 +1,4 @@
-# 0005: Compose independently callable engineering skills
+# 0006: Compose independently callable engineering skills
 
 Status: accepted. Date: 2026-10-05. Scope: Applification plugin skills and astack delivery.
 
