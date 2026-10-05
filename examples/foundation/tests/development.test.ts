@@ -1,13 +1,29 @@
 import { expect, test } from 'bun:test';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
   assertLocalTarget,
+  convexAiFilesInstalled,
   localClientEnvironment,
   localCommand,
   localEnvironment,
 } from '../scripts/development';
+
+test('AI setup observes files created after its initial missing-file check', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'astack-ai-install-'));
+  try {
+    expect(await convexAiFilesInstalled(directory)).toBe(false);
+    const generated = join(directory, 'convex/_generated/ai');
+    await mkdir(generated, { recursive: true });
+    await writeFile(join(generated, 'ai-files.state.json'), '{}');
+    expect(await convexAiFilesInstalled(directory)).toBe(false);
+    await writeFile(join(generated, 'guidelines.md'), 'Installed guidance');
+    expect(await convexAiFilesInstalled(directory)).toBe(true);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
 
 test('local startup rejects cloud selection, deploy keys and self-hosted overrides', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'astack-dev-guard-'));

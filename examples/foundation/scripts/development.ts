@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { createConnection } from 'node:net';
 import { fileURLToPath } from 'node:url';
@@ -88,20 +88,25 @@ export async function localClientEnvironment(
   };
 }
 
+export async function convexAiFilesInstalled(
+  directory: string,
+): Promise<boolean> {
+  try {
+    for (const name of ['ai-files.state.json', 'guidelines.md'])
+      await access(join(directory, 'convex/_generated/ai', name));
+    return true;
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT')
+      return false;
+    throw error;
+  }
+}
+
 export async function ensureConvexAiFiles(
   directory: string,
   env: NodeJS.ProcessEnv,
 ): Promise<void> {
-  const state = Bun.file(
-    join(directory, 'convex/_generated/ai/ai-files.state.json'),
-  );
-  if (
-    (await state.exists()) &&
-    (await Bun.file(
-      join(directory, 'convex/_generated/ai/guidelines.md'),
-    ).exists())
-  )
-    return;
+  if (await convexAiFilesInstalled(directory)) return;
   const config: unknown = JSON.parse(
     await readFile(join(directory, 'convex.json'), 'utf8'),
   );
@@ -120,7 +125,9 @@ export async function ensureConvexAiFiles(
     directory,
     env,
   );
-  if (code !== 0 || !(await state.exists()))
+  // BunFile caches a missing-file stat on the instance. Recheck the filesystem
+  // after the installer child creates its files.
+  if (code !== 0 || !(await convexAiFilesInstalled(directory)))
     throw new Error(
       'Convex AI setup did not complete. Retry bunx convex ai-files install in packages/backend.',
     );
