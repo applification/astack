@@ -50,6 +50,16 @@
     "route": "feature"
   },
   {
+    "request": "Build a new Convex app before deciding whether it is worth hosting",
+    "decision": "Start with persistent local Convex development, guard against cloud targets and keys, and preserve data across restarts. Configure local WorkOS login when needed; leave public integration proof explicit. The user decides when to move to cloud.",
+    "route": "setup"
+  },
+  {
+    "request": "Move this local app to cloud",
+    "decision": "Use the cloud transition workflow: resolve the actual project, deployment and frontend host, ask empty versus selected-data transfer, preserve local configuration and backups, update frontend/WorkOS/MCP settings, deploy to the explicit target, verify actual hosted behavior and retain recovery.",
+    "route": "setup"
+  },
+  {
     "request": "Build a public documentation site that needs server-rendered content",
     "decision": "Choose Next.js for the stated content and rendering requirement, keep its documented framework integrations, and add only the packages with real consumers. The Vite interactive UI default does not override the requested output medium.",
     "route": "feature"
@@ -231,12 +241,12 @@
   },
   {
     "request": "Add OpenAI plugin extensions for a ChatGPT sidebar and conversation panel",
-    "decision": "Feature route → ChatGPT plugin engineering → OpenAI extensions and MCP App UI guidance. Check SDK compatibility, define entrypoints with empty launch inputs, and share the UI through a versioned MCP App resource. Choose useful component states in Storybook, then prove the sidebar and conversation panel in the supported ChatGPT host.",
+    "decision": "Feature route \u2192 ChatGPT plugin engineering \u2192 OpenAI extensions and MCP App UI guidance. Check SDK compatibility, define entrypoints with empty launch inputs, and share the UI through a versioned MCP App resource. Choose useful component states in Storybook, then prove the sidebar and conversation panel in the supported ChatGPT host.",
     "route": "feature"
   },
   {
     "request": "Build an MCP App using our shared React UI components",
-    "decision": "Feature route → MCP server and web feature paths → ChatGPT plugin engineering and MCP App UI guidance. Keep presentation components in the UI package and host APIs in an adapter. Bundle a versioned HTML resource, register the UI tool/resource metadata, choose Storybook states, and prove bridge initialization, tool input/results and teardown in the target host.",
+    "decision": "Feature route \u2192 MCP server and web feature paths \u2192 ChatGPT plugin engineering and MCP App UI guidance. Keep presentation components in the UI package and host APIs in an adapter. Bundle a versioned HTML resource, register the UI tool/resource metadata, choose Storybook states, and prove bridge initialization, tool input/results and teardown in the target host.",
     "route": "feature"
   },
   {

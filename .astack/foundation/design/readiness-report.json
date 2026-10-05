@@ -1,0 +1,86 @@
+{
+  "format": "astack-foundation-readiness/v1",
+  "startedAt": "2026-10-05T08:06:44.965Z",
+  "finishedAt": "2026-10-05T08:06:57.715Z",
+  "revision": "5b29b08aa07b8e22279725b3fe75ca387040a2ec@sha256-1721484f2a44aa246f4c32de2ab545340ded9db532d22058958122b34d484719",
+  "taskProfile": "baseline",
+  "outcome": "pass",
+  "environment": {
+    "kind": "disposable local Convex + Vite + Chromium",
+    "buildId": "5b29b08aa07b8e22279725b3fe75ca387040a2ec@sha256-1721484f2a44aa246f4c32de2ab545340ded9db532d22058958122b34d484719",
+    "web": "http://127.0.0.1:60597",
+    "convex": "http://127.0.0.1:60595",
+    "mcp": "http://127.0.0.1:60596/mcp",
+    "actors": "proof-owner-a, proof-owner-b",
+    "credentialPolicy": "Ephemeral signed RS256 JWTs; no token or private key written to evidence"
+  },
+  "checks": [
+    {
+      "id": "R1",
+      "surface": "identity",
+      "outcome": "pass",
+      "observation": "Running backend health and web identify this revision and local proof environment."
+    },
+    {
+      "id": "R2",
+      "surface": "web → persistence",
+      "outcome": "pass",
+      "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+    },
+    {
+      "id": "R3",
+      "surface": "web ↔ MCP status persistence",
+      "outcome": "pass",
+      "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+    },
+    {
+      "id": "R4",
+      "surface": "authorization",
+      "outcome": "pass",
+      "observation": "Another signed user cannot read or mutate the first user’s item through Convex or MCP."
+    },
+    {
+      "id": "R5",
+      "surface": "authentication",
+      "outcome": "pass",
+      "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+    },
+    {
+      "id": "R6",
+      "surface": "MCP contracts",
+      "outcome": "pass",
+      "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+    },
+    {
+      "id": "R7",
+      "surface": "local MCP App host",
+      "outcome": "pass",
+      "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+    },
+    {
+      "id": "R8",
+      "surface": "web runtime",
+      "outcome": "pass",
+      "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+    },
+    {
+      "id": "G1",
+      "surface": "WorkOS",
+      "outcome": "skipped",
+      "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+    },
+    {
+      "id": "G2",
+      "surface": "ChatGPT",
+      "outcome": "skipped",
+      "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+    }
+  ],
+  "artifacts": [
+    "web-persisted.png",
+    "mcp-app-host.png",
+    "mcp-host-observations.json",
+    "runtime.log"
+  ],
+  "cleanup": "complete"
+}

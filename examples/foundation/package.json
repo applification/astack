@@ -10,7 +10,10 @@
   "scripts": {
     "prepare": "bun scripts/install-hooks.ts",
     "hooks:install": "bun scripts/install-hooks.ts",
-    "dev": "turbo dev",
+    "dev": "bun scripts/development.ts",
+    "dev:backend": "bun scripts/development.ts backend",
+    "development:verify": "bun scripts/development-proof.ts",
+    "convex:local": "bun scripts/development.ts convex",
     "build": "turbo build",
     "build:mcp-ui": "bun run --cwd apps/mcp-ui build && bun scripts/embed-ui.ts",
     "lint": "eslint . --max-warnings 0",

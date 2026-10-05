@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import assert from 'node:assert/strict';
 import {
   chmod,
+  cp,
   mkdir,
   mkdtemp,
   readFile,
@@ -12,7 +13,7 @@ import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { gzipSync } from 'node:zlib';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 import * as ts from 'typescript';
 import { z } from 'zod';
 import {
@@ -233,7 +234,19 @@ describe('independent delivery trial gates', () => {
       join(tmpdir(), 'astack-trial-source-parse-'),
     );
     try {
-      await retainProject(foundationRoot, directory);
+      // Exercise all current source, independent of growing local proof archives.
+      // Other cases below cover proof/media retention with controlled fixtures.
+      const source = join(directory, 'source');
+      const retainedRoot = join(directory, 'retained');
+      await cp(foundationRoot, source, {
+        recursive: true,
+        filter: (path) => isSourcePath(relative(foundationRoot, path)),
+      });
+      await writeFile(
+        join(source, 'redaction-example.txt'),
+        'Authorization: Bearer local-retention-example',
+      );
+      await retainProject(source, retainedRoot);
       const manifest = z
         .object({
           files: z.record(
@@ -247,14 +260,37 @@ describe('independent delivery trial gates', () => {
         })
         .parse(
           JSON.parse(
-            await readFile(join(directory, 'retention.json'), 'utf8'),
+            await readFile(join(retainedRoot, 'retention.json'), 'utf8'),
           ) as unknown,
         );
+      const omissions = z
+        .object({
+          omittedFiles: z.array(
+            z.object({ path: z.string(), reason: z.string() }),
+          ),
+        })
+        .parse(
+          JSON.parse(
+            await readFile(join(retainedRoot, 'retention.json'), 'utf8'),
+          ) as unknown,
+        );
+      expect(
+        omissions.omittedFiles.some(
+          (file) =>
+            file.path === '.astack/design/work-items.pen' &&
+            file.reason.includes('Pen MCP'),
+        ),
+      ).toBe(true);
+      expect(
+        await Bun.file(
+          join(retainedRoot, 'delivered/.astack/design/work-items.pen'),
+        ).exists(),
+      ).toBe(false);
       const paths: string[] = [];
       let transformed = 0;
       for (const [name, metadata] of Object.entries(manifest.files)) {
-        const original = await readFile(join(foundationRoot, name));
-        const retained = await readFile(join(directory, 'delivered', name));
+        const original = await readFile(join(source, name));
+        const retained = await readFile(join(retainedRoot, 'delivered', name));
         expect(createHash('sha256').update(original).digest('hex')).toBe(
           metadata.originalSha256,
         );
@@ -265,7 +301,7 @@ describe('independent delivery trial gates', () => {
         if (metadata.transformed) transformed++;
         // Historical proof artifacts preserve failed deliveries as observed.
         if (isSourcePath(name) && /\.tsx?$/.test(name))
-          paths.push(join(directory, 'delivered', name));
+          paths.push(join(retainedRoot, 'delivered', name));
       }
       expect(paths.length).toBeGreaterThan(20);
       expect(transformed).toBeGreaterThan(0);

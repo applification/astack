@@ -22,6 +22,7 @@ A fresh checkout creates a repeatable project in which an agent can make, observ
 | F8 | Fresh agents using the candidate entry create the foundation, deliver a feature and fix a seeded defect; another agent reviews; repeat with the same rubric. | Candidate digest/revision, prompts, result, proof and independent scored review. |
 | F9 | Existing plugin, site and relevant reference validations pass; evidence survives cleanup. | Existing checks and retained redacted proof. |
 | F10 | The generated reference follows an explicit Pen visual design: tokens, shared components, desktop/narrow layouts and consequential web/MCP states. Frame/story links, rendered comparisons and a fresh generation trial preserve the selected design as an input. | Portable `.pen`, exported handoff/frames, `design:verify`, visual review, new creation-trial evidence. The original v1 trial scores do not establish design fidelity. |
+| F11 | New generated apps start with persistent local Convex, reject cloud target overrides and retain data after restart. A user-initiated move-to-cloud workflow chooses project/deployment and data, updates frontend/auth/MCP settings, deploys and verifies hosted behavior, and preserves local development/recovery. | Local startup/guard and restart evidence; portable transition workflow and reference commands. This iteration adds the workflow; no specific cloud transition is requested or claimed as verified. |
 
 ## Principles and decisions
 

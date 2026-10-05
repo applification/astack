@@ -1,17 +1,17 @@
-This records the actual CLI delivery trial of fixed candidate `2a973c5aa556953db48b2a3104754de54c31f4e5`: **pass**, 6/6 completed stages and 6/6 passing canonical gates. Runner exit: `0`. [Full derivative summary](summary.json) preserves every dimension, finding, usage record and canonical result; original records remain in the ZIP.
+This records the original CLI runner's result for fixed candidate `2a973c5aa556953db48b2a3104754de54c31f4e5`: **pass**, 6/6 completed stages and 6/6 passing canonical gates. Runner exit: `0`. [Full derivative summary](summary.json) preserves every dimension, finding, usage record and canonical result; original records remain in the ZIP. The later audit correction below limits what that original result establishes.
 
 **Plugin activation correction, 5 October 2026:** all 12 task/review startup stderr records in this archive contain `failed to load plugin` for a quoted plugin key. Exact candidate installation and file digests were verified, and actual delivered-product acceptance and the saved scores remain as recorded. Automatic candidate plugin activation was not established. The original runner did not gate on that error, so its passing canonical gates cannot establish a successfully loaded plugin or general plugin invocation. The Pen follow-up corrects the CLI configuration and rejects plugin startup errors. Its new creation trials are separate; they do not retroactively validate automatic plugin activation for these feature/bug trials. Original scores, raw bytes and archive checksum are preserved.
 
 Foundation source `84455f625e2c41166d0ff4b80592d3a35fa30ff5bd69c3c1edc8a31b6490f52c`; rubric `8aa129b3809a7e2da895c0d51fb16e3dac8194b2f57d59290974a41068ea6bdb`. Two rounds, concurrency `2`: `gpt-6.1-sol` / `ultra`, codex-cli 0.160.0, Bun 1.4.0, Node v24.19.0, Darwin 27.0.0 arm64. Delivery/review sandboxes: `danger-full-access` / `read-only`. Each fresh task/reviewer had a 20-minute deadline and 80-action cap. Authentication reuse and ambient-instruction limits are recorded. Observed harness events: 2026-10-05T00:02:03.460Z–2026-10-05T00:50:11.508Z.
 
-| Stage | Delivery final | Review final | Trusted acceptance | Score | Gate |
-| --- | --- | --- | --- | --- | --- |
-| round-1-creation | complete | complete | pass | 12/12 | pass |
-| round-1-feature | complete | complete | pass | 12/12 | pass |
-| round-1-bug | complete | complete | pass | 12/12 | pass |
-| round-2-creation | complete | complete | pass | 12/12 | pass |
-| round-2-feature | complete | complete | pass | 12/12 | pass |
-| round-2-bug | complete | complete | pass | 12/12 | pass |
+| Stage            | Delivery final | Review final | Trusted acceptance | Score | Gate |
+| ---------------- | -------------- | ------------ | ------------------ | ----- | ---- |
+| round-1-creation | complete       | complete     | pass               | 12/12 | pass |
+| round-1-feature  | complete       | complete     | pass               | 12/12 | pass |
+| round-1-bug      | complete       | complete     | pass               | 12/12 | pass |
+| round-2-creation | complete       | complete     | pass               | 12/12 | pass |
+| round-2-feature  | complete       | complete     | pass               | 12/12 | pass |
+| round-2-bug      | complete       | complete     | pass               | 12/12 | pass |
 
 The unchanged rubric scores route intent, scope/ownership, supported implementation, meaningful proof, recovery/regression and accurate result at 0–2 each. Passing requires at least 10/12, nonzero scope/ownership and meaningful proof, no unresolved authorization defect, completed delivery/review finals, and passing trusted acceptance.
 

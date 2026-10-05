@@ -18,11 +18,13 @@
     },
     "build": {
       "dependsOn": ["^build"],
+      "env": ["VITE_*"],
       "outputs": ["dist/**", "storybook-static/**"]
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "passThroughEnv": ["VITE_*"]
     },
     "test": {
       "dependsOn": ["^typecheck"],

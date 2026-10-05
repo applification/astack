@@ -12,7 +12,7 @@ From an astack checkout, generate a separate project:
 bun scripts/create-foundation.ts /absolute/path/to/my-product
 ```
 
-Follow the generated README for installation, environment configuration, and startup. Commit the Bun lockfile and retain the generated scoped instructions with the code they govern. Record consequential departures in the project's ADRs; use current official documentation for the selected platform and installed versions. Scaffold output and a successful build establish structure, not integration readiness.
+Follow the generated README for installation, environment configuration, and startup. `bun run dev` starts persistent local Convex without requiring a Convex account, supplies its actual URL to clients and rejects cloud targets/deploy keys. Ordinary shutdown preserves local data; readiness owns separate disposable state. The user initiates a [move to cloud](cloud-transition.md) when ready; generated `.astack/cloud.md` maps that workflow to the reference, including data choice, frontend and WorkOS/MCP configuration, hosted proof and recovery. Commit the Bun lockfile and retain the generated scoped instructions with the code they govern. Record consequential departures in the project's ADRs; use current official documentation for the selected platform and installed versions. Scaffold output and a successful build establish structure, not integration readiness.
 
 ```text
 apps/
@@ -59,7 +59,10 @@ These are the reference project's commands, run from its root. Existing projects
 | `bun run check:quick -- <file...>` | Fast scoped feedback for named files; without arguments, use current edits or all scopes when clean. Read the selected checks. |
 | `bun run check:affected -- <base-ref>` | Check changed packages and affected consumers against the given Git base; defaults to `HEAD`. Review selection for indirect effects. |
 | `bun run check:ci` | Run the retained deterministic package and boundary checks. A green result covers those checks. |
+| `bun run development:verify` | Check ordinary local startup, the served frontend URL, data/configuration after restart and private export in an owned copy; CLI test identity does not establish provider login. |
 | `bun run readiness` | Exercise a disposable local deployment with signed proof identities and real reference behavior. Read the retained evidence and missing layers. |
-| `bun run dev` | Start the configured product for live WorkOS use. Follow the README's environment and origin setup. |
+| `bun run dev` | Start persistent local Convex and clients; preserve state and reject cloud targets. Follow local WorkOS setup. |
+| `bun run dev:backend` | Start persistent local Convex without clients for configuration/data operations. |
+| `bun run convex:local -- <command>` | Guard local env/run/data/export/import commands against target overrides; requires the backend running. |
 
 Use the project-owned control route for real-product observations and retain acceptance case IDs, revision, environment, actions, and results under the feature contract. Record direct MCP, browser, live OAuth, installed-host, and agent-trial results separately. A local reference run does not demonstrate installed MCP host behavior or successful delivery by fresh agents. Missing credentials or host access remain named gaps; they cannot become passes because deterministic CI succeeds. Follow [proof](proof.md) for result classification and [PR review](pr.md) before delivery.

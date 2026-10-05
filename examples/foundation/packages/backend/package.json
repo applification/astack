@@ -10,7 +10,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings 0",
-    "dev": "convex dev",
+    "dev": "bun ../../scripts/development.ts backend",
     "codegen": "convex codegen --typecheck disable"
   },
   "dependencies": {

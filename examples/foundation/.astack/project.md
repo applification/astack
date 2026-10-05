@@ -1,6 +1,8 @@
 # Work items reference
 
-This disposable reference shares one Convex domain across a React/Vite web app and authenticated MCP Apps endpoint. Its canonical DTO is `id`, `title`, `status`; status is `open` or `done`. Production identity is WorkOS. Local proof uses temporary signed JWTs with distinct web and MCP audiences and no external account.
+This reference starts with persistent local development and shares one Convex domain across a React/Vite web app and authenticated MCP Apps endpoint. Its canonical DTO is `id`, `title`, `status`; status is `open` or `done`. Production identity is WorkOS. Local proof uses temporary signed JWTs with distinct web and MCP audiences and no external account.
+
+Ordinary startup is `bun run dev` (backend plus clients) or `bun run dev:backend` (backend only). It uses local Convex without requiring an account, rejects cloud targets/keys, supplies the local URL to clients and preserves `packages/backend/.convex` and `.env.local` on shutdown. `bun run convex:local -- <command>` guards local administrative/data commands. `bun run development:verify` proves persistent startup/restart and private export in its own copy; it preserves the developer's state and retains a redacted report. WorkOS setup remains necessary for real login. The user initiates cloud delivery; follow `.astack/cloud.md` for target/data choices, configuration, hosted proof and recovery without overwriting local development.
 
 From this directory run `bun install --frozen-lockfile`, `bun run typecheck`, `bun run test`, `bun run build` and `bun run verify`. The direct product control route is `./.codex/skills/astack-work-items/control.ts doctor --json` then `./.codex/skills/astack-work-items/control.ts verify --json`. Its tracked feature map is `.astack/feature-map/work-items/README.md`.
 

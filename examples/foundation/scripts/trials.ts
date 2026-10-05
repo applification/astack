@@ -822,6 +822,16 @@ export async function retainProject(
       else if (entry.isFile()) {
         const bytes = await readFile(path);
         const extension = extname(name).toLowerCase();
+        if (extension === '.pen') {
+          omittedFiles.push({
+            path: redactTrial(name),
+            originalSha256: digest(bytes),
+            sizeBytes: bytes.length,
+            reason:
+              'Opaque Pen design; omitted from text sanitization. Read or edit the native source through Pen MCP.',
+          });
+          continue;
+        }
         const binaryImage =
           extension === '.png'
             ? bytes

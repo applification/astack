@@ -44,6 +44,10 @@ jobs:
         run: |
           cd "$RUNNER_TEMP/astack-foundation"
           bun run readiness
+      - name: Persistent local development and restart
+        run: |
+          cd "$RUNNER_TEMP/astack-foundation"
+          bun run development:verify
       - name: Render against the Pen design
         run: |
           cd "$RUNNER_TEMP/astack-foundation"
