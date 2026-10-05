@@ -13,12 +13,19 @@ When the PR changes Convex schema, functions, configuration, or client integrati
 
 Use an additional independent reviewer or subagent only when the change's risk or breadth justifies the extra pass and the project permits it. This is separate from the required Convex reviewer skill. Independent review remains advisory; the lead assesses each finding against actual code and intent.
 
+## Show the change
+
+Before creating or updating the PR, choose the smallest view that answers the reviewer's main question about the change. For nontrivial logic, ownership, state or interaction changes, include a compact explanation beside the relevant description: pseudocode, a call/component/file tree, a before/after sketch or a Mermaid diagram. Use [review explanation guidance](pr-explanation.md) to choose and ground that view in the actual diff. A simple label correction can stay with a sentence and its relevant evidence; do not add a diagram that repeats it.
+
+Explain what changed and why the boundary or order matters. Link source locations or acceptance cases where useful, label proposals or unknowns, and refresh the view when the diff changes. An explanatory diagram, sketch or HTML illustration does not establish that the depicted behavior ran. Keep actual observations and gaps in the proof summary.
+
 Before marking a PR ready, select the screenshots or recordings that help a reviewer assess the result and attach them to the PR, or link committed media accessible from it. Keep redundant captures with the raw runner artifacts; a proof index can map multiple observations to one byte-identical image. If media is unnecessary for review, state why briefly. Video is optional; use it when motion, timing, or a journey needs to be seen. Follow [proportional evidence retention](proof.md#keep-review-evidence-proportional) rather than committing a full run directory.
 
 Keep the PR description brief and useful to a reviewer:
 
 - **Why:** the intended outcome and reason for change.
 - **Scope:** the material behavior and implementation boundaries.
+- **Explanation when useful:** one focused view of the changed logic, structure, state or interaction beside the claim it clarifies; distinguish an illustrative view from observed product evidence.
 - **Behavior contract and validation:** link the tracked `.astack/<feature>/behavior-contract.md` for design sprints and summarize its agreed cases, Pencil and Storybook decisions for web UI work, any chosen frames or story IDs, running-product results, and gaps. Name the exact revision and environment for proof. Omit a separate contract for a small change whose outcome is already clear from Why; put its web UI tool decisions in the PR.
 - **Tradeoffs:** only choices a reviewer would reasonably question.
 - **Blast radius:** affected users, surfaces, or data and the key safety fact.

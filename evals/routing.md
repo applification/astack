@@ -81,4 +81,16 @@ Invoke each task through `$applification:astack <request>`. The user chooses onl
 | "A cached agent action passed, so claim the new model chooses correctly" | Record replay separately and run live without cache for model-choice claims. Cached actions can support their exact observed outcome, not fresh model behavior. |
 | "The CI artifact link has expired" | Name the evidence gap and rerun if necessary. Retain sanitized evidence supporting lasting claims under the feature folder or a durable approved store, beyond short CI expiry. |
 
+## PR explanation selection
+
+These are interpretation cases; posted explanation inspection and delivery proof are separate observations.
+
+| Request | Expected decision |
+| --- | --- |
+| "Prepare a PR for a backend permission change with no UI change" | PR route; show the actual actor and authorization boundary with a compact flow or sequence diagram when it helps review, link the changed source and cases, and report allowed/denied observations separately. No invented UI screenshot or diagram-as-proof claim. |
+| "Open a PR for a one-word label correction" | Keep the PR concise with the intended label and relevant observed check. Skip an additional explanation diagram that would repeat the sentence; retain useful captured media under the existing policy. |
+| "Prepare a PR after moving state and adapters between packages" | PR route; use a shallow before/after responsibility or component tree grounded in actual paths and state owners. Preserve enough context to assess the boundary, and link equivalence/integration evidence separately. |
+| "Explain a proposed UI layout in a PR using an HTML illustration" | Use a focused illustration only when simpler views are inadequate; render and inspect it, label it as proposed, and include an accessible capture/artifact and text equivalent in the PR. A local path is not a shareable PR artifact; illustrative rendering does not prove product behavior. |
+| "The PR diagram describes the earlier diff after a later implementation change" | Refresh the view and source links from the current diff, inspect the posted explanation, and rerun only proof the later change could affect. Keep the explanation current without relabeling old observations as new proof. |
+
 After a trial, record whether astack chose the right route, found an important missing decision, selected checks proportionately, and reported proof honestly. Fix an observed failure narrowly rather than adding more universal gates.

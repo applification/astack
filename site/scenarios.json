@@ -241,12 +241,12 @@
   },
   {
     "request": "Add OpenAI plugin extensions for a ChatGPT sidebar and conversation panel",
-    "decision": "Feature route \u2192 ChatGPT plugin engineering \u2192 OpenAI extensions and MCP App UI guidance. Check SDK compatibility, define entrypoints with empty launch inputs, and share the UI through a versioned MCP App resource. Choose useful component states in Storybook, then prove the sidebar and conversation panel in the supported ChatGPT host.",
+    "decision": "Feature route → ChatGPT plugin engineering → OpenAI extensions and MCP App UI guidance. Check SDK compatibility, define entrypoints with empty launch inputs, and share the UI through a versioned MCP App resource. Choose useful component states in Storybook, then prove the sidebar and conversation panel in the supported ChatGPT host.",
     "route": "feature"
   },
   {
     "request": "Build an MCP App using our shared React UI components",
-    "decision": "Feature route \u2192 MCP server and web feature paths \u2192 ChatGPT plugin engineering and MCP App UI guidance. Keep presentation components in the UI package and host APIs in an adapter. Bundle a versioned HTML resource, register the UI tool/resource metadata, choose Storybook states, and prove bridge initialization, tool input/results and teardown in the target host.",
+    "decision": "Feature route → MCP server and web feature paths → ChatGPT plugin engineering and MCP App UI guidance. Keep presentation components in the UI package and host APIs in an adapter. Bundle a versioned HTML resource, register the UI tool/resource metadata, choose Storybook states, and prove bridge initialization, tool input/results and teardown in the target host.",
     "route": "feature"
   },
   {
@@ -357,6 +357,31 @@
   {
     "request": "The CI artifact link has expired",
     "decision": "Name the evidence gap and rerun if necessary. Retain sanitized evidence supporting lasting claims under the feature folder or a durable approved store, beyond short CI expiry.",
+    "route": "pr"
+  },
+  {
+    "request": "Prepare a PR for a backend permission change with no UI change",
+    "decision": "PR route; show the actual actor and authorization boundary with a compact flow or sequence diagram when it helps review, link the changed source and cases, and report allowed/denied observations separately. No invented UI screenshot or diagram-as-proof claim.",
+    "route": "pr"
+  },
+  {
+    "request": "Open a PR for a one-word label correction",
+    "decision": "Keep the PR concise with the intended label and relevant observed check. Skip an additional explanation diagram that would repeat the sentence; retain useful captured media under the existing policy.",
+    "route": "pr"
+  },
+  {
+    "request": "Prepare a PR after moving state and adapters between packages",
+    "decision": "PR route; use a shallow before/after responsibility or component tree grounded in actual paths and state owners. Preserve enough context to assess the boundary, and link equivalence/integration evidence separately.",
+    "route": "pr"
+  },
+  {
+    "request": "Explain a proposed UI layout in a PR using an HTML illustration",
+    "decision": "Use a focused illustration only when simpler views are inadequate; render and inspect it, label it as proposed, and include an accessible capture/artifact and text equivalent in the PR. A local path is not a shareable PR artifact; illustrative rendering does not prove product behavior.",
+    "route": "pr"
+  },
+  {
+    "request": "The PR diagram describes the earlier diff after a later implementation change",
+    "decision": "Refresh the view and source links from the current diff, inspect the posted explanation, and rerun only proof the later change could affect. Keep the explanation current without relabeling old observations as new proof.",
     "route": "pr"
   }
 ]
