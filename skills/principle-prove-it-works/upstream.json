@@ -1,0 +1,18 @@
+{
+  "repository": "https://github.com/cursor/plugins",
+  "revision": "4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Lauren Tan",
+  "files": [
+    {
+      "source_path": "pstack/skills/principle-prove-it-works/SKILL.md",
+      "source_sha256": "ec79a15025bac8d33d62011c54f3b612733fd2a024e623b531b3637aa75070e2",
+      "local_path": "SKILL.md"
+    }
+  ],
+  "adaptations": [
+    "Replace Cursor-only invocation policy with directly callable Codex identity and UI metadata.",
+    "Resolve principle composition to packaged skills; keep checks proportional and actions within caller authority.",
+    "Use astack evidence retention instead of the pstack decision-log skill."
+  ]
+}

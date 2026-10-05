@@ -1,0 +1,18 @@
+{
+  "repository": "https://github.com/cursor/plugins",
+  "revision": "4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Lauren Tan",
+  "files": [
+    {
+      "source_path": "pstack/skills/principle-encode-lessons-in-structure/SKILL.md",
+      "source_sha256": "77044c83a9ac6df78fc643887ea5f1f11f082adaf14b717c060cdaed03cce863",
+      "local_path": "SKILL.md"
+    }
+  ],
+  "adaptations": [
+    "Promote the already bundled pinned principle body to a directly callable leaf with Codex identity and UI metadata.",
+    "Resolve dependencies to sibling principle skills and keep application within caller scope.",
+    "Use project task/decision notes instead of pstack brain infrastructure."
+  ]
+}

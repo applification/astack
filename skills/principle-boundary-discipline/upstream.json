@@ -1,0 +1,17 @@
+{
+  "repository": "https://github.com/cursor/plugins",
+  "revision": "4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Lauren Tan",
+  "files": [
+    {
+      "source_path": "pstack/skills/principle-boundary-discipline/SKILL.md",
+      "source_sha256": "62ac2862c2caa22dd14531f51c9c6bb445ceb198ca98a687e25b4d47c1f10a28",
+      "local_path": "SKILL.md"
+    }
+  ],
+  "adaptations": [
+    "Promote the already bundled pinned principle body to a directly callable leaf with Codex identity and UI metadata.",
+    "Resolve dependencies to sibling principle skills and keep application within caller scope."
+  ]
+}

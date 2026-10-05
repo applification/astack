@@ -1,6 +1,6 @@
 interface:
   display_name: "Project Setup"
-  short_description: "Set up a local project or adopt astack on an existing stack"
-  default_prompt: "Use $applification:project-setup to establish this project and its local delivery and proof routes."
+  short_description: "Establish astack's runtime control and verification loop"
+  default_prompt: "Use $applification:project-setup to establish or upgrade this project's runtime control and verification loop."
 policy:
   allow_implicit_invocation: true

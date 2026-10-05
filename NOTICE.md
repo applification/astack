@@ -2,7 +2,9 @@
 
 astack includes MIT-licensed engineering guidance from these sources. Each owning skill retains the complete upstream licence and a pinned `upstream.json` with source paths, original hashes and adaptations.
 
-- `typescript-best-practices`: Cursor pstack, revision `4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536`, Copyright (c) 2026 Lauren Tan. Includes the TypeScript patterns and type-system, boundary and encode-lessons principle bodies.
+- `typescript-best-practices`: Cursor pstack, revision `4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536`, Copyright (c) 2026 Lauren Tan. Includes the TypeScript rules and patterns.
+- `principle-type-system-discipline`, `principle-boundary-discipline`, `principle-encode-lessons-in-structure`: the same pinned Cursor pstack revision and licence, promoted from bundled references to independently callable leaves. Each leaf owns its source record and adaptations.
+- `principle-prove-it-works`, `principle-test-behavior-not-implementation`, `principle-fix-root-causes`, `principle-sequence-verifiable-units`: additional callable verification/delivery principles from the same pinned Cursor pstack revision and licence, adapted to astack scope, evidence and publication rules.
 - `show-me`: HumanLayer, revision `ca7c8088db69e315a8b2deea43820270457f8f3c`, Copyright (c) 2026 HumanLayer.
 - `domain-modeling`: Matt Pocock, revision `4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d`, Copyright (c) 2026 Matt Pocock. Includes glossary and ADR formats.
 

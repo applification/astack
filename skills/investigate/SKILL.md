@@ -7,7 +7,7 @@ metadata:
 
 # Investigation
 
-Use this skill directly for the requested outcome, or as the selected astack delivery route. Read relevant project instructions and working commands; user scope and project constraints take precedence.
+Use this skill directly for the requested outcome, or as the selected astack delivery route. Read relevant project instructions, `.astack/project.md` when present and working commands; user scope and project constraints take precedence.
 
 Answer the question from code, history, running behavior, or primary documentation as appropriate. Separate observed facts from inference. Recommend an option with tradeoffs when asked; do not create implementation work merely to make the answer feel complete. A read-only investigation ends with the answer; if the user asks to implement a finding, use the relevant change route and its PR.
 

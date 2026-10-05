@@ -1,6 +1,6 @@
-# Project setup
+# New product defaults
 
-Use this when starting a new product, adopting astack in an existing project, or adding a proof route that the project has not described. The stack below is astack's greenfield default, not a condition for using its work routes or app control. For a product with persistent web and MCP behavior, the [worked foundation](https://github.com/applification/astack/tree/main/examples/foundation) is an optional starting point. Its commands and proof history remain project records; [Convex](../../convex/SKILL.md), [WorkOS auth](../../workos-auth/SKILL.md) and [MCP](../../mcp-server/SKILL.md) own the reusable engineering guidance.
+Use this for a new product without a chosen stack, or as the target when assessing an existing project's upgrades through [runtime loop setup](runtime-loop.md). The runtime loop is the setup outcome; select the defaults that serve its actual product surfaces. For a product with persistent web and MCP behavior, the [worked foundation](https://github.com/applification/astack/tree/main/examples/foundation) is an optional starting point. Its commands and proof history remain project records; [Convex](../../convex/SKILL.md), [WorkOS auth](../../workos-auth/SKILL.md) and [MCP](../../mcp-server/SKILL.md) own the reusable engineering guidance.
 
 New apps start locally, including their Convex deployment. Preserve persistent state across development restarts and keep disposable proof isolated. Do not provision cloud as a prerequisite for evaluating an app. When the user chooses to host it or move to cloud, follow the [cloud transition workflow](../../cloud-transition/SKILL.md); selecting the target, choosing data transfer, updating auth/MCP and frontend settings, deploying, verifying hosted behavior and retaining recovery all belong to astack delivery. Existing apps preserve their accepted deployment unless a transition is requested.
 
@@ -40,44 +40,5 @@ Once a product has a runnable user surface that needs repeatable driving, follow
 
 If the new app needs a database, choose [Convex](../../convex/SKILL.md) in `packages/backend/convex`, expose the generated API to consuming apps through the backend workspace, and record how to start and identify its local deployment in the project profile. The foundation uses WorkOS for web authentication and MCP OAuth; use [WorkOS identity guidance](../../workos-auth/SKILL.md) and the current platform integration. Keep local data and credentials out of version control. Do not create an unused backend or empty app packages just to fill the layout.
 
-When adopting astack in an existing repository, keep its package manager, framework, database, layout, and working commands. Create `.astack/project.md` and a control CLI only where they earn their cost; record the commands that actually run. Migrate to Bun/Turborepo or another part of the greenfield default only when requested as a separate, reviewable change, including scripts, CI, and lockfile changes. Do not mix package managers or restructure a repository as a side effect of an unrelated fix.
 
-Inspect the actual repository first: entry points and user surfaces, package scripts or task runner, local startup and fixture commands, existing tests and CI, authentication and safe data environments, project instructions, issue/PR workflow, and the current home for durable domain terms or decisions. Reuse working paths. Confirm a proposed command from its source or by running a safe check; do not invent a command that merely sounds conventional.
-
-For domain terms, discover any existing glossary or root `GLOSSARY-MAP.md` and follow its context links. Preserve that location and format. [Domain language guidance](../../domain-modeling/SKILL.md) covers clarifying concepts and recording agreed definitions; setup alone does not justify an empty glossary or decision register.
-
-Create or update a tracked `.astack/project.md` with only what a later agent cannot cheaply infer. For a web UI design sprint, keep the behavior contract and retained evidence under `.astack/<feature>/`, alongside the Pencil file and supporting assets when selected; Storybook stories, when selected, stay with their components and are referenced from the contract. Do not make separate root `design/` and `docs/` folders for the sprint. Check the repository's ignore rules, remove or override any rule that ignores `.astack/`, and verify the files appear in Git before treating setup as complete.
-
-```markdown
-# astack project profile
-
-## Product surfaces
-Who uses each surface and which repository area serves it.
-
-## Feedback and proof
-Fast checks while editing, including the UI lint command for web and stories;
-checkpoint checks; how to start, identify, drive, and stop a disposable running
-instance; safe fixtures; evidence location.
-Name checks that establish only a component or contract and those that reach
-the real user path. Record regression, probe, rerun, exploration and triage commands
-when present, model and budget policy, safe fixtures, instance ownership, required CI
-checks, and durable evidence retention. Record actual commands, not anticipated ones. Link each existing `astack-<app>` skill and feature map.
-For the foundation profile, describe check:quick, check:affected, check:ci and
-readiness, including their selection inputs and the claims they cannot establish.
-
-## Selection rules
-Which behavior or dependency changes call for each surface, including indirect
-effects such as backend changes exposed through another client.
-
-## Project decisions
-Where durable domain terms and consequential decisions live; which feature
-folders are active under `.astack/`; PR and release rules; actions reserved
-for the owner.
-Link the existing glossary/context map and decision register when present.
-```
-
-Write concise paths and commands, with pointers to feature contracts and authoritative project sources. Do not copy long procedures or secrets into the profile or feature folders. astack does not prescribe an issue tracker or a universal test runner. A project may replace old guidance while adopting astack; reconcile conflicting instructions rather than leaving two active processes.
-
-Exercise one harmless mapped user path through the control CLI after setup, including its doctor and cleanup commands where applicable. Confirm that captured evidence survives cleanup. If the route cannot run, record the missing prerequisite and exact limit; setup is not complete merely because the files exist.
-
-When setup changes the repository, finish with a [pull request](../../pr/SKILL.md) showing the resulting layout, proof route, and any migration limits.
+Finish through [runtime loop setup](runtime-loop.md): exercise the real path, record the project profile and agent-instruction pointer, retain evidence through cleanup, and report acceptance and remaining gaps in the PR.

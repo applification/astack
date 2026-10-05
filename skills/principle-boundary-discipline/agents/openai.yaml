@@ -1,0 +1,6 @@
+interface:
+  display_name: "Boundary Discipline"
+  short_description: "Validate system boundaries and keep domain logic pure"
+  default_prompt: "Use $applification:principle-boundary-discipline for the relevant decision in this task."
+policy:
+  allow_implicit_invocation: true

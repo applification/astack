@@ -5,6 +5,8 @@ on:
     paths:
       - "site/**"
       - "README.md"
+      - "docs/guide/**"
+      - "docs/project-install.md"
       - "skills/**"
       - "assets/**"
       - "plugin.json"

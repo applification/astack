@@ -7,6 +7,10 @@ metadata:
 
 # Convex engineering
 
+Read `.astack/project.md` when present for the project's runtime, control and verification commands; use the requested scope without requiring the astack coordinator or a setup pass.
+
+Apply [boundary discipline](../principle-boundary-discipline/SKILL.md) to arguments, identity and protocol adapters alongside the framework guidance.
+
 Read the actual schema, generated API, scoped instructions, consumers and target deployment. Use [integration guidance](references/integration.md) for setup, framework selection, local development and companion capabilities. Preserve an existing layout; new Bun/Turbo products put the backend in `packages/backend/convex`.
 
 Before backend edits apply `$convex:convex-expert` when available. It supplies current framework procedures; this skill owns Applification's data, client and local-development decisions. If unavailable, use current official docs and scoped project guidance, record the missing review prerequisite, and keep the resulting Convex PR draft until `$convex:convex-reviewer` runs. Do not run a Next.js quickstart inside an existing Vite app.

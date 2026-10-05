@@ -1,0 +1,6 @@
+interface:
+  display_name: "Prove It Works"
+  short_description: "Prove claimed outcomes against the actual artifact"
+  default_prompt: "Use $applification:principle-prove-it-works for the relevant decision in this task."
+policy:
+  allow_implicit_invocation: true

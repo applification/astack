@@ -7,6 +7,10 @@ metadata:
 
 # WorkOS authentication
 
+Read `.astack/project.md` when present for the project's runtime, control and verification commands; use the requested scope without requiring the astack coordinator or a setup pass.
+
+Apply [boundary discipline](../principle-boundary-discipline/SKILL.md) to credentials, token validation and identity adapters.
+
 Use directly for a WorkOS integration or auth defect. Inspect the installed SDKs, current callbacks/origins, server auth configuration, actual resource URL and ownership checks. Keep existing provider/project conventions. For new Applification web/MCP products use AuthKit for web and Connect for MCP; they share a user system with distinct token contracts.
 
 ## Web session and data access
