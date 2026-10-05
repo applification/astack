@@ -12,7 +12,7 @@ The [iteration plan](https://chatgpt.com/space/page_b11134b1d1708191adcbfc59518d
 
 ## Owner direction on 5 October 2026
 
-Slack is not a current priority and is excluded. Dots is unavailable to the owner; active host candidates are hand-rolled Codex or T3 Code projects. The eventual target is the owner’s `/apps/loami` project. Loami needs substantial preparation before productive delivery or a representative trial, so assess that readiness separately when selected. Do not infer its actual checkout path or change Loami as part of this guidance slice. Use disposable foundation projects for the next inner-loop proof.
+Slack is not a current priority and is excluded. Dots is unavailable to the owner; active host candidates are hand-rolled Codex or T3 Code projects. astack remains project-independent. The owner mentioned `/apps/loami` as one of many projects that could use it. Any preparation needed there is project-specific work if selected, not a required astack milestone or dependency. Do not infer its checkout path or change Loami in this slice. Use disposable foundation projects for the next inner-loop proof.
 
 ## Foundation proof obligations carried forward
 
@@ -27,4 +27,4 @@ Slack is not a current priority and is excluded. Dots is unavailable to the owne
 
 Keep full raw runner output in ignored local folders or CI artifacts. Commit concise reports, source identities and selected media needed for lasting claims. Preserve failures and their provenance without copying whole run trees into `.astack`.
 
-Pending owner choices: actual Codex/T3 Code arrangement and durable work system; future assignment/source channel and host access; bounded pilot concurrency/retries/budgets; result-return channel; explicit communication, merge and release grants; outcome observation window and recovery. Text versus machine representation may be revisited when those capabilities are known. Loami readiness is a separate future work choice. No host implementation or external action is authorised by this milestone record.
+Pending owner choices: actual Codex/T3 Code arrangement and durable work system; future assignment/source channel and host access; bounded pilot concurrency/retries/budgets; result-return channel; explicit communication, merge and release grants; outcome observation window and recovery. Text versus machine representation may be revisited when those capabilities are known. Any adopting project’s readiness is assessed when that project is selected; Loami is not a required target. No host implementation or external action is authorised by this milestone record.

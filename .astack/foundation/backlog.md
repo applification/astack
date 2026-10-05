@@ -2,7 +2,7 @@
 
 The foundation PR establishes a supported project, executable checks and observed delivery trials. These later capabilities remain separate work under the [iteration plan](https://chatgpt.com/space/page_b11134b1d1708191adcbfc59518d1580). [Specialist guidance and portable text contracts](../specialists/behavior-contract.md) are the next implementation slice. Their [milestones](../specialists/milestones.md) separate guidance assessment from actual delivery and host integration proof; those latter behaviors remain unverified.
 
-Owner steering on 5 October 2026 excludes Slack from current work and removes inaccessible Dots from active candidates. Investigate hand-rolled Codex or T3 Code projects later; Loami is the eventual target after separate readiness work. The original external-signal pilot below is deferred beyond that choice.
+Owner steering on 5 October 2026 excludes Slack from current work and removes inaccessible Dots from active candidates. Investigate hand-rolled Codex or T3 Code projects later; Loami is one of many projects that could adopt astack; its project-specific readiness is not an astack milestone or dependency. The original external-signal pilot below is deferred beyond that choice.
 
 These milestones span both loops. Specialist selection, coordination, role guidance and portable assignment/result contracts belong to astack. The external chief-of-staff host owns persistent signal collection, prioritisation, deduplication, dispatch and outcome follow-up. An astack assignment can use Slack/PostHog evidence; ongoing monitoring and commissioning live in the outer host. Deferred from this PR does not mean outside the kitchen's goal or, for specialist guidance, outside astack's remit.
 
