@@ -10,7 +10,7 @@ Use TanStack Form with Standard Schema/Zod validation for the React reference. D
 
 Adopt strict shared TypeScript presets and verified ESLint correctness/boundary rules, not blanket bans on context, effects or component size. Keep tests about observable behaviour and meaningful contracts; `.ts` versus `.tsx` is not a restriction. Stories establish useful presentation states, real browser/protocol checks establish integration, and actual provider/host observations remain distinct.
 
-Quick checks operate on changed files with correct project configuration. Affected checks include consumers; shared/config changes broaden scope. CI checks all applicable packages and running journeys. Formatting/staged lint run before commit with lint-staged's protections; an affected pre-push hook remains optional until measured cost supports it. Timing targets are set from measurements, not from claimed command names.
+Quick checks operate on changed files with correct project configuration. Affected checks include consumers; shared/config changes broaden scope. CI checks all applicable packages and running journeys. Formatting/staged lint run before commit with lint-staged's protections; an affected pre-push hook remains optional until measured cost supports it. The [provisional local feedback budget](../../.astack/foundation/feedback-proof.md#provisional-local-feedback-budget) sets investigation thresholds from the retained candidate measurements, with explicit host and cache scope. It does not weaken correctness or claim new timing observations.
 
 ## Consequences and verification
 

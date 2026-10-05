@@ -30,4 +30,4 @@ Pencil: skipped for this worked engineering profile; no existing visual design t
 
 ## Baseline and first slice
 
-Baseline `f29f52d`: guidance and runnable protocol/e2e references exist; no repeatable Vite + Convex + WorkOS + MCP profile, readiness command or observed fresh-agent delivery trials exist. Build one profile, its supported examples and enforcement, then run the trials. The Page is the direction; this folder records implementation and revision-specific observations. Evidence and remaining gaps are in `evidence.md`.
+Baseline `f29f52d`: guidance and runnable protocol/e2e references exist; no repeatable Vite + Convex + WorkOS + MCP profile, readiness command or observed fresh-agent delivery trials exist. Build one profile, its supported examples and enforcement, then run the trials. The Page is the direction; this folder records implementation and revision-specific observations. Evidence and remaining gaps are in `evidence.md`; [the deferred milestone backlog](backlog.md) records subsequent integration requirements.

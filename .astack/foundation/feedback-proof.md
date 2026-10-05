@@ -27,3 +27,17 @@ bun scripts/prove-foundation-feedback.ts /absolute/path/to/astack /absolute/path
 The optional `--turbo-config /absolute/path/to/candidate-turbo.json` overlays only that candidate file inside the disposable scaffold and records it. The runner uses the real scaffold command, frozen installs, a local Git identity and installed Husky hooks. It retains sanitized command output, exit codes, durations, exact failure diagnostics and Turbo task summaries, then removes the disposable checkout.
 
 The first Git baseline is committed before Husky is installed in the new repository. Both acceptance commits execute the installed pre-commit hook. Timings use fresh CLI processes and ordinary warm filesystem caches. The selected-file quick gate is narrower than affected checks. These probes verify the listed failure paths and partial-stage recovery, and make no claim about live WorkOS, a deployed backend, installed ChatGPT, remote caching, every lint rule, or every possible Git recovery scenario.
+
+## Provisional local feedback budget
+
+Use these thresholds to investigate slower feedback on this measured local setup. They are provisional budgets derived from the candidate observations above, with ordinary warm filesystem caches and fresh CLI processes. They are neither new measurements nor percentile guarantees, and do not transfer to CI or other hosts without measurement. “Cold” below means the embedded MCP resource is initially missing; no filesystem caches were flushed.
+
+| Local case | Investigation threshold | Supporting observation |
+| --- | --- | --- |
+| Selected-file quick check with prepared outputs | 2 seconds | 1227 ms valid repeat; 1262 ms rejected promise |
+| First selected-file quick check requiring embedded-resource preparation | 5 seconds | 3289 ms first run |
+| Actual installed pre-commit check | 3 seconds | 2175 ms partial-stage commit; 1650 ms rejected commit |
+| Affected checks after a shared-package change | 15 seconds | 11117 ms shared-UI consumer check |
+| Unchanged repeated Turbo lint/typecheck with a populated local cache | 500 ms | 83 ms, all 11 tasks hit |
+
+When a threshold is exceeded, inspect selection, output preparation and cache inputs, retain the observation, and revise the host-specific budget if evidence warrants it. Preserve correctness, consumer coverage and partially staged protection. The affected pre-push hook remains deferred; run affected checks before handoff and require integration checks in CI. Measure a small edit, shared change and configuration change again after tooling, package graph or host changes.
