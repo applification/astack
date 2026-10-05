@@ -1,0 +1,13 @@
+{
+  "observedOn": "2026-10-05",
+  "environmentId": "environment_01M44GM0FT8SCNA5D3CYQNY2E5",
+  "email": "voiced@applification.net",
+  "userId": "user_01M45T2NKBZ5F9G6TTJC3BWVS9",
+  "before": { "hasPassword": false, "sessionCount": 0, "linkedIdentities": 0 },
+  "operation": "WorkOS management deleteUser",
+  "outcome": "deleted",
+  "freshExactEmailQueryCount": 0,
+  "limits": [
+    "This verifies fixture removal, not AuthKit login, SDK authentication or MCP OAuth."
+  ]
+}

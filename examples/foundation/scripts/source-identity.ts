@@ -11,6 +11,7 @@ export function isSourcePath(path: string): boolean {
         '.git',
         '.convex',
         '.proof',
+        '.auth-fixtures',
         '.turbo',
         'dist',
         'storybook-static',

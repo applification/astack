@@ -10,6 +10,7 @@ import {
 
 export async function startMcpPreview(
   runtime: Runtime,
+  options: { emulate?: boolean } = {},
 ): Promise<{ url: string; stop(): Promise<void> }> {
   const port = await freePort();
   const url = `http://127.0.0.1:${port}`;
@@ -25,7 +26,11 @@ export async function startMcpPreview(
       '--strictPort',
     ],
     join(runtime.project, 'apps/mcp-ui'),
-    { ...localEnvironment(), VITE_MCP_URL: runtime.mcpUrl },
+    {
+      ...localEnvironment(),
+      VITE_MCP_URL: runtime.mcpUrl,
+      ...(options.emulate ? runtime.auth.clientEnvironment() : {}),
+    },
     runtime.logs,
   );
   try {

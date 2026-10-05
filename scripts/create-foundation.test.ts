@@ -26,7 +26,7 @@ function create(destination: string) {
 }
 
 test('scaffold keeps source and environment examples while excluding local state and generated hooks', async () => {
-  for (const name of ['node_modules', '.convex', 'dist', '.husky/_']) {
+  for (const name of ['node_modules', '.convex', '.auth-fixtures', 'dist', '.husky/_']) {
     await mkdir(join(source, name), { recursive: true });
     await writeFile(join(source, name, 'local'), 'excluded fixture');
   }
@@ -39,7 +39,7 @@ test('scaffold keeps source and environment examples while excluding local state
   expect(await readFile(join(destination, 'README.md'), 'utf8')).toBe('public reference\n');
   expect(await readFile(join(destination, '.env.example'), 'utf8')).toBe('EXAMPLE_SECRET=');
   expect(await readFile(join(destination, '.husky/pre-commit'), 'utf8')).toBe('handwritten hook');
-  for (const name of ['node_modules', '.convex', 'dist', '.env.local', '.husky/_']) {
+  for (const name of ['node_modules', '.convex', '.auth-fixtures', 'dist', '.env.local', '.husky/_']) {
     expect(await lstat(join(destination, name)).then(() => true, () => false)).toBe(false);
   }
   const metadata = JSON.parse(await readFile(join(destination, '.astack/scaffold.json'), 'utf8'));

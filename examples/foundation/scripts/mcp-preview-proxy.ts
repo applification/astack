@@ -1,4 +1,5 @@
 import type { Plugin } from 'vite';
+import { emulateMcpToken } from './workos-emulate';
 
 export function previewProxy(
   environment: NodeJS.ProcessEnv = process.env,
@@ -14,7 +15,10 @@ export function previewProxy(
             next();
             return;
           }
-          if (!request.url?.startsWith('/__mcp/')) {
+          if (
+            !request.url?.startsWith('/__mcp/') &&
+            request.url !== '/__emulate/mcp-token'
+          ) {
             next();
             return;
           }
@@ -29,6 +33,29 @@ export function previewProxy(
               (origin && origin !== `http://${host}`)
             ) {
               response.writeHead(403).end('Foreign origin is not permitted');
+              return;
+            }
+            if (request.url === '/__emulate/mcp-token') {
+              const issuer = environment.ASTACK_EMULATE_URL;
+              if (
+                environment.ASTACK_AUTH_MODE !== 'emulate' ||
+                !issuer ||
+                request.method !== 'POST' ||
+                request.headers['content-type'] !== 'application/json'
+              ) {
+                response.writeHead(404).end('No local Emulate session route');
+                return;
+              }
+              const token = await emulateMcpToken({
+                url: issuer,
+                apiKey: 'sk_test_default',
+              });
+              response
+                .writeHead(200, {
+                  'Content-Type': 'application/json',
+                  'Cache-Control': 'no-store',
+                })
+                .end(JSON.stringify({ access_token: token }));
               return;
             }
             const endpoint = environment['VITE_MCP_URL'];

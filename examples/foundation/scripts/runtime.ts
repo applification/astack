@@ -3,10 +3,11 @@ import { createServer } from 'node:net';
 import { cp, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve, relative } from 'node:path';
-import { generateKeyPair, exportJWK, SignJWT } from 'jose';
+import { generateKeyPair, exportPKCS8, SignJWT } from 'jose';
 import { ConvexHttpClient } from 'convex/browser';
 import { makeFunctionReference } from 'convex/server';
 import { isSourcePath, sourceDigest } from './source-identity';
+import { startWorkosEmulate, emulateClientId } from './workos-emulate';
 
 export const foundationRoot = resolve(import.meta.dir, '..');
 export type OwnedProcess = {
@@ -22,6 +23,7 @@ export type Runtime = {
   siteUrl: string;
   mcpUrl: string;
   buildId: string;
+  auth: Awaited<ReturnType<typeof startWorkosEmulate>>;
   issuer: string;
   webAudience: string;
   tokens: {
@@ -258,10 +260,12 @@ export async function startRuntime(
   const project = join(privateDirectory, 'app');
   const logs: string[] = [],
     processes: OwnedProcess[] = [];
+  let auth: Awaited<ReturnType<typeof startWorkosEmulate>> | undefined;
   const stop = async () => {
     const errors: unknown[] = [];
     for (const process of [...processes].reverse())
       await stopProcess(process).catch((error: unknown) => errors.push(error));
+    await auth?.close().catch((error: unknown) => errors.push(error));
     await rm(privateDirectory, { recursive: true, force: true }).catch(
       (error: unknown) => errors.push(error),
     );
@@ -293,18 +297,19 @@ export async function startRuntime(
       siteUrl = `http://127.0.0.1:${sitePort}`;
     const webUrl = `http://127.0.0.1:${webPort}`,
       mcpUrl = `${siteUrl}/mcp`;
-    const issuer = `${siteUrl}/proof-issuer`,
-      webAudience = 'astack-work-items-web';
-    const { privateKey, publicKey } = await generateKeyPair('RS256', {
+    const { privateKey } = await generateKeyPair('RS256', {
       modulusLength: 2048,
+      extractable: true,
     });
-    const key = {
-      ...(await exportJWK(publicKey)),
-      kid: 'disposable-proof',
-      alg: 'RS256',
-      use: 'sig',
-    };
-    const jwks = `data:text/plain;charset=utf-8;base64,${Buffer.from(JSON.stringify({ keys: [key] })).toString('base64')}`;
+    auth = await startWorkosEmulate(mcpUrl, {
+      signingKey: {
+        privateKey: await exportPKCS8(privateKey),
+        kid: 'disposable-emulate',
+      },
+    });
+    const issuer = auth.emulator.url,
+      webAudience = emulateClientId;
+    const key = { kid: 'disposable-emulate' };
     const token = (subject: string, audience: string, expired = false) =>
       new SignJWT({})
         .setProtectedHeader({ alg: 'RS256', typ: 'JWT', kid: key.kid })
@@ -314,15 +319,17 @@ export async function startRuntime(
         .setIssuedAt()
         .setExpirationTime(expired ? Math.floor(Date.now() / 1000) - 60 : '30m')
         .sign(privateKey);
-    const [web, mcp, otherWeb, otherMcp, wrongAudience, expired] =
+    const [webSession, mcp, otherSession, otherMcp, wrongAudience, expired] =
       await Promise.all([
-        token('proof-owner-a', webAudience),
-        token('proof-owner-a', mcpUrl),
-        token('proof-owner-b', webAudience),
-        token('proof-owner-b', mcpUrl),
-        token('proof-owner-a', 'wrong-resource'),
-        token('proof-owner-a', mcpUrl, true),
+        auth.passwordSession(0),
+        auth.mcpToken(0),
+        auth.passwordSession(1),
+        auth.mcpToken(1),
+        token('user_astack_local_owner', 'wrong-resource'),
+        token('user_astack_local_owner', mcpUrl, true),
       ]);
+    const web = webSession.accessToken,
+      otherWeb = otherSession.accessToken;
     const backend = join(project, 'packages/backend'),
       env = { ...localEnvironment(), CONVEX_AGENT_MODE: 'anonymous' };
     logs.push(await command(['bun', 'run', 'build:mcp-ui'], project));
@@ -354,11 +361,8 @@ export async function startRuntime(
       return content.includes('CONVEX_DEPLOYMENT') ? true : false;
     }, 'local Convex deployment configuration');
     const settings = {
-      ASTACK_PROOF_MODE: 'local',
-      ASTACK_PROOF_JWKS: jwks,
-      ASTACK_PROOF_ISSUER: issuer,
-      ASTACK_PROOF_WEB_AUDIENCE: webAudience,
-      MCP_RESOURCE_URL: mcpUrl,
+      ...auth.settings,
+      WORKOS_AUTHKIT_DOMAIN: '',
       ASTACK_BUILD_ID: buildId,
     };
     for (const [name, value] of Object.entries(settings))
@@ -381,7 +385,7 @@ export async function startRuntime(
       };
       return identity.buildId === buildId &&
         identity.resource === mcpUrl &&
-        identity.authMode === 'local-proof'
+        identity.authMode === 'workos-emulate'
         ? identity
         : false;
     }, 'configured backend build identity');
@@ -397,8 +401,7 @@ export async function startRuntime(
     const webEnv = {
       ...localEnvironment(),
       VITE_CONVEX_URL: convexUrl,
-      VITE_ASTACK_PROOF_MODE: 'local',
-      VITE_ASTACK_PROOF_TOKEN: web,
+      ...auth.clientEnvironment(),
       VITE_ASTACK_BUILD_ID: buildId,
     };
     processes.push(
@@ -432,6 +435,7 @@ export async function startRuntime(
       siteUrl,
       mcpUrl,
       buildId,
+      auth,
       issuer,
       webAudience,
       tokens: { web, mcp, otherWeb, otherMcp, wrongAudience, expired },

@@ -20,6 +20,8 @@ import {
 } from './runtime';
 import { startMcpHost } from './mcp-host';
 import { startMcpPreview } from './mcp-preview';
+import { verifyEmulateAuth } from './auth-proof';
+import { emulatePassword, emulateUsers } from './workos-emulate';
 
 type WorkItem = { id: string; title: string; status: 'open' | 'done' };
 type Check = {
@@ -319,9 +321,9 @@ export async function verify(
       web: runtime.webUrl,
       convex: runtime.convexUrl,
       mcp: runtime.mcpUrl,
-      actors: 'proof-owner-a, proof-owner-b',
+      actors: 'Emulate seeded owner and other user',
       credentialPolicy:
-        'Ephemeral signed RS256 JWTs; no token or private key written to evidence',
+        'WorkOS Emulate AuthKit/Connect tokens; synthetic expired/wrong-audience negative controls only; no credentials retained',
     };
     browser = await chromium.launch();
     const liveBrowser = browser;
@@ -331,19 +333,43 @@ export async function verify(
     await check(
       'R1',
       'identity',
-      'Running backend health and web identify this revision and local proof environment.',
+      'Running backend health and web identify this revision and WorkOS Emulate environment.',
       async () => {
         const health = (await (
           await fetch(`${active.siteUrl}/health`)
         ).json()) as { buildId: string; resource: string; authMode: string };
         assert.equal(health.buildId, active.buildId);
         assert.equal(health.resource, active.mcpUrl);
-        assert.equal(health.authMode, 'local-proof');
+        assert.equal(health.authMode, 'workos-emulate');
         await page.goto(active.webUrl);
         await page
           .getByRole('heading', { name: 'Work items', exact: true })
           .waitFor();
         await page.locator(`[data-build-id="${active.buildId}"]`).waitFor();
+      },
+    );
+    await check(
+      'R10',
+      'WorkOS Emulate AuthKit/session',
+      'SDK login, linked identity, refresh rotation, replay denial and session revocation pass in Emulate; browser uses the official AuthKit/Convex adapter.',
+      async () => {
+        await verifyEmulateAuth(active.auth);
+        await page
+          .getByRole('button', { name: 'Sign in', exact: true })
+          .click();
+        await page
+          .getByLabel('Email', { exact: true })
+          .fill(emulateUsers[0].email);
+        await page
+          .getByRole('button', { name: 'Continue', exact: true })
+          .click();
+        await page
+          .getByLabel('Password', { exact: true })
+          .fill(emulatePassword);
+        await page
+          .getByRole('button', { name: 'Continue', exact: true })
+          .click();
+        await page.getByLabel('Title', { exact: true }).waitFor();
       },
     );
     const title = `Proof item ${Date.now()}`;
@@ -976,7 +1002,7 @@ export async function verify(
     await check(
       'R9',
       'standalone MCP development preview',
-      'Opening the development URL shows a connection action without host errors; a signed local fixture loads the actual MCP resource, changes persisted status, refreshes and disconnects. OAuth state mismatch is rejected. Live WorkOS remains separate.',
+      'Opening the development URL shows a connection action without host errors; an Emulate-issued token loads the actual MCP resource, changes persisted status, refreshes and disconnects. OAuth state mismatch is rejected. Live WorkOS remains separate.',
       async () => {
         preview = await startMcpPreview(active);
         const errors: string[] = [];
@@ -1071,20 +1097,100 @@ export async function verify(
         await previewPage.close();
       },
     );
+    await check(
+      'R11',
+      'Emulate development preview',
+      'Connect with Emulate loads persisted work, renews local tokens on reconnect and enforces same-origin/method/content-type guards. It does not exercise real OAuth consent.',
+      async () => {
+        await preview?.stop();
+        preview = await startMcpPreview(active, { emulate: true });
+        const tokenRoute = `${preview.url}/__emulate/mcp-token`;
+        assert.equal(
+          (
+            await fetch(tokenRoute, {
+              method: 'POST',
+              headers: {
+                origin: 'http://foreign.invalid',
+                'Content-Type': 'application/json',
+              },
+              body: '{}',
+            })
+          ).status,
+          403,
+        );
+        assert.equal((await fetch(tokenRoute)).status, 404);
+        assert.equal(
+          (
+            await fetch(tokenRoute, {
+              method: 'POST',
+              headers: { 'Content-Type': 'text/plain' },
+              body: '{}',
+            })
+          ).status,
+          404,
+        );
+        const previewPage = await liveBrowser.newPage();
+        await previewPage.goto(preview.url);
+        await previewPage
+          .getByRole('button', { name: 'Connect with Emulate', exact: true })
+          .click();
+        const frame = previewPage.frameLocator('iframe');
+        await frame.getByText(item.title, { exact: true }).waitFor();
+        const before = items(await owner.query(list, {})).find(
+          (value) => value.id === item.id,
+        );
+        assert.ok(before);
+        await frame
+          .getByRole('button', {
+            name: before.status === 'open' ? 'Mark done' : 'Reopen',
+            exact: true,
+          })
+          .click();
+        await expectPersistedStatus(
+          () => owner.query(list, {}),
+          item.id,
+          before.status === 'open' ? 'done' : 'open',
+        );
+        await previewPage
+          .getByRole('button', { name: 'Disconnect', exact: true })
+          .click();
+        await previewPage.locator('iframe').waitFor({ state: 'detached' });
+        await previewPage
+          .getByRole('button', { name: 'Connect with Emulate', exact: true })
+          .click();
+        await previewPage
+          .frameLocator('iframe')
+          .getByText(item.title, { exact: true })
+          .waitFor();
+        await previewPage.screenshot({
+          path: join(evidence, 'emulate-mcp-preview.png'),
+          fullPage: true,
+        });
+        report.artifacts.push('emulate-mcp-preview.png');
+        await previewPage.close();
+      },
+    );
     report.checks.push(
       {
         id: 'G1',
         surface: 'WorkOS',
         outcome: 'skipped',
         observation:
-          'Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant.',
+          'Emulate proves local AuthKit behavior. Manual Hosted AuthKit login/redirect/refresh/subject continuity requires a temporary astack Staging identity. Real staging SDK proof is a separate auth:staging run.',
       },
       {
         id: 'G2',
-        surface: 'ChatGPT',
+        surface: 'real MCP OAuth',
         outcome: 'skipped',
         observation:
-          'Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run.',
+          'Real MCP consent, exact-resource issuance and same WorkOS identity across web/MCP require manual staging acceptance. Emulate Connect has no DCR/PKCE/consent/refresh coverage.',
+      },
+      {
+        id: 'H1',
+        surface: 'installed ChatGPT host',
+        outcome: 'skipped',
+        observation:
+          'The local AppBridge host passed. Installed ChatGPT OAuth, tool selection and App behavior require a separate authorized host acceptance run and public HTTPS resource.',
       },
     );
     report.outcome = 'pass';

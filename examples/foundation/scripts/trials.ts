@@ -813,6 +813,7 @@ export async function retainProject(
           .split('/')
           .some(
             (part) =>
+              part === '.auth-fixtures' ||
               part.startsWith('.env') ||
               ['node_modules', '.git', '.convex'].includes(part),
           )

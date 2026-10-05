@@ -1,5 +1,9 @@
 import { freePort, type Runtime } from './runtime';
 
+// Emulate's Node HTTP adapter installs a lightweight global Response. Bun.serve
+// requires its native Response; retain that constructor before starting Emulate.
+const HostResponse = globalThis.Response;
+
 /** Local Apps SDK host: its tool/resource traffic reaches the actual Convex MCP endpoint. */
 export async function startMcpHost(
   runtime: Runtime,
@@ -30,10 +34,12 @@ export async function startMcpHost(
         (request.headers.has('origin') &&
           request.headers.get('origin') !== origin)
       )
-        return new Response('Foreign origin is not allowed', { status: 403 });
+        return new HostResponse('Foreign origin is not allowed', {
+          status: 403,
+        });
       const path = url.pathname;
       if (path === '/host.js')
-        return new Response(javascript, {
+        return new HostResponse(javascript, {
           headers: { 'content-type': 'text/javascript' },
         });
       if (path === '/mcp') {
@@ -51,17 +57,17 @@ export async function startMcpHost(
             ? {}
             : { body: await request.arrayBuffer() }),
         });
-        return new Response(upstream.body, {
+        return new HostResponse(upstream.body, {
           status: upstream.status,
           headers: upstream.headers,
         });
       }
       if (path === '/')
-        return new Response(
+        return new HostResponse(
           '<!doctype html><html><head><meta charset="utf-8"><title>Local MCP App host</title></head><body><h1>Local MCP App host</h1><p id="status" role="status">Connecting</p><button id="palette" disabled>Update host palette</button><button id="remount" disabled>Teardown and remount</button><button id="close-app" disabled>Close App</button><div id="app-container"></div><script type="module" src="/host.js"></script></body></html>',
           { headers: { 'content-type': 'text/html' } },
         );
-      return new Response('Not found', { status: 404 });
+      return new HostResponse('Not found', { status: 404 });
     },
   });
   return {

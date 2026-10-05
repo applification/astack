@@ -70,3 +70,7 @@ The [first-run repair record](startup-preview/README.md) retains the owner's rep
 Live WorkOS sign-in/refresh/subject continuity and installed ChatGPT OAuth/tool/UI behavior remain unverified, explicitly recorded as G1 and G2 in fixture readiness. The sandbox now accepts the exact local loopback MCP Resource Indicator and both local browser actions reach hosted sign-in. A public HTTPS MCP resource is needed for external host access. Configuration, authorization entry and local JWT boundary checks do not establish completed provider flows.
 
 The branch is available for owner review. No merge, release, production deployment, COS, Slack or PostHog integration is included.
+
+## WorkOS testing hierarchy follow-up
+
+The owner's 5 October clarification replaces the shared-account testing model. [Current authentication evidence](auth-testing/README.md) distinguishes deterministic WorkOS Emulate local/CI proof, disposable real astack Staging SDK proof, manual G1/G2 acceptance and installed-host H1. It records removal of the unused shared account and preserves first failures. Historical reports above retain their original candidates and gap definitions; no provider/host result is inferred from Emulate.

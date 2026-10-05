@@ -5,6 +5,7 @@ import { createConnection } from 'node:net';
 import { fileURLToPath } from 'node:url';
 import { parseEnv } from 'node:util';
 import { sourceDigest } from './source-identity';
+import { startWorkosEmulate, emulatePassword } from './workos-emulate';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const backend = join(root, 'packages/backend');
@@ -80,7 +81,7 @@ export async function localClientEnvironment(
   const site = values.CONVEX_SITE_URL;
   return {
     ...env,
-    ...(web.VITE_WORKOS_CLIENT_ID
+    ...(inherited.ASTACK_AUTH_MODE !== 'emulate' && web.VITE_WORKOS_CLIENT_ID
       ? { VITE_WORKOS_CLIENT_ID: web.VITE_WORKOS_CLIENT_ID }
       : {}),
     VITE_CONVEX_URL: assertLoopback(url),
@@ -244,7 +245,10 @@ async function waitForBackendStop(): Promise<void> {
   }
 }
 
-async function initializeLocalAuth(env: NodeJS.ProcessEnv): Promise<void> {
+async function initializeLocalAuth(
+  env: NodeJS.ProcessEnv,
+  emulate?: Awaited<ReturnType<typeof startWorkosEmulate>>,
+): Promise<void> {
   async function capture(args: string[]): Promise<string> {
     const child = Bun.spawn(localCommand(args), {
       cwd: backend,
@@ -267,8 +271,12 @@ async function initializeLocalAuth(env: NodeJS.ProcessEnv): Promise<void> {
       .map((name) => name.trim()),
   );
   // Convex evaluates auth.config at push time and requires every accessed env key.
-  // Missing values deny identity; never replace a configured provider or proof fixture.
+  // Initialize missing keys, then select the requested mode. Saved public staging
+  // settings stay on disk while Emulate supplies the active local provider.
   for (const [name, value] of Object.entries({
+    ASTACK_AUTH_MODE: 'staging',
+    WORKOS_EMULATE_URL: '',
+    WORKOS_EMULATE_JWKS: '',
     ASTACK_PROOF_MODE: 'disabled',
     WORKOS_CLIENT_ID: '',
     WORKOS_AUTHKIT_DOMAIN: '',
@@ -277,11 +285,18 @@ async function initializeLocalAuth(env: NodeJS.ProcessEnv): Promise<void> {
     if (!names.has(name)) await capture(['env', 'set', name, value]);
   }
   const settings = await readSettings(join(backend, '.env.local'));
-  if (settings.WORKOS_CLIENT_ID && settings.WORKOS_AUTHKIT_DOMAIN) {
+  if (emulate) {
+    for (const [name, value] of Object.entries({
+      ...emulate.settings,
+      WEB_ORIGIN: 'http://127.0.0.1:5173',
+    }))
+      await capture(['env', 'set', name, value]);
+  } else if (settings.WORKOS_CLIENT_ID && settings.WORKOS_AUTHKIT_DOMAIN) {
     const site = settings.CONVEX_SITE_URL;
     if (!site)
       throw new Error('The local deployment must save CONVEX_SITE_URL.');
     for (const [name, value] of Object.entries({
+      ASTACK_AUTH_MODE: 'staging',
       WORKOS_CLIENT_ID: settings.WORKOS_CLIENT_ID,
       WORKOS_AUTHKIT_DOMAIN: settings.WORKOS_AUTHKIT_DOMAIN,
       MCP_RESOURCE_URL: `${assertLoopback(site)}/mcp`,
@@ -290,8 +305,8 @@ async function initializeLocalAuth(env: NodeJS.ProcessEnv): Promise<void> {
     }))
       await capture(['env', 'set', name, value]);
   } else
-    console.log(
-      'WorkOS is not configured. Run bun run setup:workos --client-id client_... --authkit-domain https://YOUR-DOMAIN.authkit.app, or ask astack to configure a staging sandbox.',
+    throw new Error(
+      'Staging requires saved public WorkOS settings. Run setup:workos first; ordinary bun dev uses Emulate.',
     );
   const revision =
     Bun.spawnSync(['git', 'rev-parse', 'HEAD'], { cwd: root })
@@ -307,6 +322,9 @@ async function initializeLocalAuth(env: NodeJS.ProcessEnv): Promise<void> {
 
 if (import.meta.main) {
   const mode = process.argv[2] ?? 'app';
+  const authMode = process.env.ASTACK_AUTH_MODE ?? 'emulate';
+  if (!['emulate', 'staging'].includes(authMode))
+    throw new Error('ASTACK_AUTH_MODE must be emulate or staging.');
   const args = process.argv
     .slice(3)
     .filter((arg, index) => !(index === 0 && arg === '--'));
@@ -337,6 +355,11 @@ if (import.meta.main) {
     if (args.length)
       throw new Error('Local startup takes no deployment overrides.');
     const env = await localEnvironment(backend);
+    if (authMode === 'staging')
+      Object.assign(env, {
+        VITE_ASTACK_AUTH_MODE: 'staging',
+        VITE_ASTACK_PROOF_MODE: 'disabled',
+      });
     await ensureConvexAiFiles(backend, env);
     const saved = await readSettings(join(backend, '.env.local'));
     if (saved.CONVEX_URL && (await backendListening(saved.CONVEX_URL)))
@@ -354,25 +377,43 @@ if (import.meta.main) {
       if (code !== 0) process.exit(code);
       await waitForBackendStop();
     }
-    await initializeLocalAuth(env);
-    const code = await run(['bun', 'run', 'build:mcp-ui'], root, env);
-    if (code !== 0) process.exit(code);
-    console.log(
-      'Starting persistent local Convex development. Data stays in packages/backend/.convex; stopping does not delete it.',
-    );
-    process.exitCode = await run(
-      [
-        'bunx',
-        '--no-install',
-        'convex',
-        'dev',
-        ...(mode === 'app'
-          ? ['--start', 'bun ../../scripts/development.ts clients']
-          : []),
-      ],
-      backend,
-      env,
-    );
+    const local = await readSettings(join(backend, '.env.local'));
+    let emulate: Awaited<ReturnType<typeof startWorkosEmulate>> | undefined;
+    try {
+      if (authMode === 'emulate') {
+        if (!local.CONVEX_SITE_URL)
+          throw new Error('Missing local Convex site URL.');
+        emulate = await startWorkosEmulate(
+          `${assertLoopback(local.CONVEX_SITE_URL)}/mcp`,
+          { port: 4100 },
+        );
+        Object.assign(env, emulate.clientEnvironment());
+        console.log(
+          `WorkOS Emulate: owner@example.com / ${emulatePassword}. Local fixtures only; bun run dev:staging selects the real provider.`,
+        );
+      }
+      await initializeLocalAuth(env, emulate);
+      const code = await run(['bun', 'run', 'build:mcp-ui'], root, env);
+      if (code !== 0) throw new Error('Development MCP resource build failed.');
+      console.log(
+        'Starting persistent local Convex development. Data stays in packages/backend/.convex; stopping does not delete it.',
+      );
+      process.exitCode = await run(
+        [
+          'bunx',
+          '--no-install',
+          'convex',
+          'dev',
+          ...(mode === 'app'
+            ? ['--start', 'bun ../../scripts/development.ts clients']
+            : []),
+        ],
+        backend,
+        env,
+      );
+    } finally {
+      await emulate?.close();
+    }
   } else
     throw new Error(
       'Usage: development.ts [app | backend | clients | convex <command...>]',

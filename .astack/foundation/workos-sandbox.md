@@ -2,18 +2,18 @@
 
 Observed on 2026-10-04 and updated on 2026-10-05 through connected WorkOS management operations and public OAuth discovery. Configuration and browser authorization entry were observed; completed live login and MCP OAuth remain unverified.
 
-| Resource | Verified value |
-| --- | --- |
-| Project | `astack` — `project_01M44GM0F6BRQ9ND1ATCEVE96E` |
-| Environment | `Staging` — `environment_01M44GM0FT8SCNA5D3CYQNY2E5`, `sandbox: true` |
-| Default web application | `app_01M44GM0YB4RMXZQFRSDQ84AB7` |
-| Web client ID | `client_01M44GM0TDFFAQKQA7YFX23ZDY` |
-| AuthKit issuer | `https://friendly-site-75-staging.authkit.app` |
-| Redirect and logout URIs | `http://localhost:5173/` (default), `http://127.0.0.1:5173/` |
-| CORS origins | `http://localhost:5173`, `http://127.0.0.1:5173` |
-| Dynamic client registration | Enabled; read back as `true` |
-| Client ID Metadata Document | Enabled; read back as `true` |
-| OAuth resource indicators | Empty; actual public MCP resource URL still required |
+| Resource                    | Verified value                                                        |
+| --------------------------- | --------------------------------------------------------------------- |
+| Project                     | `astack` — `project_01M44GM0F6BRQ9ND1ATCEVE96E`                       |
+| Environment                 | `Staging` — `environment_01M44GM0FT8SCNA5D3CYQNY2E5`, `sandbox: true` |
+| Default web application     | `app_01M44GM0YB4RMXZQFRSDQ84AB7`                                      |
+| Web client ID               | `client_01M44GM0TDFFAQKQA7YFX23ZDY`                                   |
+| AuthKit issuer              | `https://friendly-site-75-staging.authkit.app`                        |
+| Redirect and logout URIs    | `http://localhost:5173/` (default), `http://127.0.0.1:5173/`          |
+| CORS origins                | `http://localhost:5173`, `http://127.0.0.1:5173`                      |
+| Dynamic client registration | Enabled; read back as `true`                                          |
+| Client ID Metadata Document | Enabled; read back as `true`                                          |
+| OAuth resource indicators   | Empty; actual public MCP resource URL still required                  |
 
 `createProjectWithNewEnvironments` used `includeProductionEnvironment: false`. The project has exactly one sandbox environment. All subsequent mutations targeted that sandbox or its applications. Existing projects were untouched. No test identities, invitations or emails were created. One disposable Connect application was registered for the check below and removed. No API key secrets were retrieved or retained.
 
@@ -29,4 +29,6 @@ The default AuthKit application `app_01M44GM0YB4RMXZQFRSDQ84AB7` now preserves b
 
 Actual Chromium visits to web 5173 and MCP preview 5174 showed the sign-in/connection actions and reached this sandbox's hosted sign-in page without uncaught page errors. The MCP preview's disposable public DCR client was `client_01M45R09FHS43C4BTE43B8TD3Y` / `app_01M45R09FHEY687WRDCSB27J45`; it was removed after the smoke check. This establishes browser discovery/registration/authorization entry, not successful login, consent, token issuance or refresh. Owner-operated sign-in is pending.
 
-For controlled live tests, [WorkOS's staging recipe](https://workos.com/docs/authkit/testing) uses a scoped API key and dedicated verified test identity. The management connector exposes key metadata rather than the SDK key secret, and its `createUser` operation has no `emailVerified` parameter. Such credentials must stay in ignored local configuration or a secret store. Owner-operated hosted/social login is another way to establish a real sandbox session. Neither path was performed in this setup.
+The auth strategy now follows [ADR 0005](../../docs/adr/0005-authentication-proof-hierarchy.md): Emulate for normal local/CI auth; astack Staging for disposable programmatic provider users; explicit manual G1/G2 and separate installed-host H1 acceptance. The [reference procedure](../../examples/foundation/.astack/auth-testing.md) specifies setup, generated passwords, SDK authentication, teardown and recovery. There is no canonical shared manual login.
+
+On 5 October, an exact search found the unused `voiced@applification.net` test record (`user_01M45T2NKBZ5F9G6TTJC3BWVS9`), with no password, identities or sessions. It was deleted through the authorized management operation; a fresh exact-email query returned an empty list. The connected management tools still expose key metadata rather than the scoped SDK secret. This prevents an observed staging SDK login until that key is configured; it does not prevent deterministic Emulate proof. Historical browser entry/configuration observations above remain configuration evidence, not completed acceptance.

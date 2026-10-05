@@ -40,6 +40,14 @@ const clientId: unknown = import.meta.env['VITE_WORKOS_CLIENT_ID'];
 const redirectUri: unknown =
   import.meta.env['VITE_WORKOS_REDIRECT_URI'] || `${location.origin}/`;
 const apiHostname: unknown = import.meta.env['VITE_WORKOS_API_HOSTNAME'];
+const emulate = import.meta.env['VITE_ASTACK_AUTH_MODE'] === 'emulate';
+if (
+  emulate &&
+  (!['127.0.0.1', 'localhost'].includes(location.hostname) ||
+    !['127.0.0.1', 'localhost'].includes(new URL(url).hostname) ||
+    apiHostname !== 'localhost')
+)
+  throw new Error('WorkOS Emulate is restricted to loopback.');
 const devMode = import.meta.env['VITE_WORKOS_DEV_MODE'] === 'true';
 if (
   devMode &&
@@ -64,6 +72,12 @@ createRoot(root).render(
         clientId={clientId}
         redirectUri={redirectUri}
         devMode={devMode}
+        {...(emulate
+          ? {
+              https: false,
+              port: Number(import.meta.env['VITE_WORKOS_API_PORT']),
+            }
+          : {})}
         {...(typeof apiHostname === 'string' && apiHostname
           ? { apiHostname }
           : {})}

@@ -85,6 +85,6 @@ if (import.meta.main) {
     values['authkit-domain'],
   );
   console.log(
-    'WorkOS public configuration saved locally. bun dev will configure the local Convex provider. In the staging WorkOS application allow redirects/logout and CORS for http://127.0.0.1:5173/ and http://127.0.0.1:5174/; enable DCR and register http://127.0.0.1:3211/mcp as a resource indicator. See README.md.',
+    'WorkOS public configuration saved locally. bun run dev:staging will configure the local Convex provider. In the staging WorkOS application allow redirects/logout and CORS for http://127.0.0.1:5173/ and http://127.0.0.1:5174/; enable DCR and register http://127.0.0.1:3211/mcp as a resource indicator. See README.md.',
   );
 }

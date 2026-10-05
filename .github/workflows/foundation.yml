@@ -2,17 +2,17 @@ name: astack foundation
 on:
   pull_request:
     paths:
-      - 'examples/foundation/**'
-      - 'scripts/create-foundation.ts'
-      - '.astack/foundation/**'
-      - 'docs/adr/**'
-      - '.github/workflows/foundation.yml'
+      - "examples/foundation/**"
+      - "scripts/create-foundation.ts"
+      - ".astack/foundation/**"
+      - "docs/adr/**"
+      - ".github/workflows/foundation.yml"
   push:
     branches: [main]
     paths:
-      - 'examples/foundation/**'
-      - 'scripts/create-foundation.ts'
-      - '.github/workflows/foundation.yml'
+      - "examples/foundation/**"
+      - "scripts/create-foundation.ts"
+      - ".github/workflows/foundation.yml"
   workflow_dispatch:
 permissions:
   contents: read
@@ -43,6 +43,7 @@ jobs:
       - name: Real backend, browser and MCP readiness
         run: |
           cd "$RUNNER_TEMP/astack-foundation"
+          bun run auth:verify
           bun run readiness
       - name: Persistent local development and restart
         run: |

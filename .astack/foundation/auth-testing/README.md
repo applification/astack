@@ -1,0 +1,15 @@
+# WorkOS auth strategy — 5 October 2026
+
+The owner replaced the permanent shared manual-user model with [ADR 0005](../../../docs/adr/0005-authentication-proof-hierarchy.md). The implementation and acceptance procedure are in [the generated profile's auth contract](../../../examples/foundation/.astack/auth-testing.md).
+
+`bun dev` now starts seeded WorkOS Emulate with persistent local Convex. Normal CI/readiness exercises the official AuthKit React/Convex adapter, SDK sessions, ownership, audience/expiry denial and actual web/MCP/AppBridge behavior. Positive credentials come from official Emulate APIs. Synthetic expired/wrong-audience JWTs remain negative controls only. The preview's local token route renews on reconnect, rejects foreign origins and is excluded from published App HTML.
+
+`auth:staging` is a separate opt-in real-provider runner. It creates unique verified identities and generated passwords, authenticates/refreshes/revokes with the SDK and deletes users in `finally`. An owned external-ID journal supports lost-response or interrupted-run recovery. Normal journals/report recovery fields contain no passwords; temporary manual leases stay private. Generation, source identity and retention exclude `.auth-fixtures`. Missing credentials produce a skipped report and nonzero exit.
+
+Local workspace checks passed formatting, typed lint/types, 45 tests and web/MCP/Storybook builds. Root checks covered 72 routing examples and portable plugin validation; all three scaffold tests passed, including private-fixture exclusion. Enforcement passed. The new local readiness passed R1–R11, including AuthKit browser login, API session tests, independently confirmed persistence and both preview modes. The first integration run failed at R7 because Emulate's HTTP adapter installed a lightweight global Response incompatible with Bun.serve; retaining Bun's native constructor fixed the response and the original denial check passed on rerun. Original failure and subsequent CI evidence are retained separately.
+
+The real staging SDK run was **skipped**, with nonzero exit, because its scoped SDK API key is not available through the connected management tools or local configuration. No real provider login/session result is inferred from Emulate. Manual G1 (Hosted AuthKit), G2 (real MCP consent/exact-resource/same-user continuity) and H1 (installed ChatGPT) remain **skipped**. Older reports retain their original G1/G2 definitions; H1 makes the host distinction explicit in new reports.
+
+The canonical shared account was removed: an exact query found `user_01M45T2NKBZ5F9G6TTJC3BWVS9` with no password, linked identities or sessions; authorized deletion succeeded, and a fresh exact-email query returned no users. See [the removal record](shared-account-removal.json). No replacement permanent account was created. The astack Staging environment and its public web/MCP settings remain available.
+
+Fresh generated Linux CI and sanitized reports/media are linked here after the candidate run. The developer's running persistent instance was preserved; this task did not merge, publish or move Convex to cloud.

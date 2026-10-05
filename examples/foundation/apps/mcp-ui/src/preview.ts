@@ -31,6 +31,14 @@ if (
     'Start the local backend with bun dev to preview its MCP App.',
   );
 const serverUrl = new URL(endpoint);
+const emulate = import.meta.env['VITE_ASTACK_AUTH_MODE'] === 'emulate';
+if (emulate) {
+  if (!['127.0.0.1', 'localhost'].includes(location.hostname))
+    throw new Error('Emulate preview requires local development.');
+  connect.textContent = 'Connect with Emulate';
+  status.textContent =
+    'Local seeded identity via WorkOS Emulate. Real OAuth consent requires staging acceptance.';
+}
 const provider = new PreviewOAuth(
   endpoint,
   location.origin,
@@ -73,8 +81,30 @@ async function populate() {
 }
 async function mount(code?: string) {
   await close();
+  let emulateToken: string | undefined;
+  if (emulate) {
+    const response = await fetch('/__emulate/mcp-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+    });
+    const result: unknown = await response.json();
+    if (
+      !response.ok ||
+      typeof result !== 'object' ||
+      result === null ||
+      !('access_token' in result) ||
+      typeof result.access_token !== 'string'
+    )
+      throw new Error('Local Emulate session could not be created.');
+    emulateToken = result.access_token;
+  }
   const transport = new HttpTransport(serverUrl, {
-    authProvider: provider,
+    ...(emulate && emulateToken
+      ? {
+          requestInit: { headers: { Authorization: `Bearer ${emulateToken}` } },
+        }
+      : { authProvider: provider }),
     fetch: localFetch,
   });
   const client = new Client({
@@ -112,7 +142,10 @@ async function mount(code?: string) {
     if (!view) throw new Error('The App iframe did not open.');
     await bridge.connect(new PostMessageTransport(view, view));
     await initialized;
-    if (status) status.textContent = 'Connected to local Convex through MCP.';
+    if (status)
+      status.textContent = emulate
+        ? 'Connected through MCP with the seeded Emulate owner. OAuth consent is a staging acceptance check.'
+        : 'Connected to local Convex through MCP.';
   } catch (error) {
     await close();
     await client.close();

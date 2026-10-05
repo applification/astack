@@ -24,6 +24,31 @@ export function localProofEnabled(): boolean {
   return true;
 }
 
+export function emulateEnabled(): boolean {
+  if (process.env.ASTACK_AUTH_MODE !== 'emulate') return false;
+  const issuer = process.env.WORKOS_EMULATE_URL;
+  if (
+    !isLoopbackUrl(process.env.CONVEX_SITE_URL) ||
+    !issuer ||
+    !isLoopbackUrl(issuer) ||
+    new URL(issuer).origin !== issuer ||
+    new URL(issuer).username ||
+    new URL(issuer).password
+  )
+    throw new Error(
+      'WorkOS Emulate is restricted to a local Convex deployment and loopback issuer origin.',
+    );
+  return true;
+}
+
+export function mcpIssuer(): string | undefined {
+  return emulateEnabled()
+    ? process.env.WORKOS_EMULATE_URL
+    : localProofEnabled()
+      ? process.env.ASTACK_PROOF_ISSUER
+      : process.env.WORKOS_AUTHKIT_DOMAIN;
+}
+
 export function isLocalMcpResource(
   site: string | undefined,
   resource: string,

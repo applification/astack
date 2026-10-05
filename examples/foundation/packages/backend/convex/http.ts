@@ -2,7 +2,12 @@ import { httpRouter } from 'convex/server';
 import { z } from 'zod';
 
 import { httpAction } from './_generated/server';
-import { localProofEnabled, requireUser } from './lib/identity';
+import {
+  emulateEnabled,
+  localProofEnabled,
+  mcpIssuer,
+  requireUser,
+} from './lib/identity';
 import { handleMcpRequest } from './lib/mcp';
 
 const http = httpRouter();
@@ -81,9 +86,7 @@ function readValidatedClaims(request: Request): z.infer<typeof claimsSchema> {
 const mcp = httpAction(async (ctx, request) => {
   const failure = boundaryFailure(request);
   if (failure) return failure;
-  const issuer = localProofEnabled()
-    ? process.env.ASTACK_PROOF_ISSUER
-    : process.env.WORKOS_AUTHKIT_DOMAIN;
+  const issuer = mcpIssuer();
   const resource = process.env.MCP_RESOURCE_URL;
   if (!issuer || !resource)
     return jsonResponse(
@@ -113,9 +116,7 @@ const mcp = httpAction(async (ctx, request) => {
 const metadata = httpAction((_, request) => {
   const failure = boundaryFailure(request);
   if (failure) return Promise.resolve(failure);
-  const issuer = localProofEnabled()
-    ? process.env.ASTACK_PROOF_ISSUER
-    : process.env.WORKOS_AUTHKIT_DOMAIN;
+  const issuer = mcpIssuer();
   const resource = process.env.MCP_RESOURCE_URL;
   if (!issuer || !resource)
     return Promise.resolve(
@@ -149,7 +150,11 @@ http.route({
         service: 'astack-foundation',
         buildId: process.env.ASTACK_BUILD_ID ?? 'unconfigured',
         resource: process.env.MCP_RESOURCE_URL ?? null,
-        authMode: localProofEnabled() ? 'local-proof' : 'workos',
+        authMode: emulateEnabled()
+          ? 'workos-emulate'
+          : localProofEnabled()
+            ? 'local-proof'
+            : 'workos',
         profile: 'react-vite-convex-workos-mcp',
       }),
     ),
