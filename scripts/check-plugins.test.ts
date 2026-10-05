@@ -4,7 +4,13 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { checkPlugin } from './check-plugins';
 let path: string;
-beforeEach(() => { path = mkdtempSync(join(tmpdir(), 'astack-portable-')); cpSync(resolve(import.meta.dir, '../plugins/applification'), path, { recursive: true }); });
+beforeEach(() => {
+  path = mkdtempSync(join(tmpdir(), 'astack-portable-'));
+  const root = resolve(import.meta.dir, '..');
+  for (const entry of ['plugin.json', 'mcp.json', 'LICENSE', 'NOTICE.md', 'assets', 'skills']) {
+    cpSync(join(root, entry), join(path, entry), { recursive: true });
+  }
+});
 afterEach(() => rmSync(path, { recursive: true, force: true }));
 test('portable package retains existing publisher identity', () => expect(checkPlugin(path)).toBe('applification'));
 test('legacy fallback cannot silently coexist with the portable package', () => {

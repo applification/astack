@@ -6,7 +6,7 @@
       "name": "applification",
       "source": {
         "source": "local",
-        "path": "./plugins/applification"
+        "path": "./"
       },
       "policy": {
         "installation": "AVAILABLE",

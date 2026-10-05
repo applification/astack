@@ -68,7 +68,7 @@ async function main() {
       plugins: [
         {
           name: 'applification',
-          source: { source: 'local', path: './plugins/applification' },
+          source: { source: 'local', path: './' },
           policy: { installation: 'AVAILABLE', authentication: 'ON_INSTALL' },
         },
       ],
@@ -98,7 +98,7 @@ async function main() {
   };
   let installed = false;
   try {
-    const expected = await fileDigests(join(snapshot, 'plugins/applification'));
+    const expected = await fileDigests(snapshot);
     await command(
       [
         'codex',

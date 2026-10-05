@@ -1,6 +1,6 @@
 # Move this reference to cloud
 
-Start locally with `bun run dev`. Moving to cloud is an explicit user decision. This file supplements astack's [cloud transition workflow](https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/cloud-transition.md) with reference commands. No cloud project, host or data-transfer choice is preselected.
+Start locally with `bun run dev`. Moving to cloud is an explicit user decision. This file supplements astack's [cloud transition workflow](https://github.com/applification/astack/blob/main/skills/astack/references/cloud-transition.md) with reference commands. No cloud project, host or data-transfer choice is preselected.
 
 Record the chosen Convex team/project/deployment/type, frontend host/domain, WorkOS environment, revision, empty-versus-transfer decision and recovery policy in `.astack/cloud/transition.md`. Keep credentials and snapshots private. Preserve `packages/backend/.env.local` and `packages/backend/.convex`; a separate clean release checkout keeps cloud configuration independent. `bun run dev` and `bun run convex:local` deliberately refuse cloud targets.
 
