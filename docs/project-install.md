@@ -55,7 +55,7 @@ codex plugin add convex@openai-curated-remote
 
 ## Portable package
 
-astack uses root `plugin.json` and `mcp.json` with the Agent Plugins schemas. OpenAI-specific presentation lives in `extensions.com.openai`; skills are discovered under `skills/`. The empty MCP server map is deliberate. A project using astack adds its own runtime plugin/server, guided by [ChatGPT plugin engineering](../plugins/applification/skills/astack/references/chatgpt-plugin.md) and [local installation](../plugins/applification/skills/astack/references/plugin-local-install.md). No fallback manifest is needed.
+astack uses root `plugin.json` and `mcp.json` with the Agent Plugins schemas. OpenAI-specific presentation lives in `extensions.com.openai`; skills are discovered under `skills/`. The empty MCP server map is deliberate. A project using astack adds its own runtime plugin/server, guided by [ChatGPT plugin engineering](../plugins/applification/skills/chatgpt-plugin/SKILL.md) and [local installation](../plugins/applification/skills/astack/references/plugin-local-install.md). No fallback manifest is needed.
 
 ## Update
 

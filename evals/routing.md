@@ -106,4 +106,17 @@ These interpretation cases cover terminology, scope and document ownership; they
 | "While fixing this one screen, we agreed Reservation is the canonical term" | Record the agreed meaning promptly, then keep code changes within the authorized scope. Surface the wider rename and affected public or persisted consumers as a separate scope decision; terminology agreement alone does not authorize a repository-wide migration. |
 | "Put our cache expiry and retry implementation in GLOSSARY.md" | Keep the glossary focused on agreed domain meanings. Put operational detail in relevant project documentation; use the existing decision register only for a consequential tradeoff whose rationale merits retention. Link acceptance cases separately. |
 
+## Direct and composed skill selection
+
+These interpretation cases support the callable architecture; installed discovery and observed delivery require separate trials.
+
+| Request | Expected decision |
+| --- | --- |
+| "Show me how this function works without changing code or preparing a PR" | Use show-me directly: read the relevant function and produce the smallest useful source-grounded logic sketch, tree or diagram. Keep prose brief and label unknowns; do not start implementation or PR preparation. |
+| "Use domain-modeling to record the term we just agreed" | Apply domain-modeling directly, reuse the existing glossary/context home, record the agreed meaning promptly and return remaining ambiguity or consequential decisions. Do not start unrelated implementation or require the astack coordinator. |
+| "Verify this change and report failures; do not repair it or update its PR" | Use verify directly, run proportionate requested checks on the named revision/environment and return actual results and gaps. Verification can finish with a failure report; no unrequested repair or PR publication. |
+| "Use astack to fix this small typo in a CLI message" | Select bug-fix or implement according to whether a defect is reported, preserve the narrow scope, run a meaningful focused check and finish through pr. Apply skills sequentially without requiring delegation, domain modeling or a diagram for the simple change. |
+| "Use bug-fix directly to repair an existing Convex ownership check" | Apply bug-fix and relevant database guidance; use convex-expert before backend edits and the required convex-reviewer before PR readiness. Reproduce the permission defect, fix within scope and retain allowed/denied observations; do not rely on astack having supplied platform gates. |
+| "Use mcp-server directly for a kept tool change" | Select relevant platform guidance, implement the tool within the authorized boundary, prove applicable contract/transport/agent layers and finish through verify and pr. For a bounded contribution whose caller owns publication, return the result to that caller instead of opening a duplicate PR. |
+
 After a trial, record whether astack chose the right route, found an important missing decision, selected checks proportionately, and reported proof honestly. Fix an observed failure narrowly rather than adding more universal gates.

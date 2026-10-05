@@ -1,6 +1,11 @@
-# Domain language
+---
+name: domain-modeling
+description: Resolve ambiguous domain concepts against code and concrete cases, and maintain agreed glossary terms and consequential decisions.
+---
 
-Use this when a change introduces a domain concept, exposes ambiguous terminology, or changes what an existing term means. Keep the selected work route: domain modeling supports intent, implementation and review rather than adding another delivery route. A routine fix using settled terms needs no separate modeling session.
+# Domain modeling
+
+Use this when a change introduces a domain concept, exposes ambiguous terminology, or changes what an existing term means. Use it directly to sharpen a model or as part of astack delivery. Return the resolved definitions, relevant decisions and any remaining ambiguity; domain modeling alone does not start unrelated implementation. A routine fix using settled terms needs no separate modeling session.
 
 ## Find the language in use
 

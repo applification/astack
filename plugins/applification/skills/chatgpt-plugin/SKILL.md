@@ -1,27 +1,34 @@
+---
+name: chatgpt-plugin
+description: Build or change ChatGPT plugin UI, extensions, packaging or events with explicit SDK and installed-host boundaries.
+---
+
 # ChatGPT plugin engineering
 
-Read this for ChatGPT/Work plugin implementation, MCP Apps, OpenAI extensions, plugin packaging, or MCP Events. Keep the existing Feature, Bug fix, Refactor or Investigation route; this is specialized implementation guidance, not a new route. A tools-only MCP change stays on [the MCP server path](mcp-server.md).
+Before editing, apply [affected-capability selection](../astack/references/capability-selection.md) for the boundaries this task reaches. Reuse a selected skill already in progress; do not restart through astack.
+
+Use this skill directly or during astack delivery for ChatGPT/Work plugin implementation, MCP Apps, OpenAI extensions, plugin packaging, or MCP Events. Keep the existing Feature, Bug fix, Refactor or Investigation route; this is specialized implementation guidance, not a new route. A tools-only MCP change stays on [the MCP server path](../mcp-server/SKILL.md).
 
 ## Select the pieces
 
 A plugin packages skills and MCP connections. The MCP server owns authorized actions and resources. MCP Apps adds bundled HTML UI and a standard host bridge. OpenAI extensions add ChatGPT-specific entrypoints and context. MCP Events adds user-authorized monitoring through persistent subscriptions. Add only the pieces the requested outcome uses.
 
-Use the TypeScript SDK for OpenAI extensions. Before adding dependencies read [compatibility](openai-compatibility.md), check the published peer requirements, and prove the selected profile. Protocol revisions, package major versions and MCP Apps bridge versions are different identifiers. Do not infer support for a protocol from a package name.
+Use the TypeScript SDK for OpenAI extensions. Before adding dependencies read [compatibility](../astack/references/openai-compatibility.md), check the published peer requirements, and prove the selected profile. Protocol revisions, package major versions and MCP Apps bridge versions are different identifiers. Do not infer support for a protocol from a package name.
 
 Load only the relevant references:
 
 | Work | Reference |
 | --- | --- |
-| Shared React UI, Storybook, bundling or host lifecycle | [MCP App UI](mcp-app-ui.md) |
-| Sidebar, thread panels, settings, links, mentions, context or files | [OpenAI extensions](openai-extensions.md) |
-| Monitoring, subscription lifecycle or webhook delivery | [MCP Events](mcp-events.md) |
-| Portable manifests, local marketplace, server connection or tunnel | [Packaging and local installation](plugin-local-install.md) |
+| Shared React UI, Storybook, bundling or host lifecycle | [MCP App UI](../astack/references/mcp-app-ui.md) |
+| Sidebar, thread panels, settings, links, mentions, context or files | [OpenAI extensions](../astack/references/openai-extensions.md) |
+| Monitoring, subscription lifecycle or webhook delivery | [MCP Events](../astack/references/mcp-events.md) |
+| Portable manifests, local marketplace, server connection or tunnel | [Packaging and local installation](../astack/references/plugin-local-install.md) |
 
 ## Contract and ownership
 
 Extend the project's existing behavior contract with target clients and versions, entrypoint and trigger, authenticated actor, what the model sees, UI-only state, authoritative persistence, capability fallback, and required real-host observations. Include the user instruction that authorizes an event response and what ends monitoring. Do not turn every application state change into an unsolicited message.
 
-For new products, follow [project setup](project-setup.md). Typical consumers are apps/mcp, apps/plugin-ui, packages/ui and an existing domain/backend package. Separate browser-safe presentation components from the MCP adapter and server code. An existing repository keeps its layout and package manager. An astack knowledge update does not need to become a product monorepo.
+For new products, follow [project setup](../project-setup/SKILL.md). Typical consumers are apps/mcp, apps/plugin-ui, packages/ui and an existing domain/backend package. Separate browser-safe presentation components from the MCP adapter and server code. An existing repository keeps its layout and package manager. An astack knowledge update does not need to become a product monorepo.
 
 ## Proof and tooling
 
@@ -34,3 +41,7 @@ OpenAI Developers can provide current implementation guidance when available. pl
 The repository's [reference example](https://github.com/applification/astack/tree/main/examples/chatgpt-plugin) exercises two isolated SDK profiles. It is a development fixture, not a hosted service or evidence of ChatGPT support.
 
 Sources checked 2026-09-30: [plugin architecture](https://developers.openai.com/plugins/concepts/plugins), [extensions](https://developers.openai.com/plugins/build/extensions), [UI](https://developers.openai.com/plugins/build/chatgpt-ui), [testing](https://developers.openai.com/plugins/deploy/connect-chatgpt).
+
+## Finish the requested job
+
+When composed as a bounded contribution, return its result to the caller if the caller owns integration, verification or PR publication; reuse completed phases and do not open a duplicate PR. For a read-only assessment, return source-grounded findings and gaps. For kept implementation changes, use [verify](../verify/SKILL.md) to consolidate the applicable observations and [pr](../pr/SKILL.md) to finish in an existing or new PR, draft when required work is blocked. Return the delivered outcome, affected boundaries, revision/environment, proof and remaining decisions. Do not merge or release without owner authority.

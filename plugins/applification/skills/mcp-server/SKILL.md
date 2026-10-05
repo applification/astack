@@ -1,10 +1,17 @@
+---
+name: mcp-server
+description: Build or change an MCP server and verify its tool contract, transport, authorization and agent use.
+---
+
 # MCP server path
 
-Use this path when building or changing an MCP server. Start from the project's existing transport, host requirements and authentication model. Keep domain authorization in the domain service even when an MCP gateway has authenticated the caller. An MCP-only change has no web design sprint; an MCP App with visible UI also follows the [web feature path](web-feature.md) for its UI states.
+Before editing, apply [affected-capability selection](../astack/references/capability-selection.md) for the boundaries this task reaches. Reuse a selected skill already in progress; do not restart through astack.
 
-For ChatGPT MCP Apps, OpenAI extensions, portable packaging or events, also use [ChatGPT plugin engineering](chatgpt-plugin.md). Its [compatibility ledger](openai-compatibility.md) overrides the generic v2 default when using the released OpenAI helper; do not mix incompatible SDK majors.
+Use this skill directly or during astack delivery when building or changing an MCP server. Start from the project's existing transport, host requirements and authentication model. Keep domain authorization in the domain service even when an MCP gateway has authenticated the caller. An MCP-only change has no web design sprint; an MCP App with visible UI also follows the [web feature path](../web-feature/SKILL.md) for its UI states.
 
-The [foundation profile](foundation.md) serves authenticated HTTP MCP directly from a Convex HTTP action and uses WorkOS Connect for OAuth. Share authorized backend operations with web; keep transport details at the MCP adapter and the host bridge out of portable UI. This profile needs no separate `apps/mcp` service. A separate server remains appropriate for other runtimes, deployment boundaries, or stdio tools. Apply the profile's identity rules before choosing token validation or delegation.
+For ChatGPT MCP Apps, OpenAI extensions, portable packaging or events, also use [ChatGPT plugin engineering](../chatgpt-plugin/SKILL.md). Its [compatibility ledger](../astack/references/openai-compatibility.md) overrides the generic v2 default when using the released OpenAI helper; do not mix incompatible SDK majors.
+
+The [foundation profile](../astack/references/foundation.md) serves authenticated HTTP MCP directly from a Convex HTTP action and uses WorkOS Connect for OAuth. Share authorized backend operations with web; keep transport details at the MCP adapter and the host bridge out of portable UI. This profile needs no separate `apps/mcp` service. A separate server remains appropriate for other runtimes, deployment boundaries, or stdio tools. Apply the profile's identity rules before choosing token validation or delegation.
 
 ## Choose the serving boundary
 
@@ -24,4 +31,8 @@ Select checks from the acceptance cases and name what each establishes:
 
 Run the narrowest applicable layers. A tool implementation change usually needs direct client proof; a new remote endpoint or OAuth change needs running transport proof; a description or workflow change may need agent proof even when direct calls still pass. If a live model or OAuth environment is unavailable, report that layer as skipped or inconclusive instead of promoting another layer's result. A mock MCP server is useful for testing a consuming client while its dependency is unavailable, not for proving the server under change.
 
-Record project-specific startup, safe fixtures, test identities, proof commands and host constraints in `.astack/project.md`. Keep tokens, protected preview parameters and private tool results out of committed evidence. See the shared [proof outcomes](proof.md#run) for reporting on an exact revision.
+Record project-specific startup, safe fixtures, test identities, proof commands and host constraints in `.astack/project.md`. Keep tokens, protected preview parameters and private tool results out of committed evidence. See the shared [proof outcomes](../verify/references/proof-policy.md#run) for reporting on an exact revision.
+
+## Finish the requested job
+
+When composed as a bounded contribution, return its result to the caller if the caller owns integration, verification or PR publication; reuse completed phases and do not open a duplicate PR. For a read-only assessment, return source-grounded findings and gaps. For kept implementation changes, use [verify](../verify/SKILL.md) to consolidate the applicable observations and [pr](../pr/SKILL.md) to finish in an existing or new PR, draft when required work is blocked. Return the delivered outcome, affected boundaries, revision/environment, proof and remaining decisions. Do not merge or release without owner authority.

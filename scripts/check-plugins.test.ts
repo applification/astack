@@ -16,3 +16,18 @@ test('packaged server cannot reference a missing executable asset', () => {
   mcp.mcpServers.test = { type: 'stdio', command: 'node', args: ['${PLUGIN_ROOT}/missing.mjs'] };
   writeFileSync(file, JSON.stringify(mcp)); expect(() => checkPlugin(path)).toThrow('Missing package path');
 });
+test('a callable skill must have its own matching identity', () => {
+  const file = join(path, 'skills/show-me/SKILL.md');
+  writeFileSync(file, readFileSync(file, 'utf8').replace('name: show-me', 'name: pr'));
+  expect(() => checkPlugin(path)).toThrow(/Duplicate skill name|Skill name differs from folder/);
+});
+test('relocated skill composition cannot point at missing instructions', () => {
+  const file = join(path, 'skills/pr/SKILL.md');
+  writeFileSync(file, readFileSync(file, 'utf8') + '\n[missing skill](../missing/SKILL.md)\n');
+  expect(() => checkPlugin(path)).toThrow('Missing skill link');
+});
+test('skill references must remain inside the portable package', () => {
+  const file = join(path, 'skills/astack/SKILL.md');
+  writeFileSync(file, readFileSync(file, 'utf8') + '\n[outside](../../../)\n');
+  expect(() => checkPlugin(path)).toThrow('Skill link escapes package');
+});

@@ -6,7 +6,7 @@ Use the standard MCP Apps bridge for initialization, tool input/results, server 
 
 Share browser-safe presentational components from packages/ui or the project's existing UI package. Pass typed data and callbacks into them. Keep App, OpenAIExtensions, capability detection, navigation and tool calls in the MCP App adapter. Do not import Next.js server components, server secrets or Node filesystem code into the iframe. Bundle the production components as an HTML resource; do not embed Storybook as the product UI.
 
-For web design follow [web-feature](web-feature.md). Storybook is useful for host themes, inline/fullscreen sizing, loading, empty, error, selected, read-only and conflict states. Provide a small fake host adapter where interactions need it and call that component evidence. Preserve the project's shadcn/Tailwind system; map its tokens to host variables. @openai/apps-sdk-ui and the extension stylesheet are optional. Avoid global styles that accidentally replace host-compatible controls.
+For web design follow [web-feature](../../web-feature/SKILL.md). Storybook is useful for host themes, inline/fullscreen sizing, loading, empty, error, selected, read-only and conflict states. Provide a small fake host adapter where interactions need it and call that component evidence. Preserve the project's shadcn/Tailwind system; map its tokens to host variables. @openai/apps-sdk-ui and the extension stylesheet are optional. Avoid global styles that accidentally replace host-compatible controls.
 
 ## Lifecycle and data
 

@@ -1,6 +1,6 @@
 import { Validator } from '@cfworker/json-schema';
 import { readFileSync, existsSync, readdirSync, realpathSync } from 'node:fs';
-import { resolve, relative, isAbsolute } from 'node:path';
+import { resolve, relative, isAbsolute, dirname } from 'node:path';
 const root = resolve(import.meta.dir, '..');
 const read = (p: string) => JSON.parse(readFileSync(p, 'utf8'));
 function contained(base: string, value: string) {
@@ -10,6 +10,37 @@ function contained(base: string, value: string) {
   const rel = relative(realpathSync(base), realpathSync(path));
   if (rel.startsWith('..') || isAbsolute(rel)) throw new Error(`Package escape: ${value}`);
   return path;
+}
+function checkSkills(base: string) {
+  const skills = resolve(base, 'skills');
+  const names = new Set<string>();
+  for (const folder of readdirSync(skills)) {
+    const entry = contained(base, `./skills/${folder}/SKILL.md`);
+    const source = readFileSync(entry, 'utf8');
+    const frontmatter = source.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/)?.[1];
+    const name = frontmatter?.match(/^name:\s*["']?([a-z0-9-]+)["']?\s*$/m)?.[1];
+    const description = frontmatter?.match(/^description:\s*(.+)$/m)?.[1]?.trim();
+    if (!name || !description || description === '""' || description === "''") throw new Error(`Missing skill identity: ${entry}`);
+    if (names.has(name)) throw new Error(`Duplicate skill name: ${name}`);
+    names.add(name);
+    if (name !== folder) throw new Error(`Skill name differs from folder: ${folder}/${name}`);
+  }
+  function links(directory: string) {
+    for (const item of readdirSync(directory, { withFileTypes: true })) {
+      const file = resolve(directory, item.name);
+      if (item.isDirectory()) { links(file); continue; }
+      if (!item.name.endsWith('.md')) continue;
+      for (const match of readFileSync(file, 'utf8').matchAll(/!?\[[^\]]*\]\(([^)]+)\)/g)) {
+        const url = match[1];
+        if (/^[a-z][a-z0-9+.-]*:/i.test(url) || url.startsWith('#')) continue;
+        const target = resolve(dirname(file), decodeURIComponent(url.split('#')[0]));
+        if (!existsSync(target)) throw new Error(`Missing skill link: ${file} -> ${url}`);
+        const rel = relative(realpathSync(base), realpathSync(target));
+        if (rel.startsWith('..') || isAbsolute(rel)) throw new Error(`Skill link escapes package: ${file} -> ${url}`);
+      }
+    }
+  }
+  links(skills);
 }
 export function checkPlugin(base: string) {
   for (const name of ['plugin', 'mcp']) {
@@ -26,7 +57,7 @@ export function checkPlugin(base: string) {
   for (const key of ['apps', 'onboardingSkill']) if (ext?.[key]) contained(base, ext[key]);
   for (const key of ['composerIcon', 'logo', 'logoDark']) if (ext?.interface?.[key]) contained(base, ext.interface[key]);
   for (const value of ext?.interface?.screenshots ?? []) contained(base, value);
-  for (const name of readdirSync(resolve(base, 'skills'))) contained(base, `./skills/${name}/SKILL.md`);
+  checkSkills(base);
   const servers = read(resolve(base, 'mcp.json')).mcpServers ?? {};
   for (const server of Object.values(servers) as { type: string; command?: string; args?: string[] }[]) {
     for (const value of [server.command, ...(server.args ?? [])]) {

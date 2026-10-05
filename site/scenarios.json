@@ -413,5 +413,35 @@
     "request": "Put our cache expiry and retry implementation in GLOSSARY.md",
     "decision": "Keep the glossary focused on agreed domain meanings. Put operational detail in relevant project documentation; use the existing decision register only for a consequential tradeoff whose rationale merits retention. Link acceptance cases separately.",
     "route": "feature"
+  },
+  {
+    "request": "Show me how this function works without changing code or preparing a PR",
+    "decision": "Use show-me directly: read the relevant function and produce the smallest useful source-grounded logic sketch, tree or diagram. Keep prose brief and label unknowns; do not start implementation or PR preparation.",
+    "route": "investigation"
+  },
+  {
+    "request": "Use domain-modeling to record the term we just agreed",
+    "decision": "Apply domain-modeling directly, reuse the existing glossary/context home, record the agreed meaning promptly and return remaining ambiguity or consequential decisions. Do not start unrelated implementation or require the astack coordinator.",
+    "route": "investigation"
+  },
+  {
+    "request": "Verify this change and report failures; do not repair it or update its PR",
+    "decision": "Use verify directly, run proportionate requested checks on the named revision/environment and return actual results and gaps. Verification can finish with a failure report; no unrequested repair or PR publication.",
+    "route": "investigation"
+  },
+  {
+    "request": "Use astack to fix this small typo in a CLI message",
+    "decision": "Select bug-fix or implement according to whether a defect is reported, preserve the narrow scope, run a meaningful focused check and finish through pr. Apply skills sequentially without requiring delegation, domain modeling or a diagram for the simple change.",
+    "route": "bug"
+  },
+  {
+    "request": "Use bug-fix directly to repair an existing Convex ownership check",
+    "decision": "Apply bug-fix and relevant database guidance; use convex-expert before backend edits and the required convex-reviewer before PR readiness. Reproduce the permission defect, fix within scope and retain allowed/denied observations; do not rely on astack having supplied platform gates.",
+    "route": "bug"
+  },
+  {
+    "request": "Use mcp-server directly for a kept tool change",
+    "decision": "Select relevant platform guidance, implement the tool within the authorized boundary, prove applicable contract/transport/agent layers and finish through verify and pr. For a bounded contribution whose caller owns publication, return the result to that caller instead of opening a duplicate PR.",
+    "route": "feature"
   }
 ]

@@ -18,7 +18,7 @@ Give material acceptance cases stable IDs. For each, name the observable expecta
 
 Before acting, verify checkout/run and build or deployment identity. A path hash or open port alone does not prove the served revision. For dirty local work, capture a digest of the source/build inputs alongside the full Git commit. Use disposable data and isolated actors. Wrong instance, missing fixtures or rejected credentials make the check inconclusive, not a confirmed product failure.
 
-With e2e MCP, open the intended target, observe, validate locators with `locate`, try the interaction, then close the session. It needs no model. Prefer accessible roles/names and exact user actions. Use the [app-control ownership rules](app-control.md#share-ownership-with-the-test-runner): either e2e owns an isolated server, or it connects through a URL-only config to a CLI-owned verified instance. Tests never stop a stack they did not start.
+With e2e MCP, open the intended target, observe, validate locators with `locate`, try the interaction, then close the session. It needs no model. Prefer accessible roles/names and exact user actions. Use the [app-control ownership rules](../../app-control/references/control-contract.md#share-ownership-with-the-test-runner): either e2e owns an isolated server, or it connects through a URL-only config to a CLI-owned verified instance. Tests never stop a stack they did not start.
 
 ## Verify known behavior
 
@@ -40,11 +40,11 @@ Every issue or warning starts as a candidate. Keep its source report, expected/o
 
 For confirmation, write an isolated probe using exact actions and assertions of the expected behavior. Check its locators live first. Require one selected test failing in its body with `ASSERTION_FAILED`, no run-level/setup errors, and evidence that the assertion encodes this finding. A model-generated failure, locator error, timeout or exhausted budget cannot confirm it. Reject with evidence and a reason; leave unreproduced candidates unresolved. Where exact reproduction is unavailable, retain an explicit visual/host verification gap rather than inventing confirmation.
 
-Keep failing probes outside the passing suite. A confirmed defect affecting the change's acceptance cases blocks completion unless the owner explicitly accepts the limitation; moving it outside the suite does not waive it. After the fix, rerun the original probe, then retain the passing repro in the regression suite. Record the linked lifecycle as candidate → confirmed/rejected → fixed → regression. Do not weaken acceptance or an assertion to remove a finding.
+Keep failing probes outside the passing suite. A confirmed defect affecting the change's acceptance cases blocks delivery completion unless the owner explicitly accepts the limitation; moving it outside the suite does not waive it. After the fix, rerun the original probe, then retain the passing repro in the regression suite. Record the linked lifecycle as candidate → confirmed/rejected → fixed → regression. Do not weaken acceptance or an assertion to remove a finding.
 
 ## Interpret and retain evidence
 
-Use [astack proof outcomes](proof.md#run). Read `run.errors`, selected results, attempts, error phase/source, exploration steps, assessment and termination reason. Validate the report format against the pinned version. Missing reports, empty selection and unknown report formats are inconclusive.
+Use [astack proof outcomes](../../verify/references/proof-policy.md#run). Read `run.errors`, selected results, attempts, error phase/source, exploration steps, assessment and termination reason. Validate the report format against the pinned version. Missing reports, empty selection and unknown report formats are inconclusive.
 
 | Observation | astack interpretation |
 | --- | --- |
@@ -67,7 +67,7 @@ A concise proof result records acceptance ID, full revision, dirty source/build 
 
 Keep required deterministic checks separate from advisory exploration. Run production regressions on affected targets, reject focused-only tests in CI, and preserve first failures and retries. Configure required checks where the repository supports them; report a missing enforceable merge gate instead of claiming it exists.
 
-Use locked dependencies, pinned Actions, read-only tokens and per-run reports. A selected automatic charter is bounded and advisory; broader bug bashes need an explicit selection. Advisory status does not excuse a confirmed relevant defect or an unverified acceptance case. Publish case results, flaky tests, candidates and incomplete charters separately in the PR summary. The [PR readiness rules](pr.md) still apply.
+Use locked dependencies, pinned Actions, read-only tokens and per-run reports. A selected automatic charter is bounded and advisory; broader bug bashes need an explicit selection. Advisory status does not excuse a confirmed relevant defect or an unverified acceptance case. Return case results, flaky tests, candidates and incomplete charters separately to the caller. Include them in the PR summary when PR preparation is part of the requested delivery. The [PR readiness rules](../../pr/SKILL.md) still apply.
 
 Framework test/config code runs with OS permissions. Untrusted PRs use externally isolated runners without secrets or subscription credentials. Subscription-backed exploration uses explicitly trusted runners with a separate framework login under the service account. Preflight provider access; a Codex login alone is insufficient. Do not copy Loami's runner name or credentials into another project.
 
