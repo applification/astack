@@ -2,8 +2,13 @@ import { describe, expect, test } from 'bun:test';
 import assert from 'node:assert/strict';
 import { ConvexError } from 'convex/values';
 import { localEnvironment, redact } from '../scripts/runtime';
-import { selfContainedResource, items, denied } from '../scripts/readiness';
-import { TrialEvents } from '../scripts/trials';
+import {
+  selfContainedResource,
+  items,
+  denied,
+  expectPersistedStatus,
+} from '../scripts/readiness';
+import { TrialEvents, seedWasObserved } from '../scripts/trials';
 
 describe('proof boundary policy', () => {
   test('local subprocesses do not inherit deployment or authentication secrets', () => {
@@ -44,6 +49,133 @@ describe('proof boundary policy', () => {
     expect(() =>
       items([{ id: 'a', title: 'one', status: 'unknown' }]),
     ).toThrow();
+  });
+  test('status persistence allows mutation latency but a validated mismatch fails deterministically', async () => {
+    let reads = 0;
+    await expectPersistedStatus(
+      () =>
+        Promise.resolve([
+          {
+            id: 'one',
+            title: 'Work item',
+            status: ++reads < 3 ? 'open' : 'done',
+          },
+        ]),
+      'one',
+      'done',
+      { timeoutMs: 100, pollMs: 1 },
+    );
+    expect(reads).toBe(3);
+    let failure: unknown;
+    try {
+      await expectPersistedStatus(
+        () =>
+          Promise.resolve([{ id: 'one', title: 'Work item', status: 'open' }]),
+        'one',
+        'done',
+        { timeoutMs: 20, pollMs: 20 },
+      );
+    } catch (error) {
+      failure = error;
+    }
+    expect(failure).toBeInstanceOf(assert.AssertionError);
+    expect(
+      seedWasObserved({
+        outcome: 'fail',
+        report: {
+          outcome: 'fail',
+          checks: [
+            {
+              id: 'R3',
+              outcome:
+                failure instanceof assert.AssertionError
+                  ? 'fail'
+                  : 'inconclusive',
+            },
+          ],
+        },
+      }),
+    ).toBe(true);
+  });
+  test('transport and schema errors during status polling cannot become seed observations', async () => {
+    for (const read of [
+      () => Promise.reject(new Error('fetch failed: network unavailable')),
+      () =>
+        Promise.resolve([{ id: 'one', title: 'Work item', status: 'invalid' }]),
+    ]) {
+      let failure: unknown;
+      try {
+        await expectPersistedStatus(read, 'one', 'done', {
+          timeoutMs: 100,
+          pollMs: 1,
+        });
+      } catch (error) {
+        failure = error;
+      }
+      expect(failure).toBeInstanceOf(Error);
+      expect(failure).not.toBeInstanceOf(assert.AssertionError);
+      expect(
+        seedWasObserved({
+          outcome: 'inconclusive',
+          report: {
+            outcome: 'inconclusive',
+            checks: [{ id: 'R3', outcome: 'inconclusive' }],
+          },
+        }),
+      ).toBe(false);
+    }
+    let reads = 0;
+    await assert.rejects(
+      expectPersistedStatus(
+        () => {
+          if (++reads === 1)
+            return Promise.resolve([
+              { id: 'one', title: 'Work item', status: 'open' },
+            ]);
+          return Promise.reject(new Error('later network failure'));
+        },
+        'one',
+        'done',
+        { timeoutMs: 100, pollMs: 1 },
+      ),
+      /later network failure/,
+    );
+    expect(reads).toBe(2);
+  });
+  test('an in-flight read cannot outlive the polling deadline or become seed evidence', async () => {
+    for (const read of [
+      () =>
+        new Promise<unknown>((resolve) =>
+          setTimeout(() => {
+            resolve([{ id: 'one', title: 'Work item', status: 'done' }]);
+          }, 40),
+        ),
+      () => new Promise<unknown>(() => {}),
+    ]) {
+      let failure: unknown;
+      try {
+        await expectPersistedStatus(read, 'one', 'done', {
+          timeoutMs: 5,
+          pollMs: 1,
+        });
+      } catch (error) {
+        failure = error;
+      }
+      expect(failure).toBeInstanceOf(Error);
+      expect(failure).not.toBeInstanceOf(assert.AssertionError);
+      expect(failure instanceof Error ? failure.message : '').toContain(
+        'read exceeded',
+      );
+      expect(
+        seedWasObserved({
+          outcome: 'inconclusive',
+          report: {
+            outcome: 'inconclusive',
+            checks: [{ id: 'R3', outcome: 'inconclusive' }],
+          },
+        }),
+      ).toBe(false);
+    }
   });
   test('an expected Convex ownership denial is accepted, but a backend crash is not', async () => {
     await denied(() => Promise.reject(new ConvexError({ code: 'FORBIDDEN' })), {

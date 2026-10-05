@@ -52,6 +52,58 @@ const workItemsSchema = z.array(
 export function items(value: unknown): WorkItem[] {
   return workItemsSchema.parse(value);
 }
+/** Only validated, successfully read state can establish a persistence mismatch. */
+export async function expectPersistedStatus(
+  read: () => Promise<unknown>,
+  id: string,
+  expected: 'open' | 'done',
+  options: { timeoutMs?: number; pollMs?: number } = {},
+): Promise<void> {
+  const timeoutMs = options.timeoutMs ?? 5000,
+    deadline = Date.now() + timeoutMs;
+  const pollMs = options.pollMs ?? 100;
+  let observed: WorkItem['status'] | undefined;
+  for (;;) {
+    const readBudget = deadline - Date.now();
+    if (readBudget <= 0)
+      throw new Error(
+        'Backend status read deadline expired before a validated read',
+      );
+    // Transport and DTO errors propagate immediately; neither is seed evidence.
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const readTimeout = () =>
+      new Error(`Backend status read exceeded its ${timeoutMs}ms deadline`);
+    const expired = new Promise<never>((_resolve, reject) => {
+      timer = setTimeout(() => {
+        reject(readTimeout());
+      }, readBudget);
+    });
+    try {
+      const value = await Promise.race([read(), expired]);
+      if (Date.now() >= deadline) throw readTimeout();
+      observed = items(value).find((item) => item.id === id)?.status;
+      if (Date.now() >= deadline) throw readTimeout();
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+    if (observed === expected) return;
+    const remaining = deadline - Date.now();
+    // Avoid starting another network read with only a fraction of the polling
+    // interval left. The last successfully validated wrong state stays evidence.
+    if (remaining <= pollMs) {
+      await new Promise<void>((done) =>
+        setTimeout(done, Math.max(0, remaining)),
+      );
+      break;
+    }
+    await new Promise<void>((done) => setTimeout(done, pollMs));
+  }
+  assert.equal(
+    observed,
+    expected,
+    `Fresh backend reads did not persist web status '${expected}' within ${timeoutMs}ms`,
+  );
+}
 export function selfContainedResource(html: string): void {
   assert.ok(
     html.includes('<html') || html.includes('<!doctype'),
@@ -335,25 +387,40 @@ export async function verify(
         await page
           .getByRole('button', { name: 'Mark done', exact: true })
           .click();
+        const settledControl = page.getByRole('button', {
+          name: /^(Mark done|Reopen)$/,
+        });
+        await waitFor(
+          async () =>
+            (await settledControl.count()) === 1 &&
+            (await settledControl.isEnabled()),
+          'web status mutation to settle',
+          10_000,
+        );
+        await expectPersistedStatus(
+          () => owner.query(list, {}),
+          item.id,
+          'done',
+        );
         await page
           .getByRole('button', { name: 'Reopen', exact: true })
           .waitFor();
-        assert.equal(
-          items(await owner.query(list, {})).find(
-            (value) => value.id === item.id,
-          )?.status,
-          'done',
-        );
         await page.getByRole('button', { name: 'Reopen', exact: true }).click();
+        await waitFor(
+          async () =>
+            (await settledControl.count()) === 1 &&
+            (await settledControl.isEnabled()),
+          'web reopen mutation to settle',
+          10_000,
+        );
+        await expectPersistedStatus(
+          () => owner.query(list, {}),
+          item.id,
+          'open',
+        );
         await page
           .getByRole('button', { name: 'Mark done', exact: true })
           .waitFor();
-        assert.equal(
-          items(await owner.query(list, {})).find(
-            (value) => value.id === item.id,
-          )?.status,
-          'open',
-        );
         const reopened = await ownerMcp.callTool({
           name: 'work_items_list',
           arguments: {},
