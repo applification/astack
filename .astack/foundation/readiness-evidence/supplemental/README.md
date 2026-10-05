@@ -1,6 +1,6 @@
 # Supplementary historical readiness records
 
-This archive preserves seven earlier local runtime/control attempts and the ignored copy of the isolated domain TSX enforcement result before their worktree is archived. It records historical observations; exporting did not run another acceptance check. [The summary](summary.json) retains each exact reported build identity, time, case result and cleanup status. Original files remain untouched.
+This archive preserves seven earlier local runtime/control attempts and the ignored copy of the isolated domain TSX enforcement result before their worktree was archived. It records historical observations; exporting did not run another acceptance check. [The summary](summary.json) retains each exact reported build identity, time, case result and cleanup status. At export, originals were verified unchanged; their exact bytes and hashes remain preserved here.
 
 | Record | Original reported outcome | Interpretation and limit |
 | --- | --- | --- |
