@@ -1,6 +1,6 @@
 # Agent Observatory evidence
 
-Environment: Otis/macOS arm64, Bun 1.4.0, Node 24.21, Codex CLI 0.160.0, Convex SDK 1.46.0. Date: 2026-10-05. Revision: the implementation commit and its documentation-only proof update in this PR (see the PR commit list). Raw private reports remain ignored under `.proof/agent-observatory` and `.e2e-live`.
+Environment: Otis/macOS arm64, Bun 1.4.0, Node 24.21, Codex CLI 0.160.0, Convex SDK 1.46.0. Date: 2026-10-05. Runtime, browser and native-service proof applies to implementation `a201b49`; the deployed source is identical to that commit. Site/plugin integrity, strict types, all 19 tests and UI lint also passed on merged revision `6264517` (current main incorporated). This evidence update changes documentation only. Raw private reports remain ignored under `.proof/agent-observatory` and `.e2e-live`.
 
 | Acceptance | Observed result |
 | --- | --- |
