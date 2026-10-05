@@ -1,0 +1,173 @@
+{
+  "format": "astack-ci-evidence-summary/v1",
+  "derivative": true,
+  "run": {
+    "url": "https://github.com/applification/astack/actions/runs/37246177562",
+    "id": 37246177562,
+    "headRevision": "cbbb14495fcd6c3cc6039b08263e5fe568bc20c7",
+    "checkoutMergeRevision": "53a97d68eb90deff59ad8dd4199deebe8c9913d2",
+    "baseRevision": "f29f52dc5ee5b73feb1b24d301cb61f1a578549f",
+    "jobUrl": "https://github.com/applification/astack/actions/runs/37246177562/job/111564432525",
+    "jobId": 111564432525,
+    "outcome": "success",
+    "startedAt": "2026-10-05T00:06:36Z",
+    "finishedAt": "2026-10-05T00:08:33Z",
+    "elapsedSeconds": 117,
+    "jobMetadataSource": "https://api.github.com/repos/applification/astack/actions/jobs/111564432525"
+  },
+  "environment": {
+    "runner": "Ubuntu 24.04.5 LTS x64",
+    "node": "v24.21.0",
+    "bunRevision": "1.4.0+34cbb9a40",
+    "chromium": "153.0.8010.12 (Playwright build 1243)",
+    "typeScriptCompiler": "Version 7.0.2",
+    "typeScriptCompilerApi": "Version 6.0.3",
+    "eslint": "v9.39.4",
+    "vite": "8.3.2",
+    "storybook": "10.6.1"
+  },
+  "foundationChecks": {
+    "freshIndependentScaffold": true,
+    "frozenInstallation": true,
+    "formattingTypedLintStrictTypes": "pass",
+    "tests": {
+      "passed": 32,
+      "failed": 0,
+      "expectCalls": 466,
+      "files": 4
+    },
+    "builds": {
+      "web": "pass",
+      "mcpUi": "pass",
+      "storybook": "pass"
+    },
+    "checkCi": {
+      "mode": "ci",
+      "elapsedMs": 27035,
+      "outcome": "pass"
+    },
+    "enforcement": {
+      "passed": 15,
+      "total": 15,
+      "sourceSha256": "ad62b6c1e4b8b15278f7461f64608321f51bba54f0643f2bb57a52be10afc3a0",
+      "scope": "adopted detectable rules; semantic composition and test quality require review"
+    }
+  },
+  "readiness": {
+    "buildId": "unversioned@sha256-ad62b6c1e4b8b15278f7461f64608321f51bba54f0643f2bb57a52be10afc3a0",
+    "revisionLabelIsActual": "The scaffold runs outside Git, so its measured identity is unversioned plus exact source digest. The checkout merge/head are recorded separately; no SHA prefix is invented.",
+    "taskProfile": "baseline",
+    "startedAt": "2026-10-05T00:08:09.722Z",
+    "finishedAt": "2026-10-05T00:08:24.100Z",
+    "outcome": "pass",
+    "checks": [
+      {
+        "id": "R1",
+        "surface": "identity",
+        "outcome": "pass",
+        "observation": "Running backend health and web identify this revision and local proof environment."
+      },
+      {
+        "id": "R2",
+        "surface": "web → persistence",
+        "outcome": "pass",
+        "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+      },
+      {
+        "id": "R3",
+        "surface": "web ↔ MCP status persistence",
+        "outcome": "pass",
+        "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+      },
+      {
+        "id": "R4",
+        "surface": "authorization",
+        "outcome": "pass",
+        "observation": "Another signed user cannot read or mutate the first user’s item through Convex or MCP."
+      },
+      {
+        "id": "R5",
+        "surface": "authentication",
+        "outcome": "pass",
+        "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+      },
+      {
+        "id": "R6",
+        "surface": "MCP contracts",
+        "outcome": "pass",
+        "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+      },
+      {
+        "id": "R7",
+        "surface": "local MCP App host",
+        "outcome": "pass",
+        "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+      },
+      {
+        "id": "R8",
+        "surface": "web runtime",
+        "outcome": "pass",
+        "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+      },
+      {
+        "id": "G1",
+        "surface": "WorkOS",
+        "outcome": "skipped",
+        "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+      },
+      {
+        "id": "G2",
+        "surface": "ChatGPT",
+        "outcome": "skipped",
+        "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+      }
+    ],
+    "cleanup": "complete",
+    "host": {
+      "mounts": 2,
+      "teardownAcknowledgements": 2,
+      "closedOwnedConnections": 4,
+      "uncaughtAppErrors": []
+    },
+    "coverage": "R4 includes validated second-user MCP list isolation; R3 uses fresh backend persistence reads and a bounded status deadline."
+  },
+  "evidence": {
+    "sourceRoot": "examples/foundation/.proof/ci-linux-cbbb144",
+    "rawArchive": "raw-evidence.zip",
+    "rawArchiveBytes": 194720,
+    "rawArchiveSha256": "34a9842faf3b1b44f5bd0b1816139fafb70f2f894f52b810d8995acdb78f5aa5",
+    "manifest": "raw-evidence.files.tsv",
+    "sourceFileCount": 7,
+    "utf8FileCount": 5,
+    "binaryPngCount": 2,
+    "originalBytes": 193789,
+    "retainedBytes": 193694,
+    "transformedFiles": 1,
+    "transformationPolicy": "Only known filesystem runner and temporary prefixes replaced in UTF8 exported copies. Existing terminal bytes and all other content remain unchanged. Original files remain local and untouched; PNGs are byte-exact.",
+    "originalPatternMatchCounts": {
+      "privateKeyBlocks": 0,
+      "signedJwtPatterns": 0,
+      "providerKeyPatterns": 0,
+      "literalBearerCandidates": 1,
+      "credentialAssignments": 0,
+      "filesystemUserPrefixes": 17,
+      "randomizedMacTemporaryPrefixes": 0
+    },
+    "retainedPatternMatchCounts": {
+      "privateKeyBlocks": 0,
+      "signedJwtPatterns": 0,
+      "providerKeyPatterns": 0,
+      "literalBearerCandidates": 1,
+      "credentialAssignments": 0,
+      "filesystemUserPrefixes": 0,
+      "randomizedMacTemporaryPrefixes": 0
+    },
+    "classifiedBearerCandidate": {
+      "count": 1,
+      "classification": "Public passing test title, matched to the exact checked-in proof-policy test name; no token value."
+    },
+    "actualCredentialMatchesIdentified": 0,
+    "scanLimit": "Pattern observations are bounded; they do not guarantee detecting every possible secret. Two PNGs were visually checked for synthetic test data.",
+    "archiveVerification": "Two stored-byte builds with sorted paths, fixed timestamps and permissions matched. Every entry matched its retained hash; source hashes were rechecked unchanged."
+  }
+}
