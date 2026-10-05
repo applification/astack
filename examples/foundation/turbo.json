@@ -24,7 +24,7 @@
     "dev": {
       "cache": false,
       "persistent": true,
-      "passThroughEnv": ["VITE_*"]
+      "passThroughEnv": ["VITE_*", "ASTACK_AUTH_MODE", "ASTACK_EMULATE_URL"]
     },
     "test": {
       "dependsOn": ["^typecheck"],

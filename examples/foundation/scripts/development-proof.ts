@@ -189,6 +189,30 @@ try {
     throw new Error(
       'First-run clients still report a missing host or runtime error.',
     );
+  // This crosses Turbo's strict environment boundary as ordinary bun dev does.
+  // A direct Vite readiness runtime alone cannot establish that wiring.
+  const tokenRoute = await fetch('http://127.0.0.1:5174/__emulate/mcp-token', {
+    method: 'POST',
+    headers: {
+      Origin: 'http://127.0.0.1:5174',
+      'Content-Type': 'application/json',
+    },
+    body: '{}',
+  });
+  if (!tokenRoute.ok)
+    throw new Error(
+      `Ordinary development Emulate token route returned ${tokenRoute.status}.`,
+    );
+  const tokenResult: unknown = await tokenRoute.json();
+  if (
+    typeof tokenResult !== 'object' ||
+    tokenResult === null ||
+    !('access_token' in tokenResult) ||
+    typeof tokenResult.access_token !== 'string'
+  )
+    throw new Error('Ordinary development returned no Emulate Connect token.');
+  observations.emulatePreviewTokenRoute =
+    'Available through ordinary Turbo development; no credential retained.';
   await page
     .getByRole('button', { name: 'Connect with Emulate', exact: true })
     .click();
