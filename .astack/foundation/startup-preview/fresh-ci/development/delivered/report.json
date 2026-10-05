@@ -1,0 +1,36 @@
+{
+  "outcome": "pass",
+  "observations": {
+    "sourceIdentity": "unversioned@sha256-a4077030b137e23c7233861457d148245c9b867ba270a698d43523d5dabba6d0",
+    "firstRunSurfaces": "Unconfigured web gives the one-time WorkOS setup action; MCP preview opens its connection host without protocol/runtime errors.",
+    "aiSetup": "Managed AI files installed automatically without an interactive prompt; scoped instructions preserved.",
+    "firstStartup": "persistent local Convex; clients received loopback URL; no Convex account or deploy key supplied",
+    "localConfigSha256": "af962536167d33cdaccfbaf29b44e57824e336ab118946c7c1b1e08e39e51f90",
+    "processEnumeration": "Derived 5 descendant process IDs from a ps snapshot; the CLI process ID is separately known.",
+    "statePreservedOnStop": true,
+    "persistedItem": {
+      "id": "j57fj4zr9h02yy7hm0byzm65wh8fpwad",
+      "title": "Persistent local development",
+      "status": "open"
+    },
+    "restartRead": [
+      {
+        "id": "j57fj4zr9h02yy7hm0byzm65wh8fpwad",
+        "title": "Persistent local development",
+        "status": "open"
+      }
+    ],
+    "existingConfigurationPreserved": true,
+    "privateExport": {
+      "bytes": 1486,
+      "sha256": "98a64cf9668cd5262b33150ace99bfeca7cd9fcf16a8d1dc01f4c44fd8f0d823",
+      "retained": false
+    },
+    "authenticationLimit": "CLI administration used an explicit test identity; this is data/startup proof, not WorkOS login or OAuth proof.",
+    "cleanup": "complete"
+  },
+  "limits": [
+    "No cloud project/deployment was created.",
+    "No data transfer or hosted behavior was exercised."
+  ]
+}
