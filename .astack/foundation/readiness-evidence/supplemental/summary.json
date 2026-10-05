@@ -1,0 +1,680 @@
+{
+  "format": "foundation-supplementary-readiness-export/v1",
+  "derivative": true,
+  "scope": "Seven earlier local runtime/control folders and the ignored 17-probe enforcement result; historical observations only, no new verification run.",
+  "source": "foundation-proof worktree, .proof/<group> and examples/foundation/.proof/enforcement/report.json",
+  "archive": {
+    "path": "raw-evidence.zip",
+    "sha256": "0f20c4b64ea324f7f2b6f7093708322d3a1ce25e1b5eb1d2a21e1ddd7be1b3b2",
+    "bytes": 384515,
+    "records": 30,
+    "UTF8": 17,
+    "PNG": 13,
+    "changedExports": 0
+  },
+  "runs": [
+    {
+      "name": "host-styles-teardown-final",
+      "reportOriginalOutcome": "pass",
+      "interpretation": "Observed historical local pass for the reported cases only.",
+      "revision": "8957d6736c0bae54335accea5c11de16049c739d@sha256-3812e08ecdbab92cc0f699278bbf981e77d0e9ded5139f4b2490fd6deec24d3a",
+      "startedAt": "2026-10-04T22:35:46.947Z",
+      "finishedAt": "2026-10-04T22:35:58.432Z",
+      "taskProfile": "baseline",
+      "cleanup": "complete",
+      "checks": [
+        {
+          "id": "R1",
+          "surface": "identity",
+          "outcome": "pass",
+          "observation": "Running backend health and web identify this revision and local proof environment."
+        },
+        {
+          "id": "R2",
+          "surface": "web \u2192 persistence",
+          "outcome": "pass",
+          "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+        },
+        {
+          "id": "R3",
+          "surface": "web \u2194 MCP status persistence",
+          "outcome": "pass",
+          "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+        },
+        {
+          "id": "R4",
+          "surface": "authorization",
+          "outcome": "pass",
+          "observation": "Another signed user cannot read or mutate the first user\u2019s item through Convex or MCP."
+        },
+        {
+          "id": "R5",
+          "surface": "authentication",
+          "outcome": "pass",
+          "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+        },
+        {
+          "id": "R6",
+          "surface": "MCP contracts",
+          "outcome": "pass",
+          "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+        },
+        {
+          "id": "R7",
+          "surface": "local MCP App host",
+          "outcome": "pass",
+          "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+        },
+        {
+          "id": "R8",
+          "surface": "web runtime",
+          "outcome": "pass",
+          "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+        },
+        {
+          "id": "G1",
+          "surface": "WorkOS",
+          "outcome": "skipped",
+          "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+        },
+        {
+          "id": "G2",
+          "surface": "ChatGPT",
+          "outcome": "skipped",
+          "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+        }
+      ],
+      "error": null,
+      "sourceLimit": "The recorded build identity is retained; a complete input snapshot was not captured in this folder. No source reconstruction or final-head equivalence is claimed."
+    },
+    {
+      "name": "host-styles-teardown-first",
+      "reportOriginalOutcome": "pass",
+      "interpretation": "Observed historical local pass for the reported cases only.",
+      "revision": "8957d6736c0bae54335accea5c11de16049c739d@sha256-eecab70df6869c48ef0383f4696f31e7d987e78fa5b3b15e497cdd5adf4e3fd7",
+      "startedAt": "2026-10-04T22:34:57.154Z",
+      "finishedAt": "2026-10-04T22:35:08.999Z",
+      "taskProfile": "baseline",
+      "cleanup": "complete",
+      "checks": [
+        {
+          "id": "R1",
+          "surface": "identity",
+          "outcome": "pass",
+          "observation": "Running backend health and web identify this revision and local proof environment."
+        },
+        {
+          "id": "R2",
+          "surface": "web \u2192 persistence",
+          "outcome": "pass",
+          "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+        },
+        {
+          "id": "R3",
+          "surface": "web \u2194 MCP status persistence",
+          "outcome": "pass",
+          "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+        },
+        {
+          "id": "R4",
+          "surface": "authorization",
+          "outcome": "pass",
+          "observation": "Another signed user cannot read or mutate the first user\u2019s item through Convex or MCP."
+        },
+        {
+          "id": "R5",
+          "surface": "authentication",
+          "outcome": "pass",
+          "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+        },
+        {
+          "id": "R6",
+          "surface": "MCP contracts",
+          "outcome": "pass",
+          "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+        },
+        {
+          "id": "R7",
+          "surface": "local MCP App host",
+          "outcome": "pass",
+          "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+        },
+        {
+          "id": "R8",
+          "surface": "web runtime",
+          "outcome": "pass",
+          "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+        },
+        {
+          "id": "G1",
+          "surface": "WorkOS",
+          "outcome": "skipped",
+          "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+        },
+        {
+          "id": "G2",
+          "surface": "ChatGPT",
+          "outcome": "skipped",
+          "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+        }
+      ],
+      "error": null,
+      "sourceLimit": "The recorded build identity is retained; a complete input snapshot was not captured in this folder. No source reconstruction or final-head equivalence is claimed."
+    },
+    {
+      "name": "integration-first",
+      "reportOriginalOutcome": "fail",
+      "interpretation": "The original fail records a 30-second host connection wait timeout. This is inconclusive about the host product behavior; the next attempt is separate.",
+      "revision": "46e335864a7dc25077d68d510e83a6599657ed89+dirty-692489296e06",
+      "startedAt": "2026-10-04T22:14:11.033Z",
+      "finishedAt": "2026-10-04T22:14:54.417Z",
+      "taskProfile": null,
+      "cleanup": "complete",
+      "checks": [
+        {
+          "id": "R1",
+          "surface": "identity",
+          "outcome": "pass",
+          "observation": "Running backend health and web identify this revision and local proof environment."
+        },
+        {
+          "id": "R2",
+          "surface": "web \u2192 persistence",
+          "outcome": "pass",
+          "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+        },
+        {
+          "id": "R3",
+          "surface": "MCP \u2192 web",
+          "outcome": "pass",
+          "observation": "A status change through the actual MCP endpoint survives a fresh read and web reload."
+        },
+        {
+          "id": "R4",
+          "surface": "authorization",
+          "outcome": "pass",
+          "observation": "Another signed user cannot read or mutate the first user\u2019s item through Convex or MCP."
+        },
+        {
+          "id": "R5",
+          "surface": "authentication",
+          "outcome": "pass",
+          "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+        },
+        {
+          "id": "R6",
+          "surface": "MCP contracts",
+          "outcome": "pass",
+          "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+        },
+        {
+          "id": "R7",
+          "surface": "local MCP App host",
+          "outcome": "fail",
+          "observation": "TimeoutError: waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('status').filter({ hasText: 'Connected to the running MCP server' }) to be visible\u001b[22m\n"
+        }
+      ],
+      "error": "TimeoutError: waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('status').filter({ hasText: 'Connected to the running MCP server' }) to be visible\u001b[22m\n",
+      "sourceLimit": "The recorded build identity is retained; a complete input snapshot was not captured in this folder. No source reconstruction or final-head equivalence is claimed."
+    },
+    {
+      "name": "integration-second",
+      "reportOriginalOutcome": "pass",
+      "interpretation": "Observed historical local pass for the reported cases only.",
+      "revision": "46e335864a7dc25077d68d510e83a6599657ed89+dirty-692489296e06",
+      "startedAt": "2026-10-04T22:15:53.157Z",
+      "finishedAt": "2026-10-04T22:16:06.730Z",
+      "taskProfile": null,
+      "cleanup": "complete",
+      "checks": [
+        {
+          "id": "R1",
+          "surface": "identity",
+          "outcome": "pass",
+          "observation": "Running backend health and web identify this revision and local proof environment."
+        },
+        {
+          "id": "R2",
+          "surface": "web \u2192 persistence",
+          "outcome": "pass",
+          "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+        },
+        {
+          "id": "R3",
+          "surface": "MCP \u2192 web",
+          "outcome": "pass",
+          "observation": "A status change through the actual MCP endpoint survives a fresh read and web reload."
+        },
+        {
+          "id": "R4",
+          "surface": "authorization",
+          "outcome": "pass",
+          "observation": "Another signed user cannot read or mutate the first user\u2019s item through Convex or MCP."
+        },
+        {
+          "id": "R5",
+          "surface": "authentication",
+          "outcome": "pass",
+          "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+        },
+        {
+          "id": "R6",
+          "surface": "MCP contracts",
+          "outcome": "pass",
+          "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+        },
+        {
+          "id": "R7",
+          "surface": "local MCP App host",
+          "outcome": "pass",
+          "observation": "The real MCP resource renders inside a sandboxed iframe through AppBridge connected to the running MCP endpoint."
+        },
+        {
+          "id": "R8",
+          "surface": "web runtime",
+          "outcome": "pass",
+          "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+        },
+        {
+          "id": "G1",
+          "surface": "WorkOS",
+          "outcome": "skipped",
+          "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+        },
+        {
+          "id": "G2",
+          "surface": "ChatGPT",
+          "outcome": "skipped",
+          "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+        }
+      ],
+      "error": null,
+      "sourceLimit": "The recorded build identity is retained; a complete input snapshot was not captured in this folder. No source reconstruction or final-head equivalence is claimed."
+    },
+    {
+      "name": "integration-status-roundtrip",
+      "reportOriginalOutcome": "pass",
+      "interpretation": "Observed historical local pass for the reported cases only.",
+      "revision": "0073d37538e31d7c18acf69e4873541beaa5e11a@sha256-68a98a7de083b915450a937bbd2807638f2c7eef615d4c40221abd861d9a7837",
+      "startedAt": "2026-10-04T22:24:05.080Z",
+      "finishedAt": "2026-10-04T22:24:15.503Z",
+      "taskProfile": "baseline",
+      "cleanup": "complete",
+      "checks": [
+        {
+          "id": "R1",
+          "surface": "identity",
+          "outcome": "pass",
+          "observation": "Running backend health and web identify this revision and local proof environment."
+        },
+        {
+          "id": "R2",
+          "surface": "web \u2192 persistence",
+          "outcome": "pass",
+          "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+        },
+        {
+          "id": "R3",
+          "surface": "web \u2194 MCP status persistence",
+          "outcome": "pass",
+          "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+        },
+        {
+          "id": "R4",
+          "surface": "authorization",
+          "outcome": "pass",
+          "observation": "Another signed user cannot read or mutate the first user\u2019s item through Convex or MCP."
+        },
+        {
+          "id": "R5",
+          "surface": "authentication",
+          "outcome": "pass",
+          "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+        },
+        {
+          "id": "R6",
+          "surface": "MCP contracts",
+          "outcome": "pass",
+          "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+        },
+        {
+          "id": "R7",
+          "surface": "local MCP App host",
+          "outcome": "pass",
+          "observation": "The real MCP resource renders and changes persisted status through AppBridge; a web reload observes that change."
+        },
+        {
+          "id": "R8",
+          "surface": "web runtime",
+          "outcome": "pass",
+          "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+        },
+        {
+          "id": "G1",
+          "surface": "WorkOS",
+          "outcome": "skipped",
+          "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+        },
+        {
+          "id": "G2",
+          "surface": "ChatGPT",
+          "outcome": "skipped",
+          "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+        }
+      ],
+      "error": null,
+      "sourceLimit": "The recorded build identity is retained; a complete input snapshot was not captured in this folder. No source reconstruction or final-head equivalence is claimed."
+    },
+    {
+      "name": "integration-strict-denials",
+      "reportOriginalOutcome": "pass",
+      "interpretation": "Observed historical local pass for the reported cases only.",
+      "revision": "8e26656c5d7f2b97cce54eceeee6c7b1903d178a@sha256-59c8d29d220d3e22471877f86932f22e95589782775244dd979adc6e986184e4",
+      "startedAt": "2026-10-04T22:22:45.585Z",
+      "finishedAt": "2026-10-04T22:22:55.937Z",
+      "taskProfile": "baseline",
+      "cleanup": "complete",
+      "checks": [
+        {
+          "id": "R1",
+          "surface": "identity",
+          "outcome": "pass",
+          "observation": "Running backend health and web identify this revision and local proof environment."
+        },
+        {
+          "id": "R2",
+          "surface": "web \u2192 persistence",
+          "outcome": "pass",
+          "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+        },
+        {
+          "id": "R3",
+          "surface": "MCP \u2192 web",
+          "outcome": "pass",
+          "observation": "A status change through the actual MCP endpoint survives a fresh read and web reload."
+        },
+        {
+          "id": "R4",
+          "surface": "authorization",
+          "outcome": "pass",
+          "observation": "Another signed user cannot read or mutate the first user\u2019s item through Convex or MCP."
+        },
+        {
+          "id": "R5",
+          "surface": "authentication",
+          "outcome": "pass",
+          "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+        },
+        {
+          "id": "R6",
+          "surface": "MCP contracts",
+          "outcome": "pass",
+          "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+        },
+        {
+          "id": "R7",
+          "surface": "local MCP App host",
+          "outcome": "pass",
+          "observation": "The real MCP resource renders and changes persisted status through AppBridge; a web reload observes that change."
+        },
+        {
+          "id": "R8",
+          "surface": "web runtime",
+          "outcome": "pass",
+          "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+        },
+        {
+          "id": "G1",
+          "surface": "WorkOS",
+          "outcome": "skipped",
+          "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+        },
+        {
+          "id": "G2",
+          "surface": "ChatGPT",
+          "outcome": "skipped",
+          "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+        }
+      ],
+      "error": null,
+      "sourceLimit": "The recorded build identity is retained; a complete input snapshot was not captured in this folder. No source reconstruction or final-head equivalence is claimed."
+    },
+    {
+      "name": "title-edit-missing-feature-control",
+      "reportOriginalOutcome": "fail",
+      "interpretation": "Explicit F0 negative control: absent requested title-edit tool is rejected. This is an expected control failure, not a delivered feature.",
+      "revision": "fed39f33e446e691f6500abdfdf93adafc5078f4@sha256-35353f1c641ab8d0f14d557105f98bae6d19f4a2a73da33cb371259e5c8ca6b9",
+      "startedAt": "2026-10-04T22:23:16.017Z",
+      "finishedAt": "2026-10-04T22:23:28.118Z",
+      "taskProfile": "title-edit",
+      "cleanup": "complete",
+      "checks": [
+        {
+          "id": "R1",
+          "surface": "identity",
+          "outcome": "pass",
+          "observation": "Running backend health and web identify this revision and local proof environment."
+        },
+        {
+          "id": "R2",
+          "surface": "web \u2192 persistence",
+          "outcome": "pass",
+          "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+        },
+        {
+          "id": "R3",
+          "surface": "MCP \u2192 web",
+          "outcome": "pass",
+          "observation": "A status change through the actual MCP endpoint survives a fresh read and web reload."
+        },
+        {
+          "id": "R4",
+          "surface": "authorization",
+          "outcome": "pass",
+          "observation": "Another signed user cannot read or mutate the first user\u2019s item through Convex or MCP."
+        },
+        {
+          "id": "R5",
+          "surface": "authentication",
+          "outcome": "pass",
+          "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+        },
+        {
+          "id": "R6",
+          "surface": "MCP contracts",
+          "outcome": "pass",
+          "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+        },
+        {
+          "id": "R7",
+          "surface": "local MCP App host",
+          "outcome": "pass",
+          "observation": "The real MCP resource renders and changes persisted status through AppBridge; a web reload observes that change."
+        },
+        {
+          "id": "F0",
+          "surface": "title edit contract",
+          "outcome": "fail",
+          "observation": "AssertionError [ERR_ASSERTION]: Missing requested work_items_update_title tool"
+        }
+      ],
+      "error": "AssertionError [ERR_ASSERTION]: Missing requested work_items_update_title tool",
+      "sourceLimit": "The recorded build identity is retained; a complete input snapshot was not captured in this folder. No source reconstruction or final-head equivalence is claimed."
+    },
+    {
+      "name": "enforcement",
+      "reportOriginalOutcome": "pass",
+      "inputSha256": "ede5bc2ce0b3b684805e0812795415d845bab5add98d891bc744f7fac3e8a76b",
+      "results": [
+        {
+          "case": "valid composition (cold)",
+          "outcome": "pass",
+          "elapsedMs": 1769,
+          "rules": []
+        },
+        {
+          "case": "valid composition (warm)",
+          "outcome": "pass",
+          "elapsedMs": 1815,
+          "rules": []
+        },
+        {
+          "case": "unowned promise",
+          "outcome": "pass",
+          "elapsedMs": 1639,
+          "rules": [
+            "@typescript-eslint/no-floating-promises"
+          ]
+        },
+        {
+          "case": "unsafe unknown boundary",
+          "outcome": "pass",
+          "elapsedMs": 1615,
+          "rules": [
+            "@typescript-eslint/no-explicit-any",
+            "@typescript-eslint/no-unsafe-return",
+            "@typescript-eslint/no-unsafe-member-access"
+          ]
+        },
+        {
+          "case": "missing accessible name",
+          "outcome": "pass",
+          "elapsedMs": 1755,
+          "rules": [
+            "jsx-a11y/alt-text"
+          ]
+        },
+        {
+          "case": "invalid hook call",
+          "outcome": "pass",
+          "elapsedMs": 1839,
+          "rules": [
+            "react-hooks/rules-of-hooks"
+          ]
+        },
+        {
+          "case": "portable public backend import",
+          "outcome": "pass",
+          "elapsedMs": 1774,
+          "rules": [
+            "foundation/portable-ui"
+          ]
+        },
+        {
+          "case": "portable relative backend import",
+          "outcome": "pass",
+          "elapsedMs": 1679,
+          "rules": [
+            "foundation/portable-ui"
+          ]
+        },
+        {
+          "case": "Node builtin without node prefix",
+          "outcome": "pass",
+          "elapsedMs": 1608,
+          "rules": [
+            "foundation/portable-ui"
+          ]
+        },
+        {
+          "case": "global network alias",
+          "outcome": "pass",
+          "elapsedMs": 1514,
+          "rules": [
+            "foundation/portable-ui"
+          ]
+        },
+        {
+          "case": "domain React dependency",
+          "outcome": "pass",
+          "elapsedMs": 967,
+          "rules": [
+            "foundation/portable-ui"
+          ]
+        },
+        {
+          "case": "domain presentation dependency",
+          "outcome": "pass",
+          "elapsedMs": 992,
+          "rules": [
+            "foundation/portable-ui"
+          ]
+        },
+        {
+          "case": "domain browser capability",
+          "outcome": "pass",
+          "elapsedMs": 993,
+          "rules": [
+            "no-restricted-globals"
+          ]
+        },
+        {
+          "case": "domain TSX window capability",
+          "outcome": "pass",
+          "elapsedMs": 1168,
+          "rules": [
+            "no-restricted-globals"
+          ]
+        },
+        {
+          "case": "domain TSX document capability",
+          "outcome": "pass",
+          "elapsedMs": 1117,
+          "rules": [
+            "no-restricted-globals"
+          ]
+        },
+        {
+          "case": "portable configured alias bypass",
+          "outcome": "pass",
+          "elapsedMs": 1647,
+          "rules": [
+            "foundation/portable-ui"
+          ]
+        },
+        {
+          "case": "strict compiler detects invalid assignment",
+          "outcome": "pass",
+          "elapsedMs": 152,
+          "rules": [
+            "TS2322"
+          ]
+        }
+      ],
+      "compiler": "Version 7.0.2",
+      "compilerApi": "Version 6.0.3",
+      "eslint": "v9.39.4",
+      "sourceLimit": "This is the ignored copy of the 17-probe result for the isolated domain TSX repair. Its source and repair are recorded separately under repair-evidence/domain-tsx; no new run occurred during export."
+    }
+  ],
+  "coverageCorrection": "All seven earlier runtime folders predate repaired R4. Their reported R4 passes checked another owner Convex read isolation and MCP mutation denial; they did not establish second-owner MCP list isolation. Original outcomes and check text are retained, not rewritten. integration-first also does not record R8 or external gaps; these omitted cases cannot be counted as passed. title-edit-missing-feature-control stops at F0; no later title-edit case is established.",
+  "privacy": {
+    "sanitizer": "Existing redactTrial from fixed candidate 2a973c5, with VT-control normalization for UTF-8 logs and host-path normalization before export; no transformations were needed for these already-sanitized originals.",
+    "boundedScan": {
+      "jwt": 0,
+      "privateKey": 0,
+      "bearer": 0,
+      "keyAssignment": 0,
+      "userPath": 0,
+      "tempPath": 0
+    },
+    "binaryPolicy": "All thirteen PNG screenshots verified by PNG signature and preserved byte-exact. No binary was omitted.",
+    "limits": "Bounded scans check actual JWT/private-key/Bearer/key-assignment syntax and user/temporary paths. They are not an exhaustive semantic privacy proof. Screenshots are synthetic local work-item fixtures."
+  },
+  "sourceIdentityLimits": "Reported revision/build identities are preserved without substitution. The early dirty identity supplies only its original twelve-character dirty suffix; it is not a full source digest. No complete original input snapshot is present in these seven folders. The enforcement input digest identifies the separately retained domain TSX repair.",
+  "cleanup": "All seven runtime reports record cleanup complete. No external WorkOS or installed ChatGPT outcome is established; G1/G2 are skipped where present. No source replay or final-head readiness claim is made.",
+  "independentAudit": {
+    "outcome": "clear",
+    "provenance": "Independent read-only child review, relayed by /root/evidence_audit on 2026-10-05. This field summarizes the received review; it is not a new runtime observation.",
+    "observations": [
+      "Original source inventory 30/30 matches: 17 UTF-8 and 13 PNG.",
+      "Per-entry original/export hashes, byte lengths, transformation flags and ZIP metadata match.",
+      "Two independent ZIP rebuilds are byte-identical to archive SHA-256 0f20c4b64ea324f7f2b6f7093708322d3a1ce25e1b5eb1d2a21e1ddd7be1b3b2.",
+      "PNG signatures and chunk CRCs are valid; no PNG text metadata present.",
+      "Bounded text private-key/JWT/Bearer/assignment/provider-key/user/macOS-temporary-path patterns return zero.",
+      "Original R7 timeout raw fail and F0 absent-tool negative control are preserved, missing cases are not passed, and all seven runtime cleanup fields remain complete.",
+      "Historical R4 correction, dirty/source snapshot limits, no replay/current-head claim are accurate."
+    ],
+    "limits": "No screenshot OCR or exhaustive semantic privacy audit is claimed."
+  }
+}
