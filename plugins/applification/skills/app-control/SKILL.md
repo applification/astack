@@ -1,6 +1,8 @@
 ---
 name: app-control
 description: Create or repair a project-owned control CLI and feature map for driving and observing its running product.
+metadata:
+  short-description: "Build product-driving commands and feature maps"
 ---
 
 # Make the app controllable

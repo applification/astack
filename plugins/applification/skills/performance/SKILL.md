@@ -1,6 +1,8 @@
 ---
 name: performance
 description: Investigate measured slowness and verify an improvement against a comparable baseline.
+metadata:
+  short-description: "Measure bottlenecks and verify performance changes"
 ---
 
 # Performance

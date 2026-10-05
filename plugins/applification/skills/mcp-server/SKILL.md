@@ -1,6 +1,8 @@
 ---
 name: mcp-server
 description: Build or change an MCP server and verify its tool contract, transport, authorization and agent use.
+metadata:
+  short-description: "Build and verify MCP tools, transport and authorization"
 ---
 
 # MCP server path

@@ -1,6 +1,8 @@
 ---
 name: verify
 description: Select and run proportionate engineering checks, interpret failures and partial proof, and report observed results with revision and environment.
+metadata:
+  short-description: "Run proportionate checks and report actual proof"
 ---
 
 # Verify the outcome

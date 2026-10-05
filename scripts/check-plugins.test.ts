@@ -31,3 +31,17 @@ test('skill references must remain inside the portable package', () => {
   writeFileSync(file, readFileSync(file, 'utf8') + '\n[outside](../../../)\n');
   expect(() => checkPlugin(path)).toThrow('Skill link escapes package');
 });
+test('every callable skill has packaged UI metadata', () => {
+  rmSync(join(path, 'skills/show-me/agents/openai.yaml'));
+  expect(() => checkPlugin(path)).toThrow('Missing package path');
+});
+test('skill frontmatter identity is parsed as YAML strings', () => {
+  const file = join(path, 'skills/show-me/SKILL.md');
+  writeFileSync(file, readFileSync(file, 'utf8').replace(/^description:.*$/m, 'description: [a, b]'));
+  expect(() => checkPlugin(path)).toThrow('invalid skill identity');
+});
+test('a skill invocation prompt selects its owning skill', () => {
+  const file = join(path, 'skills/show-me/agents/openai.yaml');
+  writeFileSync(file, readFileSync(file, 'utf8').replace('$applification:show-me', '$applification:verify'));
+  expect(() => checkPlugin(path)).toThrow('Skill invocation prompt differs from identity');
+});

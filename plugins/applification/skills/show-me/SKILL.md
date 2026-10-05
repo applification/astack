@@ -1,6 +1,8 @@
 ---
 name: show-me
 description: Explain the current topic visually with concise logic sketches, trees, diagrams or a focused HTML artifact.
+metadata:
+  short-description: "Explain code, boundaries and choices with useful views"
 ---
 
 # Show me

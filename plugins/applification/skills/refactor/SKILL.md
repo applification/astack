@@ -1,6 +1,8 @@
 ---
 name: refactor
 description: Improve internal structure while preserving behavior through pinned outputs and equivalence checks.
+metadata:
+  short-description: "Improve structure while preserving tested behavior"
 ---
 
 # Refactor

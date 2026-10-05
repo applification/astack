@@ -40,3 +40,7 @@ Only these focused direct/composed cases ran. Advertising 16 skills does not pro
 Repeat the foundation feature/bug trials with corrected verified activation. Manual G1 Hosted AuthKit, G2 real MCP OAuth/same-user continuity, H1 installed ChatGPT, the initial unexplained typed-lint failure, image-inspection traceability and actual cloud transition remain recorded gaps. Emulate, disposable real WorkOS Staging and installed/manual host acceptance remain distinct. Apps remain local until the owner chooses hosting; no shared test account was created.
 
 The later host/durable-work choice remains hand-rolled Codex or T3 Code, subject to capability investigation and agreement. Slack is excluded, Dots unavailable, and Loami is one possible adopting project among many, with no astack dependency on its readiness. PostHog and scheduled gardening remain deferred. PR 18 remains unmerged pending owner approval.
+
+## Later consolidation and metadata revision
+
+The owner subsequently directed migration of PR 17 into PR 18 and complete metadata for every skill. The trial source above is retained as historical evidence; new plugin bytes and consolidated handoffs require their own activation/assessment. See [consolidation evidence](../consolidation/evidence.md) for that later revision.

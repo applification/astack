@@ -18,12 +18,25 @@ function checkSkills(base: string) {
     const entry = contained(base, `./skills/${folder}/SKILL.md`);
     const source = readFileSync(entry, 'utf8');
     const frontmatter = source.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/)?.[1];
-    const name = frontmatter?.match(/^name:\s*["']?([a-z0-9-]+)["']?\s*$/m)?.[1];
-    const description = frontmatter?.match(/^description:\s*(.+)$/m)?.[1]?.trim();
-    if (!name || !description || description === '""' || description === "''") throw new Error(`Missing skill identity: ${entry}`);
+    const metadata = frontmatter ? Bun.YAML.parse(frontmatter) as Record<string, any> : null;
+    const name = metadata?.name;
+    const description = metadata?.description;
+    if (typeof name !== 'string' || !/^[a-z0-9-]+$/.test(name) || typeof description !== 'string' || !description.trim() || description.length > 1024) throw new Error(`Missing or invalid skill identity: ${entry}`);
     if (names.has(name)) throw new Error(`Duplicate skill name: ${name}`);
     names.add(name);
     if (name !== folder) throw new Error(`Skill name differs from folder: ${folder}/${name}`);
+    // These are astack's authoring requirements; the portable format allows
+    // UI metadata to be optional. Validate parsed YAML, not matching headings.
+    const short = metadata?.metadata?.['short-description'];
+    if (typeof short !== 'string' || short.length < 25 || short.length > 64) throw new Error(`Invalid skill short description: ${entry}`);
+    const agentPath = contained(base, `./skills/${folder}/agents/openai.yaml`);
+    const agent = Bun.YAML.parse(readFileSync(agentPath, 'utf8')) as Record<string, any>;
+    const ui = agent?.interface;
+    if (typeof ui?.display_name !== 'string' || !ui.display_name.trim() || ui.short_description !== short) throw new Error(`Invalid skill UI metadata: ${agentPath}`);
+    const identity = `${name}`;
+    const prompt = ui.default_prompt;
+    if (typeof prompt !== 'string' || !new RegExp(`\\$(?:${read(resolve(base, 'plugin.json')).name}:)?${identity}(?![a-z0-9-])`).test(prompt)) throw new Error(`Skill invocation prompt differs from identity: ${agentPath}`);
+    if (typeof agent?.policy?.allow_implicit_invocation !== 'boolean') throw new Error(`Invalid skill invocation policy: ${agentPath}`);
   }
   function links(directory: string) {
     for (const item of readdirSync(directory, { withFileTypes: true })) {

@@ -1,6 +1,8 @@
 ---
 name: implement
 description: Implement an agreed feature or behavior change in coherent slices with affected-surface proof and a pull request.
+metadata:
+  short-description: "Deliver an agreed feature with observable proof"
 ---
 
 # Feature

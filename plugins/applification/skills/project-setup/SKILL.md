@@ -1,6 +1,8 @@
 ---
 name: project-setup
 description: Set up a new product or adopt astack in an existing project with real startup, proof and project guidance.
+metadata:
+  short-description: "Set up a local project or adopt astack on an existing stack"
 ---
 
 # Set up the project

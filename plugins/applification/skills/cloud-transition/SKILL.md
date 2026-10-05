@@ -1,6 +1,8 @@
 ---
 name: cloud-transition
 description: Move an app to the chosen cloud environment while preserving local development, validating data and retaining recovery.
+metadata:
+  short-description: "Move an app to an owner-selected host with recovery proof"
 ---
 
 # Move an app to cloud

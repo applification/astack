@@ -1,11 +1,13 @@
 ---
 name: pr
 description: Review an existing change or prepare and update its pull request with intent, quality, useful explanations and observed proof.
+metadata:
+  short-description: "Review changes and prepare a PR with useful evidence"
 ---
 
 # PR and review
 
-Use this skill directly for a review or PR, or when astack delivery reaches review. Read the request, current diff, project PR rules and available proof first. Repository changes meant to be kept finish in a PR, whether they came from a feature, bug fix, refactor, performance change, or project setup. Continue an existing PR when it already covers the task. A read-only investigation or review needs no new PR. If required design or proof is blocked after independent work is complete, open a draft PR that names the blocker and unverified claims; do not describe the change as finished. A missing remote or base branch must be resolved before a PR can exist.
+Use this skill directly for a review or PR, or when astack delivery reaches review. Read the request, current diff, project PR rules and available proof first. Repository changes meant to be kept finish in a PR, whether they came from a feature, bug fix, refactor, performance change, or project setup. Carry the owner-selected PR through later additions and revisions. Continue it when it covers the task; coherent slices can be separate commits within it. A new capability or skill does not by itself authorize a second PR. A read-only investigation or review needs no new PR. If required design or proof is blocked after independent work is complete, open a draft PR that names the blocker and unverified claims; do not describe the change as finished. A missing remote or base branch must be resolved before a PR can exist.
 
 For a read-only review, return findings with source locations and proof gaps. For PR preparation, inspect the full diff against the agreed intent. Review two questions separately:
 

@@ -1,6 +1,8 @@
 ---
 name: chatgpt-plugin
 description: Build or change ChatGPT plugin UI, extensions, packaging or events with explicit SDK and installed-host boundaries.
+metadata:
+  short-description: "Build and prove ChatGPT UI, packaging and host integration"
 ---
 
 # ChatGPT plugin engineering

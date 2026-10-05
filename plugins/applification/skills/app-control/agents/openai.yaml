@@ -1,0 +1,6 @@
+interface:
+  display_name: "App Control"
+  short_description: "Build product-driving commands and feature maps"
+  default_prompt: "Use $applification:app-control to establish or repair a control route through the actual running product."
+policy:
+  allow_implicit_invocation: true

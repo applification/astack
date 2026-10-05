@@ -1,6 +1,8 @@
 ---
 name: bug-fix
 description: Reproduce a reported defect, repair its supported cause and retain proportionate before-and-after regression evidence.
+metadata:
+  short-description: "Reproduce and repair a defect with regression proof"
 ---
 
 # Bug fix

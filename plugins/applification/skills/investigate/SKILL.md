@@ -1,6 +1,8 @@
 ---
 name: investigate
 description: Answer an engineering question from code, history, primary sources or running behavior without starting unrequested implementation.
+metadata:
+  short-description: "Answer engineering questions from source and evidence"
 ---
 
 # Investigation

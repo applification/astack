@@ -1,6 +1,8 @@
 ---
 name: astack
 description: Coordinate an engineering task from intent through implementation, proportional verification and review using astack's focused skills.
+metadata:
+  short-description: "Coordinate engineering work from intent to proof"
 ---
 
 # astack
@@ -40,6 +42,12 @@ Read and apply the selected delivery skill and the capability skills it needs, i
 
 Implement coherent slices, use fast feedback, and return to intent when evidence changes a material assumption. Use verify for affected checks and observed outcomes; invoke pr for kept changes. Read-only investigations end with an answer. A direct focused skill invocation finishes its own requested job, without starting unrelated phases or calling astack recursively.
 
+## Specialist contributions and handoffs
+
+Keep the chosen route and one delivery lead. Select expertise by affected behavior, trust boundaries and uncertainty using [specialist guidance](references/specialists.md); a small fix can stay with the lead. Read the selected role rows, not every linked platform guide. Delegate bounded contributions when available and permitted; otherwise apply the guidance yourself and disclose missing independent review. Assign one writer per worktree, and keep shared-contract ownership explicit.
+
+Use [portable handoffs](references/handoffs.md) for COS assignments, specialist briefs and consolidated results. Preserve the caller's work identity, evidence, acceptance, authority and limits. A small direct request can carry these in the conversation and PR without another file. Distinguish completed engineering work, partial/draft results and blocked decisions. astack defines the method and handoffs; the external COS host owns durable records, prioritisation, dispatch, deduplication and follow-up.
+
 ## Select platform skills only when needed
 
 - For web UI work, use [$applification:web-feature](../web-feature/SKILL.md) to decide separately whether Pencil and Storybook help, and [shadcn lint](references/shadcn-lint.md) when applicable.
@@ -49,4 +57,4 @@ Implement coherent slices, use fast feedback, and return to intent when evidence
 
 Existing projects keep their working stack and package manager unless migration is requested. The new-project defaults belong to project-setup. Acceptance is observable behavior, not whatever checks happen to pass. Keep proof revision/environment and failed, partial or untested claims visible. Routing examples and builds do not establish observed delivery.
 
-Finish kept changes in an existing or new PR, draft when required work is blocked. Check the publication target early and resolve missing prerequisites while independent work continues. Skill composition does not expand authority: merges, releases, destructive changes and external messages follow the owner's authorization and project policy.
+Preserve the owner-selected PR as the delivery target when scope evolves. Coherent implementation slices can be separate commits in that PR; they do not by themselves justify another PR. Finish kept changes in that existing PR, or create one when no target exists, draft when required work is blocked. Check the publication target early and resolve missing prerequisites while independent work continues. Skill composition does not expand authority: merges, releases, destructive changes and external messages follow the owner's authorization and project policy.

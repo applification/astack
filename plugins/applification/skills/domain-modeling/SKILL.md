@@ -1,6 +1,8 @@
 ---
 name: domain-modeling
 description: Resolve ambiguous domain concepts against code and concrete cases, and maintain agreed glossary terms and consequential decisions.
+metadata:
+  short-description: "Resolve domain concepts and record agreed language"
 ---
 
 # Domain modeling

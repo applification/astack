@@ -1,6 +1,8 @@
 ---
 name: web-feature
 description: Design and deliver a web UI change with proportionate Pen, Storybook and running-product evidence.
+metadata:
+  short-description: "Design and deliver web UI with proportionate proof"
 ---
 
 # Web UI decision and design sprint

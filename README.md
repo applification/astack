@@ -38,7 +38,11 @@ The plugin has one coordinating entry, [`astack`](plugins/applification/skills/a
 | `chatgpt-plugin` | Build ChatGPT UI, extensions, packaging and events |
 | `cloud-transition` | Deliver an authorized hosting transition |
 
-Browse the [skills directory](plugins/applification/skills/) for each `SKILL.md`. The seven delivery routes stay intact. Existing projects preserve their stack; new-product defaults remain opinionated to Applification's Bun/Turbo, React/Vite, Convex, WorkOS and MCP profile. Proof names the affected behavior, revision, environment and observed result. Small fixes stay lightweight.
+Browse the [skills directory](plugins/applification/skills/) for each `SKILL.md`. Each has YAML `name`, `description` and `metadata.short-description`, plus `agents/openai.yaml` with a display name, short description, invocation prompt and automatic-selection policy. The seven delivery routes stay intact. Existing projects preserve their stack; new-product defaults remain opinionated to Applification's Bun/Turbo, React/Vite, Convex, WorkOS and MCP profile. Proof names the affected behavior, revision, environment and observed result. Small fixes stay lightweight.
+
+[Specialist guidance](plugins/applification/skills/astack/references/specialists.md) selects bounded contributions by affected behavior and risk. A small fix can remain lead-only; broader work can use relevant expertise through these skills or project companions. Environments without delegation apply the guidance sequentially and disclose missing independent review. Each worktree has one writer.
+
+The [portable text handoffs](plugins/applification/skills/astack/references/handoffs.md) carry work identity, evidence, scope, acceptance, authority and execution limits through specialist contributions and the lead’s result. They distinguish completed engineering work, partial/draft results and blocked decisions. astack supplies the engineering method; the external COS host owns durable records, priorities, dispatch, deduplication and outcome follow-up. The [worked examples](plugins/applification/skills/astack/references/handoff-examples.md) illustrate the contracts; actual specialist delivery and the external pilot remain [subsequent proof milestones](.astack/specialists/milestones.md).
 
 ## Install in Codex
 
