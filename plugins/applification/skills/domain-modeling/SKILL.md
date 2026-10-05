@@ -1,57 +1,84 @@
 ---
 name: domain-modeling
-description: Resolve ambiguous domain concepts against code and concrete cases, and maintain agreed glossary terms and consequential decisions.
+description: Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing a GLOSSARY.md, or recording or editing an ADR.
+license: MIT
 metadata:
   short-description: "Resolve domain concepts and record agreed language"
 ---
 
-# Domain modeling
 
-Use this when a change introduces a domain concept, exposes ambiguous terminology, or changes what an existing term means. Use it directly to sharpen a model or as part of astack delivery. Return the resolved definitions, relevant decisions and any remaining ambiguity; domain modeling alone does not start unrelated implementation. A routine fix using settled terms needs no separate modeling session.
+# Domain Modeling
 
-## Find the language in use
+Actively build and sharpen the project's domain model as you design. This is the *active* discipline: challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `GLOSSARY.md` for vocabulary is not this skill: that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
 
-Read the project's existing glossary, relevant decision history, affected code and concrete user cases. Reuse its authoritative location and format, including paths recorded in `.astack/project.md`. When a root `GLOSSARY-MAP.md` exists, follow it to the relevant context's glossary and decisions. The same word may have different meanings in different contexts; preserve those boundaries and describe their relationship only when this work needs it. Ask about the context when the sources cannot resolve a material ambiguity.
+## File structure
 
-Without an established home, use root `GLOSSARY.md` for the first agreed project term. Create it when that term is resolved, not as an empty setup artifact. Introduce a map and separate context glossaries only when actual distinct contexts justify them. Do not require a glossary for every repository or every PR.
+Most repos have a single context:
 
-## Sharpen meaning while working
-
-Treat the glossary as an active source of shared meaning. When a request uses a term inconsistently, name the ambiguity and propose precise alternatives. Check relationships with concrete scenarios: can one reservation cover several guests, can a guest have several reservations, and what remains after cancellation? Choose questions that affect this change; do not interrogate every familiar word.
-
-Compare the stated meaning with the implementation. A contradiction may indicate a defect, an outdated definition or an unresolved product choice. Surface the discrepancy with source evidence and a distinguishing acceptance case. Do not silently rewrite the glossary to legitimize existing code, or change behavior merely to make a definition true. Resolve material choices with the owner while continuing independent work.
-
-Within authorized repository work, record an agreed definition promptly and reconcile affected acceptance cases and documentation. Keep tentative meanings and blocked choices in the task or behavior contract until resolved. A read-only investigation reports discrepancies without editing files. Terminology agreement does not authorize a broad code rename, migration or change to external contracts; keep implementation within the agreed scope and prove any changed consumers under the selected route.
-
-## Record definitions, behavior and decisions in their own homes
-
-| Information | Home |
-| --- | --- |
-| Agreed domain terms and relationships | Existing glossary, or `GLOSSARY.md` when first needed |
-| Intended observable behavior, acceptance cases and open product choices | Behavior contract, task or PR according to change size |
-| Consequential choice and its rationale | Existing decision register or ADR location |
-| Implementation procedures and operational detail | Relevant code or project documentation |
-
-Keep glossary entries short and specific to the project's domain. Give the canonical term, its meaning and any relationships needed to distinguish it. Mark confusing alternatives when useful; do not fill the file with generic programming vocabulary, retry policies or speculative entities. Link the glossary from feature contracts rather than maintaining competing definitions there.
-
-For example, after agreement in a booking project:
-
-```markdown
-# Booking language
-
-## Terms
-
-**Reservation**: An agreement to hold places for named guests on one scheduled visit.
-Avoid using “visit” for this agreement.
-
-**Visit**: One scheduled occasion that reservations refer to. Cancelling a reservation
-does not cancel the visit.
+```
+/
+├── GLOSSARY.md
+├── docs/
+│   └── adr/
+│       ├── 0001-event-sourced-orders.md
+│       └── 0002-postgres-for-write-model.md
+└── src/
 ```
 
-Those definitions do not specify storage, endpoints or all cancellation behavior. Acceptance cases establish the relevant behavior separately.
+If a `GLOSSARY-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
 
-Record an ADR when a real choice involves a meaningful reversal cost, a non-obvious tradeoff and rationale future maintainers will need. Follow the project's numbering, format and status policy. Without an existing home, create `docs/adr/NNNN-short-name.md` lazily for the first such decision, with concise context, decision and rationale; add alternatives or consequences only when useful. Routine reversible implementation choices need no ADR. Preserve asset and feature evidence locations described by the behavior contract.
+```
+/
+├── GLOSSARY-MAP.md
+├── docs/
+│   └── adr/                          ← system-wide decisions
+├── src/
+│   ├── ordering/
+│   │   ├── GLOSSARY.md
+│   │   └── docs/adr/                 ← context-specific decisions
+│   └── billing/
+│       ├── GLOSSARY.md
+│       └── docs/adr/
+```
 
-## Review the result
+Create files lazily: only when you have something to write. If no `GLOSSARY.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
 
-Before a PR, check the affected request, glossary, code names, contract and explanation for inconsistent meanings. Account for residual naming drift or unresolved choices instead of claiming complete alignment. Link relevant glossary or decision changes in the PR when they help review. Definitions and diagrams explain the intended model; observed checks establish whether the implementation meets its acceptance cases.
+## During the session
+
+### Challenge against the glossary
+
+When the user uses a term that conflicts with the existing language in `GLOSSARY.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y. Which is it?"
+
+### Sharpen fuzzy language
+
+When the user uses vague or overloaded terms, propose a precise canonical term. "You're saying 'account': do you mean the Customer or the User? Those are different things."
+
+### Discuss concrete scenarios
+
+When domain relationships are being discussed, stress-test them with specific scenarios. Invent scenarios that probe edge cases and force the user to be precise about the boundaries between concepts.
+
+### Cross-reference with code
+
+When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible. Which is right?"
+
+### Update GLOSSARY.md inline
+
+When a term is resolved, update `GLOSSARY.md` right there. Don't batch these up: capture them as they happen. Preserve the project's existing glossary home and format; otherwise use [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md).
+
+`GLOSSARY.md` should be totally devoid of implementation details. Do not treat `GLOSSARY.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
+
+### Offer ADRs sparingly
+
+Only offer to create an ADR when all three are true:
+
+1. **Hard to reverse**: the cost of changing your mind later is meaningful
+2. **Surprising without context**: a future reader will wonder "why did they do it this way?"
+3. **The result of a real trade-off**: there were genuine alternatives and you picked one for specific reasons
+
+If any of the three is missing, skip the ADR. Preserve the project's decision register, numbering and format; otherwise use [ADR-FORMAT.md](./ADR-FORMAT.md).
+
+## Scope and agreement
+
+Record definitions once agreed within the authorized repository task. Keep tentative meanings and blocked choices in the task or behavior contract until resolved; do not rewrite the glossary to legitimize existing code. For a read-only assessment, report discrepancies instead of editing. Domain agreement does not authorize broad renames, migrations or changed external contracts. Continue independent work while material choices await the owner. A routine fix using settled terms needs no modeling session, empty glossary or ADR.
+
+Return resolved meanings, source contradictions and open choices to the caller. The delivery workflow owns implementation/proof and [pr](../pr/SKILL.md) checks consistency between changed terms, code and acceptance cases. [Imported source and adaptations](upstream.json); [MIT licence](LICENSE).

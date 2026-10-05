@@ -45,3 +45,13 @@ test('a skill invocation prompt selects its owning skill', () => {
   writeFileSync(file, readFileSync(file, 'utf8').replace('$applification:show-me', '$applification:verify'));
   expect(() => checkPlugin(path)).toThrow('Skill invocation prompt differs from identity');
 });
+test('a local reference must identify an existing heading', () => {
+  const file = join(path, 'skills/pr/SKILL.md');
+  writeFileSync(file, readFileSync(file, 'utf8') + '\n[case](../testing/SKILL.md#missing-case)\n');
+  expect(() => checkPlugin(path)).toThrow('Missing skill anchor');
+});
+test('template links in fenced examples do not refer to packaged project files', () => {
+  const file = join(path, 'skills/pr/SKILL.md');
+  writeFileSync(file, readFileSync(file, 'utf8') + '\n```markdown\n[project glossary](./src/context/GLOSSARY.md)\n```\n');
+  expect(checkPlugin(path)).toBe('applification');
+});

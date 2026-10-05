@@ -1,97 +1,133 @@
 ---
 name: show-me
-description: Explain the current topic visually with concise logic sketches, trees, diagrams or a focused HTML artifact.
+description: Help the user understand the current topic visually with concise diagrams, code-shape sketches, and focused HTML artifacts.
+license: MIT
 metadata:
   short-description: "Explain code, boundaries and choices with useful views"
 ---
 
-# Show me
 
-Show the point directly. Keep prose brief and put each view beside the short explanation it supports. Use this for a discussion, code walkthrough, design choice or review; a PR is one possible destination. Read the relevant source or supplied material first and choose the smallest view that answers the user's question.
+Help the user understand the current topic of conversation visually. Skip the preamble and keep prose brief. Pick the smallest view that makes the key point clear.
 
-Use judgment: one view is often enough; several can answer distinct questions. Skip a view that merely repeats a simple sentence. Keep real names, relevant ownership and ordering; label proposals and unknowns. Do not invent a missing call, API or observed outcome.
-
-## Show logic
-
-Use pseudocode when conditions or operation order matter. For example, explaining a save path:
+- Show logic or an algorithm as pseudocode:
 
 ```text
-on save(draft)
-  validate draft
-  if draft matches stored version
-    return unchanged
-  persist draft
-  return saved version
+on(save)
+  if content is unchanged
+    return cached result
+  write new content
+  return fresh result
 ```
 
-## Show runtime flow
-
-Use a shallow call tree for the calls that explain the effect:
+- Show runtime control flow as a call tree:
 
 ```text
-confirmReservation
-  authorizeGuest
-  holdPlaces
-    checkAvailability
-    writeReservation
-  sendConfirmation
+submitForm
+  createSession
+    persistPrompt
+    launchAgent
+  navigateToSession
 ```
 
-Annotate conditional or concurrent calls. Use a sequence diagram if a tree would hide timing or actor boundaries.
+- Show UI structure as a component tree, including state and module boundaries that matter:
 
-## Show structure and ownership
-
-Use a component tree with the state and module boundaries that matter:
-
-```text
-<BookingPage> (apps/web)
-  useReservations()          # server-owned records
-  <GuestPicker>             # local selection
-  <ReservationSummary> (packages/ui)
+```tsx
+<SessionPage> (apps/example/src/routes/session.tsx)
+  useSessionEvents()
+  <SessionToolbar>
+    <RunSkillButton> (packages/ui)
 ```
 
-Use a shallow file tree to explain responsibilities:
+- Show file responsibility or a broad refactor as a shallow file tree:
 
 ```text
 src/
-├── bookings/    # reservation rules
-├── storage/     # persistence adapter
-└── web/         # request and response boundary
+├── commands/       # parses user actions
+├── sessions/       # owns session state
+└── transport/      # sends API requests
 ```
 
-## Show interactions or states
-
-Use Mermaid for actor interaction, data flow, lifecycle or control flow:
+- Show component interaction, control flow, or data flow with Mermaid:
 
 ```mermaid
 sequenceDiagram
-    participant Guest
-    participant Web
-    participant Bookings
-    Guest->>Web: Confirm selected visit
-    Web->>Bookings: Reserve places for guest
-    Bookings-->>Web: Reservation or unavailable
-    Web-->>Guest: Show result
+    participant User
+    participant UI
+    participant Daemon
+    User->>UI: choose command
+    UI->>Daemon: send expanded prompt
+    Daemon-->>UI: stream result
 ```
 
-Give it a short text equivalent. Inspect rendering when tools and the destination support it; if they do not, use a readable text view and name that limit.
+- Use `diff` when the point is what changes and the surrounding shape already exists. Match the diff shape to the topic.
 
-## Show what changed
-
-Use a focused `diff` sketch when the surrounding structure is familiar:
+For a component change:
 
 ```diff
- confirmReservation
- + authorizeGuest
-   holdPlaces
- - sendConfirmation
- + enqueueConfirmation
+ <SessionPage>
+   useSessionEvents()
+   <SessionToolbar>
++    <RunSkillButton />
+   <SessionTimeline>
++    <SkillResultCard />
 ```
 
-The same technique works for files, components, state transitions and pseudocode. Show the whole target block instead when most is new or omitted context would hide ownership or ordering. These examples illustrate formats, not claims about the project being discussed.
+For a file-layout change:
 
-## Show a dense visual concept
+```diff
+ src/
+ ├── commands/
++│   └── show-me.ts       # expands the slash command
+ ├── sessions/
+-└── transport.ts
++└── transport/
++    ├── client.ts
++    └── stream.ts
+```
 
-When text or Mermaid cannot explain a layout or comparison clearly, create one focused HTML file: a diagram, infographic or short deck suited to the question. Match the product's colors, type, spacing and components; use real labels and data, and make it readable on desktop and mobile. Render and inspect it with available tools, then open or display it for the user. Include a text equivalent and a usable artifact or selected capture if the destination cannot render HTML.
+For a call-tree or call-stack change:
 
-For PR use, the [pr skill](../pr/SKILL.md#show-the-change) owns publication and [artifact delivery](../pr/references/explanation-delivery.md). An illustration explains meaning; it does not prove the depicted behavior executed or authorize publishing, merging or messaging.
+```diff
+ submitForm
+   createSession
+     persistPrompt
++    expandSkillMention
+     launchAgent
+-  navigateToSession
++  navigateToSession
++    subscribeToEvents
+```
+
+For a state or control-flow change:
+
+```diff
+ on(save)
+-  write content
++  if content is unchanged
++    return cached result
++  write new content
++  invalidate cache
+```
+
+- Show the whole block when most of it is new, when omitted context would hide ownership or order, or when the user needs a copyable target shape:
+
+```ts
+function expandSkill(command: string): string {
+  const skillName = command.slice(1)
+  return `use the ${skillName} skill`
+}
+```
+
+- For a visual UI, layout, state comparison, or concept too dense for Mermaid, write one focused HTML file — a diagram, an infographic, or a short slide deck, whichever fits the point. Match the product's colors, type, spacing, and components; use real labels and data; support desktop and mobile. Then open it for the user:
+
+Use the available Codex file/artifact display or `open_in_codex` for the saved file. Render and inspect it when the environment supports that; otherwise give a readable text equivalent and name the display limit.
+
+### guidance
+
+Place each visual next to the short text it supports. Keep only the calls, files, props, states, and boundaries needed to answer the user's current question or the options to resolve the current discussion point.
+
+You may use one of these, you may use several, it is unlikely you will use all of them. Use your judgement and don't overwhelm the user.
+
+Read the relevant source or supplied material before depicting it; label proposals and unknowns. A direct invocation completes the explanation without starting unrelated engineering work. For a PR, [pr](../pr/SKILL.md#show-the-change) owns publication and [artifact delivery](../pr/references/explanation-delivery.md). A view explains the change; it does not prove execution or grant external publication authority.
+
+[Imported source and adaptations](upstream.json); [MIT licence](LICENSE).

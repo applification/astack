@@ -4,7 +4,7 @@ The [iteration plan](https://chatgpt.com/space/page_b11134b1d1708191adcbfc59518d
 
 | Slice | Outcome and required evidence | State |
 | --- | --- | --- |
-| Specialist guidance and text contracts | Existing entry/routes, proportionate role selection, bounded briefs, contribution/result meanings, examples and independent assessment. | Current slice; see behavior contract/evidence. No delivery or host guarantee claimed. |
+| Specialist guidance and text contracts | Existing entry/routes, proportionate role selection, bounded briefs, contribution/result meanings, examples and independent assessment. | Preserved in PR 18; role briefs are optional delegation/COS detail. Text contracts establish no host guarantee. |
 | Observed specialist inner loop | Direct requests and COS-shaped assignments; lightweight and wider selection; findings resolution, blocked decision and partial proof. Actual fresh-agent delivery with verified candidate plugin activation, running-product cases and independent review. | Pending. Repeat foundation title-edit and seeded-bug trials with corrected activation. Declare rubric and budgets before running; retain exact source/plugin/revision/environment, interventions and meaningful failures. |
 | Host and durable work choice | Inspect hand-rolled Codex or T3 Code capabilities, actual version/access and existing durable work system. Agree dispatch/return channel, IDs, permissions and limits with owner. | Unresolved. Owner cannot access Dots, so it is not an active candidate. Choose Codex or T3 Code arrangement and durable work records; do not infer capabilities. |
 | One bounded host pilot | A direct or COS-shaped assignment through the selected Codex/T3 Code arrangement, reviewed engineering result and durable return. Prove restart/resume, replay/duplicates, bounded concurrency/retries and actual result receipt. | Later host/work-record agreement required. Slack is excluded from current scope. Replays must create no duplicate task, PR or message; no external communication or release without authority. |
@@ -32,3 +32,11 @@ Pending owner choices: actual Codex/T3 Code arrangement and durable work system;
 ## Consolidation into PR 18
 
 Owner direction on 5 October 2026 moves all PR 17 changes into PR 18. GitHub confirmed the migrated files and merge ancestry before PR 17 was closed on that direction. The combined PR owns specialist guidance, portable handoffs, callable skill composition, domain language and review explanations. Original PR 17 evidence remains tied to its tested source; later metadata and installed-candidate checks have their own revision. The wider specialist/COS delivery trials and bounded host pilot remain next milestones, with the existing proof gaps preserved.
+
+## Engineering collection architecture in PR 18
+
+The owner corrected knowledge ownership after the initial callable-folder change. TypeScript, React, Convex, WorkOS auth and testing now own their instructions/references; existing MCP/ChatGPT skills own their platform references. The small astack coordinator composes those skills. Removed the shared capability-selection detour and duplicate route index. Normal direct requests remain lightweight; specialist briefs/portable contracts are loaded for actual delegation or COS handoffs.
+
+Import pstack TypeScript with its full rules/examples, pinned source, MIT licence and bundled principle dependencies. Reuse HumanLayer show-me and Matt Pocock domain-modeling with narrow recorded adaptations. Worked foundation commands and fixed SDK experiment records live under their examples. Follow [the architecture contract](../knowledge-ownership/behavior-contract.md) for direct technical and composed delivery observations; do not promote metadata/build checks into behavioral proof.
+
+PR 18 remains the sole review target and requires owner approval to merge. Broader foundation/host milestones above remain open; no adopting project is a prerequisite for this collection.

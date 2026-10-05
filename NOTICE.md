@@ -1,7 +1,9 @@
-# Attribution
+# Third-party skill attribution
 
-astack is informed by the engineering workflow ideas in [pstack](https://github.com/cursor/plugins/tree/main/pstack) and [Matt Pocock's skills](https://github.com/mattpocock/skills), both published under the MIT License. astack's instructions are written for this project rather than copied from either repository.
+astack includes MIT-licensed engineering guidance from these sources. Each owning skill retains the complete upstream licence and a pinned `upstream.json` with source paths, original hashes and adaptations.
 
-The PR explanation guidance is also informed by HumanLayer's [show-me skill](https://github.com/humanlayer/skills/blob/ca7c8088db69e315a8b2deea43820270457f8f3c/plugins/show-me/skills/show-me/SKILL.md), published under the MIT License. It is written for astack's review and proof flow; the upstream skill and examples are not bundled.
+- `typescript-best-practices`: Cursor pstack, revision `4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536`, Copyright (c) 2026 Lauren Tan. Includes the TypeScript patterns and type-system, boundary and encode-lessons principle bodies.
+- `show-me`: HumanLayer, revision `ca7c8088db69e315a8b2deea43820270457f8f3c`, Copyright (c) 2026 HumanLayer.
+- `domain-modeling`: Matt Pocock, revision `4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d`, Copyright (c) 2026 Matt Pocock. Includes glossary and ADR formats.
 
-The domain language guidance is informed by Matt Pocock's [domain-modeling skill](https://github.com/mattpocock/skills/blob/4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d/skills/engineering/domain-modeling/SKILL.md), published under the MIT License. astack adapts its glossary and decision practices to existing project conventions, behavior contracts and scoped delivery; the upstream skill and templates are not bundled.
+Applification-specific engineering guidance and adaptations are maintained by Applification under the repository licence. Referenced companion skills and vendor documentation are not bundled unless identified above.

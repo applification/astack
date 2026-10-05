@@ -7,24 +7,22 @@ metadata:
 
 # ChatGPT plugin engineering
 
-Before editing, apply [affected-capability selection](../astack/references/capability-selection.md) for the boundaries this task reaches. Reuse a selected skill already in progress; do not restart through astack.
-
 Use this skill directly or during astack delivery for ChatGPT/Work plugin implementation, MCP Apps, OpenAI extensions, plugin packaging, or MCP Events. Keep the existing Feature, Bug fix, Refactor or Investigation route; this is specialized implementation guidance, not a new route. A tools-only MCP change stays on [the MCP server path](../mcp-server/SKILL.md).
 
 ## Select the pieces
 
 A plugin packages skills and MCP connections. The MCP server owns authorized actions and resources. MCP Apps adds bundled HTML UI and a standard host bridge. OpenAI extensions add ChatGPT-specific entrypoints and context. MCP Events adds user-authorized monitoring through persistent subscriptions. Add only the pieces the requested outcome uses.
 
-Use the TypeScript SDK for OpenAI extensions. Before adding dependencies read [compatibility](../astack/references/openai-compatibility.md), check the published peer requirements, and prove the selected profile. Protocol revisions, package major versions and MCP Apps bridge versions are different identifiers. Do not infer support for a protocol from a package name.
+Use the TypeScript SDK for OpenAI extensions. Before adding dependencies read [compatibility](references/compatibility.md), check the published peer requirements, and prove the selected profile. Protocol revisions, package major versions and MCP Apps bridge versions are different identifiers. Do not infer support for a protocol from a package name.
 
 Load only the relevant references:
 
 | Work | Reference |
 | --- | --- |
-| Shared React UI, Storybook, bundling or host lifecycle | [MCP App UI](../astack/references/mcp-app-ui.md) |
-| Sidebar, thread panels, settings, links, mentions, context or files | [OpenAI extensions](../astack/references/openai-extensions.md) |
-| Monitoring, subscription lifecycle or webhook delivery | [MCP Events](../astack/references/mcp-events.md) |
-| Portable manifests, local marketplace, server connection or tunnel | [Packaging and local installation](../astack/references/plugin-local-install.md) |
+| Shared React UI, Storybook, bundling or host lifecycle | [MCP App UI](references/mcp-app-ui.md) |
+| Sidebar, thread panels, settings, links, mentions, context or files | [OpenAI extensions](references/openai-extensions.md) |
+| Monitoring, subscription lifecycle or webhook delivery | [MCP Events](references/mcp-events.md) |
+| Portable manifests, local marketplace, server connection or tunnel | [Packaging and local installation](references/plugin-local-install.md) |
 
 ## Contract and ownership
 

@@ -6,7 +6,7 @@ This is separate from resource subscriptions that refresh an open viewer, UI mes
 
 ## Protocol and ownership
 
-Require MCP 2.0 protocol 2026-07-28. Advertise events in server/discover and implement events/list, events/subscribe and events/unsubscribe on the same authenticated endpoint as tools. Check [SDK compatibility](openai-compatibility.md); @openai/mcp-extensions is not an event delivery framework. ChatGPT currently supports webhook delivery and callback verification, not polling, streaming or gap/terminated notifications.
+Require MCP 2.0 protocol 2026-07-28. Advertise events in server/discover and implement events/list, events/subscribe and events/unsubscribe on the same authenticated endpoint as tools. Check [SDK compatibility](compatibility.md); @openai/mcp-extensions is not an event delivery framework. ChatGPT currently supports webhook delivery and callback verification, not polling, streaming or gap/terminated notifications.
 
 Define stable names, bounded payload schemas, filter input schemas and pagination when needed. Expose only events the principal can discover. Validate resource filters and account permissions before subscribing and recheck access before delivery. Send summaries with IDs and a read tool for large records. User-authored payload text is data, not agent instructions.
 

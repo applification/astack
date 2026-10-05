@@ -14,7 +14,7 @@ Use this directly to verify a named change or claim, or during astack delivery. 
 3. Run the selected checks and inspect their assertions, reports, attempts and artifacts. Confirm material effects with a fresh read or independent view. Preserve the first failure, distinguish product defects from setup failures, and retain useful regressions after an authorized fix.
 4. Return a concise result for each applicable case: expected observation, actual observation, revision/environment, evidence and remaining gap. Use pass, fail, inconclusive, skipped or not applicable with reasons. Report a retry pass as flaky rather than erasing its first failure.
 
-Read [proof policy](references/proof-policy.md) for surface selection, candidate confirmation, evidence retention and host boundaries. For a project using e2e, follow the [e2e loop](../astack/references/e2e.md). Keep component, protocol, emulated-host, live-provider and installed-host observations distinct. Builds and routing examples do not establish agent delivery.
+Read [proof policy](references/proof-policy.md) for surface selection, candidate confirmation, evidence retention and host boundaries. When authoring or repairing checks, apply [testing](../testing/SKILL.md); it owns regression design and the e2e loop. Keep component, protocol, emulated-host, live-provider and installed-host observations distinct. Builds and routing examples do not establish agent delivery.
 
 For example, a save test that never gets past login is inconclusive for saving. A successful save followed by a fresh read of the changed record can support persistence on that actor/environment, while leaving another host untested. A copy correction may need only a focused rendered check.
 

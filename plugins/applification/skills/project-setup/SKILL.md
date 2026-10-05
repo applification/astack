@@ -13,6 +13,6 @@ For an existing project, preserve its framework, package manager, layout and wor
 
 Establish the smallest runnable surface and a Git publication target early. Start new apps locally; hosting is an owner choice. Follow existing glossary/context maps and decision registers, using [domain-modeling](../domain-modeling/SKILL.md) only when terms need resolving. Avoid empty files and unused packages.
 
-When repeatable product driving is needed, create or adopt the project control skill and feature map through [app-control](../app-control/SKILL.md). Keep design and acceptance in the [behavior contract](../astack/references/behavior-contract.md). Use [verify](../verify/SKILL.md) to exercise one harmless real path and confirm retained evidence survives cleanup. Report actual setup commands, resulting layout, proof result and exact prerequisites still missing.
+When repeatable product driving is needed, create or adopt the project control skill and feature map through [app-control](../app-control/SKILL.md). Keep design and acceptance in the [behavior contract](../implement/references/behavior-contract.md). Use [verify](../verify/SKILL.md) to exercise one harmless real path and confirm retained evidence survives cleanup. Report actual setup commands, resulting layout, proof result and exact prerequisites still missing.
 
 Kept setup changes finish through [pr](../pr/SKILL.md). A read-only setup assessment returns its findings without editing. Missing startup or host proof remains a gap; generated files alone do not establish a working project.

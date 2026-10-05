@@ -1,0 +1,38 @@
+{
+  "repository": "https://github.com/cursor/plugins",
+  "revision": "4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Lauren Tan",
+  "files": [
+    {
+      "source_path": "pstack/skills/typescript-best-practices/SKILL.md",
+      "source_sha256": "28f9e61710e205f6f3c5476f333483cff0e988f6a5b639e2faad536344b40c5e",
+      "local_path": "SKILL.md"
+    },
+    {
+      "source_path": "pstack/skills/typescript-best-practices/references/patterns.md",
+      "source_sha256": "faa1362055374452efccac1b629677c61acfb0bcc6c4e3311836b5715638ee18",
+      "local_path": "references/patterns.md"
+    },
+    {
+      "source_path": "pstack/skills/principle-type-system-discipline/SKILL.md",
+      "source_sha256": "c83da8031ffb4c86410030d3e261f659598fca2b7d8158fd9dc269d70a3a025e",
+      "local_path": "references/type-system-discipline.md"
+    },
+    {
+      "source_path": "pstack/skills/principle-boundary-discipline/SKILL.md",
+      "source_sha256": "62ac2862c2caa22dd14531f51c9c6bb445ceb198ca98a687e25b4d47c1f10a28",
+      "local_path": "references/boundary-discipline.md"
+    },
+    {
+      "source_path": "pstack/skills/principle-encode-lessons-in-structure/SKILL.md",
+      "source_sha256": "77044c83a9ac6df78fc643887ea5f1f11f082adaf14b717c060cdaed03cce863",
+      "local_path": "references/encode-lessons-in-structure.md"
+    }
+  ],
+  "adaptations": [
+    "Replace Cursor-only paths/disable-model-invocation with portable Codex identity/UI metadata; preserve name and trigger.",
+    "Resolve three principle dependencies as bundled owned references; update named calls to relative links.",
+    "Append Applification integration notes; preserve all rule rows and example blocks."
+  ]
+}

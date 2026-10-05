@@ -1,0 +1,18 @@
+{
+  "repository": "https://github.com/humanlayer/skills",
+  "revision": "ca7c8088db69e315a8b2deea43820270457f8f3c",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 HumanLayer",
+  "files": [
+    {
+      "source_path": "plugins/show-me/skills/show-me/SKILL.md",
+      "source_sha256": "434a2346cc95e313b0d367d477dda2e23ba642dd2181757415a09500664af100",
+      "local_path": "SKILL.md"
+    }
+  ],
+  "adaptations": [
+    "Replace Cursor-only invocation flag with Codex metadata.",
+    "Replace Bash(open...) with available Codex file/artifact display; retain all example blocks and formats.",
+    "Append source/scope and PR destination policy."
+  ]
+}

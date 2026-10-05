@@ -1,6 +1,6 @@
 # MCP App UI
 
-Use the standard MCP Apps bridge for initialization, tool input/results, server tool calls, messages and model context. Add @openai/mcp-extensions/app for supported OpenAI additions. window.openai is for capabilities without a shared equivalent, not the default data layer. Check [compatibility](openai-compatibility.md) before installing SDKs.
+Use the standard MCP Apps bridge for initialization, tool input/results, server tool calls, messages and model context. Add @openai/mcp-extensions/app for supported OpenAI additions. window.openai is for capabilities without a shared equivalent, not the default data layer. Check [compatibility](compatibility.md) before installing SDKs.
 
 ## Reuse components
 

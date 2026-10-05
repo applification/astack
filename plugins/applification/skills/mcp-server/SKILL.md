@@ -7,13 +7,11 @@ metadata:
 
 # MCP server path
 
-Before editing, apply [affected-capability selection](../astack/references/capability-selection.md) for the boundaries this task reaches. Reuse a selected skill already in progress; do not restart through astack.
-
 Use this skill directly or during astack delivery when building or changing an MCP server. Start from the project's existing transport, host requirements and authentication model. Keep domain authorization in the domain service even when an MCP gateway has authenticated the caller. An MCP-only change has no web design sprint; an MCP App with visible UI also follows the [web feature path](../web-feature/SKILL.md) for its UI states.
 
-For ChatGPT MCP Apps, OpenAI extensions, portable packaging or events, also use [ChatGPT plugin engineering](../chatgpt-plugin/SKILL.md). Its [compatibility ledger](../astack/references/openai-compatibility.md) overrides the generic v2 default when using the released OpenAI helper; do not mix incompatible SDK majors.
+For ChatGPT MCP Apps, OpenAI extensions, portable packaging or events, also use [ChatGPT plugin engineering](../chatgpt-plugin/SKILL.md). Its [compatibility ledger](../chatgpt-plugin/references/compatibility.md) overrides the generic v2 default when using the released OpenAI helper; do not mix incompatible SDK majors.
 
-The [foundation profile](../astack/references/foundation.md) serves authenticated HTTP MCP directly from a Convex HTTP action and uses WorkOS Connect for OAuth. Share authorized backend operations with web; keep transport details at the MCP adapter and the host bridge out of portable UI. This profile needs no separate `apps/mcp` service. A separate server remains appropriate for other runtimes, deployment boundaries, or stdio tools. Apply the profile's identity rules before choosing token validation or delegation.
+The [foundation profile](https://github.com/applification/astack/blob/main/examples/foundation/docs/engineering-profile.md) serves authenticated HTTP MCP directly from a Convex HTTP action and uses WorkOS Connect for OAuth. Share authorized backend operations with web; keep transport details at the MCP adapter and the host bridge out of portable UI. This profile needs no separate `apps/mcp` service. A separate server remains appropriate for other runtimes, deployment boundaries, or stdio tools. Apply the profile's identity rules before choosing token validation or delegation.
 
 ## Choose the serving boundary
 

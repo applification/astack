@@ -3,6 +3,16 @@ import { readFileSync, existsSync, readdirSync, realpathSync } from 'node:fs';
 import { resolve, relative, isAbsolute, dirname } from 'node:path';
 const root = resolve(import.meta.dir, '..');
 const read = (p: string) => JSON.parse(readFileSync(p, 'utf8'));
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+function record(value: unknown): Record<string, unknown> {
+  return isRecord(value) ? value : {};
+}
+function prose(source: string) {
+  // Code samples describe the adopting project, not files in this package.
+  return source.replace(/^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1\s*$/gm, '');
+}
 function contained(base: string, value: string) {
   if (!value.startsWith('./') || value.split('/').includes('..')) throw new Error(`Invalid package path: ${value}`);
   const path = resolve(base, value);
@@ -18,7 +28,7 @@ function checkSkills(base: string) {
     const entry = contained(base, `./skills/${folder}/SKILL.md`);
     const source = readFileSync(entry, 'utf8');
     const frontmatter = source.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/)?.[1];
-    const metadata = frontmatter ? Bun.YAML.parse(frontmatter) as Record<string, any> : null;
+    const metadata = record(frontmatter ? Bun.YAML.parse(frontmatter) : null);
     const name = metadata?.name;
     const description = metadata?.description;
     if (typeof name !== 'string' || !/^[a-z0-9-]+$/.test(name) || typeof description !== 'string' || !description.trim() || description.length > 1024) throw new Error(`Missing or invalid skill identity: ${entry}`);
@@ -27,29 +37,35 @@ function checkSkills(base: string) {
     if (name !== folder) throw new Error(`Skill name differs from folder: ${folder}/${name}`);
     // These are astack's authoring requirements; the portable format allows
     // UI metadata to be optional. Validate parsed YAML, not matching headings.
-    const short = metadata?.metadata?.['short-description'];
+    const short = record(metadata.metadata)['short-description'];
     if (typeof short !== 'string' || short.length < 25 || short.length > 64) throw new Error(`Invalid skill short description: ${entry}`);
     const agentPath = contained(base, `./skills/${folder}/agents/openai.yaml`);
-    const agent = Bun.YAML.parse(readFileSync(agentPath, 'utf8')) as Record<string, any>;
-    const ui = agent?.interface;
+    const agent = record(Bun.YAML.parse(readFileSync(agentPath, 'utf8')));
+    const ui = record(agent.interface);
     if (typeof ui?.display_name !== 'string' || !ui.display_name.trim() || ui.short_description !== short) throw new Error(`Invalid skill UI metadata: ${agentPath}`);
     const identity = `${name}`;
     const prompt = ui.default_prompt;
     if (typeof prompt !== 'string' || !new RegExp(`\\$(?:${read(resolve(base, 'plugin.json')).name}:)?${identity}(?![a-z0-9-])`).test(prompt)) throw new Error(`Skill invocation prompt differs from identity: ${agentPath}`);
-    if (typeof agent?.policy?.allow_implicit_invocation !== 'boolean') throw new Error(`Invalid skill invocation policy: ${agentPath}`);
+    if (typeof record(agent.policy).allow_implicit_invocation !== 'boolean') throw new Error(`Invalid skill invocation policy: ${agentPath}`);
   }
   function links(directory: string) {
     for (const item of readdirSync(directory, { withFileTypes: true })) {
       const file = resolve(directory, item.name);
       if (item.isDirectory()) { links(file); continue; }
       if (!item.name.endsWith('.md')) continue;
-      for (const match of readFileSync(file, 'utf8').matchAll(/!?\[[^\]]*\]\(([^)]+)\)/g)) {
+      for (const match of prose(readFileSync(file, 'utf8')).matchAll(/!?\[[^\]]*\]\(([^)]+)\)/g)) {
         const url = match[1];
         if (/^[a-z][a-z0-9+.-]*:/i.test(url) || url.startsWith('#')) continue;
         const target = resolve(dirname(file), decodeURIComponent(url.split('#')[0]));
         if (!existsSync(target)) throw new Error(`Missing skill link: ${file} -> ${url}`);
         const rel = relative(realpathSync(base), realpathSync(target));
         if (rel.startsWith('..') || isAbsolute(rel)) throw new Error(`Skill link escapes package: ${file} -> ${url}`);
+        const anchor = url.split('#')[1];
+        if (anchor && target.endsWith('.md')) {
+          const headings = [...prose(readFileSync(target, 'utf8')).matchAll(/^#{1,6}\s+(.+)$/gm)]
+            .map((heading) => heading[1].toLowerCase().replace(/[^\p{L}\p{N}_ -]/gu, '').replace(/ /g, '-'));
+          if (!headings.includes(decodeURIComponent(anchor))) throw new Error(`Missing skill anchor: ${file} -> ${url}`);
+        }
       }
     }
   }

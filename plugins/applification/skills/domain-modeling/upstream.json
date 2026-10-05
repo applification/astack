@@ -1,0 +1,28 @@
+{
+  "repository": "https://github.com/mattpocock/skills",
+  "revision": "4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Matt Pocock",
+  "files": [
+    {
+      "source_path": "skills/engineering/domain-modeling/SKILL.md",
+      "source_sha256": "7b925d7b1e341a2eeae33ad68a8a8c0ab889a38ddd22a7598e4c240e5a7556a3",
+      "local_path": "SKILL.md"
+    },
+    {
+      "source_path": "skills/engineering/domain-modeling/GLOSSARY-FORMAT.md",
+      "source_sha256": "21dcc40cdec8e151a829b98ab1517c1867bc444e3665134a98c6983411996801",
+      "local_path": "GLOSSARY-FORMAT.md"
+    },
+    {
+      "source_path": "skills/engineering/domain-modeling/ADR-FORMAT.md",
+      "source_sha256": "944c92aa790e8fbdc9199640b170979abb8a34ba8d0fe18c2a01a63bce140ca0",
+      "local_path": "ADR-FORMAT.md"
+    }
+  ],
+  "adaptations": [
+    "Add Codex metadata.",
+    "Preserve project glossary/ADR homes and formats where already established; retain upstream formats as defaults.",
+    "Clarify that only agreed definitions can be recorded within write authority; read-only requests report instead."
+  ]
+}

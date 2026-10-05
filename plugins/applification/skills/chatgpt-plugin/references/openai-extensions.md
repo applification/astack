@@ -1,6 +1,6 @@
 # OpenAI extension contracts
 
-Use @openai/mcp-extensions/server and /app with a verified [SDK profile](openai-compatibility.md). Keep the shared MCP Apps APIs underneath. The launch matrix below is expected support, not evidence from an account. Recheck upstream and the actual client before implementation.
+Use @openai/mcp-extensions/server and /app with a verified [SDK profile](compatibility.md). Keep the shared MCP Apps APIs underneath. The launch matrix below is expected support, not evidence from an account. Recheck upstream and the actual client before implementation.
 
 | Feature | Desktop | Work web | iOS | Android |
 | --- | --- | --- | --- | --- |

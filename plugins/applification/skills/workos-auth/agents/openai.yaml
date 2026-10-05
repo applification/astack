@@ -1,0 +1,6 @@
+interface:
+  display_name: "WorkOS Authentication"
+  short_description: "Keep WorkOS web and MCP identity boundaries explicit"
+  default_prompt: "Use $applification:workos-auth for the requested engineering task."
+policy:
+  allow_implicit_invocation: true
