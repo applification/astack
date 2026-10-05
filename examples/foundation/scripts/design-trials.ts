@@ -26,6 +26,7 @@ async function main() {
       model: { type: 'string' },
       reasoning: { type: 'string' },
       rubric: { type: 'string' },
+      concurrency: { type: 'string', default: '1' },
     },
   });
   assert.ok(
@@ -79,7 +80,7 @@ async function main() {
     '-c',
     `marketplaces.${marketplace}.source=${JSON.stringify(snapshot)}`,
     '-c',
-    `plugins."applification@${marketplace}".enabled=true`,
+    `plugins={"applification@${marketplace}"={enabled=true}}`,
   ];
   const summary = {
     format: 'astack-design-creation-trials/v1',
@@ -140,122 +141,154 @@ async function main() {
         2,
       ) + '\n',
     );
-    const settled = await Promise.allSettled(
-      [1, 2].map(async (round) => {
-        const workspace = join(temporary, `round-${round}`),
-          directory = join(output, `round-${round}`);
-        await mkdir(workspace);
-        await mkdir(directory);
-        await command(['git', 'init'], workspace);
-        await command(
-          [
-            'git',
-            '-c',
-            'user.name=astack trial',
-            '-c',
-            'user.email=trial@invalid.example',
-            'commit',
-            '--allow-empty',
-            '-m',
-            'Empty design creation workspace',
-          ],
-          workspace,
+    const runRound = async (round: number) => {
+      const workspace = join(temporary, `round-${round}`),
+        directory = join(output, `round-${round}`);
+      await mkdir(workspace);
+      await mkdir(directory);
+      await command(['git', 'init'], workspace);
+      await command(
+        [
+          'git',
+          '-c',
+          'user.name=astack trial',
+          '-c',
+          'user.email=trial@invalid.example',
+          'commit',
+          '--allow-empty',
+          '-m',
+          'Empty design creation workspace',
+        ],
+        workspace,
+      );
+      const baseline = (
+        await command(['git', 'rev-parse', 'HEAD'], workspace)
+      ).trim();
+      const project = join(workspace, 'app');
+      const task = `Create the supported foundation in app/ using ${join(snapshot, 'scripts/create-foundation.ts')}. Its reference UI was implemented from Pen. Treat app/.astack/design/work-items.pen as an opaque editable design source: do not read it with text/file tools. Read the design record and MCP-exported spec.json, inspect at least the desktop and narrow PNG frames with image tools, and identify their frame IDs before judging the UI. Install the frozen lock; verify the generated project with check:ci, design:verify and readiness. Inspect the rendered screenshots against the chosen design frames. Preserve the design, proof commands, auth/ownership and shared UI boundaries. Retain source and evidence; a correct reference can be copied without inventing an unnecessary feature.`;
+      console.log(`Round ${round}: fresh design-aware creation started.`);
+      const agent = await runAgent({
+        cwd: workspace,
+        directory: join(directory, 'delivery'),
+        config,
+        model: values.model ?? '',
+        reasoning: values.reasoning,
+        sandbox: 'danger-full-access',
+        prompt: `$applification:astack ${task}\n\nAuthorized disposable local trial. Do not publish, push, merge, contact anyone, recursively delegate, inspect the evaluator rubric or weaken/change the design specification or proof commands. The caller enforces 20 minutes and 80 tool actions. Report actual results and live WorkOS/installed ChatGPT gaps. Return structured final output.`,
+      });
+      console.log(
+        `Round ${round}: delivery ended; trusted acceptance started.`,
+      );
+      let acceptance: unknown;
+      let outcome = 'inconclusive';
+      try {
+        const startup = await readFile(
+          join(directory, 'delivery/stderr.log'),
+          'utf8',
         );
-        const baseline = (
-          await command(['git', 'rev-parse', 'HEAD'], workspace)
-        ).trim();
-        const project = join(workspace, 'app');
-        const task = `Create the supported foundation in app/ using ${join(snapshot, 'scripts/create-foundation.ts')}. Its reference UI was implemented from Pen. Treat app/.astack/design/work-items.pen as an opaque editable design source: do not read it with text/file tools. Read the design record and MCP-exported spec.json, inspect at least the desktop and narrow PNG frames with image tools, and identify their frame IDs before judging the UI. Install the frozen lock; verify the generated project with check:ci, design:verify and readiness. Inspect the rendered screenshots against the chosen design frames. Preserve the design, proof commands, auth/ownership and shared UI boundaries. Retain source and evidence; a correct reference can be copied without inventing an unnecessary feature.`;
-        console.log(`Round ${round}: fresh design-aware creation started.`);
-        const agent = await runAgent({
-          cwd: workspace,
-          directory: join(directory, 'delivery'),
-          config,
-          model: values.model ?? '',
-          reasoning: values.reasoning,
-          sandbox: 'danger-full-access',
-          prompt: `$applification:astack ${task}\n\nAuthorized disposable local trial. Do not publish, push, merge, contact anyone, recursively delegate, inspect the evaluator rubric or weaken/change the design specification or proof commands. The caller enforces 20 minutes and 80 tool actions. Report actual results and live WorkOS/installed ChatGPT gaps. Return structured final output.`,
+        assert.ok(
+          !(
+            startup.includes('failed to load plugin') &&
+            startup.includes(marketplace)
+          ),
+          'Candidate plugin failed to load in the delivery process',
+        );
+        const design = await designProof({
+          projectRoot: project,
+          evidence: join(directory, 'trusted-design'),
         });
-        console.log(
-          `Round ${round}: delivery ended; trusted acceptance started.`,
-        );
-        let acceptance: unknown;
-        let outcome = 'inconclusive';
-        try {
-          const design = await designProof({
-            projectRoot: project,
-            evidence: join(directory, 'trusted-design'),
-          });
-          const readiness = await verify({
-            projectRoot: project,
-            evidenceDirectory: join(directory, 'trusted-readiness'),
-          });
-          const exactDesign = await fileDigests(
-            join(snapshot, 'examples/foundation/.astack/design'),
-          );
-          assert.deepEqual(
-            await fileDigests(join(project, '.astack/design')),
-            exactDesign,
-            'Selected design was changed',
-          );
-          assert.equal(
-            await readFile(join(project, 'scripts/design-proof.ts'), 'utf8'),
-            await readFile(
-              join(snapshot, 'examples/foundation/scripts/design-proof.ts'),
-              'utf8',
-            ),
-            'Design verifier was changed',
-          );
-          outcome =
-            design.outcome === 'pass' && readiness.outcome === 'pass'
-              ? 'pass'
-              : 'fail';
-          acceptance = { outcome, design, readiness };
-        } catch (error) {
-          acceptance = { outcome, error: redact(String(error)) };
-        }
-        await writeFile(
-          join(directory, 'acceptance.json'),
-          JSON.stringify(acceptance, null, 2) + '\n',
-        );
-        const hashes = await retainProject(
-          project,
-          join(directory, 'project'),
-          true,
-        );
-        await writeFile(
-          join(directory, 'source-hashes.json'),
-          JSON.stringify(hashes, null, 2) + '\n',
-        );
-        const reviewer = await runAgent({
-          cwd: workspace,
-          directory: join(directory, 'review'),
-          config,
-          model: values.model ?? '',
-          reasoning: values.reasoning,
-          reviewer: true,
-          prompt: `Independently review the generated app against ${baseline}. Intended task:\n${task}\n\nPredeclared rubric:\n${rubric}\n\nTrusted acceptance:\n${JSON.stringify(acceptance)}\n\nDelivery report:\n${JSON.stringify(agent.final)}\n\nInspect the original Pen-exported frames in app/.astack/design/frames and the rendered media in ${directory}. Inspect relevant source and actual raw delivery events at ${join(directory, 'delivery/events.jsonl')}, including whether the agent consumed the selected design. Do not read .pen with text/file tools. Score the six schema dimensions 0–2 with concrete evidence. Do not edit, publish, delegate or contact anyone. Mark authorizationDefect for an unresolved authorization defect. Return complete when your independent review is complete, even if the delivery fails.`,
+        const readiness = await verify({
+          projectRoot: project,
+          evidenceDirectory: join(directory, 'trusted-readiness'),
         });
-        const gate = reviewGate(agent, reviewer, {
-          outcome: outcome as 'pass' | 'fail' | 'inconclusive',
-        });
-        const result = {
-          round,
-          gate,
-          delivery: agent,
-          review: reviewer,
-          acceptance: 'acceptance.json',
-        };
-        await writeFile(
-          join(directory, 'result.json'),
-          JSON.stringify(result, null, 2) + '\n',
+        const exactDesign = await fileDigests(
+          join(snapshot, 'examples/foundation/.astack/design'),
         );
-        console.log(
-          `Round ${round}: ${gate.outcome}, ${gate.total ?? 'unavailable'}/12.`,
+        assert.deepEqual(
+          await fileDigests(join(project, '.astack/design')),
+          exactDesign,
+          'Selected design was changed',
         );
-        return { round, ...gate };
-      }),
+        assert.equal(
+          await readFile(join(project, 'scripts/design-proof.ts'), 'utf8'),
+          await readFile(
+            join(snapshot, 'examples/foundation/scripts/design-proof.ts'),
+            'utf8',
+          ),
+          'Design verifier was changed',
+        );
+        outcome =
+          design.outcome === 'pass' && readiness.outcome === 'pass'
+            ? 'pass'
+            : 'fail';
+        acceptance = { outcome, design, readiness };
+      } catch (error) {
+        acceptance = { outcome, error: redact(String(error)) };
+      }
+      await writeFile(
+        join(directory, 'acceptance.json'),
+        JSON.stringify(acceptance, null, 2) + '\n',
+      );
+      const hashes = await retainProject(
+        project,
+        join(directory, 'project'),
+        true,
+      );
+      await writeFile(
+        join(directory, 'source-hashes.json'),
+        JSON.stringify(hashes, null, 2) + '\n',
+      );
+      const reviewer = await runAgent({
+        cwd: workspace,
+        directory: join(directory, 'review'),
+        config,
+        model: values.model ?? '',
+        reasoning: values.reasoning,
+        reviewer: true,
+        prompt: `Independently review the generated app against ${baseline}. Intended task:\n${task}\n\nPredeclared rubric:\n${rubric}\n\nTrusted acceptance:\n${JSON.stringify(acceptance)}\n\nDelivery report:\n${JSON.stringify(agent.final)}\n\nInspect the original Pen-exported frames in app/.astack/design/frames and the rendered media in ${directory}. Inspect relevant source and actual raw delivery events at ${join(directory, 'delivery/events.jsonl')}, including whether the agent consumed the selected design. Do not read .pen with text/file tools. Score the six schema dimensions 0–2 with concrete evidence. Do not edit, publish, delegate or contact anyone. Mark authorizationDefect for an unresolved authorization defect. Return complete when your independent review is complete, even if the delivery fails.`,
+      });
+      const reviewStartup = await readFile(
+        join(directory, 'review/stderr.log'),
+        'utf8',
+      );
+      if (
+        reviewStartup.includes('failed to load plugin') &&
+        reviewStartup.includes(marketplace)
+      )
+        outcome = 'inconclusive';
+      const gate = reviewGate(agent, reviewer, {
+        outcome: outcome as 'pass' | 'fail' | 'inconclusive',
+      });
+      const result = {
+        round,
+        gate,
+        delivery: agent,
+        review: reviewer,
+        acceptance: 'acceptance.json',
+      };
+      await writeFile(
+        join(directory, 'result.json'),
+        JSON.stringify(result, null, 2) + '\n',
+      );
+      console.log(
+        `Round ${round}: ${gate.outcome}, ${gate.total ?? 'unavailable'}/12.`,
+      );
+      return { round, ...gate };
+    };
+    const concurrency = Number(values.concurrency);
+    assert.ok(
+      concurrency === 1 || concurrency === 2,
+      'Concurrency must be one or two.',
     );
+    const settled: PromiseSettledResult<
+      Awaited<ReturnType<typeof runRound>>
+    >[] = [];
+    if (concurrency === 2)
+      settled.push(...(await Promise.allSettled([1, 2].map(runRound))));
+    else
+      for (const round of [1, 2]) {
+        settled.push(...(await Promise.allSettled([runRound(round)])));
+      }
     const results = settled.map((result, index) =>
       result.status === 'fulfilled'
         ? result.value

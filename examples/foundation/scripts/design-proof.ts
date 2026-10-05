@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve, sep } from 'node:path';
 import { parseArgs } from 'node:util';
-import { chromium } from 'playwright';
+import { chromium, type Browser } from 'playwright';
 import { z } from 'zod';
 import { foundationRoot, revisionIdentity } from './runtime';
 import { sourceDigest } from './source-identity';
@@ -127,7 +127,7 @@ export async function designProof(options: {
     finishedAt: '',
     outcome: 'pass',
   };
-  let browser: Awaited<ReturnType<typeof chromium.launch>> | undefined;
+  let browser: Browser | undefined;
   try {
     browser = await chromium.launch();
     for (const frame of spec.frames) {
