@@ -18,7 +18,11 @@ astack by Applification is a Codex workflow for moving from an intended change t
 
 The route is a decision guide, not a checklist. astack picks checks that can catch the relevant failure and records what was actually observed. Kept repository changes end in a pull request; a read-only investigation ends with an answer. See the [work routes](plugins/applification/skills/astack/references/routes.md), [proof guidance](plugins/applification/skills/astack/references/proof.md), and [routing examples](evals/routing.md).
 
-The plugin has one entry skill, [`astack`](plugins/applification/skills/astack/SKILL.md). For web UI work, it decides whether Pencil, Storybook, or both would help with the change and records why. Proof names the affected behavior, revision, environment, and observed result. Example Mapping, Gherkin, a separate story tracker, and a universal proof runner are not required.
+The plugin has one entry skill, [`astack`](plugins/applification/skills/astack/SKILL.md). [Specialist guidance](plugins/applification/skills/astack/references/specialists.md) selects contributions within those routes by affected behavior and risk. Small fixes can stay with the lead; wider changes receive bounded specialist briefs when useful. Environments without delegation apply the same guidance sequentially and disclose missing independent review. Each worktree has one writer.
+
+The [portable text handoffs](plugins/applification/skills/astack/references/handoffs.md) carry work identity, evidence, scope, acceptance, authority and execution limits through specialist contributions and the lead’s result. They distinguish completed engineering work, partial/draft results and blocked decisions. astack supplies the engineering method; the external COS host owns durable records, priorities, dispatch, deduplication and outcome follow-up. The [worked examples](plugins/applification/skills/astack/references/handoff-examples.md) illustrate the contracts; actual specialist delivery and the external pilot remain [subsequent proof milestones](.astack/specialists/milestones.md).
+
+For web UI work, it decides whether Pencil, Storybook, or both would help with the change and records why. Proof names the affected behavior, revision, environment, and observed result. Example Mapping, Gherkin, a separate story tracker, and a universal proof runner are not required.
 
 ## Install in Codex
 
@@ -61,7 +65,7 @@ The [foundation profile](plugins/applification/skills/astack/references/foundati
 
 New apps start with persistent local development, including Convex. The user decides when to [move an app to cloud](plugins/applification/skills/astack/references/cloud-transition.md). astack carries that transition through project/deployment and data choices, frontend/auth/MCP configuration, actual hosted verification and recovery while preserving local development. The generated reference supplies guarded `dev`, `dev:backend` and `convex:local` commands and a portable transition guide.
 
-The [measured feedback and provisional local budget](.astack/foundation/feedback-proof.md#provisional-local-feedback-budget) describe when to investigate slower checks on the observed host. The [foundation backlog](.astack/foundation/backlog.md) records later specialist and chief-of-staff integration requirements.
+The [measured feedback and provisional local budget](.astack/foundation/feedback-proof.md#provisional-local-feedback-budget) describe when to investigate slower checks on the observed host. The [foundation backlog](.astack/foundation/backlog.md) records foundation proof gaps and chief-of-staff integration requirements; the [specialist milestone record](.astack/specialists/milestones.md) tracks the follow-up slices.
 
 The generated profile carries its [Pen visual design](examples/foundation/.astack/design/README.md): semantic tokens, shared components, web/MCP layouts and frame-to-story links. `design:verify` builds the generated project's Storybook and records design-derived comparisons and screenshots. Use this alongside running-product proof; fixture rendering does not establish persisted effects or live OAuth.
 

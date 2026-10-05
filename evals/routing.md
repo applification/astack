@@ -81,4 +81,18 @@ Invoke each task through `$applification:astack <request>`. The user chooses onl
 | "A cached agent action passed, so claim the new model chooses correctly" | Record replay separately and run live without cache for model-choice claims. Cached actions can support their exact observed outcome, not fresh model behavior. |
 | "The CI artifact link has expired" | Name the evidence gap and rerun if necessary. Retain sanitized evidence supporting lasting claims under the feature folder or a durable approved store, beyond short CI expiry. |
 
+## Specialist selection and handoffs
+
+These are interpretation cases; they do not establish observed delivery or host integration.
+
+| Request | Expected decision |
+| --- | --- |
+| "Fix this isolated account label without changing its interaction" | Feature route; preserve caller work identity and A1 in the conversation/PR, use lead-only guidance and a visible check, record self-review and actual revision/environment. No specialist roster or extra handoff file. |
+| "COS work COS-42 reports cross-user reads on web and MCP; repair within the supplied scope and limits" | Bug fix route; preserve supplied work/assignment/attempt IDs, source facts and acceptance; reproduce the report, select backend/data and security contributions, name one writer and shared-contract owner, use actual allowed/denied checks on both surfaces and required Convex review. Return one consolidated result; no Slack reply without authority. |
+| "Implement a new multi-step browser flow; this host has no subagents" | Feature route; select UI/UX, accessibility and web guidance from affected interactions, apply it sequentially, preserve the work identity and contract, and report lead self-review plus any required independent-review gap. Do not claim delegation or independent review. |
+| "A specialist completed review and found a confirmed acceptance defect" | Keep the parent work incomplete; preserve finding ID and case/risk, resolve with a correction and recheck or explicit owner acceptance, and retain evidence. A completed contribution cannot make the lead result completed. |
+| "COS assignment asks to remove intentional sharing but the accepted ADR conflicts" | Report blocked with the same identity, concrete owner decision/options, independent findings, remaining limits and resumption condition. Defer sharing changes while independent investigation continues; do not silently rewrite acceptance. |
+| "Local web acceptance passed but required MCP proof failed during startup" | Report partial with a draft PR, web observations and MCP inconclusive, original failure/attempt evidence and exact revision/environment. Name the next owner/action and limits; passing builds do not establish the missing MCP observation. |
+| "Resume COS-42 after a repeated signal and an expired execution budget" | Inspect the durable assignment/latest result, actual checkout, existing PR, owners and proof under the same work ID. Reconcile stale scope, authority and remaining limits with the host/owner before mutation; a new attempt cannot silently reset the budget. Host replay/deduplication still needs actual integration proof. |
+
 After a trial, record whether astack chose the right route, found an important missing decision, selected checks proportionately, and reported proof honestly. Fix an observed failure narrowly rather than adding more universal gates.

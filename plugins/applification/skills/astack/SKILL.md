@@ -35,6 +35,12 @@ Read [app control and feature map](references/app-control.md) when setting up or
 
 Use [the behavior contract](references/behavior-contract.md) for substantial behavior changes. When a web design pass uses Pencil or Storybook, the contract links the chosen frames or stories to implementation and proof in a tracked `.astack/<feature>/` folder. Given/When/Then can clarify a case but is not required. Small fixes may keep the contract and the Pencil/Storybook decision in the conversation and PR.
 
+## Specialist contributions and handoffs
+
+Keep the chosen route and one delivery lead. Select expertise by affected behavior, trust boundaries and uncertainty using [specialist guidance](references/specialists.md); a small fix can stay with the lead. Read the selected role rows, not every linked platform guide. Delegate bounded contributions when available and permitted; otherwise apply the guidance yourself and disclose missing independent review. Assign one writer per worktree, and keep shared-contract ownership explicit.
+
+Use [portable handoffs](references/handoffs.md) for COS assignments, specialist briefs and consolidated results. Preserve the caller's work identity, evidence, acceptance, authority and limits. A small direct request can carry these in the conversation and PR without another file. Distinguish completed engineering work, partial/draft results and blocked decisions. astack defines the method and handoffs; the external COS host owns durable records, prioritisation, dispatch, deduplication and follow-up.
+
 ## Shared decisions
 
 - Use Bun for JavaScript dependency management and scripts in astack's greenfield default. In an existing repository, use its package manager and scripts. astack adoption does not require a package manager or workspace migration; [project setup](references/project-setup.md) covers the default and requested migrations.
