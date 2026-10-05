@@ -1,0 +1,18 @@
+{
+  "repository": "https://github.com/cursor/plugins",
+  "revision": "4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Lauren Tan",
+  "files": [
+    {
+      "source_path": "pstack/skills/principle-sequence-verifiable-units/SKILL.md",
+      "source_sha256": "2ccbbacc56ace5afdfb8670cef19d7bd009fb2a0033b9a741cbdf2b6baf72187",
+      "local_path": "SKILL.md"
+    }
+  ],
+  "adaptations": [
+    "Replace Cursor-only invocation policy with directly callable Codex identity and UI metadata.",
+    "Resolve principle composition to packaged skills; keep checks proportional and actions within caller authority.",
+    "Keep one designated PR and agreed base, allow independent progress and distinguish a deliberately red regression from a delivery failure."
+  ]
+}

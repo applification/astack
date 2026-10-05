@@ -7,6 +7,8 @@ metadata:
 
 # ChatGPT plugin engineering
 
+Read `.astack/project.md` when present for the project's runtime, control and verification commands; use the requested scope without requiring the astack coordinator or a setup pass.
+
 Use this skill directly or during astack delivery for ChatGPT/Work plugin implementation, MCP Apps, OpenAI extensions, plugin packaging, or MCP Events. Keep the existing Feature, Bug fix, Refactor or Investigation route; this is specialized implementation guidance, not a new route. A tools-only MCP change stays on [the MCP server path](../mcp-server/SKILL.md).
 
 ## Select the pieces

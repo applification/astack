@@ -7,6 +7,8 @@ metadata:
 
 # Web UI decision and design sprint
 
+Read `.astack/project.md` when present for the project's runtime, control and verification commands; use the requested scope without requiring the astack coordinator or a setup pass.
+
 Use this skill directly or during astack delivery for a feature or fix that changes a web UI. Inspect the affected user path, existing design files, component stories, and acceptance cases before choosing checks. Decide **separately** whether Pencil and Storybook would help resolve a design choice or catch a likely regression. The number of changed lines does not decide: a one-line change to a loading state or shared component can warrant either tool, while a one-line label correction may need only a running-app check. Record each decision briefly in the behavior contract when one exists, otherwise in the PR. A reason to skip a tool must refer to the change and the evidence that will cover it.
 
 Use **Pencil** when the change needs a visual direction, layout or state comparison, or an update to an existing agreed design. Use **Storybook** when isolated component states or interactions would make the intended behavior clearer or expose a regression. Use both when comparing a component to a selected design frame matters. A new product's first substantial web UI normally benefits from both. A project without either tool can still adopt astack's work method; add a tool when the task earns its setup cost. If a selected check is unavailable, name the blocker and the claim left unverified.

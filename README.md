@@ -1,8 +1,16 @@
 # astack
 
-astack by Applification is a collection of independently useful, opinionated engineering skills. Install the **Applification** plugin and invoke the expertise you need, or give `$applification:astack` a task to coordinate delivery. Each skill owns its instructions, relevant references and examples. Each project supplies its commands, environments and product decisions.
+astack by Applification is an opinionated engineering system delivered as the **Applification** Codex plugin. Install it, establish or upgrade your project's runtime control and verification loop, then give `$applification:astack` an engineering request or invoke a focused skill directly. Each skill owns its instructions; each project owns its running environment, commands and product knowledge.
 
 **[Explore the astack site](https://astack.applification.net/)** for a visual route map and searchable routing examples. This README and the [skill source](skills/astack/SKILL.md) hold the detail. The site lives in [`site/`](site/) in this repository.
+
+The [astack guide](docs/guide/README.md) walks through project setup, a first real task, design decisions, runtime verification, principle-based steering and resumption.
+
+## Install → set up → use
+
+1. **Install the Codex plugin.** Use the commands below or the [project installation guide](docs/project-install.md) to pin a version. Codex remains the supported installation path; Claude and Skills CLI distribution can be added later without moving project runtime knowledge into the package.
+2. **Establish the project loop.** Run `$applification:project-setup Set up this new project` or `$applification:project-setup Integrate and upgrade this project for astack`. Setup applies the [new-product defaults](skills/project-setup/references/profile.md) or improves an existing project's development, control and verification tooling. The outcome is a loop an agent can actually run: start, identify, act, inspect, check and retain evidence through cleanup. It records the working loop in `.astack/project.md` and links it from project agent instructions.
+3. **Give it work.** Use `$applification:astack <request>` to select and compose the skills through the requested outcome, or `$applification:<skill> <request>` for a focused job. Both read the relevant project guidance. A missing profile does not block a narrow task or trigger a project-wide upgrade.
 
 ## How it works
 
@@ -15,6 +23,7 @@ astack by Applification is a collection of independently useful, opinionated eng
 | Answer a question from evidence | Investigation |
 | Review or finish an existing change | Pull request |
 | Make a running app controllable for verification | App control |
+| Establish or upgrade a project's runtime and verification loop | Project setup |
 
 The route is a decision guide, not a checklist. astack picks checks that can catch the relevant failure and records what was actually observed. Kept repository changes end in a pull request; a read-only investigation ends with an answer. See the [work routes](skills/astack/SKILL.md), [proof guidance](skills/verify/SKILL.md), and [routing examples](evals/routing.md).
 
@@ -34,7 +43,7 @@ The plugin has one coordinating entry, [`astack`](skills/astack/SKILL.md), plus 
 | `investigate` | Answer an engineering question from evidence |
 | `show-me` | Explain the current topic visually, throughout a conversation |
 | `domain-modeling` | Resolve concepts, glossary terms and consequential decisions |
-| `project-setup` | Establish a new project or adopt astack |
+| `project-setup` | Establish a new project or integrate and upgrade an existing runtime loop |
 | `app-control` | Build or repair product driving and feature maps |
 | `verify` | Run proportionate checks and report actual proof |
 | `pr` | Review a change or prepare/update its pull request |
@@ -43,9 +52,23 @@ The plugin has one coordinating entry, [`astack`](skills/astack/SKILL.md), plus 
 | `chatgpt-plugin` | Build ChatGPT UI, extensions, packaging and events |
 | `cloud-transition` | Deliver an authorized hosting transition |
 
-Browse the [skills directory](skills/) for each `SKILL.md`. Each has YAML `name`, `description` and `metadata.short-description`, plus `agents/openai.yaml` with a display name, short description, invocation prompt and automatic-selection policy. The seven delivery routes stay intact. Existing projects preserve their stack; new-product defaults remain opinionated to Applification's Bun/Turbo, React/Vite, Convex, WorkOS and MCP profile. Proof names the affected behavior, revision, environment and observed result. Small fixes stay lightweight.
+Browse the [skills directory](skills/) for each `SKILL.md`. Each has YAML `name`, `description` and `metadata.short-description`, plus `agents/openai.yaml` with a display name, short description, invocation prompt and automatic-selection policy. The seven delivery routes stay intact, with project setup establishing their runtime loop. Ordinary features and fixes use the project's established stack; setup can integrate and upgrade it toward Applification's opinions. New-product defaults use Bun/Turbo, React/Vite, Convex, WorkOS and MCP where the behavior needs them. Proof names the affected behavior, revision, environment and observed result. Small fixes stay lightweight.
 
-TypeScript retains pstack's rule table, examples and locally resolved principle dependencies. Show-me retains HumanLayer's visual formats/examples; domain-modeling retains Matt Pocock's active modeling discipline and glossary/ADR formats. Each import has its MIT licence, source revision, original hashes and narrow adaptations beside the skill; see [attribution](NOTICE.md). The [ownership and trial record](.astack/knowledge-ownership/behavior-contract.md) distinguishes structural checks from observed use.
+The coordinator separates **workflows** (such as `bug-fix` and `project-setup`), **platform expertise** (such as `react` and `convex`) and **principle leaves**. The index selects applicable principles; their full instructions live in independently callable skills:
+
+| Principle leaf | Apply when |
+| --- | --- |
+| [`principle-type-system-discipline`](skills/principle-type-system-discipline/SKILL.md) | Designing typed states or signatures in any typed language |
+| [`principle-boundary-discipline`](skills/principle-boundary-discipline/SKILL.md) | Wiring validation, errors or framework/protocol adapters |
+| [`principle-encode-lessons-in-structure`](skills/principle-encode-lessons-in-structure/SKILL.md) | Preventing demonstrated recurring failures with structural mechanisms |
+| [`principle-prove-it-works`](skills/principle-prove-it-works/SKILL.md) | Establishing the claimed outcome against the real artifact |
+| [`principle-test-behavior-not-implementation`](skills/principle-test-behavior-not-implementation/SKILL.md) | Designing assertions that distinguish observable failures |
+| [`principle-fix-root-causes`](skills/principle-fix-root-causes/SKILL.md) | Diagnosing a reproduced defect and repairing its supported cause |
+| [`principle-sequence-verifiable-units`](skills/principle-sequence-verifiable-units/SKILL.md) | Delivering multi-step changes in coherent checked units |
+
+The first three promote already bundled pstack principles out of TypeScript references; the verification/delivery leaves extend the same structure with pinned, attributed guidance. Workflow and platform names remain callable as before. Read a leaf when its decision applies; a direct skill can compose the same principles without entering the coordinator. Use principle names to steer a concrete decision. No separate host-specific routing agent is required.
+
+TypeScript retains pstack's rule table and examples and composes the callable principle leaves. Show-me retains HumanLayer's visual formats/examples; domain-modeling retains Matt Pocock's active modeling discipline and glossary/ADR formats. Each import has its MIT licence, source revision, original hashes and narrow adaptations beside the skill; see [attribution](NOTICE.md). The [ownership and trial record](.astack/knowledge-ownership/behavior-contract.md) distinguishes structural checks from observed use.
 
 [Specialist guidance](skills/astack/references/specialists.md) bounds actual delegated contributions by affected behavior and risk. Ordinary requests use the owning skills without a role roster or separate handoff record. Environments without delegation apply expertise sequentially and disclose missing independent review. Each worktree has one writer.
 
@@ -60,7 +83,7 @@ codex plugin marketplace add applification/astack
 codex plugin add applification@applification
 ```
 
-For a project-controlled version, use the [project installation guide](docs/project-install.md). Start a task with `$applification:astack`, for example, `$applification:astack Fix the save button that loses edits after reopening`. In Codex CLI or the IDE extension, `/skills` can select the same skill. Plugin skills do not create a literal `/astack` slash command; [Codex's custom prompt commands are deprecated](https://learn.chatgpt.com/docs/custom-prompts). A short pointer in the project's `AGENTS.md` can opt in without a manual mention. During project setup, astack inspects the repository and creates `.astack/project.md` with local proof routes and decision locations. For a runnable product, it also creates or adopts a project-owned `astack-<app>` control CLI and feature map. The plugin stays sourced from this repository; project-specific details stay in the project.
+For a project-controlled version, use the [project installation guide](docs/project-install.md). Start a task with `$applification:astack`, for example, `$applification:astack Fix the save button that loses edits after reopening`. In Codex CLI or the IDE extension, `/skills` can select the same skill. Plugin skills do not create a literal `/astack` slash command; [Codex's custom prompt commands are deprecated](https://learn.chatgpt.com/docs/custom-prompts). After installation, invoke `$applification:project-setup` to establish or upgrade the project loop. Setup records `.astack/project.md`, adds a short pointer in the project's agent instructions, and creates or upgrades the project-owned `astack-<app>` control CLI and feature map for runnable products. It proves one safe real path and records remaining coverage or prerequisite gaps. The plugin stays sourced from this repository; project-specific details stay in the project.
 
 For local development of this plugin, use `codex plugin marketplace add /absolute/path/to/astack` and `codex plugin add applification@applification` in a test Codex installation. The desktop app may need a restart to load an updated installed copy.
 
@@ -90,7 +113,7 @@ When a change introduces or changes domain concepts, astack uses the project's e
 
 The [app control route](skills/app-control/SKILL.md) creates a project-local `astack-<app>` CLI that can launch or connect to a running product, check its identity, exercise user actions, inspect results, and capture evidence. Its skill and executable script live in `.codex/skills/astack-<app>/`; a short feature map in `.astack/feature-map/<app>/` records how users reach each feature and which CLI commands drive it. Agents can invoke the script directly by path from the checkout; a package script is optional convenience, and global `PATH` setup belongs to the user. New Bun CLIs use Commander for command parsing. The CLI is built from the project's existing browser, simulator, terminal, or protocol tools; astack does not bundle one driver for every product. Setup proves the direct invocation and one mapped path end to end, and later changes update the command and map when that path changes.
 
-For new products without a chosen stack, astack's default is a Bun workspace monorepo with Turborepo: deployable surfaces in `apps/`, reusable code in `packages/`. New interactive web UI uses **React + TypeScript + Vite** and shared shadcn/ui with Tailwind CSS in `packages/ui`. Choose **Next.js App Router** when server rendering or public content requirements justify it; its version-matched agent docs and configured DevTools MCP remain part of that path. Local web development uses [Portless](https://portless.sh/) for worktree-specific URLs, with Node.js 24+ alongside Bun. The [shadcn lint workflow](skills/react/references/shadcn-lint.md) applies when shadcn/ui is used. Existing projects keep their working stack and tools unless migration is requested.
+For new products without a chosen stack, astack's default is a Bun workspace monorepo with Turborepo: deployable surfaces in `apps/`, reusable code in `packages/`. New interactive web UI uses **React + TypeScript + Vite** and shared shadcn/ui with Tailwind CSS in `packages/ui`. Choose **Next.js App Router** when server rendering or public content requirements justify it; its version-matched agent docs and configured DevTools MCP remain part of that path. Local web development uses [Portless](https://portless.sh/) for worktree-specific URLs, with Node.js 24+ alongside Bun. The [shadcn lint workflow](skills/react/references/shadcn-lint.md) applies when shadcn/ui is used. Ordinary work uses the existing stack; project setup assesses and implements useful upgrades toward this loop, honoring explicit project choices and resolving larger migration scope.
 
 The [foundation profile](examples/foundation/docs/engineering-profile.md) is a worked example for persistent web and MCP products: Convex owns data and serves MCP from an HTTP action; WorkOS AuthKit handles web sign-in and Connect handles MCP OAuth. The [work-item reference](examples/foundation/README.md) shares presentation and domain code across web and MCP UI, with host and data integration in adapters. Generate a separate project with `bun scripts/create-foundation.ts <destination>`. Its `check:quick`, `check:affected`, `check:ci`, and `readiness` commands give scoped feedback and local running-product evidence. Choose forms and data handling from the platform's supported integration; the Vite reference uses TanStack Form + Zod with native Convex subscriptions. Choose tests by behavior rather than `.ts` or `.tsx` filenames.
 

@@ -1,3 +1,11 @@
+---
+name: principle-encode-lessons-in-structure
+description: Apply when repairing recurring failures or enforcing an invariant. Choose a type, lint rule, canonical helper or runtime check that prevents the demonstrated mistake.
+license: MIT
+metadata:
+  short-description: "Prevent recurring failures with structural mechanisms"
+---
+
 # Encode Lessons in Structure
 
 Encode recurring fixes in mechanisms (tools, code, metadata, automation) instead of textual instructions. Every error, human correction, and unexpected outcome is a learning signal. Capture it, route it, and close the loop.
@@ -16,10 +24,14 @@ When you catch yourself writing the same instruction a second time:
 
 **Feedback loop:**
 - **Capture every correction.** When the human intervenes or tests fail, decide if it's a one-off or a pattern.
-- **Route to the right layer.** One-off -> brain note. Recurring fix -> skill or lint rule. Systemic issue -> principle.
+- **Route to the right layer.** One-off -> project task or decision note. Recurring fix -> skill or lint rule. Systemic issue -> principle.
 - **Close the loop.** Don't just record. Apply now or create a concrete todo.
 
 **Anti-patterns:**
 - Acknowledging without recording ("I'll keep that in mind" does not persist)
-- Recording without routing (a brain note about a lint rule that should exist is wasted unless the lint rule gets implemented)
+- Recording without routing (a project note about a lint rule that should exist is wasted unless the lint rule gets implemented)
 - Fixing without generalizing (fixing one instance while leaving the recurring pattern intact)
+
+Apply this leaf directly or alongside a workflow/platform skill. Read relevant project instructions and `.astack/project.md` when present. Return the concrete decision, affected invariant and observed check or assessment; the caller owns delivery and publication. A principle alone does not initiate setup, a broader refactor or a PR.
+
+[Imported source and adaptations](upstream.json); [MIT licence](LICENSE).

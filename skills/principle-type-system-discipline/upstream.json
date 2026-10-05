@@ -1,0 +1,17 @@
+{
+  "repository": "https://github.com/cursor/plugins",
+  "revision": "4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Lauren Tan",
+  "files": [
+    {
+      "source_path": "pstack/skills/principle-type-system-discipline/SKILL.md",
+      "source_sha256": "c83da8031ffb4c86410030d3e261f659598fca2b7d8158fd9dc269d70a3a025e",
+      "local_path": "SKILL.md"
+    }
+  ],
+  "adaptations": [
+    "Promote the already bundled pinned principle body to a directly callable leaf with Codex identity and UI metadata.",
+    "Resolve dependencies to sibling principle skills and keep application within caller scope."
+  ]
+}

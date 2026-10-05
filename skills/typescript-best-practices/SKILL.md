@@ -6,10 +6,11 @@ metadata:
   short-description: "Apply concrete TypeScript modeling and boundary rules"
 ---
 
-
 # TypeScript best practices
 
-Apply [type-system discipline](references/type-system-discipline.md) first.
+Read `.astack/project.md` when present for the project's runtime, control and verification commands; use the requested scope without requiring the astack coordinator or a setup pass.
+
+Apply [type-system discipline](../principle-type-system-discipline/SKILL.md) first.
 
 | Rule | Summary |
 |------|---------|
@@ -24,7 +25,7 @@ Apply [type-system discipline](references/type-system-discipline.md) first.
 | Type guards | Must verify the claim. A lying guard is worse than `as` because the bug hides behind a name that says it's safe. Name them `isX` or `hasX`. |
 | Exhaustiveness | Inline `const _exhaustive: never = x;` in default arms so the compiler errors when a new variant is added. |
 | `satisfies` over `as` | Validates the value without widening literal types. |
-| Boundary validation | Parse where data crosses in, into a named domain type. `Record<string, unknown>` (however spelled) stops at that parse. Trust types inside. See [boundary discipline](references/boundary-discipline.md). |
+| Boundary validation | Parse where data crosses in, into a named domain type. `Record<string, unknown>` (however spelled) stops at that parse. Trust types inside. See [boundary discipline](../principle-boundary-discipline/SKILL.md). |
 | Schema-derived types | Reach for `Pick`/`Omit`/`Parameters`/`ReturnType`/`Awaited`/`typeof` before declaring a new interface. |
 | Object args | Pass objects, not positional, so argument order is self-documenting. Skip on hot paths (per-frame render, tokenizers, parsers). |
 | Real tests | Don't mock what you can run. Prefer the framework's real test primitives with leak/disposable checks, and verify UI in a running build. Mock only what you can't run locally. |
@@ -36,6 +37,6 @@ Examples: `references/patterns.md`.
 
 Keep the existing TypeScript configuration, schema library, generated types and package manager. New projects use Bun/Turbo with React/Vite; framework-specific validators remain at their owning boundary (for example Convex `v` validators). Use the existing logger; this skill does not require another logging dependency.
 
-Read [patterns](references/patterns.md) for the rule being changed. Helpers and generated imports in examples are illustrative. A plain numeric duration still needs boundary validation if non-negativity is a domain invariant; the representation alone does not prove it. Preserve established brands and generated ID types instead of introducing a competing convention. The bundled principles supply reasoning, not a requirement for pstack host/memory infrastructure.
+Read [patterns](references/patterns.md) for the rule being changed. Helpers and generated imports in examples are illustrative. A plain numeric duration still needs boundary validation if non-negativity is a domain invariant; the representation alone does not prove it. Preserve established brands and generated ID types instead of introducing a competing convention. Read the applicable principle leaf in full; TypeScript examples supply concrete syntax alongside the language-independent discipline.
 
 Apply this directly to the requested TypeScript task; return the changed boundary, observed checks and gaps to the caller. No coordinator is required. For kept implementation changes, the caller's delivery/PR rules still apply. [Imported source and adaptations](upstream.json); MIT attribution is retained in [LICENSE](LICENSE).

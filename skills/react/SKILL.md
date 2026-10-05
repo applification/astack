@@ -7,6 +7,10 @@ metadata:
 
 # React engineering
 
+Read `.astack/project.md` when present for the project's runtime, control and verification commands; use the requested scope without requiring the astack coordinator or a setup pass.
+
+When changing adapters or typed state, read [boundary discipline](../principle-boundary-discipline/SKILL.md) or [type-system discipline](../principle-type-system-discipline/SKILL.md) as applicable.
+
 Use directly for a component, hook, form or React review. Inspect the owning app, React version, consumers and existing component/data conventions. Apply [TypeScript guidance](../typescript-best-practices/SKILL.md) for `.ts`/`.tsx` changes. Keep an existing framework and design system; new-project choices belong to [project-setup](../project-setup/SKILL.md).
 
 ## Put state where it belongs

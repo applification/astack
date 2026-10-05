@@ -1,3 +1,11 @@
+---
+name: principle-boundary-discipline
+description: Apply when wiring validation, error handling or framework and protocol adapters. Parse external data at system boundaries and keep domain logic independent of transport.
+license: MIT
+metadata:
+  short-description: "Validate system boundaries and keep domain logic pure"
+---
+
 # Boundary Discipline
 
 Place validation, type narrowing, and error handling at system boundaries. Trust internal code unconditionally. Business logic lives in pure functions. The shell is thin and mechanical.
@@ -26,3 +34,7 @@ Code organization:
 **The tests:**
 - "Is this data crossing a system boundary right now?" If not, validation is redundant.
 - "Can this be a pure function that the shell just calls?" If yes, extract it.
+
+Apply this leaf directly or alongside a workflow/platform skill. Read relevant project instructions and `.astack/project.md` when present. Return the concrete decision, affected invariant and observed check or assessment; the caller owns delivery and publication. A principle alone does not initiate setup, a broader refactor or a PR.
+
+[Imported source and adaptations](upstream.json); [MIT licence](LICENSE).

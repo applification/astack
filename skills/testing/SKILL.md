@@ -7,6 +7,12 @@ metadata:
 
 # Engineering tests
 
+Apply [test behavior, not implementation](../principle-test-behavior-not-implementation/SKILL.md) when designing assertions.
+
+Read `.astack/project.md` when present for the project's runtime, control and verification commands; use the requested scope without requiring the astack coordinator or a setup pass.
+
+When a recurring mistake needs an enforceable check, apply [encode lessons in structure](../principle-encode-lessons-in-structure/SKILL.md).
+
 Use directly to build or repair a check, or while implementing a change. Start with the behavior and failure the assertion must distinguish. Preserve the project's working runner and fixture conventions. [verify](../verify/SKILL.md) selects/consolidates delivery proof; this skill owns how checks exercise behavior and how findings become trustworthy regressions.
 
 Choose the seam that owns the rule: pure functions for deterministic domain transforms, backend calls for validation/ownership/transactions, a protocol client for MCP contracts, and a real browser for rendered interaction. Mock an unrelated expensive boundary only when it preserves the claim; do not mock the data or identity boundary being tested. A schema test cannot prove persistence and a component fixture cannot prove backend authorization.
