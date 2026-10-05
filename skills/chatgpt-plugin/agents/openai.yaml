@@ -1,0 +1,6 @@
+interface:
+  display_name: "ChatGPT Plugin"
+  short_description: "Build and prove ChatGPT UI, packaging and host integration"
+  default_prompt: "Use $applification:chatgpt-plugin to implement this plugin capability and report the applicable host proof."
+policy:
+  allow_implicit_invocation: true

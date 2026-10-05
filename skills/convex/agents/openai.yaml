@@ -1,0 +1,6 @@
+interface:
+  display_name: "Convex Engineering"
+  short_description: "Build Convex data and reactive integration safely"
+  default_prompt: "Use $applification:convex for the requested engineering task."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Domain Modeling"
+  short_description: "Resolve domain concepts and record agreed language"
+  default_prompt: "Use $applification:domain-modeling to clarify these concepts and record agreed terms in the existing glossary."
+policy:
+  allow_implicit_invocation: true

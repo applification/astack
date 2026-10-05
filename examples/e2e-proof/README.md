@@ -32,4 +32,4 @@ Raw evidence lands in distinct `.e2e/runs/<mode>-<uuid>/` directories. `identity
 
 The browser tests verify visible interaction, not animation stability, persistence or authorization. The exploration fixture checks report interpretation, not live exploration quality. Authenticated state, native mobile, actual Codex MCP configuration loading and subscription-backed charters require separate trials. The reference server is a teaching fixture, not astack's greenfield product scaffold or a universal app driver.
 
-For product setup, use [the e2e workflow](../../plugins/applification/skills/astack/references/e2e.md) and the installed version-matched e2e skill. Keep existing working runners; backend, protocol and installed-host checks retain their own proof routes.
+For product setup, use [the e2e workflow](../../skills/testing/references/e2e.md) and the installed version-matched e2e skill. Keep existing working runners; backend, protocol and installed-host checks retain their own proof routes.

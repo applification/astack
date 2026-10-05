@@ -1154,7 +1154,7 @@ export async function runTrials(options: {
         plugins: [
           {
             name: 'applification',
-            source: { source: 'local', path: './plugins/applification' },
+            source: { source: 'local', path: './' },
             policy: { installation: 'AVAILABLE', authentication: 'ON_INSTALL' },
           },
         ],
@@ -1168,7 +1168,7 @@ export async function runTrials(options: {
       '-c',
       `plugins={"applification@${marketplace}"={enabled=true}}`,
     ];
-    const expected = await fileDigests(join(snapshot, 'plugins/applification'));
+    const expected = await fileDigests(snapshot);
     const versionEntries = await Promise.all(
       ['codex', 'bun', 'node'].map(async (tool) => [
         tool,

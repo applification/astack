@@ -1,0 +1,6 @@
+interface:
+  display_name: "Performance"
+  short_description: "Measure bottlenecks and verify performance changes"
+  default_prompt: "Use $applification:performance to investigate the measured slowdown and compare a supported improvement."
+policy:
+  allow_implicit_invocation: true

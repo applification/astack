@@ -1,0 +1,6 @@
+interface:
+  display_name: "Engineering Tests"
+  short_description: "Build meaningful checks and reproduce product findings"
+  default_prompt: "Use $applification:testing for the requested engineering task."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Show Me"
+  short_description: "Explain code, boundaries and choices with useful views"
+  default_prompt: "Use $applification:show-me to explain this topic with a concise view grounded in the actual source."
+policy:
+  allow_implicit_invocation: true

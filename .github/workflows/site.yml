@@ -5,7 +5,12 @@ on:
     paths:
       - "site/**"
       - "README.md"
-      - "plugins/applification/**"
+      - "skills/**"
+      - "assets/**"
+      - "plugin.json"
+      - "mcp.json"
+      - "LICENSE"
+      - "NOTICE.md"
       - "evals/routing.md"
       - "examples/chatgpt-plugin/**"
       - "examples/e2e-proof/**"

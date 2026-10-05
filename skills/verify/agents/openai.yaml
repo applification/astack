@@ -1,0 +1,6 @@
+interface:
+  display_name: "Verify"
+  short_description: "Run proportionate checks and report actual proof"
+  default_prompt: "Use $applification:verify to check this change and report observed results, failures and proof gaps."
+policy:
+  allow_implicit_invocation: true

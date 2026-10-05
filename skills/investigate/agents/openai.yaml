@@ -1,0 +1,6 @@
+interface:
+  display_name: "Investigate"
+  short_description: "Answer engineering questions from source and evidence"
+  default_prompt: "Use $applification:investigate to answer this engineering question with source evidence and remaining unknowns."
+policy:
+  allow_implicit_invocation: true

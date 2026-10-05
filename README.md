@@ -1,8 +1,8 @@
 # astack
 
-astack by Applification is a Codex workflow for moving from an intended change to a verified result. Install the **Applification** plugin and give its `$applification:astack` skill an engineering task. The skill chooses a route, uses the relevant guidance, and checks the outcome. Each project supplies its own commands, environments, and product decisions.
+astack by Applification is a collection of independently useful, opinionated engineering skills. Install the **Applification** plugin and invoke the expertise you need, or give `$applification:astack` a task to coordinate delivery. Each skill owns its instructions, relevant references and examples. Each project supplies its commands, environments and product decisions.
 
-**[Explore the astack site](https://astack.applification.net/)** for a visual route map and searchable routing examples. This README and the [skill source](plugins/applification/skills/astack/SKILL.md) hold the detail. The site lives in [`site/`](site/) in this repository.
+**[Explore the astack site](https://astack.applification.net/)** for a visual route map and searchable routing examples. This README and the [skill source](skills/astack/SKILL.md) hold the detail. The site lives in [`site/`](site/) in this repository.
 
 ## How it works
 
@@ -16,9 +16,40 @@ astack by Applification is a Codex workflow for moving from an intended change t
 | Review or finish an existing change | Pull request |
 | Make a running app controllable for verification | App control |
 
-The route is a decision guide, not a checklist. astack picks checks that can catch the relevant failure and records what was actually observed. Kept repository changes end in a pull request; a read-only investigation ends with an answer. See the [work routes](plugins/applification/skills/astack/references/routes.md), [proof guidance](plugins/applification/skills/astack/references/proof.md), and [routing examples](evals/routing.md).
+The route is a decision guide, not a checklist. astack picks checks that can catch the relevant failure and records what was actually observed. Kept repository changes end in a pull request; a read-only investigation ends with an answer. See the [work routes](skills/astack/SKILL.md), [proof guidance](skills/verify/SKILL.md), and [routing examples](evals/routing.md).
 
-The plugin has one entry skill, [`astack`](plugins/applification/skills/astack/SKILL.md). For web UI work, it decides whether Pencil, Storybook, or both would help with the change and records why. Proof names the affected behavior, revision, environment, and observed result. Example Mapping, Gherkin, a separate story tracker, and a universal proof runner are not required.
+The plugin has one coordinating entry, [`astack`](skills/astack/SKILL.md), plus independently callable skills. Call `$applification:astack` to carry a task through delivery, or `$applification:<name>` for a focused job. Skills own their instructions and outputs; references hold supporting policy and platform detail. Composition can be sequential and does not require subagents.
+
+| Skill | Job |
+| --- | --- |
+| [`typescript-best-practices`](skills/typescript-best-practices/SKILL.md) | Concrete TypeScript modeling, validation and boundary rules imported from pstack |
+| [`react`](skills/react/SKILL.md) | Components, state, effects, forms and portable adapters |
+| [`convex`](skills/convex/SKILL.md) | Data, ownership, functions and reactive integration |
+| [`workos-auth`](skills/workos-auth/SKILL.md) | AuthKit/Connect identity, tokens and auth proof layers |
+| [`testing`](skills/testing/SKILL.md) | Meaningful regressions, integration/browser checks and candidate confirmation |
+| `implement` | Deliver an agreed feature or behavior change |
+| `bug-fix` | Reproduce and repair a supported defect |
+| `refactor` | Improve structure while preserving behavior |
+| `performance` | Measure and address slowness |
+| `investigate` | Answer an engineering question from evidence |
+| `show-me` | Explain the current topic visually, throughout a conversation |
+| `domain-modeling` | Resolve concepts, glossary terms and consequential decisions |
+| `project-setup` | Establish a new project or adopt astack |
+| `app-control` | Build or repair product driving and feature maps |
+| `verify` | Run proportionate checks and report actual proof |
+| `pr` | Review a change or prepare/update its pull request |
+| `web-feature` | Design and deliver web UI with Pen/Storybook choices |
+| `mcp-server` | Build and prove MCP tools, transport and authorization |
+| `chatgpt-plugin` | Build ChatGPT UI, extensions, packaging and events |
+| `cloud-transition` | Deliver an authorized hosting transition |
+
+Browse the [skills directory](skills/) for each `SKILL.md`. Each has YAML `name`, `description` and `metadata.short-description`, plus `agents/openai.yaml` with a display name, short description, invocation prompt and automatic-selection policy. The seven delivery routes stay intact. Existing projects preserve their stack; new-product defaults remain opinionated to Applification's Bun/Turbo, React/Vite, Convex, WorkOS and MCP profile. Proof names the affected behavior, revision, environment and observed result. Small fixes stay lightweight.
+
+TypeScript retains pstack's rule table, examples and locally resolved principle dependencies. Show-me retains HumanLayer's visual formats/examples; domain-modeling retains Matt Pocock's active modeling discipline and glossary/ADR formats. Each import has its MIT licence, source revision, original hashes and narrow adaptations beside the skill; see [attribution](NOTICE.md). The [ownership and trial record](.astack/knowledge-ownership/behavior-contract.md) distinguishes structural checks from observed use.
+
+[Specialist guidance](skills/astack/references/specialists.md) bounds actual delegated contributions by affected behavior and risk. Ordinary requests use the owning skills without a role roster or separate handoff record. Environments without delegation apply expertise sequentially and disclose missing independent review. Each worktree has one writer.
+
+The [portable text handoffs](skills/astack/references/handoffs.md) carry work identity, evidence, scope, acceptance, authority and execution limits through specialist contributions and the lead’s result. They distinguish completed engineering work, partial/draft results and blocked decisions. astack supplies the engineering method; the external COS host owns durable records, priorities, dispatch, deduplication and outcome follow-up. The [worked examples](skills/astack/references/handoff-examples.md) illustrate the contracts; actual specialist delivery and the external pilot remain [subsequent proof milestones](.astack/specialists/milestones.md).
 
 ## Install in Codex
 
@@ -51,15 +82,19 @@ When a design sprint uses Pencil, its artifacts live together in `.astack/`, whi
 
 When used, Storybook stories stay with their components in `apps/` or `packages/` and are referenced from the contract. astack does not create separate root `design/` and `docs/` folders for feature work.
 
+## Domain language
+
+When a change introduces or changes domain concepts, astack uses the project's existing glossary and concrete code/user cases to resolve ambiguous terms. It records agreed meanings promptly, keeps observable acceptance in the behavior contract, and puts consequential rationale in the existing decision register. Without an established glossary, create `GLOSSARY.md` only when the first term is agreed; follow an existing `GLOSSARY-MAP.md` for multiple contexts. Small fixes using settled terms need no extra modeling pass. See [domain language guidance](skills/domain-modeling/SKILL.md).
+
 ## App control
 
-The [app control route](plugins/applification/skills/astack/references/app-control.md) creates a project-local `astack-<app>` CLI that can launch or connect to a running product, check its identity, exercise user actions, inspect results, and capture evidence. Its skill and executable script live in `.codex/skills/astack-<app>/`; a short feature map in `.astack/feature-map/<app>/` records how users reach each feature and which CLI commands drive it. Agents can invoke the script directly by path from the checkout; a package script is optional convenience, and global `PATH` setup belongs to the user. New Bun CLIs use Commander for command parsing. The CLI is built from the project's existing browser, simulator, terminal, or protocol tools; astack does not bundle one driver for every product. Setup proves the direct invocation and one mapped path end to end, and later changes update the command and map when that path changes.
+The [app control route](skills/app-control/SKILL.md) creates a project-local `astack-<app>` CLI that can launch or connect to a running product, check its identity, exercise user actions, inspect results, and capture evidence. Its skill and executable script live in `.codex/skills/astack-<app>/`; a short feature map in `.astack/feature-map/<app>/` records how users reach each feature and which CLI commands drive it. Agents can invoke the script directly by path from the checkout; a package script is optional convenience, and global `PATH` setup belongs to the user. New Bun CLIs use Commander for command parsing. The CLI is built from the project's existing browser, simulator, terminal, or protocol tools; astack does not bundle one driver for every product. Setup proves the direct invocation and one mapped path end to end, and later changes update the command and map when that path changes.
 
-For new products without a chosen stack, astack's default is a Bun workspace monorepo with Turborepo: deployable surfaces in `apps/`, reusable code in `packages/`. New interactive web UI uses **React + TypeScript + Vite** and shared shadcn/ui with Tailwind CSS in `packages/ui`. Choose **Next.js App Router** when server rendering or public content requirements justify it; its version-matched agent docs and configured DevTools MCP remain part of that path. Local web development uses [Portless](https://portless.sh/) for worktree-specific URLs, with Node.js 24+ alongside Bun. The [shadcn lint workflow](plugins/applification/skills/astack/references/shadcn-lint.md) applies when shadcn/ui is used. Existing projects keep their working stack and tools unless migration is requested.
+For new products without a chosen stack, astack's default is a Bun workspace monorepo with Turborepo: deployable surfaces in `apps/`, reusable code in `packages/`. New interactive web UI uses **React + TypeScript + Vite** and shared shadcn/ui with Tailwind CSS in `packages/ui`. Choose **Next.js App Router** when server rendering or public content requirements justify it; its version-matched agent docs and configured DevTools MCP remain part of that path. Local web development uses [Portless](https://portless.sh/) for worktree-specific URLs, with Node.js 24+ alongside Bun. The [shadcn lint workflow](skills/react/references/shadcn-lint.md) applies when shadcn/ui is used. Existing projects keep their working stack and tools unless migration is requested.
 
-The [foundation profile](plugins/applification/skills/astack/references/foundation.md) is the core for persistent web and MCP products: Convex owns data and serves MCP from an HTTP action; WorkOS AuthKit handles web sign-in and Connect handles MCP OAuth. The [work-item reference](examples/foundation/README.md) shares presentation and domain code across web and MCP UI, with host and data integration in adapters. Generate a separate project with `bun scripts/create-foundation.ts <destination>`. Its `check:quick`, `check:affected`, `check:ci`, and `readiness` commands give scoped feedback and local running-product evidence. Choose forms and data handling from the platform's supported integration; the Vite reference uses TanStack Form + Zod with native Convex subscriptions. Choose tests by behavior rather than `.ts` or `.tsx` filenames.
+The [foundation profile](examples/foundation/docs/engineering-profile.md) is a worked example for persistent web and MCP products: Convex owns data and serves MCP from an HTTP action; WorkOS AuthKit handles web sign-in and Connect handles MCP OAuth. The [work-item reference](examples/foundation/README.md) shares presentation and domain code across web and MCP UI, with host and data integration in adapters. Generate a separate project with `bun scripts/create-foundation.ts <destination>`. Its `check:quick`, `check:affected`, `check:ci`, and `readiness` commands give scoped feedback and local running-product evidence. Choose forms and data handling from the platform's supported integration; the Vite reference uses TanStack Form + Zod with native Convex subscriptions. Choose tests by behavior rather than `.ts` or `.tsx` filenames.
 
-New apps start with persistent local development, including Convex. The user decides when to [move an app to cloud](plugins/applification/skills/astack/references/cloud-transition.md). astack carries that transition through project/deployment and data choices, frontend/auth/MCP configuration, actual hosted verification and recovery while preserving local development. The generated reference supplies guarded `dev`, `dev:backend` and `convex:local` commands and a portable transition guide.
+New apps start with persistent local development, including Convex. The user decides when to [move an app to cloud](skills/cloud-transition/SKILL.md). astack carries that transition through project/deployment and data choices, frontend/auth/MCP configuration, actual hosted verification and recovery while preserving local development. The generated reference supplies guarded `dev`, `dev:backend` and `convex:local` commands and a portable transition guide.
 
 The [measured feedback and provisional local budget](.astack/foundation/feedback-proof.md#provisional-local-feedback-budget) describe when to investigate slower checks on the observed host. The [foundation backlog](.astack/foundation/backlog.md) records later specialist and chief-of-staff integration requirements.
 
@@ -67,15 +102,15 @@ The generated profile carries its [Pen visual design](examples/foundation/.astac
 
 Reference execution, live WorkOS OAuth, installed MCP host behavior, and delivery trials by fresh agents are separate claims. Read the reference's retained evidence and gaps before relying on a result; deterministic checks or local signed identities cannot establish the other layers.
 
-For Convex work, install the companion `convex@openai-curated-remote` plugin. astack uses `@Convex` for general guidance, `$convex:quickstart` where its new-app scaffold fits, `$convex:convex-expert` for backend edits, and `$convex:add` for capabilities in an existing Convex + Next.js app. [Convex PR review](plugins/applification/skills/astack/references/pr.md) requires `$convex:convex-reviewer` before the PR is ready. astack itself does not bundle the Convex plugin.
+For Convex work, install the companion `convex@openai-curated-remote` plugin. astack uses `@Convex` for general guidance, `$convex:quickstart` where its new-app scaffold fits, `$convex:convex-expert` for backend edits, and `$convex:add` for capabilities in an existing Convex + Next.js app. [Convex PR review](skills/pr/SKILL.md) requires `$convex:convex-reviewer` before the PR is ready. astack itself does not bundle the Convex plugin.
 
-Proof maps material acceptance cases to checks and running-product observations. [Tester Army e2e](plugins/applification/skills/astack/references/e2e.md) is the default for repeatable verification and live MCP inspection in new web projects; existing apps keep their working runners. The loop discovers candidates, reproduces them with exact assertions, fixes confirmed defects, and retains passing regressions. Reports determine proof outcomes: a green exploration job with exhausted or failed steps remains inconclusive, and a retry pass remains flaky. The [runnable reference](examples/e2e-proof/README.md) exercises this policy without model calls. A passing test or a screenshot supports only the behavior it actually exercised. Applicable but untested surfaces remain visible as gaps. Before a PR is ready, attach any media captured during proof or explain why media was unnecessary; video is optional.
+Proof maps material acceptance cases to checks and running-product observations. [Tester Army e2e](skills/testing/references/e2e.md) is the default for repeatable verification and live MCP inspection in new web projects; existing apps keep their working runners. The loop discovers candidates, reproduces them with exact assertions, fixes confirmed defects, and retains passing regressions. Reports determine proof outcomes: a green exploration job with exhausted or failed steps remains inconclusive, and a retry pass remains flaky. The [runnable reference](examples/e2e-proof/README.md) exercises this policy without model calls. A passing test or a screenshot supports only the behavior it actually exercised. Applicable but untested surfaces remain visible as gaps. During PR preparation, choose a [compact explanation view](skills/show-me/SKILL.md) when it helps the reviewer understand changed logic, ownership or interactions: pseudocode, a tree, a before/after sketch or a diagram. Keep illustrations distinct from observed proof; a simple fix can stay concise. Before a PR is ready, attach any media captured during proof or explain why media was unnecessary; video is optional.
 
-For ChatGPT plugins, astack has a [plugin engineering path](plugins/applification/skills/astack/references/chatgpt-plugin.md) for MCP Apps, shared UI and Storybook, OpenAI extensions, portable packaging, local installation, and MCP 2.0 forms/events. It selects a verified [SDK compatibility profile](plugins/applification/skills/astack/references/openai-compatibility.md), distinguishes local checks from installed ChatGPT proof, and keeps platform gaps explicit. The [reference example](examples/chatgpt-plugin/README.md) exercises released-extension and MCP 2.0 profiles separately. It does not implement Loami.
+For ChatGPT plugins, astack has a [plugin engineering path](skills/chatgpt-plugin/SKILL.md) for MCP Apps, shared UI and Storybook, OpenAI extensions, portable packaging, local installation, and MCP 2.0 forms/events. It selects a verified [SDK compatibility profile](skills/chatgpt-plugin/references/compatibility.md), distinguishes local checks from installed ChatGPT proof, and keeps platform gaps explicit. The [reference example](examples/chatgpt-plugin/README.md) exercises released-extension and MCP 2.0 profiles separately. It does not implement Loami.
 
-The plugin uses root [plugin.json](plugins/applification/plugin.json) and [mcp.json](plugins/applification/mcp.json), with OpenAI presentation metadata under `extensions.com.openai`. The MCP configuration is empty because astack distributes engineering guidance, not an application server.
+The repository root is the Applification plugin root: [skills/](skills/) owns reusable engineering guidance, [assets/](assets/) contains presentation assets, and [plugin.json](plugin.json) and [mcp.json](mcp.json) define the package. OpenAI presentation metadata lives under `extensions.com.openai`. The manifest keeps the `applification` namespace. The MCP configuration is empty because astack distributes engineering guidance, not an application server. Project records, examples and the site remain separate from skill instructions.
 
-For MCP servers, astack has a separate [server and proof path](plugins/applification/skills/astack/references/mcp-server.md). It uses the project's transport and authentication requirements, tests tool contracts through an MCP client, and checks the running endpoint and agent behavior when those boundaries matter. Agent evaluations are selected for changes to tool discovery or model use; a mock server does not establish that the real server works.
+For MCP servers, astack has a separate [server and proof path](skills/mcp-server/SKILL.md). It uses the project's transport and authentication requirements, tests tool contracts through an MCP client, and checks the running endpoint and agent behavior when those boundaries matter. Agent evaluations are selected for changes to tool discovery or model use; a mock server does not establish that the real server works.
 
 ## Development
 
@@ -85,7 +120,7 @@ The site is plain HTML, CSS, and JavaScript in [`site/`](site/). Preview it with
 
 ## Sources
 
-astack draws on [pstack](https://github.com/cursor/plugins/tree/main/pstack), [FetchUpstream's ChatGPT port](https://github.com/FetchUpstream/pstack-plugin), and [Matt Pocock's skills](https://github.com/mattpocock/skills). Their ideas are adapted for a project-independent, Codex-first workflow. See [NOTICE](NOTICE.md).
+astack draws on [pstack](https://github.com/cursor/plugins/tree/main/pstack), [FetchUpstream's ChatGPT port](https://github.com/FetchUpstream/pstack-plugin), and [Matt Pocock's skills](https://github.com/mattpocock/skills). The PR explanation guidance also draws on [HumanLayer’s show-me](https://github.com/humanlayer/skills/blob/ca7c8088db69e315a8b2deea43820270457f8f3c/plugins/show-me/skills/show-me/SKILL.md). These ideas are adapted for a project-independent, Codex-first workflow. See [NOTICE](NOTICE.md).
 
 ## License
 

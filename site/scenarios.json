@@ -241,12 +241,12 @@
   },
   {
     "request": "Add OpenAI plugin extensions for a ChatGPT sidebar and conversation panel",
-    "decision": "Feature route \u2192 ChatGPT plugin engineering \u2192 OpenAI extensions and MCP App UI guidance. Check SDK compatibility, define entrypoints with empty launch inputs, and share the UI through a versioned MCP App resource. Choose useful component states in Storybook, then prove the sidebar and conversation panel in the supported ChatGPT host.",
+    "decision": "Feature route → ChatGPT plugin engineering → OpenAI extensions and MCP App UI guidance. Check SDK compatibility, define entrypoints with empty launch inputs, and share the UI through a versioned MCP App resource. Choose useful component states in Storybook, then prove the sidebar and conversation panel in the supported ChatGPT host.",
     "route": "feature"
   },
   {
     "request": "Build an MCP App using our shared React UI components",
-    "decision": "Feature route \u2192 MCP server and web feature paths \u2192 ChatGPT plugin engineering and MCP App UI guidance. Keep presentation components in the UI package and host APIs in an adapter. Bundle a versioned HTML resource, register the UI tool/resource metadata, choose Storybook states, and prove bridge initialization, tool input/results and teardown in the target host.",
+    "decision": "Feature route → MCP server and web feature paths → ChatGPT plugin engineering and MCP App UI guidance. Keep presentation components in the UI package and host APIs in an adapter. Bundle a versioned HTML resource, register the UI tool/resource metadata, choose Storybook states, and prove bridge initialization, tool input/results and teardown in the target host.",
     "route": "feature"
   },
   {
@@ -358,5 +358,125 @@
     "request": "The CI artifact link has expired",
     "decision": "Name the evidence gap and rerun if necessary. Retain sanitized evidence supporting lasting claims under the feature folder or a durable approved store, beyond short CI expiry.",
     "route": "pr"
+  },
+  {
+    "request": "Prepare a PR for a backend permission change with no UI change",
+    "decision": "PR route; show the actual actor and authorization boundary with a compact flow or sequence diagram when it helps review, link the changed source and cases, and report allowed/denied observations separately. No invented UI screenshot or diagram-as-proof claim.",
+    "route": "pr"
+  },
+  {
+    "request": "Open a PR for a one-word label correction",
+    "decision": "Keep the PR concise with the intended label and relevant observed check. Skip an additional explanation diagram that would repeat the sentence; retain useful captured media under the existing policy.",
+    "route": "pr"
+  },
+  {
+    "request": "Prepare a PR after moving state and adapters between packages",
+    "decision": "PR route; use a shallow before/after responsibility or component tree grounded in actual paths and state owners. Preserve enough context to assess the boundary, and link equivalence/integration evidence separately.",
+    "route": "pr"
+  },
+  {
+    "request": "Explain a proposed UI layout in a PR using an HTML illustration",
+    "decision": "Use a focused illustration only when simpler views are inadequate; render and inspect it, label it as proposed, and include an accessible capture/artifact and text equivalent in the PR. A local path is not a shareable PR artifact; illustrative rendering does not prove product behavior.",
+    "route": "pr"
+  },
+  {
+    "request": "The PR diagram describes the earlier diff after a later implementation change",
+    "decision": "Refresh the view and source links from the current diff, inspect the posted explanation, and rerun only proof the later change could affect. Keep the explanation current without relabeling old observations as new proof.",
+    "route": "pr"
+  },
+  {
+    "request": "The glossary defines cancellation for one reservation but the code cancels the whole visit",
+    "decision": "Surface the glossary/code contradiction with source evidence and a distinguishing case. Investigate whether it is a defect or a product choice; resolve material meaning with the owner before dependent edits. Do not silently redefine cancellation to match code.",
+    "route": "investigation"
+  },
+  {
+    "request": "We agreed our first domain term but this project has no glossary",
+    "decision": "Reuse any established term location; otherwise create root GLOSSARY.md now with the agreed concise definition and useful relationships or confusing alternatives. Keep acceptance and implementation detail elsewhere; do not create an empty context map or a routine ADR.",
+    "route": "feature"
+  },
+  {
+    "request": "Change the billing Account concept in a repo with a GLOSSARY-MAP.md",
+    "decision": "Follow the map to the billing glossary and relevant decisions, inspect affected code and cases, and preserve distinct meanings in other contexts. Resolve material ambiguity and reconcile changed definitions and acceptance within scope; do not flatten context glossaries.",
+    "route": "feature"
+  },
+  {
+    "request": "Fix punctuation in a label that already uses the agreed domain term",
+    "decision": "Keep the fix lightweight and use settled terminology. Run proportionate checks and prepare a concise PR; no new glossary, ADR or separate modeling session is needed.",
+    "route": "feature"
+  },
+  {
+    "request": "While fixing this one screen, we agreed Reservation is the canonical term",
+    "decision": "Record the agreed meaning promptly, then keep code changes within the authorized scope. Surface the wider rename and affected public or persisted consumers as a separate scope decision; terminology agreement alone does not authorize a repository-wide migration.",
+    "route": "feature"
+  },
+  {
+    "request": "Put our cache expiry and retry implementation in GLOSSARY.md",
+    "decision": "Keep the glossary focused on agreed domain meanings. Put operational detail in relevant project documentation; use the existing decision register only for a consequential tradeoff whose rationale merits retention. Link acceptance cases separately.",
+    "route": "feature"
+  },
+  {
+    "request": "Show me how this function works without changing code or preparing a PR",
+    "decision": "Use show-me directly: read the relevant function and produce the smallest useful source-grounded logic sketch, tree or diagram. Keep prose brief and label unknowns; do not start implementation or PR preparation.",
+    "route": "investigation"
+  },
+  {
+    "request": "Use domain-modeling to record the term we just agreed",
+    "decision": "Apply domain-modeling directly, reuse the existing glossary/context home, record the agreed meaning promptly and return remaining ambiguity or consequential decisions. Do not start unrelated implementation or require the astack coordinator.",
+    "route": "investigation"
+  },
+  {
+    "request": "Verify this change and report failures; do not repair it or update its PR",
+    "decision": "Use verify directly, run proportionate requested checks on the named revision/environment and return actual results and gaps. Verification can finish with a failure report; no unrequested repair or PR publication.",
+    "route": "investigation"
+  },
+  {
+    "request": "Use astack to fix this small typo in a CLI message",
+    "decision": "Select bug-fix or implement according to whether a defect is reported, preserve the narrow scope, run a meaningful focused check and finish through pr. Apply skills sequentially without requiring delegation, domain modeling or a diagram for the simple change.",
+    "route": "bug"
+  },
+  {
+    "request": "Use bug-fix directly to repair an existing Convex ownership check",
+    "decision": "Apply bug-fix and relevant database guidance; use convex-expert before backend edits and the required convex-reviewer before PR readiness. Reproduce the permission defect, fix within scope and retain allowed/denied observations; do not rely on astack having supplied platform gates.",
+    "route": "bug"
+  },
+  {
+    "request": "Use mcp-server directly for a kept tool change",
+    "decision": "Select relevant platform guidance, implement the tool within the authorized boundary, prove applicable contract/transport/agent layers and finish through verify and pr. For a bounded contribution whose caller owns publication, return the result to that caller instead of opening a duplicate PR.",
+    "route": "feature"
+  },
+  {
+    "request": "Fix this isolated account label without changing its interaction",
+    "decision": "Feature route; preserve caller work identity and A1 in the conversation/PR, use lead-only guidance and a visible check, record self-review and actual revision/environment. No specialist roster or extra handoff file.",
+    "route": "feature"
+  },
+  {
+    "request": "COS work COS-42 reports cross-user reads on web and MCP; repair within the supplied scope and limits",
+    "decision": "Bug fix route; preserve supplied work/assignment/attempt IDs, source facts and acceptance; reproduce the report, select backend/data and security contributions, name one writer and shared-contract owner, use actual allowed/denied checks on both surfaces and required Convex review. Return one consolidated result; no Slack reply without authority.",
+    "route": "bug"
+  },
+  {
+    "request": "Implement a new multi-step browser flow; this host has no subagents",
+    "decision": "Feature route; select UI/UX, accessibility and web guidance from affected interactions, apply it sequentially, preserve the work identity and contract, and report lead self-review plus any required independent-review gap. Do not claim delegation or independent review.",
+    "route": "feature"
+  },
+  {
+    "request": "A specialist completed review and found a confirmed acceptance defect",
+    "decision": "Keep the parent work incomplete; preserve finding ID and case/risk, resolve with a correction and recheck or explicit owner acceptance, and retain evidence. A completed contribution cannot make the lead result completed.",
+    "route": "pr"
+  },
+  {
+    "request": "COS assignment asks to remove intentional sharing but the accepted ADR conflicts",
+    "decision": "Report blocked with the same identity, concrete owner decision/options, independent findings, remaining limits and resumption condition. Defer sharing changes while independent investigation continues; do not silently rewrite acceptance.",
+    "route": "bug"
+  },
+  {
+    "request": "Local web acceptance passed but required MCP proof failed during startup",
+    "decision": "Report partial with a draft PR, web observations and MCP inconclusive, original failure/attempt evidence and exact revision/environment. Name the next owner/action and limits; passing builds do not establish the missing MCP observation.",
+    "route": "bug"
+  },
+  {
+    "request": "Resume COS-42 after a repeated signal and an expired execution budget",
+    "decision": "Inspect the durable assignment/latest result, actual checkout, existing PR, owners and proof under the same work ID. Reconcile stale scope, authority and remaining limits with the host/owner before mutation; a new attempt cannot silently reset the budget. Host replay/deduplication still needs actual integration proof.",
+    "route": "investigation"
   }
 ]

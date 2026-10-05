@@ -1,0 +1,6 @@
+interface:
+  display_name: "TypeScript Best Practices"
+  short_description: "Apply concrete TypeScript modeling and boundary rules"
+  default_prompt: "Use $applification:typescript-best-practices for the requested engineering task."
+policy:
+  allow_implicit_invocation: true

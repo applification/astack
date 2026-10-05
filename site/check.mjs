@@ -4,16 +4,22 @@ import path from 'node:path';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relative) => readFileSync(path.join(root, relative), 'utf8');
-const skill = read('plugins/applification/skills/astack/SKILL.md');
+const skill = read('skills/astack/SKILL.md');
 const html = read('site/index.html');
 const app = read('site/app.js');
 const scenarios = JSON.parse(read('site/scenarios.json'));
 const evals = read('evals/routing.md');
 
-const routeNames = [...skill.matchAll(/^\| .+ \| (Feature|Bug fix|Refactor|Performance|Investigation|Pull request|App control) \|$/gm)]
-  .map((match) => match[1]);
-const uniqueRoutes = [...new Set(routeNames)];
-if (uniqueRoutes.length !== 7) throw new Error('The skill route table changed. Review the site route explorer.');
+const workflowSources = {
+  Feature: 'implement', 'Bug fix': 'bug-fix', Refactor: 'refactor',
+  Performance: 'performance', Investigation: 'investigate', 'Pull request': 'pr',
+  'App control': 'app-control',
+};
+const uniqueRoutes = Object.keys(workflowSources);
+for (const [route, folder] of Object.entries(workflowSources)) {
+  if (!existsSync(path.join(root, `skills/${folder}/SKILL.md`)) ||
+      !skill.includes(`../${folder}/SKILL.md`)) throw new Error(`Missing workflow source for ${route}`);
+}
 const routeKeys = { Feature: 'feature', 'Bug fix': 'bug', Refactor: 'refactor', Performance: 'performance', Investigation: 'investigation', 'Pull request': 'pr', 'App control': 'control', 'Project setup': 'setup' };
 for (const name of [...uniqueRoutes, 'Project setup']) {
   const key = routeKeys[name];

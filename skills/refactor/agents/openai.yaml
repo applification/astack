@@ -1,0 +1,6 @@
+interface:
+  display_name: "Refactor"
+  short_description: "Improve structure while preserving tested behavior"
+  default_prompt: "Use $applification:refactor to improve this structure while preserving the agreed behavior."
+policy:
+  allow_implicit_invocation: true
