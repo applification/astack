@@ -1,0 +1,35 @@
+name: astack WorkOS Staging provider
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  provider:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+      - uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76
+        with:
+          bun-version: 1.4.0
+      - name: Install pinned provider tooling
+        working-directory: examples/foundation
+        run: bun install --frozen-lockfile
+      - name: Disposable real-provider session proof
+        working-directory: examples/foundation
+        env:
+          WORKOS_STAGING_ENVIRONMENT_ID: environment_01M44GM0FT8SCNA5D3CYQNY2E5
+          WORKOS_STAGING_CLIENT_ID: client_01M44GM0TDFFAQKQA7YFX23ZDY
+          WORKOS_STAGING_API_KEY: ${{ secrets.ASTACK_WORKOS_STAGING_API_KEY }}
+        run: bun run auth:staging
+      - name: Retain sanitized provider outcome
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: foundation-staging-proof
+          path: examples/foundation/.proof/auth-staging-*/report.json
+          include-hidden-files: true
+          retention-days: 14

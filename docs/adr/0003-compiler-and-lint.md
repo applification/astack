@@ -1,0 +1,11 @@
+# 0003: Use the supported native compiler with compatible typed lint
+
+Status: accepted. Date: 2026-10-04. Scope: foundation reference. Applies the owner's instruction to choose the best supported platform option and their request to consider newer lint tooling.
+
+Use TypeScript 7.0.2 for compiler checks, installed as `@typescript/native`. Use Microsoft's `typescript: npm:@typescript/typescript6@6.0.2` compatibility alias for the API consumed by typescript-eslint 8.71 and resolved-import boundary checks. Compiler and API have distinct jobs; the shared source strictness remains the same. Bun supplies installation, script execution and behaviour tests.
+
+The [retained comparison](../../.astack/foundation/tooling-comparison.json) measured valid source, deliberately invalid fixtures and repeated CLI timings in a disposable project. Oxlint 1.86 plus oxlint-tsgolint 7.0.2003 was substantially faster on those files, but its native React rule coverage differs, native compiler rules are experimental and custom JavaScript plugins are alpha. Adding stable ESLint for the missing rules erodes the timing gain and still omits a typed unsafe-enum diagnostic unless typed ESLint also runs. Retain typed ESLint for this foundation; reconsider Oxlint when equivalent enforcement is supported and measured. These timings are process measurements with warm filesystem caches, not editor latency or a general benchmark.
+
+TypeScript 7's checked side-effect imports require the portable CSS module declaration. No strictness flag was disabled to migrate source. Narrow dependency declaration exceptions are recorded in the reference README; they do not exclude handwritten source. Package checks resolve the root compiler binary and enforcement deliberately proves compiler and lint failures.
+
+[Microsoft's supported compatibility setup](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/), [typescript-eslint dependency support](https://typescript-eslint.io/users/dependency-versions/), [Oxlint type-aware checks](https://oxc.rs/docs/guide/usage/linter/type-aware), [Oxlint plugin status](https://oxc.rs/docs/guide/usage/linter/plugins), [JavaScript plugins](https://oxc.rs/docs/guide/usage/linter/js-plugins).

@@ -22,7 +22,9 @@ On Linux, install Chromium system dependencies with `bunx --no-install playwrigh
 4. Serve an intentionally wrong run identity. The setup assertion fails; it cannot confirm a product defect.
 5. Interpret a [sanitized recorded exploration report](fixtures/README.md) that exited zero with a failed step and no findings. Keep it inconclusive.
 
-The expected failures are part of `verify`; the command itself fails if any expected observation differs. `bun run test:e2e` runs only the passing regression against the fixed variant. The probe remains outside that suite. The reference keeps both declarations to demonstrate promotion while sharing the unchanged repro body; a real product moves the fixed probe into its suite and removes the duplicate declaration.
+`bun run verify` prints five labelled checks and finishes with `Verification PASSED (A1–A4)` when every expected observation matches. The seeded defect, invalid target and wrong-instance checks deliberately produce failing runner reports. Their full output is saved as `runner.stdout.log` and `runner.stderr.log` inside each run folder; use `bun run verify --verbose` to stream it. The verification command still exits nonzero and names the evidence folders if an observation differs.
+
+`bun run test:e2e` runs only the passing regression against the fixed variant. The probe remains outside that suite. The reference keeps both declarations to demonstrate promotion while sharing the unchanged repro body; a real product moves the fixed probe into its suite and removes the duplicate declaration.
 
 Raw evidence lands in distinct `.e2e/runs/<mode>-<uuid>/` directories. `identity.json` records the full commit, dirty state, digest of source/config/test/lock inputs, run ID, variant, actor/fixture and rerun lineage. The server returns run/source identity headers, checked before each interaction. The runner owns an ephemeral loopback server and browser; e2e disposes them on exit. `.e2e/verification.json` links acceptance outcomes, candidate/confirmation/fix/regression history and original evidence digests. Raw files remain ignored; retain selected sanitized evidence in the feature folder for review.
 

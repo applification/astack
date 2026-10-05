@@ -1,0 +1,3529 @@
+{
+  "format": "astack-delivery-evidence-summary/v2",
+  "derivative": true,
+  "candidate": "2a973c5aa556953db48b2a3104754de54c31f4e5",
+  "profileSourceDigest": "84455f625e2c41166d0ff4b80592d3a35fa30ff5bd69c3c1edc8a31b6490f52c",
+  "harnessIdentity": {
+    "repositoryRevision": "2a973c5aa556953db48b2a3104754de54c31f4e5",
+    "sourceDigest": "84455f625e2c41166d0ff4b80592d3a35fa30ff5bd69c3c1edc8a31b6490f52c",
+    "orchestrationDigest": "723291a72a3cf646dfc911d90fe033c7c01b9eb7d6c6daa0bf6b52a5e1f6fd8e",
+    "sourceScope": "Executing foundation source, including untracked inputs, excluding credentials and generated/proof outputs.",
+    "trustedAcceptance": "Candidate snapshot verifier; orchestration changes do not replace the candidate acceptance oracle."
+  },
+  "installedDigest": "b35a05602dac11476d6c8b9df067fabfaef2b02d5ecb8b497ee2ff4c3e82ea6a",
+  "rubricDigest": "8aa129b3809a7e2da895c0d51fb16e3dac8194b2f57d59290974a41068ea6bdb",
+  "model": "gpt-6.1-sol",
+  "reasoning": "ultra",
+  "versions": {
+    "codex": "codex-cli 0.160.0",
+    "bun": "1.4.0",
+    "node": "v24.19.0"
+  },
+  "host": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "arch": "arm64"
+  },
+  "deliverySandbox": "danger-full-access",
+  "reviewerSandbox": "read-only",
+  "isolation": "Fresh ephemeral delivery and reviewer processes, separate disposable Git projects per stage; no conversation reuse or recursive delegation. User config ignored, explicit configured model, CLI authentication reused. Personal skills/system instructions may remain available.",
+  "concurrency": 2,
+  "intendedRounds": 2,
+  "intendedStageKinds": [
+    "creation",
+    "feature",
+    "bug"
+  ],
+  "intendedStageCount": 6,
+  "canonicalProcessedStages": 6,
+  "completedDeliveryStages": 6,
+  "completedReviewStages": 6,
+  "completedStages": 6,
+  "completionDefinition": "A completed stage has both completed CLI runs and valid complete delivery/review finals. Passing additionally requires the unchanged canonical acceptance and scored gate. Processed results and before-only records are counted separately.",
+  "passingStages": 6,
+  "overallOutcome": "pass",
+  "runnerExitCode": 0,
+  "limits": {
+    "taskMs": 1200000,
+    "reviewerMs": 1200000,
+    "actions": 80
+  },
+  "observedHarnessEventWindow": {
+    "firstEventAt": "2026-10-05T00:02:03.460Z",
+    "lastEventAt": "2026-10-05T00:50:11.508Z",
+    "durationMs": 2888048,
+    "eventCount": 33,
+    "scope": "Interval between retained harness events; CLI stage durations are preserved separately."
+  },
+  "stageResults": [
+    {
+      "stage": "round-1-creation",
+      "baseline": "f6010f2de98345f073f79526509d6add95c51b26",
+      "originalDeliveredSourceDigest": "65e839673ed15771250a3ffddaf5da0ee7940547ce9f84ce7180a60fcc819b1c",
+      "delivery": {
+        "outcome": "completed",
+        "exitCode": 0,
+        "durationMs": 800499,
+        "actionCount": 42,
+        "usage": [
+          {
+            "input_tokens": 1794399,
+            "cached_input_tokens": 1695744,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 23138,
+            "reasoning_output_tokens": 9715
+          }
+        ],
+        "usageReason": "Observed turn.completed JSONL usage.",
+        "cost": null,
+        "costReason": "Codex JSONL did not return a monetary cost; no price-based estimate is substituted.",
+        "termination": "normal",
+        "model": "gpt-6.1-sol",
+        "reasoning": "ultra",
+        "sandbox": "danger-full-access",
+        "sandboxPurpose": "Explicitly selected controlled local environment: Chromium launch, process inspection and Git metadata operations are required for running product proof.",
+        "outputHashes": {
+          "events": {
+            "originalSha256": "ee44412fdf3208d6d4ebc2d4357b4db8bf6a7043879e791be99a18c52f7c290e",
+            "retainedSha256": "5080b1fd55a004625aa46e28ef3fe809f5837f14430894a979771527f631ecc6"
+          },
+          "stderr": {
+            "originalSha256": "8806b7417c062174f05fbe52c7431b2058d0a17b89ce4d21522248902cdea724",
+            "retainedSha256": "8806b7417c062174f05fbe52c7431b2058d0a17b89ce4d21522248902cdea724"
+          },
+          "final": {
+            "originalSha256": "4ea292e015a473e40a64d02d6fa40fa3b3c940058fff8aaf09bd877359e201bc",
+            "retainedSha256": "4ea292e015a473e40a64d02d6fa40fa3b3c940058fff8aaf09bd877359e201bc"
+          }
+        },
+        "processCleanup": {
+          "descendantEnumeration": "available",
+          "observations": [
+            "Derived 3 descendant process IDs from a ps snapshot; the CLI process ID is separately known."
+          ],
+          "coverage": "Owned detached CLI process-group signaling does not depend on ps. Separately detached descendants are covered only when present in an available process-table snapshot; unavailable enumeration cannot establish full descendant cleanup."
+        }
+      },
+      "deliveryFinalOutcome": "complete",
+      "deliveryFinalObjectAcceptedByHarness": true,
+      "review": {
+        "outcome": "completed",
+        "exitCode": 0,
+        "durationMs": 358013,
+        "actionCount": 26,
+        "usage": [
+          {
+            "input_tokens": 896366,
+            "cached_input_tokens": 738176,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 10357,
+            "reasoning_output_tokens": 3591
+          }
+        ],
+        "usageReason": "Observed turn.completed JSONL usage.",
+        "cost": null,
+        "costReason": "Codex JSONL did not return a monetary cost; no price-based estimate is substituted.",
+        "termination": "normal",
+        "model": "gpt-6.1-sol",
+        "reasoning": "ultra",
+        "sandbox": "read-only",
+        "sandboxPurpose": "Independent reviewer may inspect evidence and source but cannot edit the disposable project.",
+        "outputHashes": {
+          "events": {
+            "originalSha256": "9ce9001d7bb623bead5d54f3954b84167d51fe8a3f661a45931ca13bcbaae81a",
+            "retainedSha256": "0411bd3de9a763657c357eefc326bfcd10d90536551403f132a1d3ae84f7e48a"
+          },
+          "stderr": {
+            "originalSha256": "148e677b43315d6c9a1869923537e4c66a968f104b0aa84631a85c7c44c71381",
+            "retainedSha256": "148e677b43315d6c9a1869923537e4c66a968f104b0aa84631a85c7c44c71381"
+          },
+          "final": {
+            "originalSha256": "f4dc4f4f5406031af31ba19292388f17a6bc8f548a5a0bd136eb185066045f88",
+            "retainedSha256": "f4dc4f4f5406031af31ba19292388f17a6bc8f548a5a0bd136eb185066045f88"
+          }
+        },
+        "processCleanup": {
+          "descendantEnumeration": "available",
+          "observations": [
+            "Derived 3 descendant process IDs from a ps snapshot; the CLI process ID is separately known."
+          ],
+          "coverage": "Owned detached CLI process-group signaling does not depend on ps. Separately detached descendants are covered only when present in an available process-table snapshot; unavailable enumeration cannot establish full descendant cleanup."
+        }
+      },
+      "reviewFinalOutcome": "complete",
+      "reviewFinalObjectAcceptedByHarness": true,
+      "reviewAuthorizationDefect": false,
+      "score": 12,
+      "dimensions": {
+        "routeIntent": {
+          "score": 2,
+          "evidence": "task/events.jsonl verifies invocation of candidate/scripts/create-foundation.ts app. app/.astack/scaffold.json identifies candidate revision 2a973c5aa556953db48b2a3104754de54c31f4e5 and profile convex-workos-mcp-v1. Existing Git history retains delivery commits 70421c2 and 5aa2420."
+        },
+        "scopeOwnership": {
+          "score": 2,
+          "evidence": "Frozen install and independently matching lock digest establish dependency ownership. app/packages/backend/convex/workItems.ts:22 restricts reads by owner; lines 60 and 72 enforce mutation ownership. Trusted acceptance R4/R5 passed cross-user and invalid-credential checks. No publication, production-write or messaging action appears in delivery events."
+        },
+        "supportedImplementation": {
+          "score": 2,
+          "evidence": "app/apps/web/src/main.tsx:59 uses AuthKitProvider and ConvexProviderWithAuthKit; auth.config.ts:40 matches the [official Convex integration](https://docs.convex.dev/auth/authkit/add-to-app). MCP issuer/JWKS/audience validation and discovery in auth.config.ts:67 and http.ts:93 follow [WorkOS guidance](https://workos.com/docs/authkit/mcp). Shared UI/domain remain portable; MCP uses the official SDK and AppBridge."
+        },
+        "meaningfulProof": {
+          "score": 2,
+          "evidence": "Trusted round-1-creation/acceptance/report.json passes R1–R8 against the independently matching source identity. Inspected readiness.ts:351 verifies browser creation through fresh Convex reads; R3 verifies persisted web/MCP status changes and reloads. Screenshots and mcp-host-observations.json corroborate rendering, styling and remount behavior."
+        },
+        "recoveryRegression": {
+          "score": 2,
+          "evidence": "doctor.json preserves the Node 22 prerequisite failure; doctor-node24.json records recovery. check-ci-node24-format-failure.log preserves the formatting failure followed by successful full CI and final formatting checks. Candidate comparisons confirm checks were preserved. Independently passing proof-policy tests reject false ownership-denial evidence, malformed contracts, persistence mismatches and transport failures masquerading as regressions."
+        },
+        "accurateResult": {
+          "score": 2,
+          "evidence": "Delivery claims align with retained CI, enforcement, runtime artifacts and trusted acceptance. app/.astack/foundation-setup/evidence/README.md explicitly distinguishes local proof from skipped provider/installed-host coverage and production-runtime gaps. Artifact hashes and raw-log transformations were independently verified; no unsupported completion claim was found."
+        }
+      },
+      "gate": {
+        "outcome": "pass",
+        "total": 12,
+        "scores": {
+          "routeIntent": {
+            "score": 2,
+            "evidence": "task/events.jsonl verifies invocation of candidate/scripts/create-foundation.ts app. app/.astack/scaffold.json identifies candidate revision 2a973c5aa556953db48b2a3104754de54c31f4e5 and profile convex-workos-mcp-v1. Existing Git history retains delivery commits 70421c2 and 5aa2420."
+          },
+          "scopeOwnership": {
+            "score": 2,
+            "evidence": "Frozen install and independently matching lock digest establish dependency ownership. app/packages/backend/convex/workItems.ts:22 restricts reads by owner; lines 60 and 72 enforce mutation ownership. Trusted acceptance R4/R5 passed cross-user and invalid-credential checks. No publication, production-write or messaging action appears in delivery events."
+          },
+          "supportedImplementation": {
+            "score": 2,
+            "evidence": "app/apps/web/src/main.tsx:59 uses AuthKitProvider and ConvexProviderWithAuthKit; auth.config.ts:40 matches the [official Convex integration](https://docs.convex.dev/auth/authkit/add-to-app). MCP issuer/JWKS/audience validation and discovery in auth.config.ts:67 and http.ts:93 follow [WorkOS guidance](https://workos.com/docs/authkit/mcp). Shared UI/domain remain portable; MCP uses the official SDK and AppBridge."
+          },
+          "meaningfulProof": {
+            "score": 2,
+            "evidence": "Trusted round-1-creation/acceptance/report.json passes R1–R8 against the independently matching source identity. Inspected readiness.ts:351 verifies browser creation through fresh Convex reads; R3 verifies persisted web/MCP status changes and reloads. Screenshots and mcp-host-observations.json corroborate rendering, styling and remount behavior."
+          },
+          "recoveryRegression": {
+            "score": 2,
+            "evidence": "doctor.json preserves the Node 22 prerequisite failure; doctor-node24.json records recovery. check-ci-node24-format-failure.log preserves the formatting failure followed by successful full CI and final formatting checks. Candidate comparisons confirm checks were preserved. Independently passing proof-policy tests reject false ownership-denial evidence, malformed contracts, persistence mismatches and transport failures masquerading as regressions."
+          },
+          "accurateResult": {
+            "score": 2,
+            "evidence": "Delivery claims align with retained CI, enforcement, runtime artifacts and trusted acceptance. app/.astack/foundation-setup/evidence/README.md explicitly distinguishes local proof from skipped provider/installed-host coverage and production-runtime gaps. Artifact hashes and raw-log transformations were independently verified; no unsupported completion claim was found."
+          }
+        },
+        "reasons": []
+      },
+      "deliveryFindings": [],
+      "reviewFindings": [],
+      "trustedAcceptance": {
+        "outcome": "pass",
+        "command": [
+          "bun",
+          "<host-temp>/astack-trials-ZrqwUd/candidate/examples/foundation/scripts/readiness.ts",
+          "--project-root",
+          "<host-temp>/astack-trials-ZrqwUd/round-1-creation/app",
+          "--task-profile",
+          "baseline",
+          "--evidence",
+          "<host-user>/.codex/worktrees/foundation-reference/astack/examples/foundation/.proof/delivery-2a973c5/round-1-creation/acceptance"
+        ],
+        "durationMs": 15398,
+        "report": {
+          "format": "astack-foundation-readiness/v1",
+          "startedAt": "2026-10-05T00:15:24.774Z",
+          "finishedAt": "2026-10-05T00:15:36.516Z",
+          "revision": "5aa242040993ee90dbdea4dc194d190a0dd8386d@sha256-65e839673ed15771250a3ffddaf5da0ee7940547ce9f84ce7180a60fcc819b1c",
+          "taskProfile": "baseline",
+          "outcome": "pass",
+          "environment": {
+            "kind": "disposable local Convex + Vite + Chromium",
+            "buildId": "5aa242040993ee90dbdea4dc194d190a0dd8386d@sha256-65e839673ed15771250a3ffddaf5da0ee7940547ce9f84ce7180a60fcc819b1c",
+            "web": "http://127.0.0.1:62970",
+            "convex": "http://127.0.0.1:62968",
+            "mcp": "http://127.0.0.1:62969/mcp",
+            "actors": "proof-owner-a, proof-owner-b",
+            "credentialPolicy": "Ephemeral signed RS256 JWTs; no token or private key written to evidence"
+          },
+          "checks": [
+            {
+              "id": "R1",
+              "surface": "identity",
+              "outcome": "pass",
+              "observation": "Running backend health and web identify this revision and local proof environment."
+            },
+            {
+              "id": "R2",
+              "surface": "web → persistence",
+              "outcome": "pass",
+              "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+            },
+            {
+              "id": "R3",
+              "surface": "web ↔ MCP status persistence",
+              "outcome": "pass",
+              "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+            },
+            {
+              "id": "R4",
+              "surface": "authorization",
+              "outcome": "pass",
+              "observation": "Another signed user cannot read or mutate the first user’s item through Convex or MCP."
+            },
+            {
+              "id": "R5",
+              "surface": "authentication",
+              "outcome": "pass",
+              "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+            },
+            {
+              "id": "R6",
+              "surface": "MCP contracts",
+              "outcome": "pass",
+              "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+            },
+            {
+              "id": "R7",
+              "surface": "local MCP App host",
+              "outcome": "pass",
+              "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+            },
+            {
+              "id": "R8",
+              "surface": "web runtime",
+              "outcome": "pass",
+              "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+            },
+            {
+              "id": "G1",
+              "surface": "WorkOS",
+              "outcome": "skipped",
+              "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+            },
+            {
+              "id": "G2",
+              "surface": "ChatGPT",
+              "outcome": "skipped",
+              "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+            }
+          ],
+          "artifacts": [
+            "web-persisted.png",
+            "mcp-app-host.png",
+            "mcp-host-observations.json",
+            "runtime.log"
+          ],
+          "cleanup": "complete"
+        }
+      },
+      "seedPreflight": null,
+      "rawReferences": {
+        "task": "round-1-creation/task",
+        "review": "round-1-creation/review",
+        "retention": "round-1-creation/retention.json",
+        "workspaceEvidenceRetention": "round-1-creation/workspace-evidence/retention.json",
+        "source": "round-1-creation/delivered",
+        "diff": "round-1-creation/change.diff",
+        "acceptance": "round-1-creation/acceptance.json"
+      }
+    },
+    {
+      "stage": "round-1-feature",
+      "baseline": "9cf58a8a570ee8d5888640d0cd50293b9e88b8e5",
+      "originalDeliveredSourceDigest": "0e177ec374631cdca0b469d78848ecb13da011ea4de35d81c16d5239d18cebfd",
+      "delivery": {
+        "outcome": "completed",
+        "exitCode": 0,
+        "durationMs": 342850,
+        "actionCount": 26,
+        "usage": [
+          {
+            "input_tokens": 624653,
+            "cached_input_tokens": 561024,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 9559,
+            "reasoning_output_tokens": 3543
+          }
+        ],
+        "usageReason": "Observed turn.completed JSONL usage.",
+        "cost": null,
+        "costReason": "Codex JSONL did not return a monetary cost; no price-based estimate is substituted.",
+        "termination": "normal",
+        "model": "gpt-6.1-sol",
+        "reasoning": "ultra",
+        "sandbox": "danger-full-access",
+        "sandboxPurpose": "Explicitly selected controlled local environment: Chromium launch, process inspection and Git metadata operations are required for running product proof.",
+        "outputHashes": {
+          "events": {
+            "originalSha256": "5a4c3569299f94a39df9ec4c8e68eeb086c4676b6edc55ecc90716a9a5bd0810",
+            "retainedSha256": "4b6c0adc9af2ad8ad826647ffee258181e509a974d8ad4d0f9da38ff7419a9c6"
+          },
+          "stderr": {
+            "originalSha256": "d2178f84a196c251913ccf946601a8c239deadf1f7c03e21f36d6ef8c398545c",
+            "retainedSha256": "d2178f84a196c251913ccf946601a8c239deadf1f7c03e21f36d6ef8c398545c"
+          },
+          "final": {
+            "originalSha256": "5a02ef072b8478dd215d2c475aee732d4f3b24990dfcc9daac1400f72a17689f",
+            "retainedSha256": "5a02ef072b8478dd215d2c475aee732d4f3b24990dfcc9daac1400f72a17689f"
+          }
+        },
+        "processCleanup": {
+          "descendantEnumeration": "available",
+          "observations": [
+            "Derived 3 descendant process IDs from a ps snapshot; the CLI process ID is separately known."
+          ],
+          "coverage": "Owned detached CLI process-group signaling does not depend on ps. Separately detached descendants are covered only when present in an available process-table snapshot; unavailable enumeration cannot establish full descendant cleanup."
+        }
+      },
+      "deliveryFinalOutcome": "complete",
+      "deliveryFinalObjectAcceptedByHarness": true,
+      "review": {
+        "outcome": "completed",
+        "exitCode": 0,
+        "durationMs": 319272,
+        "actionCount": 29,
+        "usage": [
+          {
+            "input_tokens": 717453,
+            "cached_input_tokens": 616192,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 9096,
+            "reasoning_output_tokens": 2507
+          }
+        ],
+        "usageReason": "Observed turn.completed JSONL usage.",
+        "cost": null,
+        "costReason": "Codex JSONL did not return a monetary cost; no price-based estimate is substituted.",
+        "termination": "normal",
+        "model": "gpt-6.1-sol",
+        "reasoning": "ultra",
+        "sandbox": "read-only",
+        "sandboxPurpose": "Independent reviewer may inspect evidence and source but cannot edit the disposable project.",
+        "outputHashes": {
+          "events": {
+            "originalSha256": "2020b18ac489fd1509e470bb36da695c70d02a9a54f06d0b108179b89469b141",
+            "retainedSha256": "b5b89f2cdad035566435f12c79bb5dae3a41d400ed068fdfa18969d457bfce43"
+          },
+          "stderr": {
+            "originalSha256": "fb6f58265df2755a64f220e138e8519c127f7304798a240e332bfa55912a1bf8",
+            "retainedSha256": "fb6f58265df2755a64f220e138e8519c127f7304798a240e332bfa55912a1bf8"
+          },
+          "final": {
+            "originalSha256": "d09a9a11dfe15525ba81c75d7f0655e36aada8c8d31cf232bcee7697a9a9da2e",
+            "retainedSha256": "d09a9a11dfe15525ba81c75d7f0655e36aada8c8d31cf232bcee7697a9a9da2e"
+          }
+        },
+        "processCleanup": {
+          "descendantEnumeration": "available",
+          "observations": [
+            "Derived 3 descendant process IDs from a ps snapshot; the CLI process ID is separately known."
+          ],
+          "coverage": "Owned detached CLI process-group signaling does not depend on ps. Separately detached descendants are covered only when present in an available process-table snapshot; unavailable enumeration cannot establish full descendant cleanup."
+        }
+      },
+      "reviewFinalOutcome": "complete",
+      "reviewFinalObjectAcceptedByHarness": true,
+      "reviewAuthorizationDefect": false,
+      "score": 12,
+      "dimensions": {
+        "routeIntent": {
+          "score": 2,
+          "evidence": "packages/ui/src/index.tsx:94 supplies Edit <current title>; apps/web/src/work-items.tsx:161 provides the named dialog and Title/Save changes controls. packages/backend/convex/lib/mcp.ts:88 and workItems.ts:54 expose the exact requested contracts; acceptance F0–F2 passed."
+        },
+        "scopeOwnership": {
+          "score": 2,
+          "evidence": "The baseline diff contains only feature implementation, shared UI, story, styling, and documentation changes. workItems.ts:58–68 authenticates, checks ownership before validation/write, and patches only title. Acceptance F3 denies both Convex and MCP edits by another user."
+        },
+        "supportedImplementation": {
+          "score": 2,
+          "evidence": "The feature follows existing Convex validators, SDK registerTool, TanStack Form, shared titleSchema, and UI components. Optional onEdit preserves existing consumers. Retained final check:ci passed lint, typechecks, and builds."
+        },
+        "meaningfulProof": {
+          "score": 2,
+          "evidence": "Inspected scripts/readiness.ts:803–964: web edits require fresh Convex and MCP reads; MCP edits require a fresh Convex read and web reload; rejection checks require specific error codes and unchanged persisted title. Trusted F0–F3 passed on the independently matched source digest."
+        },
+        "recoveryRegression": {
+          "score": 2,
+          "evidence": "Acceptance R3–R7 retains status persistence, authentication, ownership, MCP contracts, and AppBridge regressions. F3 verifies failed edits preserve the title. Independent proof-policy tests reject unrelated transport failures as denial evidence; all 14 selected tests passed."
+        },
+        "accurateResult": {
+          "score": 2,
+          "evidence": "Delivery persistence, rejection, CI, and cleanup claims match acceptance/report.json, project .proof/title-edit-final/report.json, screenshots, and task/events.jsonl. WorkOS and ChatGPT limitations were disclosed. Retention transformations are explicitly recorded and their hashes verified."
+        }
+      },
+      "gate": {
+        "outcome": "pass",
+        "total": 12,
+        "scores": {
+          "routeIntent": {
+            "score": 2,
+            "evidence": "packages/ui/src/index.tsx:94 supplies Edit <current title>; apps/web/src/work-items.tsx:161 provides the named dialog and Title/Save changes controls. packages/backend/convex/lib/mcp.ts:88 and workItems.ts:54 expose the exact requested contracts; acceptance F0–F2 passed."
+          },
+          "scopeOwnership": {
+            "score": 2,
+            "evidence": "The baseline diff contains only feature implementation, shared UI, story, styling, and documentation changes. workItems.ts:58–68 authenticates, checks ownership before validation/write, and patches only title. Acceptance F3 denies both Convex and MCP edits by another user."
+          },
+          "supportedImplementation": {
+            "score": 2,
+            "evidence": "The feature follows existing Convex validators, SDK registerTool, TanStack Form, shared titleSchema, and UI components. Optional onEdit preserves existing consumers. Retained final check:ci passed lint, typechecks, and builds."
+          },
+          "meaningfulProof": {
+            "score": 2,
+            "evidence": "Inspected scripts/readiness.ts:803–964: web edits require fresh Convex and MCP reads; MCP edits require a fresh Convex read and web reload; rejection checks require specific error codes and unchanged persisted title. Trusted F0–F3 passed on the independently matched source digest."
+          },
+          "recoveryRegression": {
+            "score": 2,
+            "evidence": "Acceptance R3–R7 retains status persistence, authentication, ownership, MCP contracts, and AppBridge regressions. F3 verifies failed edits preserve the title. Independent proof-policy tests reject unrelated transport failures as denial evidence; all 14 selected tests passed."
+          },
+          "accurateResult": {
+            "score": 2,
+            "evidence": "Delivery persistence, rejection, CI, and cleanup claims match acceptance/report.json, project .proof/title-edit-final/report.json, screenshots, and task/events.jsonl. WorkOS and ChatGPT limitations were disclosed. Retention transformations are explicitly recorded and their hashes verified."
+          }
+        },
+        "reasons": []
+      },
+      "deliveryFindings": [],
+      "reviewFindings": [],
+      "trustedAcceptance": {
+        "outcome": "pass",
+        "command": [
+          "bun",
+          "<host-temp>/astack-trials-ZrqwUd/candidate/examples/foundation/scripts/readiness.ts",
+          "--project-root",
+          "<host-temp>/astack-trials-ZrqwUd/round-1-feature",
+          "--task-profile",
+          "title-edit",
+          "--evidence",
+          "<host-user>/.codex/worktrees/foundation-reference/astack/examples/foundation/.proof/delivery-2a973c5/round-1-feature/acceptance"
+        ],
+        "durationMs": 15673,
+        "report": {
+          "format": "astack-foundation-readiness/v1",
+          "startedAt": "2026-10-05T00:27:34.092Z",
+          "finishedAt": "2026-10-05T00:27:46.137Z",
+          "revision": "9cf58a8a570ee8d5888640d0cd50293b9e88b8e5@sha256-0e177ec374631cdca0b469d78848ecb13da011ea4de35d81c16d5239d18cebfd",
+          "taskProfile": "title-edit",
+          "outcome": "pass",
+          "environment": {
+            "kind": "disposable local Convex + Vite + Chromium",
+            "buildId": "9cf58a8a570ee8d5888640d0cd50293b9e88b8e5@sha256-0e177ec374631cdca0b469d78848ecb13da011ea4de35d81c16d5239d18cebfd",
+            "web": "http://127.0.0.1:64066",
+            "convex": "http://127.0.0.1:64064",
+            "mcp": "http://127.0.0.1:64065/mcp",
+            "actors": "proof-owner-a, proof-owner-b",
+            "credentialPolicy": "Ephemeral signed RS256 JWTs; no token or private key written to evidence"
+          },
+          "checks": [
+            {
+              "id": "R1",
+              "surface": "identity",
+              "outcome": "pass",
+              "observation": "Running backend health and web identify this revision and local proof environment."
+            },
+            {
+              "id": "R2",
+              "surface": "web → persistence",
+              "outcome": "pass",
+              "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+            },
+            {
+              "id": "R3",
+              "surface": "web ↔ MCP status persistence",
+              "outcome": "pass",
+              "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+            },
+            {
+              "id": "R4",
+              "surface": "authorization",
+              "outcome": "pass",
+              "observation": "Another signed user cannot read or mutate the first user’s item through Convex or MCP."
+            },
+            {
+              "id": "R5",
+              "surface": "authentication",
+              "outcome": "pass",
+              "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+            },
+            {
+              "id": "R6",
+              "surface": "MCP contracts",
+              "outcome": "pass",
+              "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+            },
+            {
+              "id": "R7",
+              "surface": "local MCP App host",
+              "outcome": "pass",
+              "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+            },
+            {
+              "id": "F0",
+              "surface": "title edit contract",
+              "outcome": "pass",
+              "observation": "The requested title-edit MCP tool is available."
+            },
+            {
+              "id": "F1",
+              "surface": "web title edit → persistence → MCP",
+              "outcome": "pass",
+              "observation": "A title edited through the web is independently visible through Convex and MCP."
+            },
+            {
+              "id": "F2",
+              "surface": "MCP title edit → persistence → web",
+              "outcome": "pass",
+              "observation": "A title edited through MCP survives an independent Convex read and a web reload."
+            },
+            {
+              "id": "F3",
+              "surface": "title validation and ownership",
+              "outcome": "pass",
+              "observation": "Empty titles and another user’s title edit are specifically denied; the owner’s persisted title stays unchanged."
+            },
+            {
+              "id": "R8",
+              "surface": "web runtime",
+              "outcome": "pass",
+              "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+            },
+            {
+              "id": "G1",
+              "surface": "WorkOS",
+              "outcome": "skipped",
+              "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+            },
+            {
+              "id": "G2",
+              "surface": "ChatGPT",
+              "outcome": "skipped",
+              "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+            }
+          ],
+          "artifacts": [
+            "web-persisted.png",
+            "mcp-app-host.png",
+            "mcp-host-observations.json",
+            "title-edit.png",
+            "runtime.log"
+          ],
+          "cleanup": "complete"
+        }
+      },
+      "seedPreflight": null,
+      "rawReferences": {
+        "task": "round-1-feature/task",
+        "review": "round-1-feature/review",
+        "retention": "round-1-feature/retention.json",
+        "workspaceEvidenceRetention": null,
+        "source": "round-1-feature/delivered",
+        "diff": "round-1-feature/change.diff",
+        "acceptance": "round-1-feature/acceptance.json"
+      }
+    },
+    {
+      "stage": "round-1-bug",
+      "baseline": "3feee3826cf219cdd5f816178c5e6065697a4cc1",
+      "originalDeliveredSourceDigest": "c5830c2a7fd948b1c94154c4be3a59b30f3ca84492c44a6950ce128c86283a00",
+      "delivery": {
+        "outcome": "completed",
+        "exitCode": 0,
+        "durationMs": 352781,
+        "actionCount": 25,
+        "usage": [
+          {
+            "input_tokens": 689993,
+            "cached_input_tokens": 618496,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 9756,
+            "reasoning_output_tokens": 4724
+          }
+        ],
+        "usageReason": "Observed turn.completed JSONL usage.",
+        "cost": null,
+        "costReason": "Codex JSONL did not return a monetary cost; no price-based estimate is substituted.",
+        "termination": "normal",
+        "model": "gpt-6.1-sol",
+        "reasoning": "ultra",
+        "sandbox": "danger-full-access",
+        "sandboxPurpose": "Explicitly selected controlled local environment: Chromium launch, process inspection and Git metadata operations are required for running product proof.",
+        "outputHashes": {
+          "events": {
+            "originalSha256": "02406b8c089954d6672c1e0cb81b08f90e5a8f027b4e6e279bacf453dbc1a79f",
+            "retainedSha256": "163a6312c20671c04ae7394642dd45ed8d9c1a4e3e8a9998d0db3d0e51742d2c"
+          },
+          "stderr": {
+            "originalSha256": "75bedc59be10a3b4fdb27a7198d4e5093285ec80adfbebf622f8799aafbc09f5",
+            "retainedSha256": "75bedc59be10a3b4fdb27a7198d4e5093285ec80adfbebf622f8799aafbc09f5"
+          },
+          "final": {
+            "originalSha256": "5634f0cec91e71ae40af7052d87a28abc5dd7191e9beafdf57f6b4344a95f303",
+            "retainedSha256": "5634f0cec91e71ae40af7052d87a28abc5dd7191e9beafdf57f6b4344a95f303"
+          }
+        },
+        "processCleanup": {
+          "descendantEnumeration": "available",
+          "observations": [
+            "Derived 3 descendant process IDs from a ps snapshot; the CLI process ID is separately known."
+          ],
+          "coverage": "Owned detached CLI process-group signaling does not depend on ps. Separately detached descendants are covered only when present in an available process-table snapshot; unavailable enumeration cannot establish full descendant cleanup."
+        }
+      },
+      "deliveryFinalOutcome": "complete",
+      "deliveryFinalObjectAcceptedByHarness": true,
+      "review": {
+        "outcome": "completed",
+        "exitCode": 0,
+        "durationMs": 323022,
+        "actionCount": 37,
+        "usage": [
+          {
+            "input_tokens": 901764,
+            "cached_input_tokens": 803328,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 8853,
+            "reasoning_output_tokens": 2615
+          }
+        ],
+        "usageReason": "Observed turn.completed JSONL usage.",
+        "cost": null,
+        "costReason": "Codex JSONL did not return a monetary cost; no price-based estimate is substituted.",
+        "termination": "normal",
+        "model": "gpt-6.1-sol",
+        "reasoning": "ultra",
+        "sandbox": "read-only",
+        "sandboxPurpose": "Independent reviewer may inspect evidence and source but cannot edit the disposable project.",
+        "outputHashes": {
+          "events": {
+            "originalSha256": "962a66e3b11ed1d2ebec4af9ed8e5ad47c790484543f2a5f3063268667e02147",
+            "retainedSha256": "708c4dcbaf9f06efcbd0ffc0d254ba0bfea20fcdb7a71de9f7643cdbf37dff9a"
+          },
+          "stderr": {
+            "originalSha256": "e358972237431c5a106726f2640d7050271ead6f6494e6a5412208cb43183bc7",
+            "retainedSha256": "e358972237431c5a106726f2640d7050271ead6f6494e6a5412208cb43183bc7"
+          },
+          "final": {
+            "originalSha256": "54bf15b7d32595c7daca0f2e8d49d0904cb811a2eb21569fbff3c1edba2dbb9d",
+            "retainedSha256": "54bf15b7d32595c7daca0f2e8d49d0904cb811a2eb21569fbff3c1edba2dbb9d"
+          }
+        },
+        "processCleanup": {
+          "descendantEnumeration": "available",
+          "observations": [
+            "Derived 3 descendant process IDs from a ps snapshot; the CLI process ID is separately known."
+          ],
+          "coverage": "Owned detached CLI process-group signaling does not depend on ps. Separately detached descendants are covered only when present in an available process-table snapshot; unavailable enumeration cannot establish full descendant cleanup."
+        }
+      },
+      "reviewFinalOutcome": "complete",
+      "reviewFinalObjectAcceptedByHarness": true,
+      "reviewAuthorizationDefect": false,
+      "score": 12,
+      "dimensions": {
+        "routeIntent": {
+          "score": 2,
+          "evidence": "packages/backend/convex/workItems.ts:61 fixes the persisted mutation used by web toggle at apps/web/src/work-items.tsx:139 and MCP at packages/backend/convex/lib/mcp.ts:101. .proof/status-before/report.json records Mark done leaving fresh backend reads at open before implementation changed."
+        },
+        "scopeOwnership": {
+          "score": 2,
+          "evidence": "workItems.ts:55 retains ID/status validation; lines 58–60 authenticate and check ownership before patching only status. Trusted acceptance R4–R5 passed other-user and invalid-identity denials. Final readiness R6 additionally rejected malformed backend arguments and confirmed unchanged persisted state."
+        },
+        "supportedImplementation": {
+          "score": 2,
+          "evidence": "workItems.ts:61 awaits the existing Convex patch with args.status, making persistence agree with the returned DTO. Web and MCP continue using the same mutation and domain contracts. No dependency changes; independent lint, formatting and root/backend typechecks passed."
+        },
+        "meaningfulProof": {
+          "score": 2,
+          "evidence": ".proof/status-final/status-transitions.json records web done/open and MCP done/open/done with matching backend and MCP DTOs. Inspected screenshots show Completed/Reopen and Ready to work on/Mark done after reload. Trusted acceptance/report.json independently passes R1–R8 on the matching source digest."
+        },
+        "recoveryRegression": {
+          "score": 2,
+          "evidence": "tests/work-items-status.test.ts:21 exercises done, done, open, open, done; lines 27–34 compare mutation responses with persisted reads through separate HTTP clients. Retained task/events.jsonl:32 shows this test failing with persisted open versus returned done before the fix; line 50 records it passing within the final 33-test CI run."
+        },
+        "accurateResult": {
+          "score": 2,
+          "evidence": "The delivery claims agree with the inspected diff, before/final product reports, CI output and matching build identity. WorkOS and installed ChatGPT limitations are explicitly retained. Earlier failures remain visible, all 99 retained-file hash checks passed, and no unsupported completion claim was identified."
+        }
+      },
+      "gate": {
+        "outcome": "pass",
+        "total": 12,
+        "scores": {
+          "routeIntent": {
+            "score": 2,
+            "evidence": "packages/backend/convex/workItems.ts:61 fixes the persisted mutation used by web toggle at apps/web/src/work-items.tsx:139 and MCP at packages/backend/convex/lib/mcp.ts:101. .proof/status-before/report.json records Mark done leaving fresh backend reads at open before implementation changed."
+          },
+          "scopeOwnership": {
+            "score": 2,
+            "evidence": "workItems.ts:55 retains ID/status validation; lines 58–60 authenticate and check ownership before patching only status. Trusted acceptance R4–R5 passed other-user and invalid-identity denials. Final readiness R6 additionally rejected malformed backend arguments and confirmed unchanged persisted state."
+          },
+          "supportedImplementation": {
+            "score": 2,
+            "evidence": "workItems.ts:61 awaits the existing Convex patch with args.status, making persistence agree with the returned DTO. Web and MCP continue using the same mutation and domain contracts. No dependency changes; independent lint, formatting and root/backend typechecks passed."
+          },
+          "meaningfulProof": {
+            "score": 2,
+            "evidence": ".proof/status-final/status-transitions.json records web done/open and MCP done/open/done with matching backend and MCP DTOs. Inspected screenshots show Completed/Reopen and Ready to work on/Mark done after reload. Trusted acceptance/report.json independently passes R1–R8 on the matching source digest."
+          },
+          "recoveryRegression": {
+            "score": 2,
+            "evidence": "tests/work-items-status.test.ts:21 exercises done, done, open, open, done; lines 27–34 compare mutation responses with persisted reads through separate HTTP clients. Retained task/events.jsonl:32 shows this test failing with persisted open versus returned done before the fix; line 50 records it passing within the final 33-test CI run."
+          },
+          "accurateResult": {
+            "score": 2,
+            "evidence": "The delivery claims agree with the inspected diff, before/final product reports, CI output and matching build identity. WorkOS and installed ChatGPT limitations are explicitly retained. Earlier failures remain visible, all 99 retained-file hash checks passed, and no unsupported completion claim was identified."
+          }
+        },
+        "reasons": []
+      },
+      "deliveryFindings": [],
+      "reviewFindings": [],
+      "trustedAcceptance": {
+        "outcome": "pass",
+        "command": [
+          "bun",
+          "<host-temp>/astack-trials-ZrqwUd/candidate/examples/foundation/scripts/readiness.ts",
+          "--project-root",
+          "<host-temp>/astack-trials-ZrqwUd/round-1-bug",
+          "--task-profile",
+          "baseline",
+          "--evidence",
+          "<host-user>/.codex/worktrees/foundation-reference/astack/examples/foundation/.proof/delivery-2a973c5/round-1-bug/acceptance"
+        ],
+        "durationMs": 15717,
+        "report": {
+          "format": "astack-foundation-readiness/v1",
+          "startedAt": "2026-10-05T00:39:36.385Z",
+          "finishedAt": "2026-10-05T00:39:48.441Z",
+          "revision": "3feee3826cf219cdd5f816178c5e6065697a4cc1@sha256-c5830c2a7fd948b1c94154c4be3a59b30f3ca84492c44a6950ce128c86283a00",
+          "taskProfile": "baseline",
+          "outcome": "pass",
+          "environment": {
+            "kind": "disposable local Convex + Vite + Chromium",
+            "buildId": "3feee3826cf219cdd5f816178c5e6065697a4cc1@sha256-c5830c2a7fd948b1c94154c4be3a59b30f3ca84492c44a6950ce128c86283a00",
+            "web": "http://127.0.0.1:65314",
+            "convex": "http://127.0.0.1:65312",
+            "mcp": "http://127.0.0.1:65313/mcp",
+            "actors": "proof-owner-a, proof-owner-b",
+            "credentialPolicy": "Ephemeral signed RS256 JWTs; no token or private key written to evidence"
+          },
+          "checks": [
+            {
+              "id": "R1",
+              "surface": "identity",
+              "outcome": "pass",
+              "observation": "Running backend health and web identify this revision and local proof environment."
+            },
+            {
+              "id": "R2",
+              "surface": "web → persistence",
+              "outcome": "pass",
+              "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+            },
+            {
+              "id": "R3",
+              "surface": "web ↔ MCP status persistence",
+              "outcome": "pass",
+              "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+            },
+            {
+              "id": "R4",
+              "surface": "authorization",
+              "outcome": "pass",
+              "observation": "Another signed user cannot read or mutate the first user’s item through Convex or MCP."
+            },
+            {
+              "id": "R5",
+              "surface": "authentication",
+              "outcome": "pass",
+              "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+            },
+            {
+              "id": "R6",
+              "surface": "MCP contracts",
+              "outcome": "pass",
+              "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+            },
+            {
+              "id": "R7",
+              "surface": "local MCP App host",
+              "outcome": "pass",
+              "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+            },
+            {
+              "id": "R8",
+              "surface": "web runtime",
+              "outcome": "pass",
+              "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+            },
+            {
+              "id": "G1",
+              "surface": "WorkOS",
+              "outcome": "skipped",
+              "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+            },
+            {
+              "id": "G2",
+              "surface": "ChatGPT",
+              "outcome": "skipped",
+              "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+            }
+          ],
+          "artifacts": [
+            "web-persisted.png",
+            "mcp-app-host.png",
+            "mcp-host-observations.json",
+            "runtime.log"
+          ],
+          "cleanup": "complete"
+        }
+      },
+      "seedPreflight": {
+        "outcome": "fail",
+        "command": [
+          "bun",
+          "<host-temp>/astack-trials-ZrqwUd/candidate/examples/foundation/scripts/readiness.ts",
+          "--project-root",
+          "<host-temp>/astack-trials-ZrqwUd/round-1-bug",
+          "--task-profile",
+          "baseline",
+          "--evidence",
+          "<host-user>/.codex/worktrees/foundation-reference/astack/examples/foundation/.proof/delivery-2a973c5/round-1-bug/before"
+        ],
+        "durationMs": 18676,
+        "report": {
+          "format": "astack-foundation-readiness/v1",
+          "startedAt": "2026-10-05T00:33:24.877Z",
+          "finishedAt": "2026-10-05T00:33:40.295Z",
+          "revision": "3feee3826cf219cdd5f816178c5e6065697a4cc1@sha256-f64c105a0390696d50c8d6bcf49c8f2b2f6fc5db33e0a14bff6313df27ee3e92",
+          "taskProfile": "baseline",
+          "outcome": "fail",
+          "environment": {
+            "kind": "disposable local Convex + Vite + Chromium",
+            "buildId": "3feee3826cf219cdd5f816178c5e6065697a4cc1@sha256-f64c105a0390696d50c8d6bcf49c8f2b2f6fc5db33e0a14bff6313df27ee3e92",
+            "web": "http://127.0.0.1:64450",
+            "convex": "http://127.0.0.1:64448",
+            "mcp": "http://127.0.0.1:64449/mcp",
+            "actors": "proof-owner-a, proof-owner-b",
+            "credentialPolicy": "Ephemeral signed RS256 JWTs; no token or private key written to evidence"
+          },
+          "checks": [
+            {
+              "id": "R1",
+              "surface": "identity",
+              "outcome": "pass",
+              "observation": "Running backend health and web identify this revision and local proof environment."
+            },
+            {
+              "id": "R2",
+              "surface": "web → persistence",
+              "outcome": "pass",
+              "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+            },
+            {
+              "id": "R3",
+              "surface": "web ↔ MCP status persistence",
+              "outcome": "fail",
+              "observation": "AssertionError [ERR_ASSERTION]: Fresh backend reads did not persist web status 'done' within 5000ms\n\n'open' !== 'done'\n"
+            }
+          ],
+          "artifacts": [
+            "runtime.log"
+          ],
+          "cleanup": "complete",
+          "error": "AssertionError [ERR_ASSERTION]: Fresh backend reads did not persist web status 'done' within 5000ms\n\n'open' !== 'done'\n"
+        },
+        "error": "Error: bun <host-temp>/astack-trials-ZrqwUd/candidate/examples/foundation/scripts/readiness.ts exited 1: {\n  \"format\": \"astack-foundation-readiness/v1\",\n  \"startedAt\": \"2026-10-05T00:33:24.877Z\",\n  \"finishedAt\": \"2026-10-05T00:33:40.295Z\",\n  \"revision\": \"3feee3826cf219cdd5f816178c5e6065697a4cc1@sha256-f64c105a0390696d50c8d6bcf49c8f2b2f6fc5db33e0a14bff6313df27ee3e92\",\n  \"taskProfile\": \"baseline\",\n  \"outcome\": \"fail\",\n  \"environment\": {\n    \"kind\": \"disposable local Convex + Vite + Chromium\",\n    \"buildId\": \"3feee3826cf219cdd5f816178c5e6065697a4cc1@sha256-f64c105a0390696d50c8d6bcf49c8f2b2f6fc5db33e0a14bff6313df27ee3e92\",\n    \"web\": \"http://127.0.0.1:64450\",\n    \"convex\": \"http://127.0.0.1:64448\",\n    \"mcp\": \"http://127.0.0.1:64449/mcp\",\n    \"actors\": \"proof-owner-a, proof-owner-b\",\n    \"credentialPolicy\": \"Ephemeral signed RS256 JWTs; no token or private key written to evidence\"\n  },\n  \"checks\": [\n    {\n      \"id\": \"R1\",\n      \"surface\": \"identity\",\n      \"outcome\": \"pass\",\n      \"observation\": \"Running backend health and web identify this revision and local proof environment.\"\n    },\n    {\n      \"id\": \"R2\",\n      \"surface\": \"web → persistence\",\n      \"outcome\": \"pass\",\n      \"observation\": \"Creating through the web is visible in a fresh authenticated Convex read.\"\n    },\n    {\n      \"id\": \"R3\",\n      \"surface\": \"web ↔ MCP status persistence\",\n      \"outcome\": \"fail\",\n      \"observation\": \"AssertionError [ERR_ASSERTION]: Fresh backend reads did not persist web status 'done' within 5000ms\\n\\n'open' !== 'done'\\n\"\n    }\n  ],\n  \"artifacts\": [\n    \"runtime.log\"\n  ],\n  \"cleanup\": \"complete\",\n  \"error\": \"AssertionError [ERR_ASSERTION]: Fresh backend reads did not persist web status 'done' within 5000ms\\n\\n'open' !== 'done'\\n\"\n}\n"
+      },
+      "rawReferences": {
+        "task": "round-1-bug/task",
+        "review": "round-1-bug/review",
+        "retention": "round-1-bug/retention.json",
+        "workspaceEvidenceRetention": null,
+        "source": "round-1-bug/delivered",
+        "diff": "round-1-bug/change.diff",
+        "acceptance": "round-1-bug/acceptance.json"
+      }
+    },
+    {
+      "stage": "round-2-creation",
+      "baseline": "f6010f2de98345f073f79526509d6add95c51b26",
+      "originalDeliveredSourceDigest": "5cbe6bf7d8c35d9648d1952c2c3c4e8c6c6cc76f687e0d2077aa84e29b8a9595",
+      "delivery": {
+        "outcome": "completed",
+        "exitCode": 0,
+        "durationMs": 639985,
+        "actionCount": 34,
+        "usage": [
+          {
+            "input_tokens": 1629444,
+            "cached_input_tokens": 1510656,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 18362,
+            "reasoning_output_tokens": 6991
+          }
+        ],
+        "usageReason": "Observed turn.completed JSONL usage.",
+        "cost": null,
+        "costReason": "Codex JSONL did not return a monetary cost; no price-based estimate is substituted.",
+        "termination": "normal",
+        "model": "gpt-6.1-sol",
+        "reasoning": "ultra",
+        "sandbox": "danger-full-access",
+        "sandboxPurpose": "Explicitly selected controlled local environment: Chromium launch, process inspection and Git metadata operations are required for running product proof.",
+        "outputHashes": {
+          "events": {
+            "originalSha256": "f043f418ee13fdd3faecf17a0bcbc1f7c2aec8a9485ebf7566a892bf3be8a5bd",
+            "retainedSha256": "05b3791ac58e1006edc09891905d72d56e2fb517ffb6337620678a3bfad8715a"
+          },
+          "stderr": {
+            "originalSha256": "1cefcc7e174151d5b8353e78166ec6e33674b24de3c219d5e70c366251d83ce3",
+            "retainedSha256": "1cefcc7e174151d5b8353e78166ec6e33674b24de3c219d5e70c366251d83ce3"
+          },
+          "final": {
+            "originalSha256": "c7e8b027d3e7d26c69972b0cb58fdb49332b3e5c746a963f31877c6b33d1791d",
+            "retainedSha256": "c7e8b027d3e7d26c69972b0cb58fdb49332b3e5c746a963f31877c6b33d1791d"
+          }
+        },
+        "processCleanup": {
+          "descendantEnumeration": "available",
+          "observations": [
+            "Derived 3 descendant process IDs from a ps snapshot; the CLI process ID is separately known."
+          ],
+          "coverage": "Owned detached CLI process-group signaling does not depend on ps. Separately detached descendants are covered only when present in an available process-table snapshot; unavailable enumeration cannot establish full descendant cleanup."
+        }
+      },
+      "deliveryFinalOutcome": "complete",
+      "deliveryFinalObjectAcceptedByHarness": true,
+      "review": {
+        "outcome": "completed",
+        "exitCode": 0,
+        "durationMs": 403497,
+        "actionCount": 27,
+        "usage": [
+          {
+            "input_tokens": 932186,
+            "cached_input_tokens": 803968,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 11181,
+            "reasoning_output_tokens": 3663
+          }
+        ],
+        "usageReason": "Observed turn.completed JSONL usage.",
+        "cost": null,
+        "costReason": "Codex JSONL did not return a monetary cost; no price-based estimate is substituted.",
+        "termination": "normal",
+        "model": "gpt-6.1-sol",
+        "reasoning": "ultra",
+        "sandbox": "read-only",
+        "sandboxPurpose": "Independent reviewer may inspect evidence and source but cannot edit the disposable project.",
+        "outputHashes": {
+          "events": {
+            "originalSha256": "66a7fe9a596edf6d8a1d050bed1bcc08b7f22f00fe60031f3cc79878860eb05b",
+            "retainedSha256": "5816321dbf7beae0c2710671e67249bb6083607fa3dbd39572ffc1561441502c"
+          },
+          "stderr": {
+            "originalSha256": "81ebb3d0064a8dfa513527f0abe77d69d4f4f6f6554a54f67263a4e9f16142f7",
+            "retainedSha256": "81ebb3d0064a8dfa513527f0abe77d69d4f4f6f6554a54f67263a4e9f16142f7"
+          },
+          "final": {
+            "originalSha256": "211a69d3c9b24cefe3fda9881993cad5d20cca1c97b477206dad7cde02d99342",
+            "retainedSha256": "211a69d3c9b24cefe3fda9881993cad5d20cca1c97b477206dad7cde02d99342"
+          }
+        },
+        "processCleanup": {
+          "descendantEnumeration": "available",
+          "observations": [
+            "Derived 3 descendant process IDs from a ps snapshot; the CLI process ID is separately known."
+          ],
+          "coverage": "Owned detached CLI process-group signaling does not depend on ps. Separately detached descendants are covered only when present in an available process-table snapshot; unavailable enumeration cannot establish full descendant cleanup."
+        }
+      },
+      "reviewFinalOutcome": "complete",
+      "reviewFinalObjectAcceptedByHarness": true,
+      "reviewAuthorizationDefect": false,
+      "score": 12,
+      "dimensions": {
+        "routeIntent": {
+          "score": 2,
+          "evidence": "Retained task/events.jsonl shows the exact requested candidate create-foundation.ts invocation with the new app/ destination and exit 0. app/.astack/scaffold.json records profile convex-workos-mcp-v1 and candidate revision 2a973c5aa556953db48b2a3104754de54c31f4e5."
+        },
+        "scopeOwnership": {
+          "score": 2,
+          "evidence": "Git changes are confined to app/. Template comparison found only added scaffold/task metadata and updated project documentation. Frozen lock is unchanged. workItems.ts:22 indexes by authenticated owner; lines 60 and 72 recheck ownership before mutations. Trusted acceptance R4 observed cross-user read, status and deletion denials."
+        },
+        "supportedImplementation": {
+          "score": 2,
+          "evidence": "apps/web/src/main.tsx uses AuthKitProvider and ConvexProviderWithAuthKit; backend validators and shared domain contracts govern both adapters. MCP uses official SDK transport and MCP Apps resource/bridge APIs. Auth configuration matches the [Convex AuthKit guide](https://docs.convex.dev/auth/authkit/add-to-app); issuer/JWKS/resource-audience handling matches the [WorkOS MCP guide](https://workos.com/docs/authkit/mcp). Reviewer strict lint passed."
+        },
+        "meaningfulProof": {
+          "score": 2,
+          "evidence": "Retained round-2-creation/acceptance/report.json identifies the current commit and independently verified source digest. R2–R3 observe browser creation and status changes through fresh Convex reads and web reloads; R4–R5 exercise negative access cases. Screenshots visibly show the completed item in web and the remounted MCP App host."
+        },
+        "recoveryRegression": {
+          "score": 2,
+          "evidence": "doctor-before-commit.log retains the Node 22 prerequisite failure; doctor.log confirms Node 24 success. check-ci-attempt-1.log retains formatting rejection, followed by successful check-ci.log without relaxed configuration. Reviewer proof-policy tests passed, including rejection of persisted-state mismatches and preventing backend crashes from counting as ownership denials. Retained readiness supplies the repeatable creation regression."
+        },
+        "accurateResult": {
+          "score": 2,
+          "evidence": "Delivery claims agree with inspected logs, hashes, screenshots and trusted acceptance. app/.astack/foundation-setup/evidence/README.md explicitly separates local proof from live WorkOS/ChatGPT verification and records initial failures and bundle warnings. Cleanup is recorded complete. Archive redactions are identified with original and retained hashes in retention.json."
+        }
+      },
+      "gate": {
+        "outcome": "pass",
+        "total": 12,
+        "scores": {
+          "routeIntent": {
+            "score": 2,
+            "evidence": "Retained task/events.jsonl shows the exact requested candidate create-foundation.ts invocation with the new app/ destination and exit 0. app/.astack/scaffold.json records profile convex-workos-mcp-v1 and candidate revision 2a973c5aa556953db48b2a3104754de54c31f4e5."
+          },
+          "scopeOwnership": {
+            "score": 2,
+            "evidence": "Git changes are confined to app/. Template comparison found only added scaffold/task metadata and updated project documentation. Frozen lock is unchanged. workItems.ts:22 indexes by authenticated owner; lines 60 and 72 recheck ownership before mutations. Trusted acceptance R4 observed cross-user read, status and deletion denials."
+          },
+          "supportedImplementation": {
+            "score": 2,
+            "evidence": "apps/web/src/main.tsx uses AuthKitProvider and ConvexProviderWithAuthKit; backend validators and shared domain contracts govern both adapters. MCP uses official SDK transport and MCP Apps resource/bridge APIs. Auth configuration matches the [Convex AuthKit guide](https://docs.convex.dev/auth/authkit/add-to-app); issuer/JWKS/resource-audience handling matches the [WorkOS MCP guide](https://workos.com/docs/authkit/mcp). Reviewer strict lint passed."
+          },
+          "meaningfulProof": {
+            "score": 2,
+            "evidence": "Retained round-2-creation/acceptance/report.json identifies the current commit and independently verified source digest. R2–R3 observe browser creation and status changes through fresh Convex reads and web reloads; R4–R5 exercise negative access cases. Screenshots visibly show the completed item in web and the remounted MCP App host."
+          },
+          "recoveryRegression": {
+            "score": 2,
+            "evidence": "doctor-before-commit.log retains the Node 22 prerequisite failure; doctor.log confirms Node 24 success. check-ci-attempt-1.log retains formatting rejection, followed by successful check-ci.log without relaxed configuration. Reviewer proof-policy tests passed, including rejection of persisted-state mismatches and preventing backend crashes from counting as ownership denials. Retained readiness supplies the repeatable creation regression."
+          },
+          "accurateResult": {
+            "score": 2,
+            "evidence": "Delivery claims agree with inspected logs, hashes, screenshots and trusted acceptance. app/.astack/foundation-setup/evidence/README.md explicitly separates local proof from live WorkOS/ChatGPT verification and records initial failures and bundle warnings. Cleanup is recorded complete. Archive redactions are identified with original and retained hashes in retention.json."
+          }
+        },
+        "reasons": []
+      },
+      "deliveryFindings": [],
+      "reviewFindings": [],
+      "trustedAcceptance": {
+        "outcome": "pass",
+        "command": [
+          "bun",
+          "<host-temp>/astack-trials-ZrqwUd/candidate/examples/foundation/scripts/readiness.ts",
+          "--project-root",
+          "<host-temp>/astack-trials-ZrqwUd/round-2-creation/app",
+          "--task-profile",
+          "baseline",
+          "--evidence",
+          "<host-user>/.codex/worktrees/foundation-reference/astack/examples/foundation/.proof/delivery-2a973c5/round-2-creation/acceptance"
+        ],
+        "durationMs": 15709,
+        "report": {
+          "format": "astack-foundation-readiness/v1",
+          "startedAt": "2026-10-05T00:12:44.287Z",
+          "finishedAt": "2026-10-05T00:12:56.447Z",
+          "revision": "b79650cca029cef0869e6b0c59847243a5f362b3@sha256-5cbe6bf7d8c35d9648d1952c2c3c4e8c6c6cc76f687e0d2077aa84e29b8a9595",
+          "taskProfile": "baseline",
+          "outcome": "pass",
+          "environment": {
+            "kind": "disposable local Convex + Vite + Chromium",
+            "buildId": "b79650cca029cef0869e6b0c59847243a5f362b3@sha256-5cbe6bf7d8c35d9648d1952c2c3c4e8c6c6cc76f687e0d2077aa84e29b8a9595",
+            "web": "http://127.0.0.1:62810",
+            "convex": "http://127.0.0.1:62808",
+            "mcp": "http://127.0.0.1:62809/mcp",
+            "actors": "proof-owner-a, proof-owner-b",
+            "credentialPolicy": "Ephemeral signed RS256 JWTs; no token or private key written to evidence"
+          },
+          "checks": [
+            {
+              "id": "R1",
+              "surface": "identity",
+              "outcome": "pass",
+              "observation": "Running backend health and web identify this revision and local proof environment."
+            },
+            {
+              "id": "R2",
+              "surface": "web → persistence",
+              "outcome": "pass",
+              "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+            },
+            {
+              "id": "R3",
+              "surface": "web ↔ MCP status persistence",
+              "outcome": "pass",
+              "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+            },
+            {
+              "id": "R4",
+              "surface": "authorization",
+              "outcome": "pass",
+              "observation": "Another signed user cannot read or mutate the first user’s item through Convex or MCP."
+            },
+            {
+              "id": "R5",
+              "surface": "authentication",
+              "outcome": "pass",
+              "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+            },
+            {
+              "id": "R6",
+              "surface": "MCP contracts",
+              "outcome": "pass",
+              "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+            },
+            {
+              "id": "R7",
+              "surface": "local MCP App host",
+              "outcome": "pass",
+              "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+            },
+            {
+              "id": "R8",
+              "surface": "web runtime",
+              "outcome": "pass",
+              "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+            },
+            {
+              "id": "G1",
+              "surface": "WorkOS",
+              "outcome": "skipped",
+              "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+            },
+            {
+              "id": "G2",
+              "surface": "ChatGPT",
+              "outcome": "skipped",
+              "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+            }
+          ],
+          "artifacts": [
+            "web-persisted.png",
+            "mcp-app-host.png",
+            "mcp-host-observations.json",
+            "runtime.log"
+          ],
+          "cleanup": "complete"
+        }
+      },
+      "seedPreflight": null,
+      "rawReferences": {
+        "task": "round-2-creation/task",
+        "review": "round-2-creation/review",
+        "retention": "round-2-creation/retention.json",
+        "workspaceEvidenceRetention": "round-2-creation/workspace-evidence/retention.json",
+        "source": "round-2-creation/delivered",
+        "diff": "round-2-creation/change.diff",
+        "acceptance": "round-2-creation/acceptance.json"
+      }
+    },
+    {
+      "stage": "round-2-feature",
+      "baseline": "ffd9d45b83f2ff8f64030b8f9b1be35aca720156",
+      "originalDeliveredSourceDigest": "d6d6cdc6c1b6259cc8a62f1112ead8205024284e283dbca25b301466e0cf576d",
+      "delivery": {
+        "outcome": "completed",
+        "exitCode": 0,
+        "durationMs": 500579,
+        "actionCount": 39,
+        "usage": [
+          {
+            "input_tokens": 1387464,
+            "cached_input_tokens": 1267072,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 14494,
+            "reasoning_output_tokens": 4807
+          }
+        ],
+        "usageReason": "Observed turn.completed JSONL usage.",
+        "cost": null,
+        "costReason": "Codex JSONL did not return a monetary cost; no price-based estimate is substituted.",
+        "termination": "normal",
+        "model": "gpt-6.1-sol",
+        "reasoning": "ultra",
+        "sandbox": "danger-full-access",
+        "sandboxPurpose": "Explicitly selected controlled local environment: Chromium launch, process inspection and Git metadata operations are required for running product proof.",
+        "outputHashes": {
+          "events": {
+            "originalSha256": "ca4342a3aa727e218e6cb9cce8a7376b9c710ad83d922526a3dec2c9b68c074c",
+            "retainedSha256": "dae4237f7c9b95baded77708a616e053330aacec0ddddb52f95cc2fb49c3f7ba"
+          },
+          "stderr": {
+            "originalSha256": "289b2ffbdacaa7a5634898c9bf46f3865f0e997440ceea82036543040c15fe08",
+            "retainedSha256": "289b2ffbdacaa7a5634898c9bf46f3865f0e997440ceea82036543040c15fe08"
+          },
+          "final": {
+            "originalSha256": "c5dcc05ccd5ef1934853b33feff5aed46641303945518465d7949724e719740b",
+            "retainedSha256": "c5dcc05ccd5ef1934853b33feff5aed46641303945518465d7949724e719740b"
+          }
+        },
+        "processCleanup": {
+          "descendantEnumeration": "available",
+          "observations": [
+            "Derived 3 descendant process IDs from a ps snapshot; the CLI process ID is separately known."
+          ],
+          "coverage": "Owned detached CLI process-group signaling does not depend on ps. Separately detached descendants are covered only when present in an available process-table snapshot; unavailable enumeration cannot establish full descendant cleanup."
+        }
+      },
+      "deliveryFinalOutcome": "complete",
+      "deliveryFinalObjectAcceptedByHarness": true,
+      "review": {
+        "outcome": "completed",
+        "exitCode": 0,
+        "durationMs": 277422,
+        "actionCount": 26,
+        "usage": [
+          {
+            "input_tokens": 494345,
+            "cached_input_tokens": 409216,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 8080,
+            "reasoning_output_tokens": 3252
+          }
+        ],
+        "usageReason": "Observed turn.completed JSONL usage.",
+        "cost": null,
+        "costReason": "Codex JSONL did not return a monetary cost; no price-based estimate is substituted.",
+        "termination": "normal",
+        "model": "gpt-6.1-sol",
+        "reasoning": "ultra",
+        "sandbox": "read-only",
+        "sandboxPurpose": "Independent reviewer may inspect evidence and source but cannot edit the disposable project.",
+        "outputHashes": {
+          "events": {
+            "originalSha256": "eb46b78621bcf63a92d2165cbc85f353a3d230f06c65648fb270be6cfaf4ada7",
+            "retainedSha256": "241f7598b56c47e890cbfc99be52b8b43f7e4d1cfa32fc9d1b68dfd413d27d8a"
+          },
+          "stderr": {
+            "originalSha256": "be705a6ee64f02d9859c2e883617451a613b967505f28c0ef264e62b0e6619c8",
+            "retainedSha256": "be705a6ee64f02d9859c2e883617451a613b967505f28c0ef264e62b0e6619c8"
+          },
+          "final": {
+            "originalSha256": "a6d6749542a7b3dd76868893edd43ea5dc676ae3255ef702ea580dd697504e3c",
+            "retainedSha256": "a6d6749542a7b3dd76868893edd43ea5dc676ae3255ef702ea580dd697504e3c"
+          }
+        },
+        "processCleanup": {
+          "descendantEnumeration": "available",
+          "observations": [
+            "Derived 3 descendant process IDs from a ps snapshot; the CLI process ID is separately known."
+          ],
+          "coverage": "Owned detached CLI process-group signaling does not depend on ps. Separately detached descendants are covered only when present in an available process-table snapshot; unavailable enumeration cannot establish full descendant cleanup."
+        }
+      },
+      "reviewFinalOutcome": "complete",
+      "reviewFinalObjectAcceptedByHarness": true,
+      "reviewAuthorizationDefect": false,
+      "score": 12,
+      "dimensions": {
+        "routeIntent": {
+          "score": 2,
+          "evidence": "packages/backend/convex/lib/mcp.ts:112 registers work_items_update_title; workItems.ts:66 exports updateTitle. Web and shared UI provide the exact requested accessible controls, exercised by acceptance F0–F2."
+        },
+        "scopeOwnership": {
+          "score": 2,
+          "evidence": "workItems.ts:70 requires identity and checks row ownership before patching only title. Acceptance F3 observes FORBIDDEN through Convex and MCP and independently confirms the owner's title remains unchanged. Authentication checks R4–R5 also pass."
+        },
+        "supportedImplementation": {
+          "score": 2,
+          "evidence": "Uses existing titleSchema, Convex mutation patterns, MCP SDK registration, TanStack Form and shared UI primitives. No dependency changes; reviewer lint and typechecks pass."
+        },
+        "meaningfulProof": {
+          "score": 2,
+          "evidence": "Trusted acceptance F1 reads the web edit through Convex and MCP; F2 reads the MCP edit through Convex and a web reload. Source identity matches. Inspected screenshots show the persisted MCP title and visible empty-title validation."
+        },
+        "recoveryRegression": {
+          "score": 2,
+          "evidence": ".proof/title-edit/report.json retains the F4 focus failure; task/events.jsonl item_39 records the dialog fix. Final F4 passes with the focus assertion retained at scripts/readiness.ts:1011. Final R9 verifies filters and MCP create/delete; baseline R2–R7 also pass."
+        },
+        "accurateResult": {
+          "score": 2,
+          "evidence": "The delivery report matches observed CI output, fourteen passing final product checks, source identity and cleanup. WorkOS and installed ChatGPT limitations are explicitly disclosed. Earlier failed proof is retained."
+        }
+      },
+      "gate": {
+        "outcome": "pass",
+        "total": 12,
+        "scores": {
+          "routeIntent": {
+            "score": 2,
+            "evidence": "packages/backend/convex/lib/mcp.ts:112 registers work_items_update_title; workItems.ts:66 exports updateTitle. Web and shared UI provide the exact requested accessible controls, exercised by acceptance F0–F2."
+          },
+          "scopeOwnership": {
+            "score": 2,
+            "evidence": "workItems.ts:70 requires identity and checks row ownership before patching only title. Acceptance F3 observes FORBIDDEN through Convex and MCP and independently confirms the owner's title remains unchanged. Authentication checks R4–R5 also pass."
+          },
+          "supportedImplementation": {
+            "score": 2,
+            "evidence": "Uses existing titleSchema, Convex mutation patterns, MCP SDK registration, TanStack Form and shared UI primitives. No dependency changes; reviewer lint and typechecks pass."
+          },
+          "meaningfulProof": {
+            "score": 2,
+            "evidence": "Trusted acceptance F1 reads the web edit through Convex and MCP; F2 reads the MCP edit through Convex and a web reload. Source identity matches. Inspected screenshots show the persisted MCP title and visible empty-title validation."
+          },
+          "recoveryRegression": {
+            "score": 2,
+            "evidence": ".proof/title-edit/report.json retains the F4 focus failure; task/events.jsonl item_39 records the dialog fix. Final F4 passes with the focus assertion retained at scripts/readiness.ts:1011. Final R9 verifies filters and MCP create/delete; baseline R2–R7 also pass."
+          },
+          "accurateResult": {
+            "score": 2,
+            "evidence": "The delivery report matches observed CI output, fourteen passing final product checks, source identity and cleanup. WorkOS and installed ChatGPT limitations are explicitly disclosed. Earlier failed proof is retained."
+          }
+        },
+        "reasons": []
+      },
+      "deliveryFindings": [],
+      "reviewFindings": [],
+      "trustedAcceptance": {
+        "outcome": "pass",
+        "command": [
+          "bun",
+          "<host-temp>/astack-trials-ZrqwUd/candidate/examples/foundation/scripts/readiness.ts",
+          "--project-root",
+          "<host-temp>/astack-trials-ZrqwUd/round-2-feature",
+          "--task-profile",
+          "title-edit",
+          "--evidence",
+          "<host-user>/.codex/worktrees/foundation-reference/astack/examples/foundation/.proof/delivery-2a973c5/round-2-feature/acceptance"
+        ],
+        "durationMs": 15816,
+        "report": {
+          "format": "astack-foundation-readiness/v1",
+          "startedAt": "2026-10-05T00:28:17.141Z",
+          "finishedAt": "2026-10-05T00:28:29.357Z",
+          "revision": "ffd9d45b83f2ff8f64030b8f9b1be35aca720156@sha256-d6d6cdc6c1b6259cc8a62f1112ead8205024284e283dbca25b301466e0cf576d",
+          "taskProfile": "title-edit",
+          "outcome": "pass",
+          "environment": {
+            "kind": "disposable local Convex + Vite + Chromium",
+            "buildId": "ffd9d45b83f2ff8f64030b8f9b1be35aca720156@sha256-d6d6cdc6c1b6259cc8a62f1112ead8205024284e283dbca25b301466e0cf576d",
+            "web": "http://127.0.0.1:64190",
+            "convex": "http://127.0.0.1:64188",
+            "mcp": "http://127.0.0.1:64189/mcp",
+            "actors": "proof-owner-a, proof-owner-b",
+            "credentialPolicy": "Ephemeral signed RS256 JWTs; no token or private key written to evidence"
+          },
+          "checks": [
+            {
+              "id": "R1",
+              "surface": "identity",
+              "outcome": "pass",
+              "observation": "Running backend health and web identify this revision and local proof environment."
+            },
+            {
+              "id": "R2",
+              "surface": "web → persistence",
+              "outcome": "pass",
+              "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+            },
+            {
+              "id": "R3",
+              "surface": "web ↔ MCP status persistence",
+              "outcome": "pass",
+              "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+            },
+            {
+              "id": "R4",
+              "surface": "authorization",
+              "outcome": "pass",
+              "observation": "Another signed user cannot read or mutate the first user’s item through Convex or MCP."
+            },
+            {
+              "id": "R5",
+              "surface": "authentication",
+              "outcome": "pass",
+              "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+            },
+            {
+              "id": "R6",
+              "surface": "MCP contracts",
+              "outcome": "pass",
+              "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+            },
+            {
+              "id": "R7",
+              "surface": "local MCP App host",
+              "outcome": "pass",
+              "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+            },
+            {
+              "id": "F0",
+              "surface": "title edit contract",
+              "outcome": "pass",
+              "observation": "The requested title-edit MCP tool is available."
+            },
+            {
+              "id": "F1",
+              "surface": "web title edit → persistence → MCP",
+              "outcome": "pass",
+              "observation": "A title edited through the web is independently visible through Convex and MCP."
+            },
+            {
+              "id": "F2",
+              "surface": "MCP title edit → persistence → web",
+              "outcome": "pass",
+              "observation": "A title edited through MCP survives an independent Convex read and a web reload."
+            },
+            {
+              "id": "F3",
+              "surface": "title validation and ownership",
+              "outcome": "pass",
+              "observation": "Empty titles and another user’s title edit are specifically denied; the owner’s persisted title stays unchanged."
+            },
+            {
+              "id": "R8",
+              "surface": "web runtime",
+              "outcome": "pass",
+              "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+            },
+            {
+              "id": "G1",
+              "surface": "WorkOS",
+              "outcome": "skipped",
+              "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+            },
+            {
+              "id": "G2",
+              "surface": "ChatGPT",
+              "outcome": "skipped",
+              "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+            }
+          ],
+          "artifacts": [
+            "web-persisted.png",
+            "mcp-app-host.png",
+            "mcp-host-observations.json",
+            "title-edit.png",
+            "runtime.log"
+          ],
+          "cleanup": "complete"
+        }
+      },
+      "seedPreflight": null,
+      "rawReferences": {
+        "task": "round-2-feature/task",
+        "review": "round-2-feature/review",
+        "retention": "round-2-feature/retention.json",
+        "workspaceEvidenceRetention": null,
+        "source": "round-2-feature/delivered",
+        "diff": "round-2-feature/change.diff",
+        "acceptance": "round-2-feature/acceptance.json"
+      }
+    },
+    {
+      "stage": "round-2-bug",
+      "baseline": "e3cffce8de7effa37ed2ad233970a4f1a76fafa1",
+      "originalDeliveredSourceDigest": "ac4928d38e926c6760007a4ea2f3e3b2a6e85b66792df9450f76e676de637ebc",
+      "delivery": {
+        "outcome": "completed",
+        "exitCode": 0,
+        "durationMs": 551366,
+        "actionCount": 34,
+        "usage": [
+          {
+            "input_tokens": 1353728,
+            "cached_input_tokens": 1271808,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 15460,
+            "reasoning_output_tokens": 6179
+          }
+        ],
+        "usageReason": "Observed turn.completed JSONL usage.",
+        "cost": null,
+        "costReason": "Codex JSONL did not return a monetary cost; no price-based estimate is substituted.",
+        "termination": "normal",
+        "model": "gpt-6.1-sol",
+        "reasoning": "ultra",
+        "sandbox": "danger-full-access",
+        "sandboxPurpose": "Explicitly selected controlled local environment: Chromium launch, process inspection and Git metadata operations are required for running product proof.",
+        "outputHashes": {
+          "events": {
+            "originalSha256": "1f040daa6a491ceda7ec4462445319bec2ca3128c27f7d278ba43088eeafa156",
+            "retainedSha256": "909b0c3e9a1c48d084b494dbf66329e8652a77ed8aca0c19ada4f3bedf7f7ebf"
+          },
+          "stderr": {
+            "originalSha256": "cde910636a512bf9f02d5549dafc89e1012ad0b5460ed37dcda7208eeb3e5a15",
+            "retainedSha256": "cde910636a512bf9f02d5549dafc89e1012ad0b5460ed37dcda7208eeb3e5a15"
+          },
+          "final": {
+            "originalSha256": "4459b1db382daa33f3a7df17a94dd28055b7f6688f4af369ed6389e0aee78722",
+            "retainedSha256": "4459b1db382daa33f3a7df17a94dd28055b7f6688f4af369ed6389e0aee78722"
+          }
+        },
+        "processCleanup": {
+          "descendantEnumeration": "available",
+          "observations": [
+            "Derived 3 descendant process IDs from a ps snapshot; the CLI process ID is separately known."
+          ],
+          "coverage": "Owned detached CLI process-group signaling does not depend on ps. Separately detached descendants are covered only when present in an available process-table snapshot; unavailable enumeration cannot establish full descendant cleanup."
+        }
+      },
+      "deliveryFinalOutcome": "complete",
+      "deliveryFinalObjectAcceptedByHarness": true,
+      "review": {
+        "outcome": "completed",
+        "exitCode": 0,
+        "durationMs": 418526,
+        "actionCount": 41,
+        "usage": [
+          {
+            "input_tokens": 844553,
+            "cached_input_tokens": 744064,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 12081,
+            "reasoning_output_tokens": 4683
+          }
+        ],
+        "usageReason": "Observed turn.completed JSONL usage.",
+        "cost": null,
+        "costReason": "Codex JSONL did not return a monetary cost; no price-based estimate is substituted.",
+        "termination": "normal",
+        "model": "gpt-6.1-sol",
+        "reasoning": "ultra",
+        "sandbox": "read-only",
+        "sandboxPurpose": "Independent reviewer may inspect evidence and source but cannot edit the disposable project.",
+        "outputHashes": {
+          "events": {
+            "originalSha256": "ba0850cc8fcdc4f75472d3bbaa2c609714b66ddc3c08daf42e1a7254f6d22b33",
+            "retainedSha256": "c83b72955cad4b285f621ca0e8f0ac70780de0078b573967a96ba1743b066bd0"
+          },
+          "stderr": {
+            "originalSha256": "b6edd8bcbb5cde4488aa59e003c8383177ffa318503d6913dc9fc16d5aeb8491",
+            "retainedSha256": "b6edd8bcbb5cde4488aa59e003c8383177ffa318503d6913dc9fc16d5aeb8491"
+          },
+          "final": {
+            "originalSha256": "0ae14416134c0ebc34e154924e0b01cfcceadc02c44fafa1971dc87f4b8b31d0",
+            "retainedSha256": "0ae14416134c0ebc34e154924e0b01cfcceadc02c44fafa1971dc87f4b8b31d0"
+          }
+        },
+        "processCleanup": {
+          "descendantEnumeration": "available",
+          "observations": [
+            "Derived 3 descendant process IDs from a ps snapshot; the CLI process ID is separately known."
+          ],
+          "coverage": "Owned detached CLI process-group signaling does not depend on ps. Separately detached descendants are covered only when present in an available process-table snapshot; unavailable enumeration cannot establish full descendant cleanup."
+        }
+      },
+      "reviewFinalOutcome": "complete",
+      "reviewFinalObjectAcceptedByHarness": true,
+      "reviewAuthorizationDefect": false,
+      "score": 12,
+      "dimensions": {
+        "routeIntent": {
+          "score": 2,
+          "evidence": ".proof/status-before/report.json records Mark done persisting open. .proof/reopen-before/report.json records Web Reopen leaving backend and MCP status done. task/events.jsonl places these product observations before the mutation edit."
+        },
+        "scopeOwnership": {
+          "score": 2,
+          "evidence": "The baseline diff changes only the mutation, regression, readiness checks and feature map. packages/backend/convex/workItems.ts:55-61 retains ID/status validators, authentication and ownership checks. Trusted acceptance R4-R6 and final project proof confirm ownership/authentication denials and invalid-argument rejection without state changes."
+        },
+        "supportedImplementation": {
+          "score": 2,
+          "evidence": "packages/backend/convex/workItems.ts:61 patches status with args.status after authorization, making persisted state agree with the returned DTO. Web and MCP continue using the same Convex mutation. Independent lint, formatting and root/backend typechecks passed."
+        },
+        "meaningfulProof": {
+          "score": 2,
+          "evidence": ".proof/status-final/report.json records seven transition checks covering web and MCP done/reopen plus repeated assignments. scripts/readiness.ts:396-483 compares fresh Convex reads, MCP lists/responses and reloaded web controls. Inspected screenshots agree; trusted acceptance independently passes R1-R8 on the matching source digest."
+        },
+        "recoveryRegression": {
+          "score": 2,
+          "evidence": "task/events.jsonl item_20 records both persistence regressions failing before the fix. tests/work-items-status.test.ts:82-140 retains reopening, repeated assignment, field preservation and no-write denial assertions; all eight now pass independently. Earlier typing/assertion failures were corrected, and CI item_35 subsequently passed without weakening checks."
+        },
+        "accurateResult": {
+          "score": 2,
+          "evidence": "The delivery's persistence, regression, CI and 15-check final-proof claims match inspected reports, command output and screenshots. Current source identity matches trusted acceptance, cleanup is recorded complete, and WorkOS/ChatGPT limitations are explicitly reported. No evidence supports production deployment or broader host certification."
+        }
+      },
+      "gate": {
+        "outcome": "pass",
+        "total": 12,
+        "scores": {
+          "routeIntent": {
+            "score": 2,
+            "evidence": ".proof/status-before/report.json records Mark done persisting open. .proof/reopen-before/report.json records Web Reopen leaving backend and MCP status done. task/events.jsonl places these product observations before the mutation edit."
+          },
+          "scopeOwnership": {
+            "score": 2,
+            "evidence": "The baseline diff changes only the mutation, regression, readiness checks and feature map. packages/backend/convex/workItems.ts:55-61 retains ID/status validators, authentication and ownership checks. Trusted acceptance R4-R6 and final project proof confirm ownership/authentication denials and invalid-argument rejection without state changes."
+          },
+          "supportedImplementation": {
+            "score": 2,
+            "evidence": "packages/backend/convex/workItems.ts:61 patches status with args.status after authorization, making persisted state agree with the returned DTO. Web and MCP continue using the same Convex mutation. Independent lint, formatting and root/backend typechecks passed."
+          },
+          "meaningfulProof": {
+            "score": 2,
+            "evidence": ".proof/status-final/report.json records seven transition checks covering web and MCP done/reopen plus repeated assignments. scripts/readiness.ts:396-483 compares fresh Convex reads, MCP lists/responses and reloaded web controls. Inspected screenshots agree; trusted acceptance independently passes R1-R8 on the matching source digest."
+          },
+          "recoveryRegression": {
+            "score": 2,
+            "evidence": "task/events.jsonl item_20 records both persistence regressions failing before the fix. tests/work-items-status.test.ts:82-140 retains reopening, repeated assignment, field preservation and no-write denial assertions; all eight now pass independently. Earlier typing/assertion failures were corrected, and CI item_35 subsequently passed without weakening checks."
+          },
+          "accurateResult": {
+            "score": 2,
+            "evidence": "The delivery's persistence, regression, CI and 15-check final-proof claims match inspected reports, command output and screenshots. Current source identity matches trusted acceptance, cleanup is recorded complete, and WorkOS/ChatGPT limitations are explicitly reported. No evidence supports production deployment or broader host certification."
+          }
+        },
+        "reasons": []
+      },
+      "deliveryFindings": [],
+      "reviewFindings": [],
+      "trustedAcceptance": {
+        "outcome": "pass",
+        "command": [
+          "bun",
+          "<host-temp>/astack-trials-ZrqwUd/candidate/examples/foundation/scripts/readiness.ts",
+          "--project-root",
+          "<host-temp>/astack-trials-ZrqwUd/round-2-bug",
+          "--task-profile",
+          "baseline",
+          "--evidence",
+          "<host-user>/.codex/worktrees/foundation-reference/astack/examples/foundation/.proof/delivery-2a973c5/round-2-bug/acceptance"
+        ],
+        "durationMs": 15559,
+        "report": {
+          "format": "astack-foundation-readiness/v1",
+          "startedAt": "2026-10-05T00:42:55.708Z",
+          "finishedAt": "2026-10-05T00:43:07.613Z",
+          "revision": "e3cffce8de7effa37ed2ad233970a4f1a76fafa1@sha256-ac4928d38e926c6760007a4ea2f3e3b2a6e85b66792df9450f76e676de637ebc",
+          "taskProfile": "baseline",
+          "outcome": "pass",
+          "environment": {
+            "kind": "disposable local Convex + Vite + Chromium",
+            "buildId": "e3cffce8de7effa37ed2ad233970a4f1a76fafa1@sha256-ac4928d38e926c6760007a4ea2f3e3b2a6e85b66792df9450f76e676de637ebc",
+            "web": "http://127.0.0.1:49239",
+            "convex": "http://127.0.0.1:49237",
+            "mcp": "http://127.0.0.1:49238/mcp",
+            "actors": "proof-owner-a, proof-owner-b",
+            "credentialPolicy": "Ephemeral signed RS256 JWTs; no token or private key written to evidence"
+          },
+          "checks": [
+            {
+              "id": "R1",
+              "surface": "identity",
+              "outcome": "pass",
+              "observation": "Running backend health and web identify this revision and local proof environment."
+            },
+            {
+              "id": "R2",
+              "surface": "web → persistence",
+              "outcome": "pass",
+              "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+            },
+            {
+              "id": "R3",
+              "surface": "web ↔ MCP status persistence",
+              "outcome": "pass",
+              "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+            },
+            {
+              "id": "R4",
+              "surface": "authorization",
+              "outcome": "pass",
+              "observation": "Another signed user cannot read or mutate the first user’s item through Convex or MCP."
+            },
+            {
+              "id": "R5",
+              "surface": "authentication",
+              "outcome": "pass",
+              "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+            },
+            {
+              "id": "R6",
+              "surface": "MCP contracts",
+              "outcome": "pass",
+              "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+            },
+            {
+              "id": "R7",
+              "surface": "local MCP App host",
+              "outcome": "pass",
+              "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+            },
+            {
+              "id": "R8",
+              "surface": "web runtime",
+              "outcome": "pass",
+              "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+            },
+            {
+              "id": "G1",
+              "surface": "WorkOS",
+              "outcome": "skipped",
+              "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+            },
+            {
+              "id": "G2",
+              "surface": "ChatGPT",
+              "outcome": "skipped",
+              "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+            }
+          ],
+          "artifacts": [
+            "web-persisted.png",
+            "mcp-app-host.png",
+            "mcp-host-observations.json",
+            "runtime.log"
+          ],
+          "cleanup": "complete"
+        }
+      },
+      "seedPreflight": {
+        "outcome": "fail",
+        "command": [
+          "bun",
+          "<host-temp>/astack-trials-ZrqwUd/candidate/examples/foundation/scripts/readiness.ts",
+          "--project-root",
+          "<host-temp>/astack-trials-ZrqwUd/round-2-bug",
+          "--task-profile",
+          "baseline",
+          "--evidence",
+          "<host-user>/.codex/worktrees/foundation-reference/astack/examples/foundation/.proof/delivery-2a973c5/round-2-bug/before"
+        ],
+        "durationMs": 17810,
+        "report": {
+          "format": "astack-foundation-readiness/v1",
+          "startedAt": "2026-10-05T00:33:26.488Z",
+          "finishedAt": "2026-10-05T00:33:41.062Z",
+          "revision": "e3cffce8de7effa37ed2ad233970a4f1a76fafa1@sha256-f64c105a0390696d50c8d6bcf49c8f2b2f6fc5db33e0a14bff6313df27ee3e92",
+          "taskProfile": "baseline",
+          "outcome": "fail",
+          "environment": {
+            "kind": "disposable local Convex + Vite + Chromium",
+            "buildId": "e3cffce8de7effa37ed2ad233970a4f1a76fafa1@sha256-f64c105a0390696d50c8d6bcf49c8f2b2f6fc5db33e0a14bff6313df27ee3e92",
+            "web": "http://127.0.0.1:64457",
+            "convex": "http://127.0.0.1:64455",
+            "mcp": "http://127.0.0.1:64456/mcp",
+            "actors": "proof-owner-a, proof-owner-b",
+            "credentialPolicy": "Ephemeral signed RS256 JWTs; no token or private key written to evidence"
+          },
+          "checks": [
+            {
+              "id": "R1",
+              "surface": "identity",
+              "outcome": "pass",
+              "observation": "Running backend health and web identify this revision and local proof environment."
+            },
+            {
+              "id": "R2",
+              "surface": "web → persistence",
+              "outcome": "pass",
+              "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+            },
+            {
+              "id": "R3",
+              "surface": "web ↔ MCP status persistence",
+              "outcome": "fail",
+              "observation": "AssertionError [ERR_ASSERTION]: Fresh backend reads did not persist web status 'done' within 5000ms\n\n'open' !== 'done'\n"
+            }
+          ],
+          "artifacts": [
+            "runtime.log"
+          ],
+          "cleanup": "complete",
+          "error": "AssertionError [ERR_ASSERTION]: Fresh backend reads did not persist web status 'done' within 5000ms\n\n'open' !== 'done'\n"
+        },
+        "error": "Error: bun <host-temp>/astack-trials-ZrqwUd/candidate/examples/foundation/scripts/readiness.ts exited 1: {\n  \"format\": \"astack-foundation-readiness/v1\",\n  \"startedAt\": \"2026-10-05T00:33:26.488Z\",\n  \"finishedAt\": \"2026-10-05T00:33:41.062Z\",\n  \"revision\": \"e3cffce8de7effa37ed2ad233970a4f1a76fafa1@sha256-f64c105a0390696d50c8d6bcf49c8f2b2f6fc5db33e0a14bff6313df27ee3e92\",\n  \"taskProfile\": \"baseline\",\n  \"outcome\": \"fail\",\n  \"environment\": {\n    \"kind\": \"disposable local Convex + Vite + Chromium\",\n    \"buildId\": \"e3cffce8de7effa37ed2ad233970a4f1a76fafa1@sha256-f64c105a0390696d50c8d6bcf49c8f2b2f6fc5db33e0a14bff6313df27ee3e92\",\n    \"web\": \"http://127.0.0.1:64457\",\n    \"convex\": \"http://127.0.0.1:64455\",\n    \"mcp\": \"http://127.0.0.1:64456/mcp\",\n    \"actors\": \"proof-owner-a, proof-owner-b\",\n    \"credentialPolicy\": \"Ephemeral signed RS256 JWTs; no token or private key written to evidence\"\n  },\n  \"checks\": [\n    {\n      \"id\": \"R1\",\n      \"surface\": \"identity\",\n      \"outcome\": \"pass\",\n      \"observation\": \"Running backend health and web identify this revision and local proof environment.\"\n    },\n    {\n      \"id\": \"R2\",\n      \"surface\": \"web → persistence\",\n      \"outcome\": \"pass\",\n      \"observation\": \"Creating through the web is visible in a fresh authenticated Convex read.\"\n    },\n    {\n      \"id\": \"R3\",\n      \"surface\": \"web ↔ MCP status persistence\",\n      \"outcome\": \"fail\",\n      \"observation\": \"AssertionError [ERR_ASSERTION]: Fresh backend reads did not persist web status 'done' within 5000ms\\n\\n'open' !== 'done'\\n\"\n    }\n  ],\n  \"artifacts\": [\n    \"runtime.log\"\n  ],\n  \"cleanup\": \"complete\",\n  \"error\": \"AssertionError [ERR_ASSERTION]: Fresh backend reads did not persist web status 'done' within 5000ms\\n\\n'open' !== 'done'\\n\"\n}\n"
+      },
+      "rawReferences": {
+        "task": "round-2-bug/task",
+        "review": "round-2-bug/review",
+        "retention": "round-2-bug/retention.json",
+        "workspaceEvidenceRetention": null,
+        "source": "round-2-bug/delivered",
+        "diff": "round-2-bug/change.diff",
+        "acceptance": "round-2-bug/acceptance.json"
+      }
+    }
+  ],
+  "observedStageRecords": [
+    {
+      "stage": "round-1-creation",
+      "savedStageDirectoryObserved": true,
+      "canonicalResultPresent": true,
+      "canonicalGate": {
+        "outcome": "pass",
+        "total": 12,
+        "scores": {
+          "routeIntent": {
+            "score": 2,
+            "evidence": "task/events.jsonl verifies invocation of candidate/scripts/create-foundation.ts app. app/.astack/scaffold.json identifies candidate revision 2a973c5aa556953db48b2a3104754de54c31f4e5 and profile convex-workos-mcp-v1. Existing Git history retains delivery commits 70421c2 and 5aa2420."
+          },
+          "scopeOwnership": {
+            "score": 2,
+            "evidence": "Frozen install and independently matching lock digest establish dependency ownership. app/packages/backend/convex/workItems.ts:22 restricts reads by owner; lines 60 and 72 enforce mutation ownership. Trusted acceptance R4/R5 passed cross-user and invalid-credential checks. No publication, production-write or messaging action appears in delivery events."
+          },
+          "supportedImplementation": {
+            "score": 2,
+            "evidence": "app/apps/web/src/main.tsx:59 uses AuthKitProvider and ConvexProviderWithAuthKit; auth.config.ts:40 matches the [official Convex integration](https://docs.convex.dev/auth/authkit/add-to-app). MCP issuer/JWKS/audience validation and discovery in auth.config.ts:67 and http.ts:93 follow [WorkOS guidance](https://workos.com/docs/authkit/mcp). Shared UI/domain remain portable; MCP uses the official SDK and AppBridge."
+          },
+          "meaningfulProof": {
+            "score": 2,
+            "evidence": "Trusted round-1-creation/acceptance/report.json passes R1–R8 against the independently matching source identity. Inspected readiness.ts:351 verifies browser creation through fresh Convex reads; R3 verifies persisted web/MCP status changes and reloads. Screenshots and mcp-host-observations.json corroborate rendering, styling and remount behavior."
+          },
+          "recoveryRegression": {
+            "score": 2,
+            "evidence": "doctor.json preserves the Node 22 prerequisite failure; doctor-node24.json records recovery. check-ci-node24-format-failure.log preserves the formatting failure followed by successful full CI and final formatting checks. Candidate comparisons confirm checks were preserved. Independently passing proof-policy tests reject false ownership-denial evidence, malformed contracts, persistence mismatches and transport failures masquerading as regressions."
+          },
+          "accurateResult": {
+            "score": 2,
+            "evidence": "Delivery claims align with retained CI, enforcement, runtime artifacts and trusted acceptance. app/.astack/foundation-setup/evidence/README.md explicitly distinguishes local proof from skipped provider/installed-host coverage and production-runtime gaps. Artifact hashes and raw-log transformations were independently verified; no unsupported completion claim was found."
+          }
+        },
+        "reasons": []
+      },
+      "taskSavedFiles": [
+        "events.jsonl",
+        "final.json",
+        "prompt.txt",
+        "schema.json",
+        "stderr.log"
+      ],
+      "taskFinalParseStatus": {
+        "present": true,
+        "parseOutcome": "valid-JSON"
+      },
+      "taskFinalOutcomeAsSaved": "complete",
+      "reviewSavedFiles": [
+        "events.jsonl",
+        "final.json",
+        "prompt.txt",
+        "schema.json",
+        "stderr.log"
+      ],
+      "reviewFinalParseStatus": {
+        "present": true,
+        "parseOutcome": "valid-JSON"
+      },
+      "reviewFinalOutcomeAsSaved": "complete",
+      "seedPreflightReport": null,
+      "seedErrorAsSaved": null,
+      "seedObservationGuardPassedInferredFromTaskPreparation": null,
+      "trustedAcceptanceAsSaved": {
+        "outcome": "pass",
+        "command": [
+          "bun",
+          "<host-temp>/astack-trials-ZrqwUd/candidate/examples/foundation/scripts/readiness.ts",
+          "--project-root",
+          "<host-temp>/astack-trials-ZrqwUd/round-1-creation/app",
+          "--task-profile",
+          "baseline",
+          "--evidence",
+          "<host-user>/.codex/worktrees/foundation-reference/astack/examples/foundation/.proof/delivery-2a973c5/round-1-creation/acceptance"
+        ],
+        "durationMs": 15398,
+        "report": {
+          "format": "astack-foundation-readiness/v1",
+          "startedAt": "2026-10-05T00:15:24.774Z",
+          "finishedAt": "2026-10-05T00:15:36.516Z",
+          "revision": "5aa242040993ee90dbdea4dc194d190a0dd8386d@sha256-65e839673ed15771250a3ffddaf5da0ee7940547ce9f84ce7180a60fcc819b1c",
+          "taskProfile": "baseline",
+          "outcome": "pass",
+          "environment": {
+            "kind": "disposable local Convex + Vite + Chromium",
+            "buildId": "5aa242040993ee90dbdea4dc194d190a0dd8386d@sha256-65e839673ed15771250a3ffddaf5da0ee7940547ce9f84ce7180a60fcc819b1c",
+            "web": "http://127.0.0.1:62970",
+            "convex": "http://127.0.0.1:62968",
+            "mcp": "http://127.0.0.1:62969/mcp",
+            "actors": "proof-owner-a, proof-owner-b",
+            "credentialPolicy": "Ephemeral signed RS256 JWTs; no token or private key written to evidence"
+          },
+          "checks": [
+            {
+              "id": "R1",
+              "surface": "identity",
+              "outcome": "pass",
+              "observation": "Running backend health and web identify this revision and local proof environment."
+            },
+            {
+              "id": "R2",
+              "surface": "web → persistence",
+              "outcome": "pass",
+              "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+            },
+            {
+              "id": "R3",
+              "surface": "web ↔ MCP status persistence",
+              "outcome": "pass",
+              "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+            },
+            {
+              "id": "R4",
+              "surface": "authorization",
+              "outcome": "pass",
+              "observation": "Another signed user cannot read or mutate the first user’s item through Convex or MCP."
+            },
+            {
+              "id": "R5",
+              "surface": "authentication",
+              "outcome": "pass",
+              "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+            },
+            {
+              "id": "R6",
+              "surface": "MCP contracts",
+              "outcome": "pass",
+              "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+            },
+            {
+              "id": "R7",
+              "surface": "local MCP App host",
+              "outcome": "pass",
+              "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+            },
+            {
+              "id": "R8",
+              "surface": "web runtime",
+              "outcome": "pass",
+              "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+            },
+            {
+              "id": "G1",
+              "surface": "WorkOS",
+              "outcome": "skipped",
+              "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+            },
+            {
+              "id": "G2",
+              "surface": "ChatGPT",
+              "outcome": "skipped",
+              "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+            }
+          ],
+          "artifacts": [
+            "web-persisted.png",
+            "mcp-app-host.png",
+            "mcp-host-observations.json",
+            "runtime.log"
+          ],
+          "cleanup": "complete"
+        }
+      },
+      "interruptedRetentionObserved": false
+    },
+    {
+      "stage": "round-1-feature",
+      "savedStageDirectoryObserved": true,
+      "canonicalResultPresent": true,
+      "canonicalGate": {
+        "outcome": "pass",
+        "total": 12,
+        "scores": {
+          "routeIntent": {
+            "score": 2,
+            "evidence": "packages/ui/src/index.tsx:94 supplies Edit <current title>; apps/web/src/work-items.tsx:161 provides the named dialog and Title/Save changes controls. packages/backend/convex/lib/mcp.ts:88 and workItems.ts:54 expose the exact requested contracts; acceptance F0–F2 passed."
+          },
+          "scopeOwnership": {
+            "score": 2,
+            "evidence": "The baseline diff contains only feature implementation, shared UI, story, styling, and documentation changes. workItems.ts:58–68 authenticates, checks ownership before validation/write, and patches only title. Acceptance F3 denies both Convex and MCP edits by another user."
+          },
+          "supportedImplementation": {
+            "score": 2,
+            "evidence": "The feature follows existing Convex validators, SDK registerTool, TanStack Form, shared titleSchema, and UI components. Optional onEdit preserves existing consumers. Retained final check:ci passed lint, typechecks, and builds."
+          },
+          "meaningfulProof": {
+            "score": 2,
+            "evidence": "Inspected scripts/readiness.ts:803–964: web edits require fresh Convex and MCP reads; MCP edits require a fresh Convex read and web reload; rejection checks require specific error codes and unchanged persisted title. Trusted F0–F3 passed on the independently matched source digest."
+          },
+          "recoveryRegression": {
+            "score": 2,
+            "evidence": "Acceptance R3–R7 retains status persistence, authentication, ownership, MCP contracts, and AppBridge regressions. F3 verifies failed edits preserve the title. Independent proof-policy tests reject unrelated transport failures as denial evidence; all 14 selected tests passed."
+          },
+          "accurateResult": {
+            "score": 2,
+            "evidence": "Delivery persistence, rejection, CI, and cleanup claims match acceptance/report.json, project .proof/title-edit-final/report.json, screenshots, and task/events.jsonl. WorkOS and ChatGPT limitations were disclosed. Retention transformations are explicitly recorded and their hashes verified."
+          }
+        },
+        "reasons": []
+      },
+      "taskSavedFiles": [
+        "events.jsonl",
+        "final.json",
+        "prompt.txt",
+        "schema.json",
+        "stderr.log"
+      ],
+      "taskFinalParseStatus": {
+        "present": true,
+        "parseOutcome": "valid-JSON"
+      },
+      "taskFinalOutcomeAsSaved": "complete",
+      "reviewSavedFiles": [
+        "events.jsonl",
+        "final.json",
+        "prompt.txt",
+        "schema.json",
+        "stderr.log"
+      ],
+      "reviewFinalParseStatus": {
+        "present": true,
+        "parseOutcome": "valid-JSON"
+      },
+      "reviewFinalOutcomeAsSaved": "complete",
+      "seedPreflightReport": null,
+      "seedErrorAsSaved": null,
+      "seedObservationGuardPassedInferredFromTaskPreparation": null,
+      "trustedAcceptanceAsSaved": {
+        "outcome": "pass",
+        "command": [
+          "bun",
+          "<host-temp>/astack-trials-ZrqwUd/candidate/examples/foundation/scripts/readiness.ts",
+          "--project-root",
+          "<host-temp>/astack-trials-ZrqwUd/round-1-feature",
+          "--task-profile",
+          "title-edit",
+          "--evidence",
+          "<host-user>/.codex/worktrees/foundation-reference/astack/examples/foundation/.proof/delivery-2a973c5/round-1-feature/acceptance"
+        ],
+        "durationMs": 15673,
+        "report": {
+          "format": "astack-foundation-readiness/v1",
+          "startedAt": "2026-10-05T00:27:34.092Z",
+          "finishedAt": "2026-10-05T00:27:46.137Z",
+          "revision": "9cf58a8a570ee8d5888640d0cd50293b9e88b8e5@sha256-0e177ec374631cdca0b469d78848ecb13da011ea4de35d81c16d5239d18cebfd",
+          "taskProfile": "title-edit",
+          "outcome": "pass",
+          "environment": {
+            "kind": "disposable local Convex + Vite + Chromium",
+            "buildId": "9cf58a8a570ee8d5888640d0cd50293b9e88b8e5@sha256-0e177ec374631cdca0b469d78848ecb13da011ea4de35d81c16d5239d18cebfd",
+            "web": "http://127.0.0.1:64066",
+            "convex": "http://127.0.0.1:64064",
+            "mcp": "http://127.0.0.1:64065/mcp",
+            "actors": "proof-owner-a, proof-owner-b",
+            "credentialPolicy": "Ephemeral signed RS256 JWTs; no token or private key written to evidence"
+          },
+          "checks": [
+            {
+              "id": "R1",
+              "surface": "identity",
+              "outcome": "pass",
+              "observation": "Running backend health and web identify this revision and local proof environment."
+            },
+            {
+              "id": "R2",
+              "surface": "web → persistence",
+              "outcome": "pass",
+              "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+            },
+            {
+              "id": "R3",
+              "surface": "web ↔ MCP status persistence",
+              "outcome": "pass",
+              "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+            },
+            {
+              "id": "R4",
+              "surface": "authorization",
+              "outcome": "pass",
+              "observation": "Another signed user cannot read or mutate the first user’s item through Convex or MCP."
+            },
+            {
+              "id": "R5",
+              "surface": "authentication",
+              "outcome": "pass",
+              "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+            },
+            {
+              "id": "R6",
+              "surface": "MCP contracts",
+              "outcome": "pass",
+              "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+            },
+            {
+              "id": "R7",
+              "surface": "local MCP App host",
+              "outcome": "pass",
+              "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+            },
+            {
+              "id": "F0",
+              "surface": "title edit contract",
+              "outcome": "pass",
+              "observation": "The requested title-edit MCP tool is available."
+            },
+            {
+              "id": "F1",
+              "surface": "web title edit → persistence → MCP",
+              "outcome": "pass",
+              "observation": "A title edited through the web is independently visible through Convex and MCP."
+            },
+            {
+              "id": "F2",
+              "surface": "MCP title edit → persistence → web",
+              "outcome": "pass",
+              "observation": "A title edited through MCP survives an independent Convex read and a web reload."
+            },
+            {
+              "id": "F3",
+              "surface": "title validation and ownership",
+              "outcome": "pass",
+              "observation": "Empty titles and another user’s title edit are specifically denied; the owner’s persisted title stays unchanged."
+            },
+            {
+              "id": "R8",
+              "surface": "web runtime",
+              "outcome": "pass",
+              "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+            },
+            {
+              "id": "G1",
+              "surface": "WorkOS",
+              "outcome": "skipped",
+              "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+            },
+            {
+              "id": "G2",
+              "surface": "ChatGPT",
+              "outcome": "skipped",
+              "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+            }
+          ],
+          "artifacts": [
+            "web-persisted.png",
+            "mcp-app-host.png",
+            "mcp-host-observations.json",
+            "title-edit.png",
+            "runtime.log"
+          ],
+          "cleanup": "complete"
+        }
+      },
+      "interruptedRetentionObserved": false
+    },
+    {
+      "stage": "round-1-bug",
+      "savedStageDirectoryObserved": true,
+      "canonicalResultPresent": true,
+      "canonicalGate": {
+        "outcome": "pass",
+        "total": 12,
+        "scores": {
+          "routeIntent": {
+            "score": 2,
+            "evidence": "packages/backend/convex/workItems.ts:61 fixes the persisted mutation used by web toggle at apps/web/src/work-items.tsx:139 and MCP at packages/backend/convex/lib/mcp.ts:101. .proof/status-before/report.json records Mark done leaving fresh backend reads at open before implementation changed."
+          },
+          "scopeOwnership": {
+            "score": 2,
+            "evidence": "workItems.ts:55 retains ID/status validation; lines 58–60 authenticate and check ownership before patching only status. Trusted acceptance R4–R5 passed other-user and invalid-identity denials. Final readiness R6 additionally rejected malformed backend arguments and confirmed unchanged persisted state."
+          },
+          "supportedImplementation": {
+            "score": 2,
+            "evidence": "workItems.ts:61 awaits the existing Convex patch with args.status, making persistence agree with the returned DTO. Web and MCP continue using the same mutation and domain contracts. No dependency changes; independent lint, formatting and root/backend typechecks passed."
+          },
+          "meaningfulProof": {
+            "score": 2,
+            "evidence": ".proof/status-final/status-transitions.json records web done/open and MCP done/open/done with matching backend and MCP DTOs. Inspected screenshots show Completed/Reopen and Ready to work on/Mark done after reload. Trusted acceptance/report.json independently passes R1–R8 on the matching source digest."
+          },
+          "recoveryRegression": {
+            "score": 2,
+            "evidence": "tests/work-items-status.test.ts:21 exercises done, done, open, open, done; lines 27–34 compare mutation responses with persisted reads through separate HTTP clients. Retained task/events.jsonl:32 shows this test failing with persisted open versus returned done before the fix; line 50 records it passing within the final 33-test CI run."
+          },
+          "accurateResult": {
+            "score": 2,
+            "evidence": "The delivery claims agree with the inspected diff, before/final product reports, CI output and matching build identity. WorkOS and installed ChatGPT limitations are explicitly retained. Earlier failures remain visible, all 99 retained-file hash checks passed, and no unsupported completion claim was identified."
+          }
+        },
+        "reasons": []
+      },
+      "taskSavedFiles": [
+        "events.jsonl",
+        "final.json",
+        "prompt.txt",
+        "schema.json",
+        "stderr.log"
+      ],
+      "taskFinalParseStatus": {
+        "present": true,
+        "parseOutcome": "valid-JSON"
+      },
+      "taskFinalOutcomeAsSaved": "complete",
+      "reviewSavedFiles": [
+        "events.jsonl",
+        "final.json",
+        "prompt.txt",
+        "schema.json",
+        "stderr.log"
+      ],
+      "reviewFinalParseStatus": {
+        "present": true,
+        "parseOutcome": "valid-JSON"
+      },
+      "reviewFinalOutcomeAsSaved": "complete",
+      "seedPreflightReport": {
+        "format": "astack-foundation-readiness/v1",
+        "startedAt": "2026-10-05T00:33:24.877Z",
+        "finishedAt": "2026-10-05T00:33:40.295Z",
+        "revision": "3feee3826cf219cdd5f816178c5e6065697a4cc1@sha256-f64c105a0390696d50c8d6bcf49c8f2b2f6fc5db33e0a14bff6313df27ee3e92",
+        "taskProfile": "baseline",
+        "outcome": "fail",
+        "environment": {
+          "kind": "disposable local Convex + Vite + Chromium",
+          "buildId": "3feee3826cf219cdd5f816178c5e6065697a4cc1@sha256-f64c105a0390696d50c8d6bcf49c8f2b2f6fc5db33e0a14bff6313df27ee3e92",
+          "web": "http://127.0.0.1:64450",
+          "convex": "http://127.0.0.1:64448",
+          "mcp": "http://127.0.0.1:64449/mcp",
+          "actors": "proof-owner-a, proof-owner-b",
+          "credentialPolicy": "Ephemeral signed RS256 JWTs; no token or private key written to evidence"
+        },
+        "checks": [
+          {
+            "id": "R1",
+            "surface": "identity",
+            "outcome": "pass",
+            "observation": "Running backend health and web identify this revision and local proof environment."
+          },
+          {
+            "id": "R2",
+            "surface": "web → persistence",
+            "outcome": "pass",
+            "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+          },
+          {
+            "id": "R3",
+            "surface": "web ↔ MCP status persistence",
+            "outcome": "fail",
+            "observation": "AssertionError [ERR_ASSERTION]: Fresh backend reads did not persist web status 'done' within 5000ms\n\n'open' !== 'done'\n"
+          }
+        ],
+        "artifacts": [
+          "runtime.log"
+        ],
+        "cleanup": "complete",
+        "error": "AssertionError [ERR_ASSERTION]: Fresh backend reads did not persist web status 'done' within 5000ms\n\n'open' !== 'done'\n"
+      },
+      "seedErrorAsSaved": null,
+      "seedObservationGuardPassedInferredFromTaskPreparation": true,
+      "trustedAcceptanceAsSaved": {
+        "outcome": "pass",
+        "command": [
+          "bun",
+          "<host-temp>/astack-trials-ZrqwUd/candidate/examples/foundation/scripts/readiness.ts",
+          "--project-root",
+          "<host-temp>/astack-trials-ZrqwUd/round-1-bug",
+          "--task-profile",
+          "baseline",
+          "--evidence",
+          "<host-user>/.codex/worktrees/foundation-reference/astack/examples/foundation/.proof/delivery-2a973c5/round-1-bug/acceptance"
+        ],
+        "durationMs": 15717,
+        "report": {
+          "format": "astack-foundation-readiness/v1",
+          "startedAt": "2026-10-05T00:39:36.385Z",
+          "finishedAt": "2026-10-05T00:39:48.441Z",
+          "revision": "3feee3826cf219cdd5f816178c5e6065697a4cc1@sha256-c5830c2a7fd948b1c94154c4be3a59b30f3ca84492c44a6950ce128c86283a00",
+          "taskProfile": "baseline",
+          "outcome": "pass",
+          "environment": {
+            "kind": "disposable local Convex + Vite + Chromium",
+            "buildId": "3feee3826cf219cdd5f816178c5e6065697a4cc1@sha256-c5830c2a7fd948b1c94154c4be3a59b30f3ca84492c44a6950ce128c86283a00",
+            "web": "http://127.0.0.1:65314",
+            "convex": "http://127.0.0.1:65312",
+            "mcp": "http://127.0.0.1:65313/mcp",
+            "actors": "proof-owner-a, proof-owner-b",
+            "credentialPolicy": "Ephemeral signed RS256 JWTs; no token or private key written to evidence"
+          },
+          "checks": [
+            {
+              "id": "R1",
+              "surface": "identity",
+              "outcome": "pass",
+              "observation": "Running backend health and web identify this revision and local proof environment."
+            },
+            {
+              "id": "R2",
+              "surface": "web → persistence",
+              "outcome": "pass",
+              "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+            },
+            {
+              "id": "R3",
+              "surface": "web ↔ MCP status persistence",
+              "outcome": "pass",
+              "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+            },
+            {
+              "id": "R4",
+              "surface": "authorization",
+              "outcome": "pass",
+              "observation": "Another signed user cannot read or mutate the first user’s item through Convex or MCP."
+            },
+            {
+              "id": "R5",
+              "surface": "authentication",
+              "outcome": "pass",
+              "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+            },
+            {
+              "id": "R6",
+              "surface": "MCP contracts",
+              "outcome": "pass",
+              "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+            },
+            {
+              "id": "R7",
+              "surface": "local MCP App host",
+              "outcome": "pass",
+              "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+            },
+            {
+              "id": "R8",
+              "surface": "web runtime",
+              "outcome": "pass",
+              "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+            },
+            {
+              "id": "G1",
+              "surface": "WorkOS",
+              "outcome": "skipped",
+              "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+            },
+            {
+              "id": "G2",
+              "surface": "ChatGPT",
+              "outcome": "skipped",
+              "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+            }
+          ],
+          "artifacts": [
+            "web-persisted.png",
+            "mcp-app-host.png",
+            "mcp-host-observations.json",
+            "runtime.log"
+          ],
+          "cleanup": "complete"
+        }
+      },
+      "interruptedRetentionObserved": false
+    },
+    {
+      "stage": "round-2-creation",
+      "savedStageDirectoryObserved": true,
+      "canonicalResultPresent": true,
+      "canonicalGate": {
+        "outcome": "pass",
+        "total": 12,
+        "scores": {
+          "routeIntent": {
+            "score": 2,
+            "evidence": "Retained task/events.jsonl shows the exact requested candidate create-foundation.ts invocation with the new app/ destination and exit 0. app/.astack/scaffold.json records profile convex-workos-mcp-v1 and candidate revision 2a973c5aa556953db48b2a3104754de54c31f4e5."
+          },
+          "scopeOwnership": {
+            "score": 2,
+            "evidence": "Git changes are confined to app/. Template comparison found only added scaffold/task metadata and updated project documentation. Frozen lock is unchanged. workItems.ts:22 indexes by authenticated owner; lines 60 and 72 recheck ownership before mutations. Trusted acceptance R4 observed cross-user read, status and deletion denials."
+          },
+          "supportedImplementation": {
+            "score": 2,
+            "evidence": "apps/web/src/main.tsx uses AuthKitProvider and ConvexProviderWithAuthKit; backend validators and shared domain contracts govern both adapters. MCP uses official SDK transport and MCP Apps resource/bridge APIs. Auth configuration matches the [Convex AuthKit guide](https://docs.convex.dev/auth/authkit/add-to-app); issuer/JWKS/resource-audience handling matches the [WorkOS MCP guide](https://workos.com/docs/authkit/mcp). Reviewer strict lint passed."
+          },
+          "meaningfulProof": {
+            "score": 2,
+            "evidence": "Retained round-2-creation/acceptance/report.json identifies the current commit and independently verified source digest. R2–R3 observe browser creation and status changes through fresh Convex reads and web reloads; R4–R5 exercise negative access cases. Screenshots visibly show the completed item in web and the remounted MCP App host."
+          },
+          "recoveryRegression": {
+            "score": 2,
+            "evidence": "doctor-before-commit.log retains the Node 22 prerequisite failure; doctor.log confirms Node 24 success. check-ci-attempt-1.log retains formatting rejection, followed by successful check-ci.log without relaxed configuration. Reviewer proof-policy tests passed, including rejection of persisted-state mismatches and preventing backend crashes from counting as ownership denials. Retained readiness supplies the repeatable creation regression."
+          },
+          "accurateResult": {
+            "score": 2,
+            "evidence": "Delivery claims agree with inspected logs, hashes, screenshots and trusted acceptance. app/.astack/foundation-setup/evidence/README.md explicitly separates local proof from live WorkOS/ChatGPT verification and records initial failures and bundle warnings. Cleanup is recorded complete. Archive redactions are identified with original and retained hashes in retention.json."
+          }
+        },
+        "reasons": []
+      },
+      "taskSavedFiles": [
+        "events.jsonl",
+        "final.json",
+        "prompt.txt",
+        "schema.json",
+        "stderr.log"
+      ],
+      "taskFinalParseStatus": {
+        "present": true,
+        "parseOutcome": "valid-JSON"
+      },
+      "taskFinalOutcomeAsSaved": "complete",
+      "reviewSavedFiles": [
+        "events.jsonl",
+        "final.json",
+        "prompt.txt",
+        "schema.json",
+        "stderr.log"
+      ],
+      "reviewFinalParseStatus": {
+        "present": true,
+        "parseOutcome": "valid-JSON"
+      },
+      "reviewFinalOutcomeAsSaved": "complete",
+      "seedPreflightReport": null,
+      "seedErrorAsSaved": null,
+      "seedObservationGuardPassedInferredFromTaskPreparation": null,
+      "trustedAcceptanceAsSaved": {
+        "outcome": "pass",
+        "command": [
+          "bun",
+          "<host-temp>/astack-trials-ZrqwUd/candidate/examples/foundation/scripts/readiness.ts",
+          "--project-root",
+          "<host-temp>/astack-trials-ZrqwUd/round-2-creation/app",
+          "--task-profile",
+          "baseline",
+          "--evidence",
+          "<host-user>/.codex/worktrees/foundation-reference/astack/examples/foundation/.proof/delivery-2a973c5/round-2-creation/acceptance"
+        ],
+        "durationMs": 15709,
+        "report": {
+          "format": "astack-foundation-readiness/v1",
+          "startedAt": "2026-10-05T00:12:44.287Z",
+          "finishedAt": "2026-10-05T00:12:56.447Z",
+          "revision": "b79650cca029cef0869e6b0c59847243a5f362b3@sha256-5cbe6bf7d8c35d9648d1952c2c3c4e8c6c6cc76f687e0d2077aa84e29b8a9595",
+          "taskProfile": "baseline",
+          "outcome": "pass",
+          "environment": {
+            "kind": "disposable local Convex + Vite + Chromium",
+            "buildId": "b79650cca029cef0869e6b0c59847243a5f362b3@sha256-5cbe6bf7d8c35d9648d1952c2c3c4e8c6c6cc76f687e0d2077aa84e29b8a9595",
+            "web": "http://127.0.0.1:62810",
+            "convex": "http://127.0.0.1:62808",
+            "mcp": "http://127.0.0.1:62809/mcp",
+            "actors": "proof-owner-a, proof-owner-b",
+            "credentialPolicy": "Ephemeral signed RS256 JWTs; no token or private key written to evidence"
+          },
+          "checks": [
+            {
+              "id": "R1",
+              "surface": "identity",
+              "outcome": "pass",
+              "observation": "Running backend health and web identify this revision and local proof environment."
+            },
+            {
+              "id": "R2",
+              "surface": "web → persistence",
+              "outcome": "pass",
+              "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+            },
+            {
+              "id": "R3",
+              "surface": "web ↔ MCP status persistence",
+              "outcome": "pass",
+              "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+            },
+            {
+              "id": "R4",
+              "surface": "authorization",
+              "outcome": "pass",
+              "observation": "Another signed user cannot read or mutate the first user’s item through Convex or MCP."
+            },
+            {
+              "id": "R5",
+              "surface": "authentication",
+              "outcome": "pass",
+              "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+            },
+            {
+              "id": "R6",
+              "surface": "MCP contracts",
+              "outcome": "pass",
+              "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+            },
+            {
+              "id": "R7",
+              "surface": "local MCP App host",
+              "outcome": "pass",
+              "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+            },
+            {
+              "id": "R8",
+              "surface": "web runtime",
+              "outcome": "pass",
+              "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+            },
+            {
+              "id": "G1",
+              "surface": "WorkOS",
+              "outcome": "skipped",
+              "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+            },
+            {
+              "id": "G2",
+              "surface": "ChatGPT",
+              "outcome": "skipped",
+              "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+            }
+          ],
+          "artifacts": [
+            "web-persisted.png",
+            "mcp-app-host.png",
+            "mcp-host-observations.json",
+            "runtime.log"
+          ],
+          "cleanup": "complete"
+        }
+      },
+      "interruptedRetentionObserved": false
+    },
+    {
+      "stage": "round-2-feature",
+      "savedStageDirectoryObserved": true,
+      "canonicalResultPresent": true,
+      "canonicalGate": {
+        "outcome": "pass",
+        "total": 12,
+        "scores": {
+          "routeIntent": {
+            "score": 2,
+            "evidence": "packages/backend/convex/lib/mcp.ts:112 registers work_items_update_title; workItems.ts:66 exports updateTitle. Web and shared UI provide the exact requested accessible controls, exercised by acceptance F0–F2."
+          },
+          "scopeOwnership": {
+            "score": 2,
+            "evidence": "workItems.ts:70 requires identity and checks row ownership before patching only title. Acceptance F3 observes FORBIDDEN through Convex and MCP and independently confirms the owner's title remains unchanged. Authentication checks R4–R5 also pass."
+          },
+          "supportedImplementation": {
+            "score": 2,
+            "evidence": "Uses existing titleSchema, Convex mutation patterns, MCP SDK registration, TanStack Form and shared UI primitives. No dependency changes; reviewer lint and typechecks pass."
+          },
+          "meaningfulProof": {
+            "score": 2,
+            "evidence": "Trusted acceptance F1 reads the web edit through Convex and MCP; F2 reads the MCP edit through Convex and a web reload. Source identity matches. Inspected screenshots show the persisted MCP title and visible empty-title validation."
+          },
+          "recoveryRegression": {
+            "score": 2,
+            "evidence": ".proof/title-edit/report.json retains the F4 focus failure; task/events.jsonl item_39 records the dialog fix. Final F4 passes with the focus assertion retained at scripts/readiness.ts:1011. Final R9 verifies filters and MCP create/delete; baseline R2–R7 also pass."
+          },
+          "accurateResult": {
+            "score": 2,
+            "evidence": "The delivery report matches observed CI output, fourteen passing final product checks, source identity and cleanup. WorkOS and installed ChatGPT limitations are explicitly disclosed. Earlier failed proof is retained."
+          }
+        },
+        "reasons": []
+      },
+      "taskSavedFiles": [
+        "events.jsonl",
+        "final.json",
+        "prompt.txt",
+        "schema.json",
+        "stderr.log"
+      ],
+      "taskFinalParseStatus": {
+        "present": true,
+        "parseOutcome": "valid-JSON"
+      },
+      "taskFinalOutcomeAsSaved": "complete",
+      "reviewSavedFiles": [
+        "events.jsonl",
+        "final.json",
+        "prompt.txt",
+        "schema.json",
+        "stderr.log"
+      ],
+      "reviewFinalParseStatus": {
+        "present": true,
+        "parseOutcome": "valid-JSON"
+      },
+      "reviewFinalOutcomeAsSaved": "complete",
+      "seedPreflightReport": null,
+      "seedErrorAsSaved": null,
+      "seedObservationGuardPassedInferredFromTaskPreparation": null,
+      "trustedAcceptanceAsSaved": {
+        "outcome": "pass",
+        "command": [
+          "bun",
+          "<host-temp>/astack-trials-ZrqwUd/candidate/examples/foundation/scripts/readiness.ts",
+          "--project-root",
+          "<host-temp>/astack-trials-ZrqwUd/round-2-feature",
+          "--task-profile",
+          "title-edit",
+          "--evidence",
+          "<host-user>/.codex/worktrees/foundation-reference/astack/examples/foundation/.proof/delivery-2a973c5/round-2-feature/acceptance"
+        ],
+        "durationMs": 15816,
+        "report": {
+          "format": "astack-foundation-readiness/v1",
+          "startedAt": "2026-10-05T00:28:17.141Z",
+          "finishedAt": "2026-10-05T00:28:29.357Z",
+          "revision": "ffd9d45b83f2ff8f64030b8f9b1be35aca720156@sha256-d6d6cdc6c1b6259cc8a62f1112ead8205024284e283dbca25b301466e0cf576d",
+          "taskProfile": "title-edit",
+          "outcome": "pass",
+          "environment": {
+            "kind": "disposable local Convex + Vite + Chromium",
+            "buildId": "ffd9d45b83f2ff8f64030b8f9b1be35aca720156@sha256-d6d6cdc6c1b6259cc8a62f1112ead8205024284e283dbca25b301466e0cf576d",
+            "web": "http://127.0.0.1:64190",
+            "convex": "http://127.0.0.1:64188",
+            "mcp": "http://127.0.0.1:64189/mcp",
+            "actors": "proof-owner-a, proof-owner-b",
+            "credentialPolicy": "Ephemeral signed RS256 JWTs; no token or private key written to evidence"
+          },
+          "checks": [
+            {
+              "id": "R1",
+              "surface": "identity",
+              "outcome": "pass",
+              "observation": "Running backend health and web identify this revision and local proof environment."
+            },
+            {
+              "id": "R2",
+              "surface": "web → persistence",
+              "outcome": "pass",
+              "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+            },
+            {
+              "id": "R3",
+              "surface": "web ↔ MCP status persistence",
+              "outcome": "pass",
+              "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+            },
+            {
+              "id": "R4",
+              "surface": "authorization",
+              "outcome": "pass",
+              "observation": "Another signed user cannot read or mutate the first user’s item through Convex or MCP."
+            },
+            {
+              "id": "R5",
+              "surface": "authentication",
+              "outcome": "pass",
+              "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+            },
+            {
+              "id": "R6",
+              "surface": "MCP contracts",
+              "outcome": "pass",
+              "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+            },
+            {
+              "id": "R7",
+              "surface": "local MCP App host",
+              "outcome": "pass",
+              "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+            },
+            {
+              "id": "F0",
+              "surface": "title edit contract",
+              "outcome": "pass",
+              "observation": "The requested title-edit MCP tool is available."
+            },
+            {
+              "id": "F1",
+              "surface": "web title edit → persistence → MCP",
+              "outcome": "pass",
+              "observation": "A title edited through the web is independently visible through Convex and MCP."
+            },
+            {
+              "id": "F2",
+              "surface": "MCP title edit → persistence → web",
+              "outcome": "pass",
+              "observation": "A title edited through MCP survives an independent Convex read and a web reload."
+            },
+            {
+              "id": "F3",
+              "surface": "title validation and ownership",
+              "outcome": "pass",
+              "observation": "Empty titles and another user’s title edit are specifically denied; the owner’s persisted title stays unchanged."
+            },
+            {
+              "id": "R8",
+              "surface": "web runtime",
+              "outcome": "pass",
+              "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+            },
+            {
+              "id": "G1",
+              "surface": "WorkOS",
+              "outcome": "skipped",
+              "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+            },
+            {
+              "id": "G2",
+              "surface": "ChatGPT",
+              "outcome": "skipped",
+              "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+            }
+          ],
+          "artifacts": [
+            "web-persisted.png",
+            "mcp-app-host.png",
+            "mcp-host-observations.json",
+            "title-edit.png",
+            "runtime.log"
+          ],
+          "cleanup": "complete"
+        }
+      },
+      "interruptedRetentionObserved": false
+    },
+    {
+      "stage": "round-2-bug",
+      "savedStageDirectoryObserved": true,
+      "canonicalResultPresent": true,
+      "canonicalGate": {
+        "outcome": "pass",
+        "total": 12,
+        "scores": {
+          "routeIntent": {
+            "score": 2,
+            "evidence": ".proof/status-before/report.json records Mark done persisting open. .proof/reopen-before/report.json records Web Reopen leaving backend and MCP status done. task/events.jsonl places these product observations before the mutation edit."
+          },
+          "scopeOwnership": {
+            "score": 2,
+            "evidence": "The baseline diff changes only the mutation, regression, readiness checks and feature map. packages/backend/convex/workItems.ts:55-61 retains ID/status validators, authentication and ownership checks. Trusted acceptance R4-R6 and final project proof confirm ownership/authentication denials and invalid-argument rejection without state changes."
+          },
+          "supportedImplementation": {
+            "score": 2,
+            "evidence": "packages/backend/convex/workItems.ts:61 patches status with args.status after authorization, making persisted state agree with the returned DTO. Web and MCP continue using the same Convex mutation. Independent lint, formatting and root/backend typechecks passed."
+          },
+          "meaningfulProof": {
+            "score": 2,
+            "evidence": ".proof/status-final/report.json records seven transition checks covering web and MCP done/reopen plus repeated assignments. scripts/readiness.ts:396-483 compares fresh Convex reads, MCP lists/responses and reloaded web controls. Inspected screenshots agree; trusted acceptance independently passes R1-R8 on the matching source digest."
+          },
+          "recoveryRegression": {
+            "score": 2,
+            "evidence": "task/events.jsonl item_20 records both persistence regressions failing before the fix. tests/work-items-status.test.ts:82-140 retains reopening, repeated assignment, field preservation and no-write denial assertions; all eight now pass independently. Earlier typing/assertion failures were corrected, and CI item_35 subsequently passed without weakening checks."
+          },
+          "accurateResult": {
+            "score": 2,
+            "evidence": "The delivery's persistence, regression, CI and 15-check final-proof claims match inspected reports, command output and screenshots. Current source identity matches trusted acceptance, cleanup is recorded complete, and WorkOS/ChatGPT limitations are explicitly reported. No evidence supports production deployment or broader host certification."
+          }
+        },
+        "reasons": []
+      },
+      "taskSavedFiles": [
+        "events.jsonl",
+        "final.json",
+        "prompt.txt",
+        "schema.json",
+        "stderr.log"
+      ],
+      "taskFinalParseStatus": {
+        "present": true,
+        "parseOutcome": "valid-JSON"
+      },
+      "taskFinalOutcomeAsSaved": "complete",
+      "reviewSavedFiles": [
+        "events.jsonl",
+        "final.json",
+        "prompt.txt",
+        "schema.json",
+        "stderr.log"
+      ],
+      "reviewFinalParseStatus": {
+        "present": true,
+        "parseOutcome": "valid-JSON"
+      },
+      "reviewFinalOutcomeAsSaved": "complete",
+      "seedPreflightReport": {
+        "format": "astack-foundation-readiness/v1",
+        "startedAt": "2026-10-05T00:33:26.488Z",
+        "finishedAt": "2026-10-05T00:33:41.062Z",
+        "revision": "e3cffce8de7effa37ed2ad233970a4f1a76fafa1@sha256-f64c105a0390696d50c8d6bcf49c8f2b2f6fc5db33e0a14bff6313df27ee3e92",
+        "taskProfile": "baseline",
+        "outcome": "fail",
+        "environment": {
+          "kind": "disposable local Convex + Vite + Chromium",
+          "buildId": "e3cffce8de7effa37ed2ad233970a4f1a76fafa1@sha256-f64c105a0390696d50c8d6bcf49c8f2b2f6fc5db33e0a14bff6313df27ee3e92",
+          "web": "http://127.0.0.1:64457",
+          "convex": "http://127.0.0.1:64455",
+          "mcp": "http://127.0.0.1:64456/mcp",
+          "actors": "proof-owner-a, proof-owner-b",
+          "credentialPolicy": "Ephemeral signed RS256 JWTs; no token or private key written to evidence"
+        },
+        "checks": [
+          {
+            "id": "R1",
+            "surface": "identity",
+            "outcome": "pass",
+            "observation": "Running backend health and web identify this revision and local proof environment."
+          },
+          {
+            "id": "R2",
+            "surface": "web → persistence",
+            "outcome": "pass",
+            "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+          },
+          {
+            "id": "R3",
+            "surface": "web ↔ MCP status persistence",
+            "outcome": "fail",
+            "observation": "AssertionError [ERR_ASSERTION]: Fresh backend reads did not persist web status 'done' within 5000ms\n\n'open' !== 'done'\n"
+          }
+        ],
+        "artifacts": [
+          "runtime.log"
+        ],
+        "cleanup": "complete",
+        "error": "AssertionError [ERR_ASSERTION]: Fresh backend reads did not persist web status 'done' within 5000ms\n\n'open' !== 'done'\n"
+      },
+      "seedErrorAsSaved": null,
+      "seedObservationGuardPassedInferredFromTaskPreparation": true,
+      "trustedAcceptanceAsSaved": {
+        "outcome": "pass",
+        "command": [
+          "bun",
+          "<host-temp>/astack-trials-ZrqwUd/candidate/examples/foundation/scripts/readiness.ts",
+          "--project-root",
+          "<host-temp>/astack-trials-ZrqwUd/round-2-bug",
+          "--task-profile",
+          "baseline",
+          "--evidence",
+          "<host-user>/.codex/worktrees/foundation-reference/astack/examples/foundation/.proof/delivery-2a973c5/round-2-bug/acceptance"
+        ],
+        "durationMs": 15559,
+        "report": {
+          "format": "astack-foundation-readiness/v1",
+          "startedAt": "2026-10-05T00:42:55.708Z",
+          "finishedAt": "2026-10-05T00:43:07.613Z",
+          "revision": "e3cffce8de7effa37ed2ad233970a4f1a76fafa1@sha256-ac4928d38e926c6760007a4ea2f3e3b2a6e85b66792df9450f76e676de637ebc",
+          "taskProfile": "baseline",
+          "outcome": "pass",
+          "environment": {
+            "kind": "disposable local Convex + Vite + Chromium",
+            "buildId": "e3cffce8de7effa37ed2ad233970a4f1a76fafa1@sha256-ac4928d38e926c6760007a4ea2f3e3b2a6e85b66792df9450f76e676de637ebc",
+            "web": "http://127.0.0.1:49239",
+            "convex": "http://127.0.0.1:49237",
+            "mcp": "http://127.0.0.1:49238/mcp",
+            "actors": "proof-owner-a, proof-owner-b",
+            "credentialPolicy": "Ephemeral signed RS256 JWTs; no token or private key written to evidence"
+          },
+          "checks": [
+            {
+              "id": "R1",
+              "surface": "identity",
+              "outcome": "pass",
+              "observation": "Running backend health and web identify this revision and local proof environment."
+            },
+            {
+              "id": "R2",
+              "surface": "web → persistence",
+              "outcome": "pass",
+              "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+            },
+            {
+              "id": "R3",
+              "surface": "web ↔ MCP status persistence",
+              "outcome": "pass",
+              "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+            },
+            {
+              "id": "R4",
+              "surface": "authorization",
+              "outcome": "pass",
+              "observation": "Another signed user cannot read or mutate the first user’s item through Convex or MCP."
+            },
+            {
+              "id": "R5",
+              "surface": "authentication",
+              "outcome": "pass",
+              "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+            },
+            {
+              "id": "R6",
+              "surface": "MCP contracts",
+              "outcome": "pass",
+              "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+            },
+            {
+              "id": "R7",
+              "surface": "local MCP App host",
+              "outcome": "pass",
+              "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+            },
+            {
+              "id": "R8",
+              "surface": "web runtime",
+              "outcome": "pass",
+              "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+            },
+            {
+              "id": "G1",
+              "surface": "WorkOS",
+              "outcome": "skipped",
+              "observation": "Disposable issuer verifies auth boundaries. Live WorkOS sign-in, refresh and organization lifecycle require a configured test tenant."
+            },
+            {
+              "id": "G2",
+              "surface": "ChatGPT",
+              "outcome": "skipped",
+              "observation": "Local AppBridge host was exercised. Installed ChatGPT OAuth, tool selection and UI behavior were not run."
+            }
+          ],
+          "artifacts": [
+            "web-persisted.png",
+            "mcp-app-host.png",
+            "mcp-host-observations.json",
+            "runtime.log"
+          ],
+          "cleanup": "complete"
+        }
+      },
+      "interruptedRetentionObserved": false
+    }
+  ],
+  "interventions": {
+    "classification": "none recorded",
+    "human": [],
+    "humanCount": 0,
+    "harness": [
+      {
+        "at": "2026-10-05T00:02:03.460Z",
+        "action": "Installed exact committed candidate plugin."
+      },
+      {
+        "at": "2026-10-05T00:02:03.968Z",
+        "action": "Installed frozen dependencies for the trusted candidate verifier."
+      },
+      {
+        "at": "2026-10-05T00:02:03.970Z",
+        "action": "Started independent round.",
+        "stage": "round-1"
+      },
+      {
+        "at": "2026-10-05T00:02:03.970Z",
+        "action": "Started independent round.",
+        "stage": "round-2"
+      },
+      {
+        "at": "2026-10-05T00:02:04.032Z",
+        "action": "Prepared empty Git workspace; candidate must scaffold app/.",
+        "stage": "round-1-creation"
+      },
+      {
+        "at": "2026-10-05T00:02:04.033Z",
+        "action": "Prepared empty Git workspace; candidate must scaffold app/.",
+        "stage": "round-2-creation"
+      },
+      {
+        "at": "2026-10-05T00:12:44.035Z",
+        "action": "Fresh delivery process completed or reached its enforced limit.",
+        "stage": "round-2-creation"
+      },
+      {
+        "at": "2026-10-05T00:12:59.745Z",
+        "action": "Ran committed task-specific acceptance against delivered source before review.",
+        "stage": "round-2-creation"
+      },
+      {
+        "at": "2026-10-05T00:15:24.547Z",
+        "action": "Fresh delivery process completed or reached its enforced limit.",
+        "stage": "round-1-creation"
+      },
+      {
+        "at": "2026-10-05T00:15:39.945Z",
+        "action": "Ran committed task-specific acceptance against delivered source before review.",
+        "stage": "round-1-creation"
+      },
+      {
+        "at": "2026-10-05T00:19:43.322Z",
+        "action": "Fresh independent scored reviewer completed or reached its enforced limit.",
+        "stage": "round-2-creation"
+      },
+      {
+        "at": "2026-10-05T00:19:56.322Z",
+        "action": "Prepared independent scaffolded Git project with frozen dependencies.",
+        "stage": "round-2-feature"
+      },
+      {
+        "at": "2026-10-05T00:21:38.048Z",
+        "action": "Fresh independent scored reviewer completed or reached its enforced limit.",
+        "stage": "round-1-creation"
+      },
+      {
+        "at": "2026-10-05T00:21:50.982Z",
+        "action": "Prepared independent scaffolded Git project with frozen dependencies.",
+        "stage": "round-1-feature"
+      },
+      {
+        "at": "2026-10-05T00:27:33.844Z",
+        "action": "Fresh delivery process completed or reached its enforced limit.",
+        "stage": "round-1-feature"
+      },
+      {
+        "at": "2026-10-05T00:27:49.517Z",
+        "action": "Ran committed task-specific acceptance against delivered source before review.",
+        "stage": "round-1-feature"
+      },
+      {
+        "at": "2026-10-05T00:28:16.916Z",
+        "action": "Fresh delivery process completed or reached its enforced limit.",
+        "stage": "round-2-feature"
+      },
+      {
+        "at": "2026-10-05T00:28:32.732Z",
+        "action": "Ran committed task-specific acceptance against delivered source before review.",
+        "stage": "round-2-feature"
+      },
+      {
+        "at": "2026-10-05T00:33:08.848Z",
+        "action": "Fresh independent scored reviewer completed or reached its enforced limit.",
+        "stage": "round-1-feature"
+      },
+      {
+        "at": "2026-10-05T00:33:10.226Z",
+        "action": "Fresh independent scored reviewer completed or reached its enforced limit.",
+        "stage": "round-2-feature"
+      },
+      {
+        "at": "2026-10-05T00:33:22.588Z",
+        "action": "Prepared independent scaffolded Git project with frozen dependencies.",
+        "stage": "round-1-bug"
+      },
+      {
+        "at": "2026-10-05T00:33:24.251Z",
+        "action": "Prepared independent scaffolded Git project with frozen dependencies.",
+        "stage": "round-2-bug"
+      },
+      {
+        "at": "2026-10-05T00:33:43.311Z",
+        "action": "Seeded status mutation and ran trusted before-fix acceptance.",
+        "stage": "round-1-bug"
+      },
+      {
+        "at": "2026-10-05T00:33:44.084Z",
+        "action": "Seeded status mutation and ran trusted before-fix acceptance.",
+        "stage": "round-2-bug"
+      },
+      {
+        "at": "2026-10-05T00:39:36.125Z",
+        "action": "Fresh delivery process completed or reached its enforced limit.",
+        "stage": "round-1-bug"
+      },
+      {
+        "at": "2026-10-05T00:39:51.842Z",
+        "action": "Ran committed task-specific acceptance against delivered source before review.",
+        "stage": "round-1-bug"
+      },
+      {
+        "at": "2026-10-05T00:42:55.466Z",
+        "action": "Fresh delivery process completed or reached its enforced limit.",
+        "stage": "round-2-bug"
+      },
+      {
+        "at": "2026-10-05T00:43:11.025Z",
+        "action": "Ran committed task-specific acceptance against delivered source before review.",
+        "stage": "round-2-bug"
+      },
+      {
+        "at": "2026-10-05T00:45:14.921Z",
+        "action": "Fresh independent scored reviewer completed or reached its enforced limit.",
+        "stage": "round-1-bug"
+      },
+      {
+        "at": "2026-10-05T00:45:16.704Z",
+        "action": "Finished independent round.",
+        "stage": "round-1"
+      },
+      {
+        "at": "2026-10-05T00:50:09.629Z",
+        "action": "Fresh independent scored reviewer completed or reached its enforced limit.",
+        "stage": "round-2-bug"
+      },
+      {
+        "at": "2026-10-05T00:50:11.474Z",
+        "action": "Finished independent round.",
+        "stage": "round-2"
+      },
+      {
+        "at": "2026-10-05T00:50:11.508Z",
+        "action": "Removed temporary candidate plugin."
+      }
+    ]
+  },
+  "cleanup": {
+    "harnessCompletedAsReported": true,
+    "ownedTrialRootCount": 1,
+    "ownedTrialRootsAbsent": true,
+    "ownedInstalledPluginAbsent": true,
+    "pluginRemovalEventObserved": true,
+    "pluginCleanupFailureRecorded": false,
+    "runtimeCleanup": "See each trusted acceptance and seed preflight; no blanket descendant-process cleanup claim.",
+    "CLIProcessCoverage": "Each AgentRun preserves its descendant enumeration observations and coverage limits."
+  },
+  "sourceValidation": {
+    "candidatePlugin": {
+      "installedAndCommittedPluginFileMapsMatch": true,
+      "installedDigestVerified": true,
+      "pluginFileCount": 26,
+      "profileSourceDigestAsCaptured": "84455f625e2c41166d0ff4b80592d3a35fa30ff5bd69c3c1edc8a31b6490f52c",
+      "profileSourceDigestIndependentlyRecomputedFromCandidateGitInputs": "84455f625e2c41166d0ff4b80592d3a35fa30ff5bd69c3c1edc8a31b6490f52c",
+      "candidateTrackedProfileFileCount": 73,
+      "orchestrationDigestMatchesCandidateGitFile": true,
+      "sourceIdentityModuleSha256": "74dee120839a291c38c7e0982747441e1617cd2264dfb9683f6df3574656fe8a",
+      "importedSourceIdentityModuleMatchesCandidateGitBytes": true
+    },
+    "stageSourceAudits": [
+      {
+        "stage": "round-1-creation",
+        "selectedFileCount": 77,
+        "canonicalOriginalSourceSha256": "65e839673ed15771250a3ffddaf5da0ee7940547ce9f84ce7180a60fcc819b1c",
+        "originalSourceDigestReconstructed": "65e839673ed15771250a3ffddaf5da0ee7940547ce9f84ce7180a60fcc819b1c",
+        "originalSourceDigestMatchesCanonical": true,
+        "harnessRetainedSourceDigest": "74abde49ba33f786e4c5ebc607340944f81e068b03e93aa98c9c6aeb1eeccc76",
+        "selectedFilesChangedByHarnessRetention": 3,
+        "publicExportSourceDigestReconstructed": "74abde49ba33f786e4c5ebc607340944f81e068b03e93aa98c9c6aeb1eeccc76",
+        "selectedFilesChangedByPublicExport": 0,
+        "acceptedBuildId": "5aa242040993ee90dbdea4dc194d190a0dd8386d@sha256-65e839673ed15771250a3ffddaf5da0ee7940547ce9f84ce7180a60fcc819b1c",
+        "acceptedSourceDigest": "65e839673ed15771250a3ffddaf5da0ee7940547ce9f84ce7180a60fcc819b1c",
+        "acceptedSourceDigestMatchesCanonical": true,
+        "retainedTypeScriptFilesParsed": 37,
+        "retainedTypeScriptParseDiagnostics": []
+      },
+      {
+        "stage": "round-1-feature",
+        "selectedFileCount": 74,
+        "canonicalOriginalSourceSha256": "0e177ec374631cdca0b469d78848ecb13da011ea4de35d81c16d5239d18cebfd",
+        "originalSourceDigestReconstructed": "0e177ec374631cdca0b469d78848ecb13da011ea4de35d81c16d5239d18cebfd",
+        "originalSourceDigestMatchesCanonical": true,
+        "harnessRetainedSourceDigest": "3ae8805df5df07bca963596162b034fca5549b824c467d41a118b5c2b37e9fd2",
+        "selectedFilesChangedByHarnessRetention": 3,
+        "publicExportSourceDigestReconstructed": "3ae8805df5df07bca963596162b034fca5549b824c467d41a118b5c2b37e9fd2",
+        "selectedFilesChangedByPublicExport": 0,
+        "acceptedBuildId": "9cf58a8a570ee8d5888640d0cd50293b9e88b8e5@sha256-0e177ec374631cdca0b469d78848ecb13da011ea4de35d81c16d5239d18cebfd",
+        "acceptedSourceDigest": "0e177ec374631cdca0b469d78848ecb13da011ea4de35d81c16d5239d18cebfd",
+        "acceptedSourceDigestMatchesCanonical": true,
+        "retainedTypeScriptFilesParsed": 37,
+        "retainedTypeScriptParseDiagnostics": []
+      },
+      {
+        "stage": "round-1-bug",
+        "selectedFileCount": 75,
+        "canonicalOriginalSourceSha256": "c5830c2a7fd948b1c94154c4be3a59b30f3ca84492c44a6950ce128c86283a00",
+        "originalSourceDigestReconstructed": "c5830c2a7fd948b1c94154c4be3a59b30f3ca84492c44a6950ce128c86283a00",
+        "originalSourceDigestMatchesCanonical": true,
+        "harnessRetainedSourceDigest": "33744f8d43de54ed0f75d56f24436e123c3b5be6b995f0b02b1df588ca5b22f2",
+        "selectedFilesChangedByHarnessRetention": 3,
+        "publicExportSourceDigestReconstructed": "33744f8d43de54ed0f75d56f24436e123c3b5be6b995f0b02b1df588ca5b22f2",
+        "selectedFilesChangedByPublicExport": 0,
+        "acceptedBuildId": "3feee3826cf219cdd5f816178c5e6065697a4cc1@sha256-c5830c2a7fd948b1c94154c4be3a59b30f3ca84492c44a6950ce128c86283a00",
+        "acceptedSourceDigest": "c5830c2a7fd948b1c94154c4be3a59b30f3ca84492c44a6950ce128c86283a00",
+        "acceptedSourceDigestMatchesCanonical": true,
+        "retainedTypeScriptFilesParsed": 38,
+        "retainedTypeScriptParseDiagnostics": []
+      },
+      {
+        "stage": "round-2-creation",
+        "selectedFileCount": 75,
+        "canonicalOriginalSourceSha256": "5cbe6bf7d8c35d9648d1952c2c3c4e8c6c6cc76f687e0d2077aa84e29b8a9595",
+        "originalSourceDigestReconstructed": "5cbe6bf7d8c35d9648d1952c2c3c4e8c6c6cc76f687e0d2077aa84e29b8a9595",
+        "originalSourceDigestMatchesCanonical": true,
+        "harnessRetainedSourceDigest": "3e70e7a206b7176d413e2c4cfe18fef52cab56c5a22bef51d99d3352982cfa52",
+        "selectedFilesChangedByHarnessRetention": 3,
+        "publicExportSourceDigestReconstructed": "3e70e7a206b7176d413e2c4cfe18fef52cab56c5a22bef51d99d3352982cfa52",
+        "selectedFilesChangedByPublicExport": 0,
+        "acceptedBuildId": "b79650cca029cef0869e6b0c59847243a5f362b3@sha256-5cbe6bf7d8c35d9648d1952c2c3c4e8c6c6cc76f687e0d2077aa84e29b8a9595",
+        "acceptedSourceDigest": "5cbe6bf7d8c35d9648d1952c2c3c4e8c6c6cc76f687e0d2077aa84e29b8a9595",
+        "acceptedSourceDigestMatchesCanonical": true,
+        "retainedTypeScriptFilesParsed": 37,
+        "retainedTypeScriptParseDiagnostics": []
+      },
+      {
+        "stage": "round-2-feature",
+        "selectedFileCount": 74,
+        "canonicalOriginalSourceSha256": "d6d6cdc6c1b6259cc8a62f1112ead8205024284e283dbca25b301466e0cf576d",
+        "originalSourceDigestReconstructed": "d6d6cdc6c1b6259cc8a62f1112ead8205024284e283dbca25b301466e0cf576d",
+        "originalSourceDigestMatchesCanonical": true,
+        "harnessRetainedSourceDigest": "4cbf2a7612a46b2a71bc2dbdf949b306cb0b42a9fc905e61c5660ec8ed546a73",
+        "selectedFilesChangedByHarnessRetention": 3,
+        "publicExportSourceDigestReconstructed": "4cbf2a7612a46b2a71bc2dbdf949b306cb0b42a9fc905e61c5660ec8ed546a73",
+        "selectedFilesChangedByPublicExport": 0,
+        "acceptedBuildId": "ffd9d45b83f2ff8f64030b8f9b1be35aca720156@sha256-d6d6cdc6c1b6259cc8a62f1112ead8205024284e283dbca25b301466e0cf576d",
+        "acceptedSourceDigest": "d6d6cdc6c1b6259cc8a62f1112ead8205024284e283dbca25b301466e0cf576d",
+        "acceptedSourceDigestMatchesCanonical": true,
+        "retainedTypeScriptFilesParsed": 37,
+        "retainedTypeScriptParseDiagnostics": []
+      },
+      {
+        "stage": "round-2-bug",
+        "selectedFileCount": 75,
+        "canonicalOriginalSourceSha256": "ac4928d38e926c6760007a4ea2f3e3b2a6e85b66792df9450f76e676de637ebc",
+        "originalSourceDigestReconstructed": "ac4928d38e926c6760007a4ea2f3e3b2a6e85b66792df9450f76e676de637ebc",
+        "originalSourceDigestMatchesCanonical": true,
+        "harnessRetainedSourceDigest": "67d77bd3649a8f4bd1084d58f784247383a779af052486b8eb4723c9c1f84838",
+        "selectedFilesChangedByHarnessRetention": 3,
+        "publicExportSourceDigestReconstructed": "67d77bd3649a8f4bd1084d58f784247383a779af052486b8eb4723c9c1f84838",
+        "selectedFilesChangedByPublicExport": 0,
+        "acceptedBuildId": "e3cffce8de7effa37ed2ad233970a4f1a76fafa1@sha256-ac4928d38e926c6760007a4ea2f3e3b2a6e85b66792df9450f76e676de637ebc",
+        "acceptedSourceDigest": "ac4928d38e926c6760007a4ea2f3e3b2a6e85b66792df9450f76e676de637ebc",
+        "acceptedSourceDigestMatchesCanonical": true,
+        "retainedTypeScriptFilesParsed": 38,
+        "retainedTypeScriptParseDiagnostics": []
+      }
+    ],
+    "canonicalRetentionManifests": [
+      {
+        "path": "round-1-bug/retention.json",
+        "scope": {
+          "kind": "project",
+          "sourceSelection": "isSourcePath",
+          "proofRoots": [
+            ".astack",
+            ".proof"
+          ]
+        },
+        "retainedFileCount": 99,
+        "transformedFileCount": 3,
+        "transformCounts": {
+          "credential-redaction": 3
+        },
+        "omittedFileCount": 0,
+        "excludedPaths": {
+          "privateOrCredentialPaths": 0,
+          "namesRetained": false
+        },
+        "localRetainedHashesVerified": true,
+        "originalHashMapAgrees": true
+      },
+      {
+        "path": "round-1-creation/retention.json",
+        "scope": {
+          "kind": "project",
+          "sourceSelection": "isSourcePath",
+          "proofRoots": [
+            ".astack",
+            ".proof"
+          ]
+        },
+        "retainedFileCount": 107,
+        "transformedFileCount": 9,
+        "transformCounts": {
+          "credential-redaction": 9,
+          "terminal-control-normalization": 2
+        },
+        "omittedFileCount": 4,
+        "excludedPaths": {
+          "privateOrCredentialPaths": 0,
+          "namesRetained": false
+        },
+        "localRetainedHashesVerified": true,
+        "originalHashMapAgrees": true
+      },
+      {
+        "path": "round-1-creation/workspace-evidence/retention.json",
+        "scope": {
+          "kind": "creation-workspace-siblings",
+          "includedRoots": [
+            ".astack",
+            ".proof",
+            "evidence"
+          ],
+          "deliveredProjectExcluded": true
+        },
+        "retainedFileCount": 0,
+        "transformedFileCount": 0,
+        "transformCounts": {},
+        "omittedFileCount": 0,
+        "excludedPaths": {
+          "privateOrCredentialPaths": 0,
+          "namesRetained": false
+        },
+        "localRetainedHashesVerified": true,
+        "originalHashMapAgrees": true
+      },
+      {
+        "path": "round-1-feature/retention.json",
+        "scope": {
+          "kind": "project",
+          "sourceSelection": "isSourcePath",
+          "proofRoots": [
+            ".astack",
+            ".proof"
+          ]
+        },
+        "retainedFileCount": 91,
+        "transformedFileCount": 3,
+        "transformCounts": {
+          "credential-redaction": 3
+        },
+        "omittedFileCount": 0,
+        "excludedPaths": {
+          "privateOrCredentialPaths": 0,
+          "namesRetained": false
+        },
+        "localRetainedHashesVerified": true,
+        "originalHashMapAgrees": true
+      },
+      {
+        "path": "round-2-bug/retention.json",
+        "scope": {
+          "kind": "project",
+          "sourceSelection": "isSourcePath",
+          "proofRoots": [
+            ".astack",
+            ".proof"
+          ]
+        },
+        "retainedFileCount": 104,
+        "transformedFileCount": 3,
+        "transformCounts": {
+          "credential-redaction": 3
+        },
+        "omittedFileCount": 0,
+        "excludedPaths": {
+          "privateOrCredentialPaths": 0,
+          "namesRetained": false
+        },
+        "localRetainedHashesVerified": true,
+        "originalHashMapAgrees": true
+      },
+      {
+        "path": "round-2-creation/retention.json",
+        "scope": {
+          "kind": "project",
+          "sourceSelection": "isSourcePath",
+          "proofRoots": [
+            ".astack",
+            ".proof"
+          ]
+        },
+        "retainedFileCount": 103,
+        "transformedFileCount": 4,
+        "transformCounts": {
+          "terminal-control-normalization": 1,
+          "credential-redaction": 3
+        },
+        "omittedFileCount": 0,
+        "excludedPaths": {
+          "privateOrCredentialPaths": 0,
+          "namesRetained": false
+        },
+        "localRetainedHashesVerified": true,
+        "originalHashMapAgrees": true
+      },
+      {
+        "path": "round-2-creation/workspace-evidence/retention.json",
+        "scope": {
+          "kind": "creation-workspace-siblings",
+          "includedRoots": [
+            ".astack",
+            ".proof",
+            "evidence"
+          ],
+          "deliveredProjectExcluded": true
+        },
+        "retainedFileCount": 0,
+        "transformedFileCount": 0,
+        "transformCounts": {},
+        "omittedFileCount": 0,
+        "excludedPaths": {
+          "privateOrCredentialPaths": 0,
+          "namesRetained": false
+        },
+        "localRetainedHashesVerified": true,
+        "originalHashMapAgrees": true
+      },
+      {
+        "path": "round-2-feature/retention.json",
+        "scope": {
+          "kind": "project",
+          "sourceSelection": "isSourcePath",
+          "proofRoots": [
+            ".astack",
+            ".proof"
+          ]
+        },
+        "retainedFileCount": 94,
+        "transformedFileCount": 3,
+        "transformCounts": {
+          "credential-redaction": 3
+        },
+        "omittedFileCount": 0,
+        "excludedPaths": {
+          "privateOrCredentialPaths": 0,
+          "namesRetained": false
+        },
+        "localRetainedHashesVerified": true,
+        "originalHashMapAgrees": true
+      }
+    ],
+    "omittedArtifacts": [
+      {
+        "manifest": "round-1-creation/retention.json",
+        "path": ".astack/foundation-setup/evidence/check-ci-node24.log.gz",
+        "originalSha256": "c7276ac35b6c838a68c4b5b5f290d279a5f5554375b3dcba16f62bbbef796796",
+        "sizeBytes": 3104,
+        "reason": "Unsupported binary or compressed artifact; omitted without decoding or copying because its contents cannot be safely sanitized."
+      },
+      {
+        "manifest": "round-1-creation/retention.json",
+        "path": ".astack/foundation-setup/evidence/check-ci.log.gz",
+        "originalSha256": "bdb9340b1237d722f90b9b40c28f6ed7eb970c331ab2ca0b16bdc195e5d8f338",
+        "sizeBytes": 3209,
+        "reason": "Unsupported binary or compressed artifact; omitted without decoding or copying because its contents cannot be safely sanitized."
+      },
+      {
+        "manifest": "round-1-creation/retention.json",
+        "path": ".astack/foundation-setup/evidence/readiness-1/runtime.log.gz",
+        "originalSha256": "513afbab5baa9bf923caf51567ad97a5b0b47d982bee4fa128931ec528811676",
+        "sizeBytes": 861,
+        "reason": "Unsupported binary or compressed artifact; omitted without decoding or copying because its contents cannot be safely sanitized."
+      },
+      {
+        "manifest": "round-1-creation/retention.json",
+        "path": ".astack/foundation-setup/evidence/readiness-2/runtime.log.gz",
+        "originalSha256": "5c97dbeaf34092fd41694982e5bccd6c43537c65206ad4726c4fa94b4adaa8b7",
+        "sizeBytes": 864,
+        "reason": "Unsupported binary or compressed artifact; omitted without decoding or copying because its contents cannot be safely sanitized."
+      }
+    ],
+    "omissionPolicy": "Omission records preserve hashes, sizes and reasons, including colliding sanitized display paths. Omitted bytes were not decoded or copied. Private/credential filenames are excluded by counts without names.",
+    "allPresentCanonicalRetentionHashesVerified": true,
+    "unavailableSourceAuditStageCount": 0,
+    "scope": "Canonical original workspace input digests are reconstructed from original per-file hashes when the captured source metadata is available; harness-retained source digests describe the sanitized bytes. These are separate identities. Retained source parsing checks syntax only and does not replay the app or replace trusted acceptance. Missing retention/digest data stays explicitly unavailable."
+  },
+  "evidence": {
+    "sourceRoot": "examples/foundation/.proof/delivery-2a973c5",
+    "canonicalReportLocalRecordedSha256": "0cf01a5821a24b4af0190faea65696b6687f410f1c52802d5b163b116db0c6f0",
+    "canonicalReportExportedSha256": "3a0ec24f47c04122d96c9931104be8b250bc3fe3745ec18d75c95d8e760af1df",
+    "rawArchive": "raw-evidence.zip",
+    "rawArchiveSha256": "52fd24756b49a1707b611d4efacd0232d0a4c00e8b038f11e424b5045ef96660",
+    "rawArchiveBytes": 4659713,
+    "manifest": "raw-evidence.files.tsv",
+    "sourceFileCount": 740,
+    "supportedByteExactImages": {
+      "png": 74,
+      "jpeg": 0,
+      "webp": 0
+    },
+    "utf8FileCount": 666,
+    "exportTransformedFiles": 60,
+    "exportPathTransformationCounts": {
+      "host-user-prefix": 1936,
+      "macos-temporary-root": 438,
+      "truncated-host-user-prefix": 1
+    },
+    "originalCredentialPatternCounts": {
+      "privateKeyBlocks": 0,
+      "signedJwtPatterns": 0,
+      "providerKeyPatterns": 0,
+      "literalBearerCandidates": 0,
+      "credentialAssignments": 175
+    },
+    "classifiedAlreadyRedactedAssignmentPatterns": 175,
+    "actualCredentialsIdentified": 0,
+    "remainingPersonalPathPatterns": 0,
+    "credentialScanScope": "Pattern scan of captured UTF-8 text only; supported images are byte exact and not OCR-scanned. Already masked assignments are classified separately. Omitted workspace bytes are unavailable and were not scanned.",
+    "localOriginalsUnchanged": true,
+    "entryHashesVerified": true,
+    "deterministicZipBytesVerified": true
+  },
+  "standaloneMedia": [
+    {
+      "path": "media/web-persisted.png",
+      "rawArchiveEntry": "round-1-creation/acceptance/web-persisted.png",
+      "localSourcePath": "examples/foundation/.proof/delivery-2a973c5/round-1-creation/acceptance/web-persisted.png",
+      "sha256": "af3d50d7e7743d2df65feabfdf9e91d23059d863d43a5b48396bf5aad6d2a866",
+      "bytes": 30647,
+      "transformed": false,
+      "stage": "round-1-creation",
+      "candidate": "2a973c5aa556953db48b2a3104754de54c31f4e5",
+      "originalDeliveredSourceDigest": "65e839673ed15771250a3ffddaf5da0ee7940547ce9f84ce7180a60fcc819b1c",
+      "acceptedBuildId": "5aa242040993ee90dbdea4dc194d190a0dd8386d@sha256-65e839673ed15771250a3ffddaf5da0ee7940547ce9f84ce7180a60fcc819b1c",
+      "observedScope": "Trusted local acceptance of the delivered creation project; this is not an installed ChatGPT observation or a screenshot of the later repository head."
+    },
+    {
+      "path": "media/mcp-app-host.png",
+      "rawArchiveEntry": "round-1-creation/acceptance/mcp-app-host.png",
+      "localSourcePath": "examples/foundation/.proof/delivery-2a973c5/round-1-creation/acceptance/mcp-app-host.png",
+      "sha256": "612e3d9db420646fbad485a48a08931b0c576de90cb6421e09e10e9e3bfbabb3",
+      "bytes": 38187,
+      "transformed": false,
+      "stage": "round-1-creation",
+      "candidate": "2a973c5aa556953db48b2a3104754de54c31f4e5",
+      "originalDeliveredSourceDigest": "65e839673ed15771250a3ffddaf5da0ee7940547ce9f84ce7180a60fcc819b1c",
+      "acceptedBuildId": "5aa242040993ee90dbdea4dc194d190a0dd8386d@sha256-65e839673ed15771250a3ffddaf5da0ee7940547ce9f84ce7180a60fcc819b1c",
+      "observedScope": "Trusted local acceptance of the delivered creation project; this is not an installed ChatGPT observation or a screenshot of the later repository head."
+    }
+  ],
+  "remainingGaps": [
+    "Live WorkOS web sign-in, refresh and organization lifecycle.",
+    "Live MCP OAuth and installed ChatGPT tool selection/UI behavior.",
+    "CLI-reported monetary cost is unavailable; preserved null without a price estimate."
+  ],
+  "scope": "All observed raw records from this one fixed-candidate run are retained. No previous run or unsuccessful attempt is selected away; prior trials have their own unchanged archives.",
+  "laterRepairAttribution": "The separate domain TSX restriction/enforcement repair has source digest ede5bc2ce0b3b684805e0812795415d845bab5add98d891bc744f7fac3e8a76b. It was not in this fixed candidate and does not inherit or rescore these delivery results."
+}

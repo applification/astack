@@ -1,0 +1,107 @@
+{
+  "derivative": true,
+  "rawReport": "2026-10-04-diagnostic/report.json",
+  "rawArchive": "../raw-evidence.zip",
+  "rawArchiveSha256": "9c2d690e7c5228eae6b464291d804fe1608908eafb91d552dbe11e4d20a0f88c",
+  "scope": "Disposable local scaffold; feedback and Git hooks only. No live identity, runtime, remote cache, or installed-host claim.",
+  "outcome": "fail",
+  "startedAt": "2026-10-04T22:24:09.625Z",
+  "finishedAt": "2026-10-04T22:24:37.127Z",
+  "snapshot": {
+    "profile": "convex-workos-mcp-v1",
+    "sourceRevision": "0073d37538e31d7c18acf69e4873541beaa5e11a",
+    "sourceSha256": "3f41648e44bcd7f8a39020792780a0c87f10c980ccb4046262e1e2dc33be9696",
+    "lockSha256": "1ed2f09c0b4b4dbd5864f39dbde996958ea6cf2f17bfb33cef64586236d78034"
+  },
+  "postScaffoldSourceSha256": null,
+  "manifestSha256": "1018ee29a090f5a24e3262daa41cba8dc54184594bc4b682838eb4811a7cb628",
+  "exactManifestRawEntry": "2026-10-04-diagnostic/report.json#manifest",
+  "turboOverride": null,
+  "checks": [
+    {
+      "id": "quick-valid-first-and-repeat",
+      "outcome": "pass",
+      "detail": "The same valid selected file passes twice; durations are retained independently."
+    },
+    {
+      "id": "quick-floating-promise",
+      "outcome": "pass",
+      "detail": "Quick feedback rejects the intended floating-promise rule, not a generic process failure."
+    },
+    {
+      "id": "affected-shared-ui-consumers",
+      "outcome": "fail",
+      "detail": "affected-shared-ui failed; see affected-shared-ui.log\n\n1 !== 0\n"
+    },
+    {
+      "id": "warm-cache-and-shared-config-invalidation",
+      "outcome": "fail",
+      "detail": "turbo-populate failed; see turbo-populate.log\n\n1 !== 0\n"
+    },
+    {
+      "id": "partial-stage-preservation",
+      "outcome": "pass",
+      "detail": "Installed hooks committed the valid staged content, excluded the invalid unstaged promise, and preserved its exact working-tree bytes."
+    },
+    {
+      "id": "staged-floating-promise-rejected",
+      "outcome": "pass",
+      "detail": "The installed pre-commit hook rejects the intended rule, leaves HEAD unchanged, and retains the staged change."
+    }
+  ],
+  "observations": [
+    {
+      "id": "quick-valid-first",
+      "exitCode": 0,
+      "elapsedMs": 3538
+    },
+    {
+      "id": "quick-valid-repeat",
+      "exitCode": 0,
+      "elapsedMs": 1397
+    },
+    {
+      "id": "quick-floating-promise",
+      "exitCode": 1,
+      "elapsedMs": 1283
+    },
+    {
+      "id": "affected-shared-ui",
+      "exitCode": 1,
+      "elapsedMs": 7431
+    },
+    {
+      "id": "turbo-populate",
+      "exitCode": 1,
+      "elapsedMs": 8116
+    },
+    {
+      "id": "partial-stage-commit",
+      "exitCode": 0,
+      "elapsedMs": 1903
+    },
+    {
+      "id": "partial-stage-remaining-invalid-feedback",
+      "exitCode": 1,
+      "elapsedMs": 1323
+    },
+    {
+      "id": "staged-floating-commit-rejected",
+      "exitCode": 1,
+      "elapsedMs": 1536
+    }
+  ],
+  "failureCoverage": [
+    "An explicit floating promise must produce the no-floating-promises diagnostic in quick feedback.",
+    "A shared UI change must typecheck standalone web and MCP UI consumers.",
+    "A shared compiler-config byte change must miss every warmed lint/typecheck cache task.",
+    "A valid staged change with invalid unstaged lines must commit only the staged change and preserve unstaged bytes.",
+    "A staged floating promise must reject commit, preserve HEAD and retain the staged edit."
+  ],
+  "limits": [
+    "CLI timing uses fresh processes and ordinary warm filesystem caches; no caches are flushed.",
+    "Quick feedback measures one domain source file; its scope is deliberately narrower than affected checks.",
+    "The initial Git baseline is committed before Husky is installed in the new repository; all acceptance commits execute installed hooks.",
+    "These probes cover the listed failures; they do not establish every lint rule or every Git recovery scenario."
+  ]
+}

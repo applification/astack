@@ -1,0 +1,31 @@
+{
+  "outcome": "fail",
+  "observations": {
+    "sourceIdentity": "unversioned@sha256-63cd7c26069ddc748169c9394f45dd837b98044e07717313544047d9b61a22c0",
+    "firstRunSurfaces": "Unconfigured web gives the one-time WorkOS setup action; MCP preview opens its connection host without protocol/runtime errors.",
+    "aiSetup": "Managed AI files installed automatically without an interactive prompt; scoped instructions preserved.",
+    "firstStartup": "persistent local Convex; clients received loopback URL; no Convex account or deploy key supplied",
+    "localConfigSha256": "af962536167d33cdaccfbaf29b44e57824e336ab118946c7c1b1e08e39e51f90",
+    "processEnumeration": "Derived 3 descendant process IDs from a ps snapshot; the CLI process ID is separately known.",
+    "statePreservedOnStop": true,
+    "persistedItem": {
+      "id": "j578hcecsjrbtccwsc29qc1qvn8fprrw",
+      "title": "Persistent local development",
+      "status": "open"
+    },
+    "restartRead": [
+      {
+        "id": "j578hcecsjrbtccwsc29qc1qvn8fprrw",
+        "title": "Persistent local development",
+        "status": "open"
+      }
+    ],
+    "existingConfigurationPreserved": true,
+    "cleanup": "complete"
+  },
+  "error": "bun run exited 1: $ bun scripts/development.ts convex export --include-file-storage --path /tmp/astack-development-proof-iTJBuV/snapshot.zip\n✖ Local backend isn't running. (it's not listening at http://127.0.0.1:3210)\nRun `npx convex dev` in another terminal first.\nerror: script \"convex:local\" exited with code 1\n",
+  "limits": [
+    "No cloud project/deployment was created.",
+    "No data transfer or hosted behavior was exercised."
+  ]
+}

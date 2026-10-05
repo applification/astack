@@ -1,0 +1,68 @@
+{
+  "format": "astack-trial-retention/v1",
+  "scope": {
+    "kind": "project",
+    "sourceSelection": "isSourcePath",
+    "proofRoots": [
+      ".astack",
+      ".proof"
+    ]
+  },
+  "files": {
+    "development-mcp-preview.png": {
+      "originalSha256": "57e7f943d1c8176eabdf3a23447d566aef0d2e61c99ac0879df56ad30eafe983",
+      "retainedSha256": "57e7f943d1c8176eabdf3a23447d566aef0d2e61c99ac0879df56ad30eafe983",
+      "transformed": false,
+      "retainedPath": "delivered/development-mcp-preview.png",
+      "transforms": []
+    },
+    "emulate-mcp-preview.png": {
+      "originalSha256": "b1aabc9cbf32fd2d9579b1862de876958e137856a15405b0ae2bdf1a47db2ef6",
+      "retainedSha256": "b1aabc9cbf32fd2d9579b1862de876958e137856a15405b0ae2bdf1a47db2ef6",
+      "transformed": false,
+      "retainedPath": "delivered/emulate-mcp-preview.png",
+      "transforms": []
+    },
+    "mcp-app-host.png": {
+      "originalSha256": "1abf28eaf85f8b75d65d4ad39283c7f2bc0f4c40522dadc6906c3c33123f872f",
+      "retainedSha256": "1abf28eaf85f8b75d65d4ad39283c7f2bc0f4c40522dadc6906c3c33123f872f",
+      "transformed": false,
+      "retainedPath": "delivered/mcp-app-host.png",
+      "transforms": []
+    },
+    "mcp-host-observations.json": {
+      "originalSha256": "0a5ebeb172e8eeb5790295590beb76eac7ac89caa0eb941f23737e5e9376797f",
+      "retainedSha256": "0a5ebeb172e8eeb5790295590beb76eac7ac89caa0eb941f23737e5e9376797f",
+      "transformed": false,
+      "retainedPath": "delivered/mcp-host-observations.json",
+      "transforms": []
+    },
+    "report.json": {
+      "originalSha256": "366dc0da9f1aa8638a50b0f847bc09435ca536c181e98f19d5a444c260c0b332",
+      "retainedSha256": "366dc0da9f1aa8638a50b0f847bc09435ca536c181e98f19d5a444c260c0b332",
+      "transformed": false,
+      "retainedPath": "delivered/report.json",
+      "transforms": []
+    },
+    "runtime.log": {
+      "originalSha256": "850714f926b8520c9d5ad51220fa62317a724903d9f461f375ecf41e62534b49",
+      "retainedSha256": "850714f926b8520c9d5ad51220fa62317a724903d9f461f375ecf41e62534b49",
+      "transformed": false,
+      "retainedPath": "delivered/runtime.log",
+      "transforms": []
+    },
+    "web-persisted.png": {
+      "originalSha256": "8e98d5db552fde65ec39fa6356187990c40613f2998ae7c1fc02bdccabf7e858",
+      "retainedSha256": "8e98d5db552fde65ec39fa6356187990c40613f2998ae7c1fc02bdccabf7e858",
+      "transformed": false,
+      "retainedPath": "delivered/web-persisted.png",
+      "transforms": []
+    }
+  },
+  "omittedFiles": [],
+  "excludedPaths": {
+    "privateOrCredentialPaths": 0,
+    "namesRetained": false
+  },
+  "policy": "Source digest selection is unchanged. Lifecycle metadata/docs and nested proof under .astack/.proof are additionally retained as evidence. Original/retained byte digests and observed transforms describe every artifact. UTF-8 non-NUL .log output has VT sequences removed before credential redaction and remaining controls displayed as Unicode escapes; other source text is unchanged except credential redaction. PNG/JPEG/WebP images remain byte-exact. Unsupported binaries/archives are omitted with hashes/reasons and sanitized display paths, including proof trace ZIPs. Separate omission entries preserve colliding display paths. Credential/private paths are excluded without names; environments, dependencies and symlinks are excluded."
+}

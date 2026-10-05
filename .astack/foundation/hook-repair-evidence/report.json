@@ -1,0 +1,130 @@
+{
+  "scope": "Disposable Git hook integration only; no HUSKY bypass, runtime, authentication or deployment work.",
+  "startedAt": "2026-10-04T23:08:01.675Z",
+  "finishedAt": "2026-10-04T23:08:53.976Z",
+  "outcome": "pass",
+  "cases": [
+    {
+      "id": "standalone-initial-partial-and-rejection",
+      "outcome": "pass",
+      "detail": ".husky/_: first commit ran real installed hooks with generated types and absent embedded output; partially staged MCP UI built successfully and retained exact invalid unstaged syntax; staged floating promise rejected with unchanged HEAD and staged data preserved."
+    },
+    {
+      "id": "nested-initial-partial-and-rejection",
+      "outcome": "pass",
+      "detail": "client app/.husky/_: first commit ran real installed hooks with generated types and absent embedded output; partially staged MCP UI built successfully and retained exact invalid unstaged syntax; staged floating promise rejected with unchanged HEAD and staged data preserved."
+    },
+    {
+      "id": "preserve-default-hooks",
+      "outcome": "pass",
+      "detail": "Default repository hook files and unset hook configuration survive install; the app hook remains inactive."
+    },
+    {
+      "id": "preserve-configured-hooks-and-explicit-opt-in",
+      "outcome": "pass",
+      "detail": "Configured hooks remain active after install; explicit opt-in activates the app hook and preserves old hook files."
+    },
+    {
+      "id": "preserve-occupied-tracked-parent",
+      "outcome": "pass",
+      "detail": "Tracked files outside the project prevent automatic repository hook takeover; explicit opt-in installs the project hook."
+    },
+    {
+      "id": "preserve-occupied-untracked-parent",
+      "outcome": "pass",
+      "detail": "Untracked files outside the project prevent automatic repository hook takeover; explicit opt-in installs the project hook."
+    },
+    {
+      "id": "restore-default-hooks-on-install-failure",
+      "outcome": "pass",
+      "detail": "Default hook configuration and bytes survive failed shim provisioning, and a real subsequent commit executes the previous hook."
+    },
+    {
+      "id": "restore-configured-hooks-on-install-failure",
+      "outcome": "pass",
+      "detail": "Configured hook configuration and bytes survive failed shim provisioning, and a real subsequent commit executes the previous hook."
+    }
+  ],
+  "failureCoverage": [
+    "The first standalone and nested commit must execute installed hooks with checked-in generated Convex source and missing embedded UI.",
+    "Partially staged MCP UI with invalid unstaged syntax must build staged content and preserve exact unstaged bytes.",
+    "Staged handwritten floating promises must fail by the expected rule, preserve staged data and leave HEAD unchanged.",
+    "Configured and default repository hooks must be preserved unless the fixture explicitly opts in to replacement.",
+    "Tracked and untracked owner files outside a nested project must prevent automatic hook installation.",
+    "Failed Husky shim provisioning must restore exact prior hook configuration and preserve real prior hook activity."
+  ],
+  "cleanup": "complete",
+  "limits": [
+    "Git fixtures use local identities and ignore host global/system Git configuration. All commits execute their actual installed hooks; no initial baseline bypass is used."
+  ],
+  "input": {
+    "profile": "convex-workos-mcp-v1",
+    "sourceRevision": "3d90cfb38038bf9374dbe46f1bf1d09c4d3f09ed",
+    "sourceSha256": "146d2c8a7abbe9774b8e169b2073007c5bcc7ea6c9d4d4734cf41c9c456bec46",
+    "lockSha256": "1ed2f09c0b4b4dbd5864f39dbde996958ea6cf2f17bfb33cef64586236d78034"
+  },
+  "kind": "Compact derivative of final-probe/report.json; full observations and exact sanitized command output are archived.",
+  "keyCommandObservations": [
+    {
+      "id": "standalone-initial-commit",
+      "exitCode": 0,
+      "elapsedMs": 10718
+    },
+    {
+      "id": "standalone-partial-commit",
+      "exitCode": 0,
+      "elapsedMs": 3933
+    },
+    {
+      "id": "standalone-partial-committed",
+      "exitCode": 0,
+      "elapsedMs": 12
+    },
+    {
+      "id": "standalone-invalid-commit",
+      "exitCode": 1,
+      "elapsedMs": 1562
+    },
+    {
+      "id": "nested parent-initial-commit",
+      "exitCode": 0,
+      "elapsedMs": 10711
+    },
+    {
+      "id": "nested parent-partial-commit",
+      "exitCode": 0,
+      "elapsedMs": 3965
+    },
+    {
+      "id": "nested parent-partial-committed",
+      "exitCode": 0,
+      "elapsedMs": 12
+    },
+    {
+      "id": "nested parent-invalid-commit",
+      "exitCode": 1,
+      "elapsedMs": 1597
+    },
+    {
+      "id": "failed default install-failed-explicit-install",
+      "exitCode": 1,
+      "elapsedMs": 150
+    },
+    {
+      "id": "failed default install-owner-commit",
+      "exitCode": 0,
+      "elapsedMs": 170
+    },
+    {
+      "id": "failed configured install-failed-explicit-install",
+      "exitCode": 1,
+      "elapsedMs": 160
+    },
+    {
+      "id": "failed configured install-owner-commit",
+      "exitCode": 0,
+      "elapsedMs": 61
+    }
+  ],
+  "independentReview": "No remaining actionable defects. Supplemental disposable rollback checks preserved inherited/global and multiple local values exactly."
+}

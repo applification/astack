@@ -1,0 +1,11 @@
+--- a/examples/foundation/packages/backend/convex/workItems.ts
++++ b/examples/foundation/packages/backend/convex/workItems.ts
+@@ -58,7 +58,7 @@
+     const identity = await requireUser(ctx.auth);
+     const row = await ctx.db.get(args.id);
+     if (row === null || row.owner !== identity.subject) denyUnavailableItem();
+-    await ctx.db.patch(args.id, { status: args.status });
++    await ctx.db.patch(args.id, { status: args.status === 'done' ? 'open' : 'done' });
+     return { id: row._id, title: row.title, status: args.status };
+   },
+ });

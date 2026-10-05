@@ -1,0 +1,19 @@
+{
+  "name": "@foundation/mcp-ui",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5174 --strictPort",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src vite.config.ts --max-warnings 0"
+  },
+  "dependencies": {
+    "@foundation/ui": "workspace:*",
+    "@foundation/domain": "workspace:*",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "@modelcontextprotocol/ext-apps": "1.7.5",
+    "@modelcontextprotocol/sdk": "1.32.0"
+  }
+}

@@ -1,0 +1,1136 @@
+reference	Set up job	﻿2026-10-05T11:20:21.9782719Z Current runner version: '2.337.0'
+reference	Set up job	2026-10-05T11:20:21.9805142Z ##[group]Runner Image Provisioner
+reference	Set up job	2026-10-05T11:20:21.9805883Z Hosted Compute Agent
+reference	Set up job	2026-10-05T11:20:21.9806380Z Version: 20260901.588
+reference	Set up job	2026-10-05T11:20:21.9806893Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+reference	Set up job	2026-10-05T11:20:21.9807511Z Build Date: 2026-09-01T19:56:44Z
+reference	Set up job	2026-10-05T11:20:21.9808094Z Worker ID: {a93ebba8-64df-42c8-88cb-b723bc5239fa}
+reference	Set up job	2026-10-05T11:20:21.9808656Z Azure Region: eastus
+reference	Set up job	2026-10-05T11:20:21.9809206Z ##[endgroup]
+reference	Set up job	2026-10-05T11:20:21.9810302Z ##[group]Operating System
+reference	Set up job	2026-10-05T11:20:21.9810877Z Ubuntu
+reference	Set up job	2026-10-05T11:20:21.9811360Z 24.04.5
+reference	Set up job	2026-10-05T11:20:21.9812011Z LTS
+reference	Set up job	2026-10-05T11:20:21.9812496Z ##[endgroup]
+reference	Set up job	2026-10-05T11:20:21.9812958Z ##[group]Runner Image
+reference	Set up job	2026-10-05T11:20:21.9813471Z Image: ubuntu-24.04
+reference	Set up job	2026-10-05T11:20:21.9813989Z Version: 20260927.320.1
+reference	Set up job	2026-10-05T11:20:21.9814847Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+reference	Set up job	2026-10-05T11:20:21.9816283Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+reference	Set up job	2026-10-05T11:20:21.9817095Z ##[endgroup]
+reference	Set up job	2026-10-05T11:20:21.9818058Z ##[group]GITHUB_TOKEN Permissions
+reference	Set up job	2026-10-05T11:20:21.9819843Z Contents: read
+reference	Set up job	2026-10-05T11:20:21.9820361Z Metadata: read
+reference	Set up job	2026-10-05T11:20:21.9820845Z ##[endgroup]
+reference	Set up job	2026-10-05T11:20:21.9822785Z Secret source: Actions
+reference	Set up job	2026-10-05T11:20:21.9823539Z Cache mode: write
+reference	Set up job	2026-10-05T11:20:21.9824375Z Prepare workflow directory
+reference	Set up job	2026-10-05T11:20:22.0076931Z Prepare all required actions
+reference	Set up job	2026-10-05T11:20:22.0114923Z Getting action download info
+reference	Set up job	2026-10-05T11:20:22.2638574Z Download action repository 'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683' (SHA:11bd71901bbe5b1630ceea73d27597364c9af683)
+reference	Set up job	2026-10-05T11:20:22.3454738Z Download action repository 'actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+reference	Set up job	2026-10-05T11:20:22.4531930Z Download action repository 'oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76' (SHA:735343b667d3e6f658f44d0eca948eb6282f2b76)
+reference	Set up job	2026-10-05T11:20:22.5864421Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+reference	Set up job	2026-10-05T11:20:22.9573221Z Complete job name: reference
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	﻿2026-10-05T11:20:23.0291132Z ##[group]Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.0292172Z with:
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.0292568Z   repository: applification/astack
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.0295747Z   token: ***
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.0296157Z   ssh-strict: true
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.0296541Z   ssh-user: git
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.0296924Z   persist-credentials: true
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.0297357Z   clean: true
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.0297740Z   sparse-checkout-cone-mode: true
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.0298186Z   fetch-depth: 1
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.0298553Z   fetch-tags: false
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.0298933Z   show-progress: true
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.0299318Z   lfs: false
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.0299695Z   submodules: false
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.0300102Z   set-safe-directory: true
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.0300655Z ##[endgroup]
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1162053Z Syncing repository: applification/astack
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1163738Z ##[group]Getting Git version info
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1164340Z Working directory is '/home/runner/work/astack/astack'
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1165362Z [command]/usr/bin/git version
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1476365Z git version 2.55.0
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1494346Z ##[endgroup]
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1507458Z Temporarily overriding HOME='/home/runner/work/_temp/6c177027-ea28-4ee0-ba97-f9765313fc48' before making global git config changes
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1509378Z Adding repository directory to the temporary git global config as a safe directory
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1512434Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/astack/astack
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1556612Z Deleting the contents of '/home/runner/work/astack/astack'
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1560252Z ##[group]Initializing the repository
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1564194Z [command]/usr/bin/git init /home/runner/work/astack/astack
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1640420Z hint: Using 'master' as the name for the initial branch. This default branch name
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1642096Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1643470Z hint: to use in all of your new repositories, which will suppress this warning,
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1647548Z hint: call:
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1730487Z hint:
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1732050Z hint: 	git config --global init.defaultBranch <name>
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1732923Z hint:
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1733721Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1735005Z hint: 'development'. The just-created branch can be renamed via this command:
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1736065Z hint:
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1736677Z hint: 	git branch -m <name>
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1737449Z hint:
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1738418Z hint: Disable this message with "git config set advice.defaultBranchName false"
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1739894Z Initialized empty Git repository in /home/runner/work/astack/astack/.git/
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1743296Z [command]/usr/bin/git remote add origin https://github.com/applification/astack
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1753458Z ##[endgroup]
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1754895Z ##[group]Disabling automatic garbage collection
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1756131Z [command]/usr/bin/git config --local gc.auto 0
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1759266Z ##[endgroup]
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1760635Z ##[group]Setting up auth
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1762026Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.1773731Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.2073686Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.2104733Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.2296468Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.2334441Z ##[endgroup]
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.2335704Z ##[group]Fetching the repository
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:23.2343435Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +8df3aac4ce766eba8ffd99e08c8042902672f6d4:refs/remotes/pull/15/merge
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.4228906Z From https://github.com/applification/astack
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.4230485Z  * [new ref]         8df3aac4ce766eba8ffd99e08c8042902672f6d4 -> pull/15/merge
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.4233554Z ##[endgroup]
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.4234138Z ##[group]Determining the checkout info
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.4235017Z ##[endgroup]
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.4240155Z [command]/usr/bin/git sparse-checkout disable
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.4289453Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.4318700Z ##[group]Checking out the ref
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.4323592Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/15/merge
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5394666Z Note: switching to 'refs/remotes/pull/15/merge'.
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5395166Z 
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5395483Z You are in 'detached HEAD' state. You can look around, make experimental
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5396224Z changes and commit them, and you can discard any commits you make in this
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5396886Z state without impacting any branches by switching back to a branch.
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5397493Z 
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5397838Z If you want to create a new branch to retain commits you create, you may
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5398602Z do so (now or later) by using -c with the switch command. Example:
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5399017Z 
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5399322Z   git switch -c <new-branch-name>
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5400177Z 
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5400347Z Or undo this operation with:
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5400579Z 
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5400728Z   git switch -
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5400931Z 
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5401242Z Turn off this advice by setting config variable advice.detachedHead to false
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5401901Z 
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5402406Z HEAD is now at 8df3aac Merge f0f15d5ab1e275a664488adfbda62f253c12272b into f29f52dc5ee5b73feb1b24d301cb61f1a578549f
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5412141Z ##[endgroup]
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5881054Z [command]/usr/bin/git log -1 --format=%H
+reference	Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:20:24.5907358Z 8df3aac4ce766eba8ffd99e08c8042902672f6d4
+reference	Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	﻿2026-10-05T11:20:24.6154861Z ##[group]Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+reference	Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	2026-10-05T11:20:24.6155265Z with:
+reference	Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	2026-10-05T11:20:24.6155492Z   node-version: 24
+reference	Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	2026-10-05T11:20:24.6155711Z   always-auth: false
+reference	Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	2026-10-05T11:20:24.6155935Z   check-latest: false
+reference	Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	2026-10-05T11:20:24.6158067Z   token: ***
+reference	Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	2026-10-05T11:20:24.6158304Z ##[endgroup]
+reference	Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	2026-10-05T11:20:24.7305112Z Found in cache @ /opt/hostedtoolcache/node/24.21.0/x64
+reference	Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	2026-10-05T11:20:24.7308022Z (node:2711) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+reference	Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	2026-10-05T11:20:24.7309202Z (Use `node --trace-deprecation ...` to show where the warning was created)
+reference	Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	2026-10-05T11:20:24.7310368Z ##[group]Environment details
+reference	Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	2026-10-05T11:20:25.5372916Z node: v24.21.0
+reference	Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	2026-10-05T11:20:25.5373366Z npm: 11.19.0
+reference	Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	2026-10-05T11:20:25.5373602Z yarn: 1.22.22
+reference	Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	2026-10-05T11:20:25.5374331Z ##[endgroup]
+reference	Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	﻿2026-10-05T11:20:25.5502287Z ##[group]Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76
+reference	Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	2026-10-05T11:20:25.5502688Z with:
+reference	Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	2026-10-05T11:20:25.5502864Z   bun-version: 1.4.0
+reference	Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	2026-10-05T11:20:25.5503041Z   no-cache: false
+reference	Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	2026-10-05T11:20:25.5503207Z ##[endgroup]
+reference	Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	2026-10-05T11:20:25.6613238Z (node:2742) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+reference	Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	2026-10-05T11:20:25.6614018Z (Use `node --trace-deprecation ...` to show where the warning was created)
+reference	Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	2026-10-05T11:20:25.7270920Z Cache hit for: EOLjXeUBTjlzb5UinCZPCVPwsyw=
+reference	Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	2026-10-05T11:20:25.7353145Z (node:2742) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+reference	Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	2026-10-05T11:20:25.9319379Z Received 35658633 of 35658633 (100.0%), 196.6 MBs/sec
+reference	Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	2026-10-05T11:20:25.9320203Z Cache Size: ~34 MB (35658633 B)
+reference	Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	2026-10-05T11:20:25.9348377Z [command]/usr/bin/tar -xf /home/runner/work/_temp/326f9bfe-e09b-4714-9ed3-d5730576b85f/cache.tzst -P -C /home/runner/work/astack/astack --use-compress-program unzstd
+reference	Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	2026-10-05T11:20:26.0523141Z Cache restored successfully
+reference	Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	2026-10-05T11:20:26.0551178Z [command]/home/runner/.bun/bin/bun --revision
+reference	Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	2026-10-05T11:20:26.0595936Z 1.4.0+34cbb9a40
+reference	Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	2026-10-05T11:20:26.0602946Z Using a cached version of Bun: 1.4.0+34cbb9a40
+reference	Create a fresh independent profile	﻿2026-10-05T11:20:26.0734679Z ##[group]Run bun scripts/create-foundation.ts "$RUNNER_TEMP/astack-foundation"
+reference	Create a fresh independent profile	2026-10-05T11:20:26.0735212Z ^[[36;1mbun scripts/create-foundation.ts "$RUNNER_TEMP/astack-foundation"^[[0m
+reference	Create a fresh independent profile	2026-10-05T11:20:26.1101288Z shell: /usr/bin/bash -e {0}
+reference	Create a fresh independent profile	2026-10-05T11:20:26.1101572Z ##[endgroup]
+reference	Create a fresh independent profile	2026-10-05T11:20:26.1838454Z Created astack-foundation at /home/runner/work/_temp/astack-foundation. Run bun install --frozen-lockfile, then bun run check:ci and bun run readiness. bun dev starts seeded WorkOS Emulate. Real provider setup is described in README.md.
+reference	Install pinned dependencies and browser	﻿2026-10-05T11:20:26.1891895Z ##[group]Run cd "$RUNNER_TEMP/astack-foundation"
+reference	Install pinned dependencies and browser	2026-10-05T11:20:26.1892245Z ^[[36;1mcd "$RUNNER_TEMP/astack-foundation"^[[0m
+reference	Install pinned dependencies and browser	2026-10-05T11:20:26.1892527Z ^[[36;1mbun install --frozen-lockfile^[[0m
+reference	Install pinned dependencies and browser	2026-10-05T11:20:26.1892829Z ^[[36;1mbunx --no-install playwright install chromium --with-deps^[[0m
+reference	Install pinned dependencies and browser	2026-10-05T11:20:26.1950215Z shell: /usr/bin/bash -e {0}
+reference	Install pinned dependencies and browser	2026-10-05T11:20:26.1950455Z ##[endgroup]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:26.2063508Z bun install v1.4.0 (34cbb9a40)
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8398526Z 
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8403294Z $ bun scripts/install-hooks.ts
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8559790Z Hooks not installed: no Git repository. Run git init, then bun run hooks:install.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8568760Z 
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8569101Z + @eslint/js@9.39.4
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8569420Z + @storybook/react-vite@10.6.1
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8569715Z + @tailwindcss/vite@4.3.3
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8569964Z + @types/bun@1.4.2
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8570199Z + @types/node@24.13.6
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8570395Z + @types/react@19.3.0
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8570742Z + @types/react-dom@19.3.0
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8571001Z + @typescript/native@7.0.2
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8571238Z + @vitejs/plugin-react@6.1.1
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8571494Z + @workos-inc/node@11.0.0
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8571863Z + @workos/emulate@0.14.0
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8572293Z + commander@15.0.0
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8572620Z + eslint@9.39.4
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8573015Z + eslint-plugin-jsx-a11y@6.10.2
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8573496Z + eslint-plugin-react@7.37.5
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8573958Z + eslint-plugin-react-hooks@7.1.1
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8574357Z + husky@9.1.7
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8574698Z + lint-staged@17.6.0
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8575168Z + playwright@1.63.0
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8575728Z + prettier@3.9.9
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8576224Z + storybook@10.6.1
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8576768Z + tailwindcss@4.3.3
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8577201Z + turbo@2.11.7
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8577647Z + typescript@6.0.2
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8578115Z + typescript-eslint@8.71.0
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8578576Z + vite@8.3.2
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8579066Z + vite-plugin-singlefile@2.3.3
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8579644Z + @modelcontextprotocol/ext-apps@1.7.5
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8580297Z + @modelcontextprotocol/sdk@1.32.0
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8580795Z + convex@1.46.0
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8581199Z + jose@6.2.12
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8581590Z + zod@4.6.5
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8582016Z 
+reference	Install pinned dependencies and browser	2026-10-05T11:20:27.8582354Z 524 packages installed [1.65s]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.3005311Z Installing dependencies...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.3100974Z Switching to root user to install dependencies...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.3933467Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.4353275Z Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.4354659Z Get:6 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.4383112Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.4442795Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.4482621Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.5529086Z Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [511 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.5703684Z Get:8 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [458 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.5762905Z Get:9 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [12.6 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.5960625Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1364 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.6055872Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [304 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.6068638Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Components [181 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.6071492Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1699 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.6142248Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [341 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.6182989Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Components [388 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.6225992Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1720 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.6353310Z Get:17 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [394 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.6360465Z Get:18 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Components [940 B]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.6700731Z Get:19 http://azure.archive.ubuntu.com/ubuntu noble-backports/main amd64 Components [5776 B]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.7155978Z Get:20 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe amd64 Components [12.6 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.7235356Z Get:21 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [1069 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.7313237Z Get:22 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [221 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.7314496Z Get:23 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Components [46.4 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.7323518Z Get:24 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1216 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.7390911Z Get:25 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [244 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.7406945Z Get:26 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Components [76.4 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.7416931Z Get:27 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [1566 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:28.7483158Z Get:28 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translation-en [361 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:37.3287332Z Fetched 12.6 MB in 1s (10.7 MB/s)
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.0221992Z Reading package lists...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.0433771Z Reading package lists...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.2449271Z Building dependency tree...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.2455837Z Reading state information...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3924549Z libasound2t64 is already the newest version (1.2.11-1ubuntu0.3).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3925188Z libasound2t64 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3925789Z libatk-bridge2.0-0t64 is already the newest version (2.52.0-1build1).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3926278Z libatk-bridge2.0-0t64 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3926697Z libatk1.0-0t64 is already the newest version (2.52.0-1build1).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3927054Z libatk1.0-0t64 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3927392Z libatspi2.0-0t64 is already the newest version (2.52.0-1build1).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3927725Z libatspi2.0-0t64 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3928063Z libcairo2 is already the newest version (1.18.0-3build1).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3928496Z libcairo2 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3928835Z libcups2t64 is already the newest version (2.4.7-1.2ubuntu7.14).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3929175Z libcups2t64 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3929519Z libdbus-1-3 is already the newest version (1.14.10-4ubuntu4.1).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3929826Z libdbus-1-3 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3930161Z libdrm2 is already the newest version (2.4.125-1ubuntu0.1~24.04.2).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3930511Z libdrm2 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3930841Z libglib2.0-0t64 is already the newest version (2.80.0-6ubuntu3.9).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3931181Z libglib2.0-0t64 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3931527Z libnspr4 is already the newest version (2:4.35-1.1build1).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3932079Z libnspr4 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3932398Z libnss3 is already the newest version (2:3.98-1ubuntu0.2).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3932695Z libnss3 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3933031Z libpango-1.0-0 is already the newest version (1.52.1+ds-1build1).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3933369Z libpango-1.0-0 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3933884Z libx11-6 is already the newest version (2:1.8.7-1build1).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3934816Z libx11-6 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3935278Z libxcb1 is already the newest version (1.15-1ubuntu2).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3935743Z libxcb1 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3936263Z libxcomposite1 is already the newest version (1:0.4.5-1build3).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3936785Z libxcomposite1 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3937317Z libxdamage1 is already the newest version (1:1.1.6-1build1).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3937749Z libxdamage1 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3938063Z libxext6 is already the newest version (2:1.3.4-1build2).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3938359Z libxext6 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3938681Z libxfixes3 is already the newest version (1:6.0.0-2build1).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3938986Z libxfixes3 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3939320Z libxkbcommon0 is already the newest version (1.6.0-1build1).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3939643Z libxkbcommon0 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3939975Z libxrandr2 is already the newest version (2:1.5.2-2build1).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3940284Z libxrandr2 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3940603Z xvfb is already the newest version (2:21.1.12-1ubuntu1.8).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3941030Z fonts-noto-color-emoji is already the newest version (2.047-0ubuntu0.24.04.1).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3941463Z libfontconfig1 is already the newest version (2.15.0-1.1ubuntu2).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3941899Z libfontconfig1 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3942255Z libfreetype6 is already the newest version (2.13.2+dfsg-1ubuntu0.1).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3942585Z libfreetype6 set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3942915Z fonts-liberation is already the newest version (1:2.1.5-3).
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3943236Z fonts-liberation set to manually installed.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3943549Z The following additional packages will be installed:
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3943948Z   libgl1-mesa-dri libglx-mesa0 mesa-libgallium xfonts-encodings xfonts-utils
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3944303Z Recommended packages:
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.3944536Z   fonts-ipafont-mincho fonts-tlwg-loma
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.4917007Z The following NEW packages will be installed:
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.4917816Z   fonts-freefont-ttf fonts-ipafont-gothic fonts-tlwg-loma-otf fonts-unifont
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.4926187Z   fonts-wqy-zenhei xfonts-cyrillic xfonts-encodings xfonts-scalable
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.4926922Z   xfonts-utils
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.4931853Z The following packages will be upgraded:
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.4937361Z   libgbm1 libgl1-mesa-dri libglx-mesa0 mesa-libgallium
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.5084535Z 4 upgraded, 9 newly installed, 0 to remove and 21 not upgraded.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.5085151Z Need to get 32.1 MB of archives.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.5085686Z After this operation, 79.5 MB of additional disk space will be used.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.5086323Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.6852410Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-ipafont-gothic all 00303-21ubuntu1 [3513 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:38.8846044Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 fonts-freefont-ttf all 20211204+svn4273-2 [5641 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:39.1233869Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-tlwg-loma-otf all 1:0.7.3-1 [107 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:39.2001990Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-unifont all 1:15.1.01-1build1 [2993 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:39.3016938Z Get:6 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-wqy-zenhei all 0.9.45-8 [7472 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:39.5468898Z Get:7 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libgl1-mesa-dri amd64 25.2.8-0ubuntu0.24.04.4 [38.0 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:39.6292547Z Get:8 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libglx-mesa0 amd64 25.2.8-0ubuntu0.24.04.4 [110 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:39.7123673Z Get:9 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libgbm1 amd64 25.2.8-0ubuntu0.24.04.4 [34.2 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:39.7892975Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 mesa-libgallium amd64 25.2.8-0ubuntu0.24.04.4 [10.8 MB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.1402727Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-encodings all 1:1.0.5-0ubuntu2 [578 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.2284885Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-utils amd64 1:7.7+6build3 [94.4 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.3117474Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 xfonts-cyrillic all 1:1.0.5+nmu1 [384 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.3959422Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-scalable all 1:1.0.3-1.3 [304 kB]
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.7271388Z Fetched 32.1 MB in 2s (16.9 MB/s)
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.8885520Z Selecting previously unselected package fonts-ipafont-gothic.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.9072489Z (Reading database ... 
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.9073109Z (Reading database ... 5%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.9073520Z (Reading database ... 10%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.9073883Z (Reading database ... 15%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.9074171Z (Reading database ... 20%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.9074377Z (Reading database ... 25%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.9074580Z (Reading database ... 30%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.9074775Z (Reading database ... 35%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.9074983Z (Reading database ... 40%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.9075333Z (Reading database ... 45%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.9075683Z (Reading database ... 50%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:40.9109140Z (Reading database ... 55%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:41.0393051Z (Reading database ... 60%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:41.3490457Z (Reading database ... 65%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:41.7248303Z (Reading database ... 70%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:41.8600354Z (Reading database ... 75%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:41.9947330Z (Reading database ... 80%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:42.1323505Z (Reading database ... 85%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:42.4268054Z (Reading database ... 90%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:42.7348234Z (Reading database ... 95%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:42.7348693Z (Reading database ... 100%
+reference	Install pinned dependencies and browser	2026-10-05T11:20:42.7349253Z (Reading database ... 202296 files and directories currently installed.)
+reference	Install pinned dependencies and browser	2026-10-05T11:20:42.7402894Z Preparing to unpack .../00-fonts-ipafont-gothic_00303-21ubuntu1_all.deb ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:42.7528362Z Unpacking fonts-ipafont-gothic (00303-21ubuntu1) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:42.9763127Z Selecting previously unselected package fonts-freefont-ttf.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:42.9878064Z Preparing to unpack .../01-fonts-freefont-ttf_20211204+svn4273-2_all.deb ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:42.9883842Z Unpacking fonts-freefont-ttf (20211204+svn4273-2) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:43.0915466Z Selecting previously unselected package fonts-tlwg-loma-otf.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:43.1029384Z Preparing to unpack .../02-fonts-tlwg-loma-otf_1%3a0.7.3-1_all.deb ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:43.1039600Z Unpacking fonts-tlwg-loma-otf (1:0.7.3-1) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:43.1275786Z Selecting previously unselected package fonts-unifont.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:43.1388245Z Preparing to unpack .../03-fonts-unifont_1%3a15.1.01-1build1_all.deb ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:43.1393359Z Unpacking fonts-unifont (1:15.1.01-1build1) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:43.3227325Z Selecting previously unselected package fonts-wqy-zenhei.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:43.3340323Z Preparing to unpack .../04-fonts-wqy-zenhei_0.9.45-8_all.deb ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:43.3427810Z Unpacking fonts-wqy-zenhei (0.9.45-8) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:43.7940573Z Preparing to unpack .../05-libgl1-mesa-dri_25.2.8-0ubuntu0.24.04.4_amd64.deb ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:43.8062232Z Unpacking libgl1-mesa-dri:amd64 (25.2.8-0ubuntu0.24.04.4) over (25.2.8-0ubuntu0.24.04.2) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:44.0199291Z Preparing to unpack .../06-libglx-mesa0_25.2.8-0ubuntu0.24.04.4_amd64.deb ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:44.1566626Z Unpacking libglx-mesa0:amd64 (25.2.8-0ubuntu0.24.04.4) over (25.2.8-0ubuntu0.24.04.2) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:44.2340639Z Preparing to unpack .../07-libgbm1_25.2.8-0ubuntu0.24.04.4_amd64.deb ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:44.4023397Z Unpacking libgbm1:amd64 (25.2.8-0ubuntu0.24.04.4) over (25.2.8-0ubuntu0.24.04.2) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:44.5000298Z Preparing to unpack .../08-mesa-libgallium_25.2.8-0ubuntu0.24.04.4_amd64.deb ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:44.5070952Z Unpacking mesa-libgallium:amd64 (25.2.8-0ubuntu0.24.04.4) over (25.2.8-0ubuntu0.24.04.2) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:44.8659332Z Selecting previously unselected package xfonts-encodings.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:44.8775277Z Preparing to unpack .../09-xfonts-encodings_1%3a1.0.5-0ubuntu2_all.deb ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:44.8782122Z Unpacking xfonts-encodings (1:1.0.5-0ubuntu2) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:44.9024098Z Selecting previously unselected package xfonts-utils.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:44.9140060Z Preparing to unpack .../10-xfonts-utils_1%3a7.7+6build3_amd64.deb ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:44.9146044Z Unpacking xfonts-utils (1:7.7+6build3) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:44.9800807Z Selecting previously unselected package xfonts-cyrillic.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:44.9917008Z Preparing to unpack .../11-xfonts-cyrillic_1%3a1.0.5+nmu1_all.deb ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:44.9922880Z Unpacking xfonts-cyrillic (1:1.0.5+nmu1) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.0609739Z Selecting previously unselected package xfonts-scalable.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.0729457Z Preparing to unpack .../12-xfonts-scalable_1%3a1.0.3-1.3_all.deb ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.0735429Z Unpacking xfonts-scalable (1:1.0.3-1.3) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.1188928Z Setting up mesa-libgallium:amd64 (25.2.8-0ubuntu0.24.04.4) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.1205165Z Setting up libgbm1:amd64 (25.2.8-0ubuntu0.24.04.4) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.1222177Z Setting up libgl1-mesa-dri:amd64 (25.2.8-0ubuntu0.24.04.4) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.1284001Z Setting up fonts-wqy-zenhei (0.9.45-8) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.1379808Z Setting up fonts-freefont-ttf (20211204+svn4273-2) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.1393957Z Setting up fonts-tlwg-loma-otf (1:0.7.3-1) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.1411134Z Setting up xfonts-encodings (1:1.0.5-0ubuntu2) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.1425621Z Setting up fonts-ipafont-gothic (00303-21ubuntu1) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.1576851Z update-alternatives: using /usr/share/fonts/opentype/ipafont-gothic/ipag.ttf to provide /usr/share/fonts/truetype/fonts-japanese-gothic.ttf (fonts-japanese-gothic.ttf) in auto mode
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.1589761Z Setting up fonts-unifont (1:15.1.01-1build1) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.1605151Z Setting up libglx-mesa0:amd64 (25.2.8-0ubuntu0.24.04.4) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.1621424Z Setting up xfonts-utils (1:7.7+6build3) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.1654937Z Setting up xfonts-cyrillic (1:1.0.5+nmu1) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.4988276Z Setting up xfonts-scalable (1:1.0.3-1.3) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.5227991Z Processing triggers for libc-bin (2.39-0ubuntu8.9) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.8291956Z Processing triggers for man-db (2.12.0-4build2) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.8309418Z Not building database; man-db/auto-update is not 'true'.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:45.8320228Z Processing triggers for fontconfig (2.15.0-1.1ubuntu2) ...
+reference	Install pinned dependencies and browser	2026-10-05T11:20:46.4746422Z 
+reference	Install pinned dependencies and browser	2026-10-05T11:20:46.4747141Z Running kernel seems to be up-to-date.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:46.4747421Z 
+reference	Install pinned dependencies and browser	2026-10-05T11:20:46.4747547Z No services need to be restarted.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:46.4747713Z 
+reference	Install pinned dependencies and browser	2026-10-05T11:20:46.4762539Z No containers need to be restarted.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:46.4762826Z 
+reference	Install pinned dependencies and browser	2026-10-05T11:20:46.4763059Z No user sessions are running outdated binaries.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:46.4763353Z 
+reference	Install pinned dependencies and browser	2026-10-05T11:20:46.4763701Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+reference	Install pinned dependencies and browser	2026-10-05T11:20:47.5337082Z Downloading Chrome for Testing 153.0.8010.12 (playwright chromium v1243) from https://cdn.playwright.dev/builds/cft/153.0.8010.12/linux64/chrome-linux64.zip
+reference	Install pinned dependencies and browser	2026-10-05T11:20:47.8918690Z |                                                                                |   0% of 186.8 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:48.0511181Z |■■■■■■■■                                                                        |  10% of 186.8 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:48.1275779Z |■■■■■■■■■■■■■■■■                                                                |  20% of 186.8 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:48.2096809Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 186.8 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:48.2693101Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 186.8 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:48.3289019Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 186.8 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:48.3745271Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 186.8 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:48.4374011Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 186.8 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:48.5369589Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 186.8 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:48.6065384Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 186.8 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:48.7070474Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 186.8 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:51.2791345Z Chrome for Testing 153.0.8010.12 (playwright chromium v1243) downloaded to /home/runner/.cache/ms-playwright/chromium-1243
+reference	Install pinned dependencies and browser	2026-10-05T11:20:51.2793394Z Downloading FFmpeg (playwright ffmpeg v1011) from https://cdn.playwright.dev/dbazure/download/playwright/builds/ffmpeg/1011/ffmpeg-linux.zip
+reference	Install pinned dependencies and browser	2026-10-05T11:20:51.5733414Z |                                                                                |   0% of 2.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:51.5780479Z |■■■■■■■■                                                                        |  10% of 2.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:51.5822655Z |■■■■■■■■■■■■■■■■                                                                |  20% of 2.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:51.5924353Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 2.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:51.5981940Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 2.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:51.6040743Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 2.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:51.6095109Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 2.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:51.6136441Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 2.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:51.6155764Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 2.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:51.6169564Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 2.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:51.6198584Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 2.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:51.6745438Z FFmpeg (playwright ffmpeg v1011) downloaded to /home/runner/.cache/ms-playwright/ffmpeg-1011
+reference	Install pinned dependencies and browser	2026-10-05T11:20:51.6748813Z Downloading Chrome Headless Shell 153.0.8010.12 (playwright chromium-headless-shell v1243) from https://cdn.playwright.dev/builds/cft/153.0.8010.12/linux64/chrome-headless-shell-linux64.zip
+reference	Install pinned dependencies and browser	2026-10-05T11:20:51.9761630Z |                                                                                |   0% of 114.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:52.1258380Z |■■■■■■■■                                                                        |  10% of 114.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:52.2556553Z |■■■■■■■■■■■■■■■■                                                                |  20% of 114.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:52.3036826Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 114.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:52.3509796Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 114.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:52.4094725Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 114.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:52.4451216Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 114.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:52.4753079Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 114.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:52.5298625Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 114.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:52.5646627Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 114.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:52.5995046Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 114.3 MiB
+reference	Install pinned dependencies and browser	2026-10-05T11:20:54.3971080Z Chrome Headless Shell 153.0.8010.12 (playwright chromium-headless-shell v1243) downloaded to /home/runner/.cache/ms-playwright/chromium_headless_shell-1243
+reference	Required workspace and enforcement checks	﻿2026-10-05T11:20:54.4180753Z ##[group]Run cd "$RUNNER_TEMP/astack-foundation"
+reference	Required workspace and enforcement checks	2026-10-05T11:20:54.4181101Z ^[[36;1mcd "$RUNNER_TEMP/astack-foundation"^[[0m
+reference	Required workspace and enforcement checks	2026-10-05T11:20:54.4181344Z ^[[36;1mbun run check:ci^[[0m
+reference	Required workspace and enforcement checks	2026-10-05T11:20:54.4181545Z ^[[36;1mbun run enforcement^[[0m
+reference	Required workspace and enforcement checks	2026-10-05T11:20:54.4238636Z shell: /usr/bin/bash -e {0}
+reference	Required workspace and enforcement checks	2026-10-05T11:20:54.4238867Z ##[endgroup]
+reference	Required workspace and enforcement checks	2026-10-05T11:20:54.4418770Z $ bun scripts/check.ts ci
+reference	Required workspace and enforcement checks	2026-10-05T11:20:54.4547243Z CI: format, every handwritten workspace lint/typecheck, domain contracts and both browser bundles. readiness is the separate real integration gate.
+reference	Required workspace and enforcement checks	2026-10-05T11:20:54.4569192Z $ prettier --check .
+reference	Required workspace and enforcement checks	2026-10-05T11:20:54.5328599Z Checking formatting...
+reference	Required workspace and enforcement checks	2026-10-05T11:20:55.9305071Z All matched files use Prettier code style!
+reference	Required workspace and enforcement checks	2026-10-05T11:20:55.9575480Z $ bun run --cwd apps/mcp-ui build && bun scripts/embed-ui.ts
+reference	Required workspace and enforcement checks	2026-10-05T11:20:55.9605435Z $ vite build
+reference	Required workspace and enforcement checks	2026-10-05T11:20:56.2898449Z ^[[33m(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+reference	Required workspace and enforcement checks	2026-10-05T11:20:56.2900041Z   - import "./workos-emulate" without a file extension (../../scripts/mcp-preview-proxy.ts:2:33). Add the file extension
+reference	Required workspace and enforcement checks	2026-10-05T11:20:56.2900899Z Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:20:56.3000614Z ^[[36mvite v8.3.2 ^[[32mbuilding client environment for production...^[[36m^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:20:56.3083234Z transforming...
+reference	Required workspace and enforcement checks	2026-10-05T11:20:56.4667331Z ✓ 2064 modules transformed.
+reference	Required workspace and enforcement checks	2026-10-05T11:20:56.5118058Z rendering chunks...
+reference	Required workspace and enforcement checks	2026-10-05T11:20:56.5784812Z [plugin vite:singlefile] 
+reference	Required workspace and enforcement checks	2026-10-05T11:20:56.5785066Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:20:56.5797734Z [plugin vite:singlefile] Inlining: index-DjxX_oD3.js
+reference	Required workspace and enforcement checks	2026-10-05T11:20:56.5832704Z [plugin vite:singlefile] Inlining: style-D0czOyNE.css
+reference	Required workspace and enforcement checks	2026-10-05T11:20:56.5874814Z computing gzip size...
+reference	Required workspace and enforcement checks	2026-10-05T11:20:56.5970317Z dist/index.html  784.42 kB │ gzip: 243.61 kB
+reference	Required workspace and enforcement checks	2026-10-05T11:20:56.5971223Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:20:56.5975973Z ^[[32m✓ built in 297ms^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:20:56.6499379Z Embedded self-contained MCP UI for the Convex resource server.
+reference	Required workspace and enforcement checks	2026-10-05T11:20:56.6537015Z $ eslint . --max-warnings 0
+reference	Required workspace and enforcement checks	2026-10-05T11:21:09.5919588Z $ bun scripts/prepare-check.ts && turbo typecheck && tsc --noEmit -p tsconfig.json
+reference	Required workspace and enforcement checks	2026-10-05T11:21:09.6281493Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:09.6283599Z Attention:
+reference	Required workspace and enforcement checks	2026-10-05T11:21:09.6284315Z Turborepo now collects completely anonymous telemetry regarding usage.
+reference	Required workspace and enforcement checks	2026-10-05T11:21:09.6285230Z This information is used to shape the Turborepo roadmap and prioritize features.
+reference	Required workspace and enforcement checks	2026-10-05T11:21:09.6286748Z You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+reference	Required workspace and enforcement checks	2026-10-05T11:21:09.6294027Z https://turborepo.dev/docs/telemetry
+reference	Required workspace and enforcement checks	2026-10-05T11:21:09.6294505Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:09.6442374Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:09.6453944Z    • Packages in scope: @foundation/backend, @foundation/config, @foundation/domain, @foundation/mcp-ui, @foundation/ui, @foundation/web
+reference	Required workspace and enforcement checks	2026-10-05T11:21:09.6455771Z    • Running typecheck in 6 packages
+reference	Required workspace and enforcement checks	2026-10-05T11:21:09.6456190Z    • Remote caching disabled
+reference	Required workspace and enforcement checks	2026-10-05T11:21:09.6456513Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:09.9859074Z ##[group]@foundation/domain:typecheck
+reference	Required workspace and enforcement checks	2026-10-05T11:21:09.9859662Z cache miss, executing 545fa2ffb0a29d4e
+reference	Required workspace and enforcement checks	2026-10-05T11:21:09.9860037Z $ tsc --noEmit
+reference	Required workspace and enforcement checks	2026-10-05T11:21:09.9860499Z ##[endgroup]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:10.4313582Z ##[group]@foundation/ui:typecheck
+reference	Required workspace and enforcement checks	2026-10-05T11:21:10.4325964Z cache miss, executing b4b74a54fb8d305f
+reference	Required workspace and enforcement checks	2026-10-05T11:21:10.4342355Z $ tsc --noEmit
+reference	Required workspace and enforcement checks	2026-10-05T11:21:10.4343078Z ##[endgroup]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:11.1133424Z ##[group]@foundation/mcp-ui:typecheck
+reference	Required workspace and enforcement checks	2026-10-05T11:21:11.1192911Z cache miss, executing a8009aaea65661eb
+reference	Required workspace and enforcement checks	2026-10-05T11:21:11.1222433Z $ tsc --noEmit
+reference	Required workspace and enforcement checks	2026-10-05T11:21:11.1223207Z ##[endgroup]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:11.8097297Z ##[group]@foundation/backend:typecheck
+reference	Required workspace and enforcement checks	2026-10-05T11:21:11.8097937Z cache miss, executing 0695c9ab88a831fe
+reference	Required workspace and enforcement checks	2026-10-05T11:21:11.8098358Z $ tsc --noEmit
+reference	Required workspace and enforcement checks	2026-10-05T11:21:11.8098844Z ##[endgroup]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:13.8569968Z ##[group]@foundation/web:typecheck
+reference	Required workspace and enforcement checks	2026-10-05T11:21:13.8570569Z cache miss, executing 1aadccff36786eba
+reference	Required workspace and enforcement checks	2026-10-05T11:21:13.8570998Z $ tsc --noEmit
+reference	Required workspace and enforcement checks	2026-10-05T11:21:13.8571450Z ##[endgroup]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:13.8571606Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:13.8571873Z  Tasks:    5 successful, 5 total
+reference	Required workspace and enforcement checks	2026-10-05T11:21:13.8572190Z Cached:    0 cached, 5 total
+reference	Required workspace and enforcement checks	2026-10-05T11:21:13.8572486Z   Time:    4.228s 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:13.8572631Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.2239336Z bun test v1.4.0 (34cbb9a40)
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.2257229Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.2258181Z ##[group]tests/domain.test.ts:
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.2523801Z (pass) work-item boundary > normalizes a title and rejects empty or oversized input [0.44ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.2543279Z (pass) work-item boundary > rejects malformed host results before they reach presentation [1.97ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.2543851Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.2544403Z ##[endgroup]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.2544565Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.2544940Z ##[group]tests/proof-policy.test.ts:
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.7698661Z (pass) proof boundary policy > local subprocesses do not inherit deployment or authentication secrets [0.09ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.7699815Z (pass) proof boundary policy > retained logs redact signed tokens and Bearer [REDACTED] [0.13ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.7704386Z (pass) proof boundary policy > external script or stylesheet resources cannot pass packaging proof [0.52ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.7710813Z (pass) proof boundary policy > a malformed DTO cannot become persisted-state evidence [0.64ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.7956093Z (pass) proof boundary policy > status persistence allows mutation latency but a validated mismatch fails deterministically [24.42ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.7975259Z (pass) proof boundary policy > transport and schema errors during status polling cannot become seed observations [1.94ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.8086739Z (pass) proof boundary policy > an in-flight read cannot outlive the polling deadline or become seed evidence [11.07ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.8119494Z (pass) proof boundary policy > an expected Convex ownership denial is accepted, but a backend crash is not [3.32ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.8124645Z (pass) proof boundary policy > MCP isError only counts when it contains the expected application denial [0.55ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.8126134Z (pass) proof boundary policy > malformed MCP arguments require a validation error for the specified tool and field [0.15ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.8132156Z (pass) proof boundary policy > wrong JWT audience evidence requires configured providers, not a bootstrap failure [0.59ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.8133847Z (pass) proof boundary policy > trial event accounting keeps usage and excludes conversation text from action caps [0.17ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.8134213Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.8134545Z ##[endgroup]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.8134650Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.8134878Z ##[group]tests/provenance.test.ts:
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.8171163Z (pass) source identity changes for untracked inputs but excludes secrets and observations [3.19ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.8171918Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.8172315Z ##[endgroup]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.8172458Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:14.8172779Z ##[group]tests/trials.test.ts:
+reference	Required workspace and enforcement checks	2026-10-05T11:21:15.3519247Z (pass) independent delivery trial gates > actual Git diff acquisition hashes original stdout bytes and sanitizes source only once [183.20ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:15.4863997Z (pass) independent delivery trial gates > raw command output separates stderr, redacts failures and enforces its deadline [134.53ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:15.4867862Z (pass) independent delivery trial gates > source interpolation survives retention while actual credentials stay redacted [0.48ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:15.7229102Z (pass) independent delivery trial gates > retained foundation source still parses and all recorded hashes match the bytes [234.64ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:15.7230935Z (pass) independent delivery trial gates > process enumeration failure retains the owned group fallback without claiming detached coverage [0.61ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:15.7292932Z (pass) independent delivery trial gates > creation sibling evidence is sanitized and byte provenance identifies every transformation [6.11ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:15.7380398Z (pass) independent delivery trial gates > lifecycle metadata and nested evidence survive both project and creation sibling retention [9.74ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:15.7473611Z (pass) independent delivery trial gates > binary evidence is omitted honestly while supported image bytes stay exact [8.08ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:15.7561900Z (pass) independent delivery trial gates > concurrent rounds stay bounded and preserve every round’s stage order [9.68ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:15.7580424Z (pass) independent delivery trial gates > a failed round prevents new assignments and cleanup waits for every started round [1.61ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:15.7596730Z (pass) independent delivery trial gates > report writes cannot overlap and later writes recover after a failure [1.41ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:15.7653018Z (pass) independent delivery trial gates > a green process or a delivery claim cannot substitute for scored review [2.97ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:15.7655897Z (pass) independent delivery trial gates > failed acceptance, incomplete delivery, and unresolved authorization each prevent pass [0.30ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:15.7667098Z (pass) independent delivery trial gates > the total threshold cannot hide a zero in proof or scope [0.26ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:15.7694084Z (pass) independent delivery trial gates > missing or out-of-range scores cannot pass; fewer than two rounds cannot run [0.22ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:15.7696093Z (pass) independent delivery trial gates > the maintained seed changes persisted status only and requires its running R3 failure [0.62ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.4473138Z (pass) independent delivery trial gates > fresh process accounting retains observed usage and caps a continuing action stream [682.94ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.4473626Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.4473977Z ##[endgroup]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.4474089Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.4474316Z ##[group]tests/development.test.ts:
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.4501573Z (pass) AI setup observes files created after its initial missing-file check [1.02ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.4512846Z (pass) local startup rejects cloud selection, deploy keys and self-hosted overrides [1.08ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.4525366Z (pass) clients follow the persisted local backend rather than a stale cloud frontend URL [1.26ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.4527878Z (pass) local administrative commands cannot retarget a write or export to cloud [0.21ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.4528231Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.4528492Z ##[endgroup]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.4528599Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.4528800Z ##[group]tests/auth.test.ts:
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.5979981Z (pass) official Emulate exercises seeded identity, password/session and token contracts [143.33ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.6682044Z (pass) disposable fixtures are unique and clean up even when the test fails [70.21ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7134589Z (pass) a lost create response is recovered by owned external ID and cleaned up [45.26ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7135582Z (pass) provider runner requires explicit astack staging and rejects production credentials [0.14ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7136877Z (pass) Emulate cannot be enabled against cloud Convex or a remote/credentialed issuer [0.18ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7137755Z (pass) an authentication outage cannot be counted as rejected credentials [0.06ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7138166Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7138599Z ##[endgroup]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7138709Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7139004Z ##[group]tests/setup.test.ts:
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7481548Z (pass) WorkOS setup is repeatable, preserves local state and refuses to replace another environment [2.28ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7482681Z (pass) plain HTTP WorkOS resources are limited to the exact local Convex MCP endpoint [0.14ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7509586Z (pass) MCP OAuth callbacks need a one-use state and cannot reuse another resource session [2.73ms]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7510050Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7510606Z ##[endgroup]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7510865Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7511338Z  45 pass
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7511846Z  0 fail
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7512374Z  652 expect() calls
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7512711Z Ran 45 tests across 7 files. [2.53s]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.7684852Z $ vite build
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.9469014Z ^[[36mvite v8.3.2 ^[[32mbuilding client environment for production...^[[36m^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:16.9549368Z transforming...
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.1139001Z ✓ 2194 modules transformed.
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.1604475Z rendering chunks...
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.2400261Z computing gzip size...
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.2480566Z dist/index.html                                       0.39 kB │ gzip:   0.26 kB
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.2481084Z dist/assets/inter-latin-wght-normal-Dx4kXJAl.woff2   48.25 kB
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.2481599Z dist/assets/index-D-k704hy.css                       11.55 kB │ gzip:   3.18 kB
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.2482364Z dist/assets/index-D7r8uNpy.js                       569.45 kB │ gzip: 171.73 kB
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.2482591Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.2492660Z ^[[33m[plugin builtin:vite-reporter] 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.2493269Z (!) Some chunks are larger than 500 kB after minification. Consider:
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.2493706Z - Using dynamic import() to code-split the application
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.2494599Z - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.2495905Z - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.2509560Z ^[[32m✓ built in 303ms^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.2706968Z $ storybook build
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.6510515Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.6528972Z ^[[90m┌^[[39m  Building storybook v10.6.1
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.8202082Z ^[[90m│^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.8202802Z ^[[32m◇^[[39m  Cleaning outputDir: ^[[36mstorybook-static^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.8563385Z ^[[90m│^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:17.8563863Z ^[[32m◇^[[39m  Loading presets
+reference	Required workspace and enforcement checks	2026-10-05T11:21:18.1542526Z ^[[90m│^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:18.1542944Z ^[[32m◇^[[39m  Building manager..
+reference	Required workspace and enforcement checks	2026-10-05T11:21:18.2557628Z ^[[90m│^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:18.2558226Z ^[[34m●^[[39m  Building open services..
+reference	Required workspace and enforcement checks	2026-10-05T11:21:18.2561572Z ^[[90m│^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:18.2562186Z ^[[34m●^[[39m  Building preview..
+reference	Required workspace and enforcement checks	2026-10-05T11:21:18.3030672Z ^[[90m│^[[39m  ^[[43mVite^[[49m ^[[36mvite v8.3.2 ^[[32mbuilding client environment for production...^[[36m^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:18.3765944Z transforming...
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.1988389Z ✓ 1926 modules transformed.
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.2762606Z rendering chunks...
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4285822Z computing gzip size...
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4468173Z ^[[90m│^[[39m  ^[[43mVite^[[49m storybook-static/iframe.html
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4468635Z ^[[90m│^[[39m  18.43 kB │ gzip:   5.21 kB
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4469073Z ^[[90m│^[[39m  storybook-static/assets/inter-latin-wght-normal-Dx4kXJAl.woff2
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4469435Z ^[[90m│^[[39m  48.25 kB
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4469745Z ^[[90m│^[[39m  storybook-static/assets/styles-B0G18e9z.css
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4470080Z ^[[90m│^[[39m  11.55 kB │ gzip:   3.17 kB
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4470657Z ^[[90m│^[[39m  storybook-static/assets/iframe-Ck7T_S8b.js
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4471163Z ^[[90m│^[[39m  0.04 kB │ gzip:   0.06 kB
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4471855Z ^[[90m│^[[39m  storybook-static/assets/WorkItemList.stories-C0DqzlJT.js
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4472413Z ^[[90m│^[[39m  0.62 kB │ gzip:   0.41 kB
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4472947Z ^[[90m│^[[39m  storybook-static/assets/rolldown-runtime-DkW27tQK.js
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4473508Z ^[[90m│^[[39m  1.19 kB │ gzip:   0.67 kB
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4474113Z ^[[90m│^[[39m  storybook-static/assets/Workspace.stories-BXPKdrAI.js
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4474692Z ^[[90m│^[[39m  2.20 kB │ gzip:   1.08 kB
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4475247Z ^[[90m│^[[39m  storybook-static/assets/styles-D7joA_Sp.js
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4475756Z ^[[90m│^[[39m  40.20 kB │ gzip:  13.54 kB
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4476338Z ^[[90m│^[[39m  storybook-static/assets/react-18-DV84tAQM.js
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4476816Z ^[[90m│^[[39m  211.37 kB │ gzip:  66.03 kB
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4477330Z ^[[90m│^[[39m  storybook-static/assets/iframe-CK-8pF0S.js
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4477842Z ^[[90m│^[[39m  1,124.83 kB │ gzip: 319.28 kB
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4478551Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4492647Z ^[[90m│^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4493421Z ^[[33m▲^[[39m  ^[[43mVite^[[49m ^[[33m^[[33m[MODULE_LEVEL_DIRECTIVE] ^[[0mThe semantics of the module level
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4494048Z ^[[90m│^[[39m  directive "use client" in
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4495165Z ^[[90m│^[[39m  "../../node_modules/.bun/lucide-react@1.52.0+0ac650c021fb1b59/node_modules/lucide-react/dist/esm/context.mjs"
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4496131Z ^[[90m│^[[39m  may not be preserved when bundling.
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4497070Z ^[[90m│^[[39m  ^[[38;5;246m╭^[[0m^[[38;5;246m─^[[0m^[[38;5;246m[^[[0m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4498163Z ^[[90m│^[[39m  ../../node_modules/.bun/lucide-react@1.52.0+0ac650c021fb1b59/node_modules/lucide-react/dist/esm/context.mjs:2:1
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4498918Z ^[[90m│^[[39m  ^[[38;5;246m]^[[0m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4499278Z ^[[90m│^[[39m  ^[[38;5;246m│^[[0m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4499709Z ^[[90m│^[[39m  ^[[38;5;246m2 │^[[0m "use client";
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4500207Z ^[[90m│^[[39m  ^[[38;5;240m│^[[0m ──────┬──────
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4500719Z ^[[90m│^[[39m  ^[[38;5;240m│^[[0m       ╰──────── module level directive may not be preserved
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4501099Z ^[[90m│^[[39m  ^[[38;5;240m│^[[0m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4502105Z ^[[90m│^[[39m  ^[[38;5;240m│^[[0m ^[[38;5;115mHelp^[[0m: For more information, see ^[]8;;https://rolldown.rs/in-depth/directives#other-directives^Ghttps://rolldown.rs/in-depth/d...^[]8;;^G
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4502900Z ^[[90m│^[[39m  ^[[38;5;246m───╯^[[0m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4503136Z ^[[90m│^[[39m  ^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4503461Z ^[[90m│^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4504008Z ^[[33m▲^[[39m  ^[[43mVite^[[49m ^[[33m[plugin builtin:vite-reporter]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4504776Z ^[[90m│^[[39m  (!) Some chunks are larger than 500 kB after minification. Consider:
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4505540Z ^[[90m│^[[39m  - Using dynamic import() to code-split the application
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4506362Z ^[[90m│^[[39m  - Use build.rolldownOptions.output.codeSplitting to improve chunking:
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4507697Z ^[[90m│^[[39m  ^[]8;;https://rolldown.rs/reference/OutputOptions.codeSplitting^Ghttps://rolldown.rs/reference/OutputOptions.codeSplitting^[]8;;^G
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4508614Z ^[[90m│^[[39m  - Adjust chunk size limit for this warning via
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4508982Z ^[[90m│^[[39m  build.chunkSizeWarningLimit.^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4509887Z ^[[90m│^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4510597Z ^[[33m▲^[[39m  ^[[43mVite^[[49m ^[[33m^[[33m[MODULE_LEVEL_DIRECTIVE] ^[[0mThe semantics of the module level
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4511263Z ^[[90m│^[[39m  directive "use client" in
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4512068Z ^[[90m│^[[39m  "../../node_modules/.bun/lucide-react@1.52.0+0ac650c021fb1b59/node_modules/lucide-react/dist/esm/Icon.mjs"
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4512756Z ^[[90m│^[[39m  may not be preserved when bundling.
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4513130Z ^[[90m│^[[39m  ^[[38;5;246m╭^[[0m^[[38;5;246m─^[[0m^[[38;5;246m[^[[0m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4513729Z ^[[90m│^[[39m  ../../node_modules/.bun/lucide-react@1.52.0+0ac650c021fb1b59/node_modules/lucide-react/dist/esm/Icon.mjs:2:1
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4514197Z ^[[90m│^[[39m  ^[[38;5;246m]^[[0m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4514427Z ^[[90m│^[[39m  ^[[38;5;246m│^[[0m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4514701Z ^[[90m│^[[39m  ^[[38;5;246m2 │^[[0m "use client";
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4515009Z ^[[90m│^[[39m  ^[[38;5;240m│^[[0m ──────┬──────
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4515437Z ^[[90m│^[[39m  ^[[38;5;240m│^[[0m       ╰──────── module level directive may not be preserved
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4515884Z ^[[90m│^[[39m  ^[[38;5;240m│^[[0m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4517188Z ^[[90m│^[[39m  ^[[38;5;240m│^[[0m ^[[38;5;115mHelp^[[0m: For more information, see ^[]8;;https://rolldown.rs/in-depth/directives#other-directives^Ghttps://rolldown.rs/in-depth/d...^[]8;;^G
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4517845Z ^[[90m│^[[39m  ^[[38;5;246m───╯^[[0m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4518119Z ^[[90m│^[[39m  ^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4518401Z ^[[90m│^[[39m  ^[[43mVite^[[49m ^[[32m✓ built in 1.15s^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4532960Z ^[[90m│^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4533824Z ^[[34m●^[[39m  Storybook collects completely anonymous usage telemetry. We use it to
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4534811Z ^[[90m│^[[39m  shape Storybook's roadmap and prioritize features. You can learn more,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.4536475Z ^[[90m│^[[39m  including how to opt out, at ^[]8;;https://storybook.js.org/telemetry^Ghttps://storybook.js.org/telemetry^[]8;;^G
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.7350681Z ^[[90m│^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.7351195Z ^[[32m◇^[[39m  Output directory:
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.7352090Z ^[[90m│^[[39m  /home/runner/work/_temp/astack-foundation/packages/ui/storybook-static
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.7352908Z ^[[90m│^[[39m
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.7353280Z ^[[90m└^[[39m  Storybook build completed successfully
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.7363715Z 
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.7864613Z {"mode":"ci","elapsedMs":25333,"outcome":"pass"}
+reference	Required workspace and enforcement checks	2026-10-05T11:21:19.7901078Z $ bun scripts/enforcement.ts
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2836981Z {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2837378Z   "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2837688Z   "results": [
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2837933Z     {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2838255Z       "case": "valid composition (cold)",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2838621Z       "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2838996Z       "elapsedMs": 2585,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2839288Z       "rules": []
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2839586Z     },
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2839832Z     {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2840121Z       "case": "valid composition (warm)",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2840476Z       "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2840775Z       "elapsedMs": 2547,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2841051Z       "rules": []
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2841300Z     },
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2841527Z     {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2841964Z       "case": "unowned promise",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2842286Z       "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2842568Z       "elapsedMs": 2348,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2842863Z       "rules": [
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2843204Z         "@typescript-eslint/no-floating-promises"
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2843575Z       ]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2843804Z     },
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2844029Z     {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2844310Z       "case": "unsafe unknown boundary",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2844539Z       "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2844727Z       "elapsedMs": 2410,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2845183Z       "rules": [
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2845407Z         "@typescript-eslint/no-explicit-any",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2845687Z         "@typescript-eslint/no-unsafe-return",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2845968Z         "@typescript-eslint/no-unsafe-member-access"
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2846204Z       ]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2846375Z     },
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2846602Z     {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2846857Z       "case": "missing accessible name",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2847086Z       "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2847272Z       "elapsedMs": 2570,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2847448Z       "rules": [
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2847628Z         "jsx-a11y/alt-text"
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2847819Z       ]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2847967Z     },
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2848112Z     {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2848298Z       "case": "invalid hook call",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2848511Z       "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2848693Z       "elapsedMs": 2583,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2848875Z       "rules": [
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2849076Z         "react-hooks/rules-of-hooks"
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2849288Z       ]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2849439Z     },
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2849583Z     {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2849786Z       "case": "portable public backend import",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2850029Z       "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2850223Z       "elapsedMs": 2489,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2850400Z       "rules": [
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2850587Z         "foundation/portable-ui"
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2850792Z       ]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2850940Z     },
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2851082Z     {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2851282Z       "case": "portable relative backend import",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2851524Z       "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2851871Z       "elapsedMs": 2446,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2852142Z       "rules": [
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2852336Z         "foundation/portable-ui"
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2852528Z       ]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2852673Z     },
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2852821Z     {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2853024Z       "case": "Node builtin without node prefix",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2853268Z       "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2853624Z       "elapsedMs": 2378,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2853797Z       "rules": [
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2853990Z         "foundation/portable-ui"
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2854184Z       ]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2854337Z     },
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2854486Z     {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2854662Z       "case": "global network alias",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2854885Z       "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2855065Z       "elapsedMs": 2419,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2855237Z       "rules": [
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2855425Z         "foundation/portable-ui"
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2855613Z       ]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2855762Z     },
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2855906Z     {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2856094Z       "case": "domain React dependency",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2856313Z       "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2856524Z       "elapsedMs": 1446,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2856702Z       "rules": [
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2856886Z         "foundation/portable-ui"
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2857080Z       ]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2857226Z     },
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2857378Z     {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2857575Z       "case": "domain presentation dependency",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2857807Z       "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2857998Z       "elapsedMs": 1608,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2858182Z       "rules": [
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2858372Z         "foundation/portable-ui"
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2858568Z       ]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2858717Z     },
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2858862Z     {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2859048Z       "case": "domain browser capability",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2859276Z       "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2859456Z       "elapsedMs": 1506,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2859628Z       "rules": [
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2859818Z         "no-restricted-globals"
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2860012Z       ]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2860153Z     },
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2860303Z     {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2860492Z       "case": "domain TSX window capability",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2860720Z       "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2861056Z       "elapsedMs": 1740,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2861238Z       "rules": [
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2861426Z         "no-restricted-globals"
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2861613Z       ]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2872646Z     },
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2872910Z     {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2873241Z       "case": "domain TSX document capability",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2873643Z       "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2873945Z       "elapsedMs": 1467,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2874226Z       "rules": [
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2874530Z         "no-restricted-globals"
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2874852Z       ]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2875086Z     },
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2875314Z     {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2875627Z       "case": "portable configured alias bypass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2875981Z       "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2876241Z       "elapsedMs": 2400,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2876489Z       "rules": [
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2876772Z         "foundation/portable-ui"
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2877050Z       ]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2877256Z     },
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2877505Z     {
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2877861Z       "case": "strict compiler detects invalid assignment",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2878245Z       "outcome": "pass",
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2878516Z       "elapsedMs": 227,
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2878791Z       "rules": [
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2879058Z         "TS2322"
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2879297Z       ]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2879501Z     }
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2879717Z   ]
+reference	Required workspace and enforcement checks	2026-10-05T11:21:55.2879980Z }
+reference	Real backend, browser and MCP readiness	﻿2026-10-05T11:21:55.2932313Z ##[group]Run cd "$RUNNER_TEMP/astack-foundation"
+reference	Real backend, browser and MCP readiness	2026-10-05T11:21:55.2932835Z ^[[36;1mcd "$RUNNER_TEMP/astack-foundation"^[[0m
+reference	Real backend, browser and MCP readiness	2026-10-05T11:21:55.2933230Z ^[[36;1mbun run auth:verify^[[0m
+reference	Real backend, browser and MCP readiness	2026-10-05T11:21:55.2933561Z ^[[36;1mbun run readiness^[[0m
+reference	Real backend, browser and MCP readiness	2026-10-05T11:21:55.3012114Z shell: /usr/bin/bash -e {0}
+reference	Real backend, browser and MCP readiness	2026-10-05T11:21:55.3012351Z ##[endgroup]
+reference	Real backend, browser and MCP readiness	2026-10-05T11:21:55.3110625Z $ bun scripts/auth-proof.ts
+reference	Real backend, browser and MCP readiness	2026-10-05T11:21:55.5109240Z Emulate auth/session proof passed; report: /home/runner/work/_temp/astack-foundation/.proof/auth-emulate-1791199315394
+reference	Real backend, browser and MCP readiness	2026-10-05T11:21:55.5173839Z $ bun scripts/readiness.ts
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4188610Z {
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4189085Z   "format": "astack-foundation-readiness/v1",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4189528Z   "startedAt": "2026-10-05T11:21:55.852Z",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4189910Z   "finishedAt": "2026-10-05T11:22:14.418Z",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4190610Z   "revision": "unversioned@sha256-2137d094f96ff599e0c98dccc50ba85da66e550e2b591a5c87184ed0422b412b",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4191243Z   "taskProfile": "baseline",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4191656Z   "outcome": "pass",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4192076Z   "environment": {
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4192449Z     "kind": "disposable local Convex + Vite + Chromium",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4193183Z     "buildId": "unversioned@sha256-2137d094f96ff599e0c98dccc50ba85da66e550e2b591a5c87184ed0422b412b",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4193777Z     "web": "http://127.0.0.1:33243",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4194117Z     "convex": "http://127.0.0.1:44633",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4194443Z     "mcp": "http://127.0.0.1:46831/mcp",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4194825Z     "actors": "Emulate seeded owner and other user",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4195791Z     "credentialPolicy": "WorkOS Emulate AuthKit/Connect tokens; synthetic expired/wrong-audience negative controls only; no credentials retained"
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4196608Z   },
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4197071Z   "checks": [
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4197313Z     {
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4197543Z       "id": "R1",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4197793Z       "surface": "identity",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4198104Z       "outcome": "pass",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4198728Z       "observation": "Running backend health and web identify this revision and WorkOS Emulate environment."
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4199305Z     },
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4199521Z     {
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4199732Z       "id": "R10",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4200035Z       "surface": "WorkOS Emulate AuthKit/session",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4200399Z       "outcome": "pass",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4201305Z       "observation": "SDK login, linked identity, refresh rotation, replay denial and session revocation pass in Emulate; browser uses the official AuthKit/Convex adapter."
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4203150Z     },
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4203384Z     {
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4203628Z       "id": "R2",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4204199Z       "surface": "web → persistence",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4204543Z       "outcome": "pass",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4205115Z       "observation": "Creating through the web is visible in a fresh authenticated Convex read."
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4205667Z     },
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4205884Z     {
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4206092Z       "id": "R3",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4206505Z       "surface": "web ↔ MCP status persistence",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4206902Z       "outcome": "pass",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4207666Z       "observation": "Web done/reopen actions survive independent reads; MCP observes reopened status, and MCP done survives a web reload."
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4208385Z     },
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4208609Z     {
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4208834Z       "id": "R4",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4209149Z       "surface": "authorization",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4209462Z       "outcome": "pass",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4210173Z       "observation": "Another signed user cannot read or mutate the first user’s item through Convex or MCP."
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4210748Z     },
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4210961Z     {
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4211184Z       "id": "R5",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4211479Z       "surface": "authentication",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4234281Z       "outcome": "pass",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4235426Z       "observation": "MCP denies anonymous, web-audience, wrong-audience and expired credentials; Convex denies anonymous/wrong-audience reads."
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4236213Z     },
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4236486Z     {
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4236752Z       "id": "R6",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4237054Z       "surface": "MCP contracts",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4237384Z       "outcome": "pass",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4238082Z       "observation": "Malformed status arguments are rejected and the UI resource contains its required JS/CSS."
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4238682Z     },
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4238909Z     {
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4239137Z       "id": "R7",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4239441Z       "surface": "local MCP App host",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4239781Z       "outcome": "pass",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4240742Z       "observation": "The MCP resource applies initial and updated host styles, acknowledges teardown, remounts, and changes persisted status through AppBridge and web reloads."
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4241647Z     },
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4242009Z     {
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4242216Z       "id": "R8",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4242471Z       "surface": "web runtime",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4242793Z       "outcome": "pass",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4243422Z       "observation": "No uncaught web JavaScript error was observed during the create/reload journey."
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4244014Z     },
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4244243Z     {
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4244475Z       "id": "R9",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4244822Z       "surface": "standalone MCP development preview",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4245218Z       "outcome": "pass",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4246693Z       "observation": "Opening the development URL shows a connection action without host errors; an Emulate-issued token loads the actual MCP resource, changes persisted status, refreshes and disconnects. OAuth state mismatch is rejected. Live WorkOS remains separate."
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4247948Z     },
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4248158Z     {
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4248363Z       "id": "R11",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4248684Z       "surface": "Emulate development preview",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4249026Z       "outcome": "pass",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4250064Z       "observation": "Connect with Emulate loads persisted work, renews local tokens on reconnect and enforces same-origin/method/content-type guards. It does not exercise real OAuth consent."
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4251024Z     },
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4251229Z     {
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4251441Z       "id": "G1",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4251820Z       "surface": "WorkOS",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4252303Z       "outcome": "skipped",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4253529Z       "observation": "Emulate proves local AuthKit behavior. Manual Hosted AuthKit login/redirect/refresh/subject continuity requires a temporary astack Staging identity. Real staging SDK proof is a separate auth:staging run."
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4254674Z     },
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4254903Z     {
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4255150Z       "id": "G2",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4255452Z       "surface": "real MCP OAuth",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4255786Z       "outcome": "skipped",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4256930Z       "observation": "Real MCP consent, exact-resource issuance and same WorkOS identity across web/MCP require manual staging acceptance. Emulate Connect has no DCR/PKCE/consent/refresh coverage."
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4257889Z     },
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4258096Z     {
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4258330Z       "id": "H1",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4258637Z       "surface": "installed ChatGPT host",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4258991Z       "outcome": "skipped",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4259958Z       "observation": "The local AppBridge host passed. Installed ChatGPT OAuth, tool selection and App behavior require a separate authorized host acceptance run and public HTTPS resource."
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4260859Z     }
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4261056Z   ],
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4261286Z   "artifacts": [
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4261569Z     "web-persisted.png",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4287405Z     "mcp-app-host.png",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4287790Z     "mcp-host-observations.json",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4290569Z     "development-mcp-preview.png",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4290924Z     "emulate-mcp-preview.png",
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4291206Z     "runtime.log"
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4291449Z   ],
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4291663Z   "cleanup": "complete"
+reference	Real backend, browser and MCP readiness	2026-10-05T11:22:14.4292072Z }
+reference	Persistent local development and restart	﻿2026-10-05T11:22:19.1319413Z ##[group]Run cd "$RUNNER_TEMP/astack-foundation"
+reference	Persistent local development and restart	2026-10-05T11:22:19.1319737Z ^[[36;1mcd "$RUNNER_TEMP/astack-foundation"^[[0m
+reference	Persistent local development and restart	2026-10-05T11:22:19.1319982Z ^[[36;1mbun run development:verify^[[0m
+reference	Persistent local development and restart	2026-10-05T11:22:19.1377911Z shell: /usr/bin/bash -e {0}
+reference	Persistent local development and restart	2026-10-05T11:22:19.1378142Z ##[endgroup]
+reference	Persistent local development and restart	2026-10-05T11:22:19.1470800Z $ bun scripts/development-proof.ts
+reference	Persistent local development and restart	2026-10-05T11:22:59.4746948Z Persistent local development, restart/read and private export passed; report: /home/runner/work/_temp/astack-foundation/.proof/development-1791199339434
+reference	Render against the Pen design	﻿2026-10-05T11:23:04.1540987Z ##[group]Run cd "$RUNNER_TEMP/astack-foundation"
+reference	Render against the Pen design	2026-10-05T11:23:04.1541347Z ^[[36;1mcd "$RUNNER_TEMP/astack-foundation"^[[0m
+reference	Render against the Pen design	2026-10-05T11:23:04.1541594Z ^[[36;1mbun run design:verify^[[0m
+reference	Render against the Pen design	2026-10-05T11:23:04.1598552Z shell: /usr/bin/bash -e {0}
+reference	Render against the Pen design	2026-10-05T11:23:04.1598786Z ##[endgroup]
+reference	Render against the Pen design	2026-10-05T11:23:04.1712635Z $ bun scripts/design-proof.ts
+reference	Render against the Pen design	2026-10-05T11:23:04.4786611Z $ storybook build
+reference	Render against the Pen design	2026-10-05T11:23:04.7638525Z 
+reference	Render against the Pen design	2026-10-05T11:23:04.7654939Z ^[[90m┌^[[39m  Building storybook v10.6.1
+reference	Render against the Pen design	2026-10-05T11:23:04.9218518Z ^[[90m│^[[39m
+reference	Render against the Pen design	2026-10-05T11:23:04.9219250Z ^[[32m◇^[[39m  Cleaning outputDir: ^[[36mstorybook-static^[[39m
+reference	Render against the Pen design	2026-10-05T11:23:04.9683848Z ^[[90m│^[[39m
+reference	Render against the Pen design	2026-10-05T11:23:04.9684498Z ^[[32m◇^[[39m  Loading presets
+reference	Render against the Pen design	2026-10-05T11:23:05.2359722Z ^[[90m│^[[39m
+reference	Render against the Pen design	2026-10-05T11:23:05.2360091Z ^[[32m◇^[[39m  Building manager..
+reference	Render against the Pen design	2026-10-05T11:23:05.3362443Z ^[[90m│^[[39m
+reference	Render against the Pen design	2026-10-05T11:23:05.3362868Z ^[[34m●^[[39m  Building open services..
+reference	Render against the Pen design	2026-10-05T11:23:05.3365566Z ^[[90m│^[[39m
+reference	Render against the Pen design	2026-10-05T11:23:05.3365962Z ^[[34m●^[[39m  Building preview..
+reference	Render against the Pen design	2026-10-05T11:23:05.3765722Z ^[[90m│^[[39m  ^[[43mVite^[[49m ^[[36mvite v8.3.2 ^[[32mbuilding client environment for production...^[[36m^[[39m
+reference	Render against the Pen design	2026-10-05T11:23:05.4385935Z transforming...
+reference	Render against the Pen design	2026-10-05T11:23:06.2782502Z ✓ 1926 modules transformed.
+reference	Render against the Pen design	2026-10-05T11:23:06.3545760Z rendering chunks...
+reference	Render against the Pen design	2026-10-05T11:23:06.5045387Z computing gzip size...
+reference	Render against the Pen design	2026-10-05T11:23:06.5219769Z ^[[90m│^[[39m  ^[[43mVite^[[49m storybook-static/iframe.html
+reference	Render against the Pen design	2026-10-05T11:23:06.5220500Z ^[[90m│^[[39m  18.43 kB │ gzip:   5.21 kB
+reference	Render against the Pen design	2026-10-05T11:23:06.5221364Z ^[[90m│^[[39m  storybook-static/assets/inter-latin-wght-normal-Dx4kXJAl.woff2
+reference	Render against the Pen design	2026-10-05T11:23:06.5222072Z ^[[90m│^[[39m  48.25 kB
+reference	Render against the Pen design	2026-10-05T11:23:06.5222696Z ^[[90m│^[[39m  storybook-static/assets/styles-B0G18e9z.css
+reference	Render against the Pen design	2026-10-05T11:23:06.5223037Z ^[[90m│^[[39m  11.55 kB │ gzip:   3.17 kB
+reference	Render against the Pen design	2026-10-05T11:23:06.5223371Z ^[[90m│^[[39m  storybook-static/assets/iframe-Ck7T_S8b.js
+reference	Render against the Pen design	2026-10-05T11:23:06.5223684Z ^[[90m│^[[39m  0.04 kB │ gzip:   0.06 kB
+reference	Render against the Pen design	2026-10-05T11:23:06.5224073Z ^[[90m│^[[39m  storybook-static/assets/WorkItemList.stories-C0DqzlJT.js
+reference	Render against the Pen design	2026-10-05T11:23:06.5224445Z ^[[90m│^[[39m  0.62 kB │ gzip:   0.41 kB
+reference	Render against the Pen design	2026-10-05T11:23:06.5224805Z ^[[90m│^[[39m  storybook-static/assets/rolldown-runtime-DkW27tQK.js
+reference	Render against the Pen design	2026-10-05T11:23:06.5225155Z ^[[90m│^[[39m  1.19 kB │ gzip:   0.67 kB
+reference	Render against the Pen design	2026-10-05T11:23:06.5225519Z ^[[90m│^[[39m  storybook-static/assets/Workspace.stories-BXPKdrAI.js
+reference	Render against the Pen design	2026-10-05T11:23:06.5225853Z ^[[90m│^[[39m  2.20 kB │ gzip:   1.08 kB
+reference	Render against the Pen design	2026-10-05T11:23:06.5226185Z ^[[90m│^[[39m  storybook-static/assets/styles-D7joA_Sp.js
+reference	Render against the Pen design	2026-10-05T11:23:06.5226503Z ^[[90m│^[[39m  40.20 kB │ gzip:  13.54 kB
+reference	Render against the Pen design	2026-10-05T11:23:06.5226836Z ^[[90m│^[[39m  storybook-static/assets/react-18-DV84tAQM.js
+reference	Render against the Pen design	2026-10-05T11:23:06.5227173Z ^[[90m│^[[39m  211.37 kB │ gzip:  66.03 kB
+reference	Render against the Pen design	2026-10-05T11:23:06.5227497Z ^[[90m│^[[39m  storybook-static/assets/iframe-CK-8pF0S.js
+reference	Render against the Pen design	2026-10-05T11:23:06.5227845Z ^[[90m│^[[39m  1,124.83 kB │ gzip: 319.28 kB
+reference	Render against the Pen design	2026-10-05T11:23:06.5228010Z 
+reference	Render against the Pen design	2026-10-05T11:23:06.5238477Z ^[[90m│^[[39m
+reference	Render against the Pen design	2026-10-05T11:23:06.5239359Z ^[[33m▲^[[39m  ^[[43mVite^[[49m ^[[33m^[[33m[MODULE_LEVEL_DIRECTIVE] ^[[0mThe semantics of the module level
+reference	Render against the Pen design	2026-10-05T11:23:06.5240258Z ^[[90m│^[[39m  directive "use client" in
+reference	Render against the Pen design	2026-10-05T11:23:06.5241322Z ^[[90m│^[[39m  "../../node_modules/.bun/lucide-react@1.52.0+0ac650c021fb1b59/node_modules/lucide-react/dist/esm/context.mjs"
+reference	Render against the Pen design	2026-10-05T11:23:06.5242287Z ^[[90m│^[[39m  may not be preserved when bundling.
+reference	Render against the Pen design	2026-10-05T11:23:06.5242870Z ^[[90m│^[[39m  ^[[38;5;246m╭^[[0m^[[38;5;246m─^[[0m^[[38;5;246m[^[[0m
+reference	Render against the Pen design	2026-10-05T11:23:06.5243905Z ^[[90m│^[[39m  ../../node_modules/.bun/lucide-react@1.52.0+0ac650c021fb1b59/node_modules/lucide-react/dist/esm/context.mjs:2:1
+reference	Render against the Pen design	2026-10-05T11:23:06.5244449Z ^[[90m│^[[39m  ^[[38;5;246m]^[[0m
+reference	Render against the Pen design	2026-10-05T11:23:06.5244706Z ^[[90m│^[[39m  ^[[38;5;246m│^[[0m
+reference	Render against the Pen design	2026-10-05T11:23:06.5244978Z ^[[90m│^[[39m  ^[[38;5;246m2 │^[[0m "use client";
+reference	Render against the Pen design	2026-10-05T11:23:06.5245295Z ^[[90m│^[[39m  ^[[38;5;240m│^[[0m ──────┬──────
+reference	Render against the Pen design	2026-10-05T11:23:06.5246073Z ^[[90m│^[[39m  ^[[38;5;240m│^[[0m       ╰──────── module level directive may not be preserved
+reference	Render against the Pen design	2026-10-05T11:23:06.5247013Z ^[[90m│^[[39m  ^[[38;5;240m│^[[0m
+reference	Render against the Pen design	2026-10-05T11:23:06.5247885Z ^[[90m│^[[39m  ^[[38;5;240m│^[[0m ^[[38;5;115mHelp^[[0m: For more information, see ^[]8;;https://rolldown.rs/in-depth/directives#other-directives^Ghttps://rolldown.rs/in-depth/d...^[]8;;^G
+reference	Render against the Pen design	2026-10-05T11:23:06.5260005Z ^[[90m│^[[39m  ^[[38;5;246m───╯^[[0m
+reference	Render against the Pen design	2026-10-05T11:23:06.5260360Z ^[[90m│^[[39m  ^[[39m
+reference	Render against the Pen design	2026-10-05T11:23:06.5260641Z ^[[90m│^[[39m
+reference	Render against the Pen design	2026-10-05T11:23:06.5261144Z ^[[33m▲^[[39m  ^[[43mVite^[[49m ^[[33m[plugin builtin:vite-reporter]
+reference	Render against the Pen design	2026-10-05T11:23:06.5263067Z ^[[90m│^[[39m  (!) Some chunks are larger than 500 kB after minification. Consider:
+reference	Render against the Pen design	2026-10-05T11:23:06.5263912Z ^[[90m│^[[39m  - Using dynamic import() to code-split the application
+reference	Render against the Pen design	2026-10-05T11:23:06.5265049Z ^[[90m│^[[39m  - Use build.rolldownOptions.output.codeSplitting to improve chunking:
+reference	Render against the Pen design	2026-10-05T11:23:06.5266379Z ^[[90m│^[[39m  ^[]8;;https://rolldown.rs/reference/OutputOptions.codeSplitting^Ghttps://rolldown.rs/reference/OutputOptions.codeSplitting^[]8;;^G
+reference	Render against the Pen design	2026-10-05T11:23:06.5267391Z ^[[90m│^[[39m  - Adjust chunk size limit for this warning via
+reference	Render against the Pen design	2026-10-05T11:23:06.5267984Z ^[[90m│^[[39m  build.chunkSizeWarningLimit.^[[39m
+reference	Render against the Pen design	2026-10-05T11:23:06.5268385Z ^[[90m│^[[39m
+reference	Render against the Pen design	2026-10-05T11:23:06.5269066Z ^[[33m▲^[[39m  ^[[43mVite^[[49m ^[[33m^[[33m[MODULE_LEVEL_DIRECTIVE] ^[[0mThe semantics of the module level
+reference	Render against the Pen design	2026-10-05T11:23:06.5269700Z ^[[90m│^[[39m  directive "use client" in
+reference	Render against the Pen design	2026-10-05T11:23:06.5270262Z ^[[90m│^[[39m  "../../node_modules/.bun/lucide-react@1.52.0+0ac650c021fb1b59/node_modules/lucide-react/dist/esm/Icon.mjs"
+reference	Render against the Pen design	2026-10-05T11:23:06.5270745Z ^[[90m│^[[39m  may not be preserved when bundling.
+reference	Render against the Pen design	2026-10-05T11:23:06.5271114Z ^[[90m│^[[39m  ^[[38;5;246m╭^[[0m^[[38;5;246m─^[[0m^[[38;5;246m[^[[0m
+reference	Render against the Pen design	2026-10-05T11:23:06.5271913Z ^[[90m│^[[39m  ../../node_modules/.bun/lucide-react@1.52.0+0ac650c021fb1b59/node_modules/lucide-react/dist/esm/Icon.mjs:2:1
+reference	Render against the Pen design	2026-10-05T11:23:06.5272631Z ^[[90m│^[[39m  ^[[38;5;246m]^[[0m
+reference	Render against the Pen design	2026-10-05T11:23:06.5272992Z ^[[90m│^[[39m  ^[[38;5;246m│^[[0m
+reference	Render against the Pen design	2026-10-05T11:23:06.5273410Z ^[[90m│^[[39m  ^[[38;5;246m2 │^[[0m "use client";
+reference	Render against the Pen design	2026-10-05T11:23:06.5273816Z ^[[90m│^[[39m  ^[[38;5;240m│^[[0m ──────┬──────
+reference	Render against the Pen design	2026-10-05T11:23:06.5274247Z ^[[90m│^[[39m  ^[[38;5;240m│^[[0m       ╰──────── module level directive may not be preserved
+reference	Render against the Pen design	2026-10-05T11:23:06.5274589Z ^[[90m│^[[39m  ^[[38;5;240m│^[[0m
+reference	Render against the Pen design	2026-10-05T11:23:06.5275331Z ^[[90m│^[[39m  ^[[38;5;240m│^[[0m ^[[38;5;115mHelp^[[0m: For more information, see ^[]8;;https://rolldown.rs/in-depth/directives#other-directives^Ghttps://rolldown.rs/in-depth/d...^[]8;;^G
+reference	Render against the Pen design	2026-10-05T11:23:06.5275919Z ^[[90m│^[[39m  ^[[38;5;246m───╯^[[0m
+reference	Render against the Pen design	2026-10-05T11:23:06.5276142Z ^[[90m│^[[39m  ^[[39m
+reference	Render against the Pen design	2026-10-05T11:23:06.5276428Z ^[[90m│^[[39m  ^[[43mVite^[[49m ^[[32m✓ built in 1.15s^[[39m
+reference	Render against the Pen design	2026-10-05T11:23:06.7532039Z ^[[90m│^[[39m
+reference	Render against the Pen design	2026-10-05T11:23:06.7532599Z ^[[32m◇^[[39m  Output directory:
+reference	Render against the Pen design	2026-10-05T11:23:06.7533367Z ^[[90m│^[[39m  /home/runner/work/_temp/astack-foundation/packages/ui/storybook-static
+reference	Render against the Pen design	2026-10-05T11:23:06.7534078Z ^[[90m│^[[39m
+reference	Render against the Pen design	2026-10-05T11:23:06.7534597Z ^[[90m└^[[39m  Storybook build completed successfully
+reference	Render against the Pen design	2026-10-05T11:23:06.7534970Z 
+reference	Render against the Pen design	2026-10-05T11:23:09.7346133Z {
+reference	Render against the Pen design	2026-10-05T11:23:09.7346806Z   "outcome": "pass",
+reference	Render against the Pen design	2026-10-05T11:23:09.7347124Z   "frames": [
+reference	Render against the Pen design	2026-10-05T11:23:09.7347340Z     {
+reference	Render against the Pen design	2026-10-05T11:23:09.7347588Z       "id": "Hhign",
+reference	Render against the Pen design	2026-10-05T11:23:09.7347872Z       "outcome": "pass"
+reference	Render against the Pen design	2026-10-05T11:23:09.7348142Z     },
+reference	Render against the Pen design	2026-10-05T11:23:09.7348326Z     {
+reference	Render against the Pen design	2026-10-05T11:23:09.7348494Z       "id": "l5CZRK",
+reference	Render against the Pen design	2026-10-05T11:23:09.7348686Z       "outcome": "pass"
+reference	Render against the Pen design	2026-10-05T11:23:09.7348860Z     },
+reference	Render against the Pen design	2026-10-05T11:23:09.7349011Z     {
+reference	Render against the Pen design	2026-10-05T11:23:09.7349172Z       "id": "azIBu",
+reference	Render against the Pen design	2026-10-05T11:23:09.7349352Z       "outcome": "pass"
+reference	Render against the Pen design	2026-10-05T11:23:09.7349521Z     },
+reference	Render against the Pen design	2026-10-05T11:23:09.7349674Z     {
+reference	Render against the Pen design	2026-10-05T11:23:09.7349862Z       "id": "mcpFP",
+reference	Render against the Pen design	2026-10-05T11:23:09.7350032Z       "outcome": "pass"
+reference	Render against the Pen design	2026-10-05T11:23:09.7350218Z     },
+reference	Render against the Pen design	2026-10-05T11:23:09.7350361Z     {
+reference	Render against the Pen design	2026-10-05T11:23:09.7350511Z       "id": "XSTWb",
+reference	Render against the Pen design	2026-10-05T11:23:09.7350681Z       "outcome": "pass"
+reference	Render against the Pen design	2026-10-05T11:23:09.7350855Z     },
+reference	Render against the Pen design	2026-10-05T11:23:09.7351003Z     {
+reference	Render against the Pen design	2026-10-05T11:23:09.7351385Z       "id": "FrMvz",
+reference	Render against the Pen design	2026-10-05T11:23:09.7362237Z       "outcome": "pass"
+reference	Render against the Pen design	2026-10-05T11:23:09.7362514Z     },
+reference	Render against the Pen design	2026-10-05T11:23:09.7362743Z     {
+reference	Render against the Pen design	2026-10-05T11:23:09.7362967Z       "id": "dcVZh",
+reference	Render against the Pen design	2026-10-05T11:23:09.7363223Z       "outcome": "pass"
+reference	Render against the Pen design	2026-10-05T11:23:09.7363424Z     },
+reference	Render against the Pen design	2026-10-05T11:23:09.7363569Z     {
+reference	Render against the Pen design	2026-10-05T11:23:09.7363715Z       "id": "uJu1t",
+reference	Render against the Pen design	2026-10-05T11:23:09.7363887Z       "outcome": "pass"
+reference	Render against the Pen design	2026-10-05T11:23:09.7364051Z     },
+reference	Render against the Pen design	2026-10-05T11:23:09.7364191Z     {
+reference	Render against the Pen design	2026-10-05T11:23:09.7364342Z       "id": "ZZhmK",
+reference	Render against the Pen design	2026-10-05T11:23:09.7364515Z       "outcome": "pass"
+reference	Render against the Pen design	2026-10-05T11:23:09.7364682Z     }
+reference	Render against the Pen design	2026-10-05T11:23:09.7364993Z   ]
+reference	Render against the Pen design	2026-10-05T11:23:09.7365154Z }
+reference	Retain first failure and redacted observations	﻿2026-10-05T11:23:09.7520208Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+reference	Retain first failure and redacted observations	2026-10-05T11:23:09.7520548Z with:
+reference	Retain first failure and redacted observations	2026-10-05T11:23:09.7520726Z   name: foundation-proof
+reference	Retain first failure and redacted observations	2026-10-05T11:23:09.7520968Z   path: /home/runner/work/_temp/astack-foundation/.proof/
+reference	Retain first failure and redacted observations	2026-10-05T11:23:09.7521239Z   include-hidden-files: true
+reference	Retain first failure and redacted observations	2026-10-05T11:23:09.7521441Z   retention-days: 14
+reference	Retain first failure and redacted observations	2026-10-05T11:23:09.7521623Z   if-no-files-found: warn
+reference	Retain first failure and redacted observations	2026-10-05T11:23:09.7522246Z   compression-level: 6
+reference	Retain first failure and redacted observations	2026-10-05T11:23:09.7522426Z   overwrite: false
+reference	Retain first failure and redacted observations	2026-10-05T11:23:09.7522601Z ##[endgroup]
+reference	Retain first failure and redacted observations	2026-10-05T11:23:09.8881866Z (node:6179) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+reference	Retain first failure and redacted observations	2026-10-05T11:23:09.8882573Z (Use `node --trace-deprecation ...` to show where the warning was created)
+reference	Retain first failure and redacted observations	2026-10-05T11:23:09.8968121Z With the provided path, there will be 23 files uploaded
+reference	Retain first failure and redacted observations	2026-10-05T11:23:09.8972951Z Artifact name is valid!
+reference	Retain first failure and redacted observations	2026-10-05T11:23:09.8973426Z Root directory input is valid!
+reference	Retain first failure and redacted observations	2026-10-05T11:23:10.1071961Z Beginning upload of artifact content to blob storage
+reference	Retain first failure and redacted observations	2026-10-05T11:23:10.1529386Z (node:6179) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+reference	Retain first failure and redacted observations	2026-10-05T11:23:10.2185717Z Uploaded bytes 418064
+reference	Retain first failure and redacted observations	2026-10-05T11:23:10.2342320Z Finished uploading artifact content to blob storage!
+reference	Retain first failure and redacted observations	2026-10-05T11:23:10.2343330Z SHA256 digest of uploaded artifact zip is 82cfd87a54188313f3d41fa1a030d42380e11134f26bc8e12696eb871e97b63a
+reference	Retain first failure and redacted observations	2026-10-05T11:23:10.2344039Z Finalizing artifact upload
+reference	Retain first failure and redacted observations	2026-10-05T11:23:10.4491553Z Artifact foundation-proof.zip successfully finalized. Artifact ID 11342225595
+reference	Retain first failure and redacted observations	2026-10-05T11:23:10.4492944Z Artifact foundation-proof has been successfully uploaded! Final size is 418064 bytes. Artifact ID is 11342225595
+reference	Retain first failure and redacted observations	2026-10-05T11:23:10.4498890Z Artifact download URL: https://github.com/applification/astack/actions/runs/37302285192/artifacts/11342225595
+reference	Post Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	﻿2026-10-05T11:23:10.4645364Z Post job cleanup.
+reference	Post Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	2026-10-05T11:23:10.5691024Z (node:6191) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+reference	Post Run oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76	2026-10-05T11:23:10.5691880Z (Use `node --trace-deprecation ...` to show where the warning was created)
+reference	Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	﻿2026-10-05T11:23:10.5806458Z Post job cleanup.
+reference	Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	2026-10-05T11:23:10.6874687Z (node:6199) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+reference	Post Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020	2026-10-05T11:23:10.6876017Z (Use `node --trace-deprecation ...` to show where the warning was created)
+reference	Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	﻿2026-10-05T11:23:10.7058950Z Post job cleanup.
+reference	Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:23:10.7797302Z [command]/usr/bin/git version
+reference	Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:23:10.7834402Z git version 2.55.0
+reference	Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:23:10.7869209Z Temporarily overriding HOME='/home/runner/work/_temp/a33a2e72-1d08-470d-8579-6124473294a3' before making global git config changes
+reference	Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:23:10.7870653Z Adding repository directory to the temporary git global config as a safe directory
+reference	Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:23:10.7871835Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/astack/astack
+reference	Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:23:10.7903218Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+reference	Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:23:10.7932801Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+reference	Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:23:10.8169526Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+reference	Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:23:10.8202546Z http.https://github.com/.extraheader
+reference	Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:23:10.8203902Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+reference	Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	2026-10-05T11:23:10.8234125Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+reference	Complete job	﻿2026-10-05T11:23:10.9475646Z Cleaning up orphan processes
+reference	Complete job	2026-10-05T11:23:10.9807420Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683, actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02, oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

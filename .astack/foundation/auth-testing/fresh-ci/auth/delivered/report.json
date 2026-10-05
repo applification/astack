@@ -1,0 +1,17 @@
+{
+  "revision": "unversioned@sha256-2137d094f96ff599e0c98dccc50ba85da66e550e2b591a5c87184ed0422b412b",
+  "tier": "workos-emulate",
+  "outcome": "pass",
+  "observations": [
+    "seeded user and linked identity; SDK password authentication; signature/issuer/audience",
+    "incorrect password rejected; refresh rotates and preserves subject/session; replay rejected",
+    "revocation prevents refresh (already-issued access JWTs remain valid until expiry)",
+    "Emulate-issued web and Connect tokens share the seeded subject with distinct issuers"
+  ],
+  "cleanup": "complete",
+  "limits": [
+    "No real WorkOS service or Hosted AuthKit.",
+    "No real MCP consent/DCR/PKCE/resource negotiation or Connect refresh.",
+    "No installed ChatGPT host."
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "acceptedBuild": "5349fcd9da018d80d04134358a0e0627fcb49d90@sha256-dadbad2ab43839dfb5b918122154261b760445936c69ef4337cda0271537ceff",
+  "sourceSha256": "dadbad2ab43839dfb5b918122154261b760445936c69ef4337cda0271537ceff",
+  "implementationCommit": "ba89698e594a0c4e9c139ce9416a10079defd7b8",
+  "providerObservation": "workos sandbox authorization entry; completed login, consent and refresh pending",
+  "sourceArchiveSha256": "47193a6092a048fd648696bfa9fd9f93894e90a809d685245584dabb613d238c"
+}

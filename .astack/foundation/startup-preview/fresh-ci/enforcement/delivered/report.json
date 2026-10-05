@@ -1,0 +1,143 @@
+{
+  "scope": "adopted detectable rules; semantic composition and test quality require review",
+  "inputSha256": "a4077030b137e23c7233861457d148245c9b867ba270a698d43523d5dabba6d0",
+  "compiler": "Version 7.0.2",
+  "compilerApi": "Version 6.0.3",
+  "eslint": "v9.39.4",
+  "results": [
+    {
+      "case": "valid composition (cold)",
+      "outcome": "pass",
+      "elapsedMs": 2863,
+      "rules": []
+    },
+    {
+      "case": "valid composition (warm)",
+      "outcome": "pass",
+      "elapsedMs": 2873,
+      "rules": []
+    },
+    {
+      "case": "unowned promise",
+      "outcome": "pass",
+      "elapsedMs": 2623,
+      "rules": [
+        "@typescript-eslint/no-floating-promises"
+      ]
+    },
+    {
+      "case": "unsafe unknown boundary",
+      "outcome": "pass",
+      "elapsedMs": 2657,
+      "rules": [
+        "@typescript-eslint/no-explicit-any",
+        "@typescript-eslint/no-unsafe-return",
+        "@typescript-eslint/no-unsafe-member-access"
+      ]
+    },
+    {
+      "case": "missing accessible name",
+      "outcome": "pass",
+      "elapsedMs": 2858,
+      "rules": [
+        "jsx-a11y/alt-text"
+      ]
+    },
+    {
+      "case": "invalid hook call",
+      "outcome": "pass",
+      "elapsedMs": 2853,
+      "rules": [
+        "react-hooks/rules-of-hooks"
+      ]
+    },
+    {
+      "case": "portable public backend import",
+      "outcome": "pass",
+      "elapsedMs": 2780,
+      "rules": [
+        "foundation/portable-ui"
+      ]
+    },
+    {
+      "case": "portable relative backend import",
+      "outcome": "pass",
+      "elapsedMs": 2644,
+      "rules": [
+        "foundation/portable-ui"
+      ]
+    },
+    {
+      "case": "Node builtin without node prefix",
+      "outcome": "pass",
+      "elapsedMs": 2638,
+      "rules": [
+        "foundation/portable-ui"
+      ]
+    },
+    {
+      "case": "global network alias",
+      "outcome": "pass",
+      "elapsedMs": 2664,
+      "rules": [
+        "foundation/portable-ui"
+      ]
+    },
+    {
+      "case": "domain React dependency",
+      "outcome": "pass",
+      "elapsedMs": 1571,
+      "rules": [
+        "foundation/portable-ui"
+      ]
+    },
+    {
+      "case": "domain presentation dependency",
+      "outcome": "pass",
+      "elapsedMs": 1748,
+      "rules": [
+        "foundation/portable-ui"
+      ]
+    },
+    {
+      "case": "domain browser capability",
+      "outcome": "pass",
+      "elapsedMs": 1614,
+      "rules": [
+        "no-restricted-globals"
+      ]
+    },
+    {
+      "case": "domain TSX window capability",
+      "outcome": "pass",
+      "elapsedMs": 1957,
+      "rules": [
+        "no-restricted-globals"
+      ]
+    },
+    {
+      "case": "domain TSX document capability",
+      "outcome": "pass",
+      "elapsedMs": 1661,
+      "rules": [
+        "no-restricted-globals"
+      ]
+    },
+    {
+      "case": "portable configured alias bypass",
+      "outcome": "pass",
+      "elapsedMs": 2703,
+      "rules": [
+        "foundation/portable-ui"
+      ]
+    },
+    {
+      "case": "strict compiler detects invalid assignment",
+      "outcome": "pass",
+      "elapsedMs": 281,
+      "rules": [
+        "TS2322"
+      ]
+    }
+  ]
+}

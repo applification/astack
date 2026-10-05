@@ -1,0 +1,19 @@
+{
+  "revision": "e35d33d8448ae20343b135b82db1549b2b94c431@sha256-ad75ca82c9977c79e557ea614504ccdda381ece081a86faefb96f24b7cbe5e17",
+  "tier": "real-workos-staging",
+  "environmentId": "environment_01M44GM0FT8SCNA5D3CYQNY2E5",
+  "clientId": "client_01M44GM0TDFFAQKQA7YFX23ZDY",
+  "outcome": "pass",
+  "observations": [
+    "Disposable staging user setup completed.",
+    "SDK password authentication returned the disposable subject.",
+    "Real astack Staging user created with generated password; SDK authenticated; provider signature/issuer validated.",
+    "Real AuthKit refresh preserves subject/session; revoked session cannot refresh."
+  ],
+  "cleanup": "complete",
+  "limits": [
+    "No Hosted AuthKit UI/redirect proof.",
+    "No real MCP consent/exact-resource issuance or web ↔ MCP continuity.",
+    "No installed ChatGPT host."
+  ]
+}

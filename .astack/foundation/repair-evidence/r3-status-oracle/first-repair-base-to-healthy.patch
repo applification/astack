@@ -1,0 +1,202 @@
+--- a/examples/foundation/scripts/readiness.ts
++++ b/examples/foundation/scripts/readiness.ts
+@@ -51,6 +51,32 @@
+ );
+ export function items(value: unknown): WorkItem[] {
+   return workItemsSchema.parse(value);
++}
++/** Only validated, successfully read state can establish a persistence mismatch. */
++export async function expectPersistedStatus(
++  read: () => Promise<unknown>,
++  id: string,
++  expected: 'open' | 'done',
++  options: { timeoutMs?: number; pollMs?: number } = {},
++): Promise<void> {
++  const timeoutMs = options.timeoutMs ?? 5000,
++    deadline = Date.now() + timeoutMs;
++  let observed: WorkItem['status'] | undefined;
++  do {
++    // Transport and DTO errors propagate immediately; neither is seed evidence.
++    observed = items(await read()).find((item) => item.id === id)?.status;
++    if (observed === expected) return;
++    const remaining = deadline - Date.now();
++    if (remaining <= 0) break;
++    await new Promise<void>((done) =>
++      setTimeout(done, Math.min(options.pollMs ?? 100, remaining)),
++    );
++  } while (Date.now() <= deadline);
++  assert.equal(
++    observed,
++    expected,
++    `Fresh backend reads did not persist web status '${expected}' within ${timeoutMs}ms`,
++  );
+ }
+ export function selfContainedResource(html: string): void {
+   assert.ok(
+@@ -335,25 +361,40 @@
+         await page
+           .getByRole('button', { name: 'Mark done', exact: true })
+           .click();
++        const settledControl = page.getByRole('button', {
++          name: /^(Mark done|Reopen)$/,
++        });
++        await waitFor(
++          async () =>
++            (await settledControl.count()) === 1 &&
++            (await settledControl.isEnabled()),
++          'web status mutation to settle',
++          10_000,
++        );
++        await expectPersistedStatus(
++          () => owner.query(list, {}),
++          item.id,
++          'done',
++        );
+         await page
+           .getByRole('button', { name: 'Reopen', exact: true })
+           .waitFor();
+-        assert.equal(
+-          items(await owner.query(list, {})).find(
+-            (value) => value.id === item.id,
+-          )?.status,
+-          'done',
+-        );
+         await page.getByRole('button', { name: 'Reopen', exact: true }).click();
++        await waitFor(
++          async () =>
++            (await settledControl.count()) === 1 &&
++            (await settledControl.isEnabled()),
++          'web reopen mutation to settle',
++          10_000,
++        );
++        await expectPersistedStatus(
++          () => owner.query(list, {}),
++          item.id,
++          'open',
++        );
+         await page
+           .getByRole('button', { name: 'Mark done', exact: true })
+           .waitFor();
+-        assert.equal(
+-          items(await owner.query(list, {})).find(
+-            (value) => value.id === item.id,
+-          )?.status,
+-          'open',
+-        );
+         const reopened = await ownerMcp.callTool({
+           name: 'work_items_list',
+           arguments: {},
+--- a/examples/foundation/tests/proof-policy.test.ts
++++ b/examples/foundation/tests/proof-policy.test.ts
+@@ -2,8 +2,13 @@
+ import assert from 'node:assert/strict';
+ import { ConvexError } from 'convex/values';
+ import { localEnvironment, redact } from '../scripts/runtime';
+-import { selfContainedResource, items, denied } from '../scripts/readiness';
+-import { TrialEvents } from '../scripts/trials';
++import {
++  selfContainedResource,
++  items,
++  denied,
++  expectPersistedStatus,
++} from '../scripts/readiness';
++import { TrialEvents, seedWasObserved } from '../scripts/trials';
+ 
+ describe('proof boundary policy', () => {
+   test('local subprocesses do not inherit deployment or authentication secrets', () => {
+@@ -45,6 +50,95 @@
+       items([{ id: 'a', title: 'one', status: 'unknown' }]),
+     ).toThrow();
+   });
++  test('status persistence allows mutation latency but a validated mismatch fails deterministically', async () => {
++    let reads = 0;
++    await expectPersistedStatus(
++      async () => [
++        {
++          id: 'one',
++          title: 'Work item',
++          status: ++reads < 3 ? 'open' : 'done',
++        },
++      ],
++      'one',
++      'done',
++      { timeoutMs: 100, pollMs: 1 },
++    );
++    expect(reads).toBe(3);
++    let failure: unknown;
++    try {
++      await expectPersistedStatus(
++        async () => [{ id: 'one', title: 'Work item', status: 'open' }],
++        'one',
++        'done',
++        { timeoutMs: 0 },
++      );
++    } catch (error) {
++      failure = error;
++    }
++    expect(failure).toBeInstanceOf(assert.AssertionError);
++    expect(
++      seedWasObserved({
++        outcome: 'fail',
++        report: {
++          outcome: 'fail',
++          checks: [
++            {
++              id: 'R3',
++              outcome:
++                failure instanceof assert.AssertionError
++                  ? 'fail'
++                  : 'inconclusive',
++            },
++          ],
++        },
++      }),
++    ).toBe(true);
++  });
++  test('transport and schema errors during status polling cannot become seed observations', async () => {
++    for (const read of [
++      async () => {
++        throw new Error('fetch failed: network unavailable');
++      },
++      async () => [{ id: 'one', title: 'Work item', status: 'invalid' }],
++    ]) {
++      let failure: unknown;
++      try {
++        await expectPersistedStatus(read, 'one', 'done', {
++          timeoutMs: 100,
++          pollMs: 1,
++        });
++      } catch (error) {
++        failure = error;
++      }
++      expect(failure).toBeInstanceOf(Error);
++      expect(failure).not.toBeInstanceOf(assert.AssertionError);
++      expect(
++        seedWasObserved({
++          outcome: 'inconclusive',
++          report: {
++            outcome: 'inconclusive',
++            checks: [{ id: 'R3', outcome: 'inconclusive' }],
++          },
++        }),
++      ).toBe(false);
++    }
++    let reads = 0;
++    await assert.rejects(
++      expectPersistedStatus(
++        async () => {
++          if (++reads === 1)
++            return [{ id: 'one', title: 'Work item', status: 'open' }];
++          throw new Error('later network failure');
++        },
++        'one',
++        'done',
++        { timeoutMs: 100, pollMs: 1 },
++      ),
++      /later network failure/,
++    );
++    expect(reads).toBe(2);
++  });
+   test('an expected Convex ownership denial is accepted, but a backend crash is not', async () => {
+     await denied(() => Promise.reject(new ConvexError({ code: 'FORBIDDEN' })), {
+       kind: 'code',

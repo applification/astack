@@ -374,6 +374,7 @@
 │        ├─ web-feature.md              <span class="tree-note">design sprint</span>
 │        ├─ app-control.md              <span class="tree-note">app control</span>
 │        ├─ project-setup.md            <span class="tree-note">setup</span>
+│        ├─ foundation.md               <span class="tree-note">Convex + MCP + WorkOS</span>
 │        ├─ shadcn-lint.md              <span class="tree-note">UI lint</span>
 │        ├─ database.md                 <span class="tree-note">Convex</span>
 │        ├─ mcp-server.md               <span class="tree-note">MCP</span>
@@ -438,18 +439,20 @@ Should "away" hide the last-seen time?</code></pre><p class="card-foot">A frame 
     <p class="source-row"><a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/chatgpt-plugin.md">Plugin engineering ↗</a> · <a href="https://github.com/applification/astack/blob/main/examples/chatgpt-plugin/README.md">Reference example ↗</a></p>
   </section>
   <section class="explainer-band" id="stack" aria-labelledby="stack-title"><div class="section-shell">
-    <div class="section-heading"><div><p class="eyebrow">06 / WHEN NEEDED</p><h2 id="stack-title">Defaults for new work.<br><em>Specialists for specific work.</em></h2></div><p>An existing project keeps its framework, package manager and working tools. The layout below is astack's default for a new product with no chosen stack.</p></div>
+    <div class="section-heading"><div><p class="eyebrow">06 / PROJECT FOUNDATION</p><h2 id="stack-title">Defaults for new work.<br><em>Specialists for specific work.</em></h2></div><p>New interactive UI starts with React, TypeScript and Vite. Choose Next.js for server rendering or public content requirements. Existing projects keep their working stack. The core profile below shares persistent behavior across web and MCP.</p></div>
     <div class="explainer-pair">
-      <div class="explainer-card"><h3>New product layout</h3><pre class="file-tree"><code>my-product/
+      <div class="explainer-card"><h3>Convex + MCP + WorkOS</h3><pre class="file-tree"><code>my-product/
 ├─ bun.lock
 ├─ turbo.json
 ├─ apps/
-│  ├─ web/                    <span class="tree-note">Next.js</span>
-│  └─ mcp/                    <span class="tree-note">MCP server</span>
+│  ├─ web/                    <span class="tree-note">React + Vite</span>
+│  └─ mcp-ui/                 <span class="tree-note">host bridge</span>
 └─ packages/
-   ├─ ui/                     <span class="tree-note">shadcn/ui</span>
-   └─ backend/convex/         <span class="tree-note">when data is needed</span></code></pre><p class="card-foot">New web apps use Portless for worktree-specific local URLs. Next DevTools provides framework diagnostics; the project's browser driver checks the user path. <a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/project-setup.md">Project setup ↗</a></p></div>
-      <div class="explainer-card"><h3>Specialist paths</h3><div class="specialist-row"><strong>Convex</strong><p>Use the companion plugin for setup and backend edits. A PR touching Convex needs its reviewer before it is ready.</p></div><div class="specialist-row"><strong>MCP server</strong><p>Check the tool contract, the running transport and agent use as separate claims when each boundary matters.</p></div><div class="specialist-row"><strong>Web UI</strong><p>Choose Pencil and Storybook by the question each can answer. Use shadcn lint where the project uses shadcn/ui.</p></div><p class="card-foot"><a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/database.md">Convex path ↗</a> · <a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/mcp-server.md">MCP path ↗</a></p></div>
+   ├─ ui/                     <span class="tree-note">portable presentation</span>
+   ├─ domain/                 <span class="tree-note">pure rules</span>
+   ├─ config/                 <span class="tree-note">shared tooling</span>
+   └─ backend/convex/         <span class="tree-note">data + MCP endpoint</span></code></pre><p class="card-foot">The work-item reference gives scoped checks and disposable local readiness. Live WorkOS OAuth, installed-host behavior and fresh-agent trials need their own evidence. <a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/foundation.md">Foundation profile ↗</a></p></div>
+      <div class="explainer-card"><h3>Specialist paths</h3><div class="specialist-row"><strong>Convex + WorkOS</strong><p>Use the companion Convex plugin for backend work. Web sessions and MCP OAuth share identity while keeping their token contracts distinct. Backend operations enforce ownership.</p></div><div class="specialist-row"><strong>MCP server</strong><p>Check tool contracts, running transport and agent use separately. The core profile serves MCP in Convex; a separate runtime can own its own service.</p></div><div class="specialist-row"><strong>Web UI</strong><p>Share presentation through props and keep host APIs in adapters. Choose supported forms for the platform and tests by behavior; Convex owns its reactive data.</p></div><p class="card-foot"><a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/project-setup.md">Project setup ↗</a> · <a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/database.md">Convex path ↗</a> · <a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/mcp-server.md">MCP path ↗</a></p></div>
     </div>
   </div></section>
   <section class="section-shell explainer-section" id="proof" aria-labelledby="proof-title">
@@ -466,7 +469,7 @@ Should "away" hide the last-seen time?</code></pre><p class="card-foot">A frame 
     <div class="adopt-grid">
       <div class="install-card"><div class="install-heading"><span>TRY IT IN CODEX</span><button id="copy-command" class="copy-button" type="button" aria-label="Copy installation commands">Copy</button></div><pre><code id="install-command">codex plugin marketplace add applification/astack
 codex plugin add applification@applification</code></pre><p>Then start a task with <code>$applification:astack</code> and describe what you want done.</p></div>
-      <div class="adopt-notes"><div><span class="note-index">01</span><h3>Pin it when it matters</h3><p>For a project-controlled version, point a local marketplace entry at an astack ref or SHA and enable it in that project's Codex config.</p><a href="https://github.com/applification/astack/blob/main/docs/project-install.md">Project install guide ↗</a></div><div><span class="note-index">02</span><h3>Keep your stack</h3><p>Adopting astack does not require a framework or package manager migration. Its Bun, Next.js, and Turborepo layout is the default for new products with no chosen stack.</p><a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/project-setup.md">Project setup ↗</a></div></div>
+      <div class="adopt-notes"><div><span class="note-index">01</span><h3>Pin it when it matters</h3><p>For a project-controlled version, point a local marketplace entry at an astack ref or SHA and enable it in that project's Codex config.</p><a href="https://github.com/applification/astack/blob/main/docs/project-install.md">Project install guide ↗</a></div><div><span class="note-index">02</span><h3>Keep your stack</h3><p>Adopting astack does not require migration. New interactive UI defaults to Bun, Turborepo, React and Vite. The foundation profile adds Convex, MCP and WorkOS where the product needs them.</p><a href="https://github.com/applification/astack/blob/main/plugins/applification/skills/astack/references/project-setup.md">Project setup ↗</a></div></div>
     </div>
   </section>
 </main>

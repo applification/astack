@@ -1,0 +1,13 @@
+bun.lock
+**/_generated/
+**/generated/
+node_modules
+**/dist
+**/storybook-static
+.proof
+.convex
+.turbo
+**/*.pen
+packages/backend/.agents
+packages/backend/.claude
+packages/backend/skills-lock.json

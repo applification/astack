@@ -1,0 +1,7 @@
+{
+  "control": "Browser cache deliberately points to an owned regular file for this process only",
+  "exitCode": 1,
+  "observed": "Verification FAILED with diagnostic paths",
+  "outcome": "pass",
+  "cleanup": "complete"
+}

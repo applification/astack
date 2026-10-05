@@ -1,0 +1,34 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "globalDependencies": [
+    "packages/config/typescript.json",
+    "packages/config/eslint.mjs",
+    "packages/config/package.json",
+    "eslint.config.mjs",
+    "tsconfig.json"
+  ],
+  "tasks": {
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "outputs": []
+    },
+    "lint": {
+      "dependsOn": ["^lint"],
+      "outputs": []
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "env": ["VITE_*"],
+      "outputs": ["dist/**", "storybook-static/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "passThroughEnv": ["VITE_*", "ASTACK_AUTH_MODE", "ASTACK_EMULATE_URL"]
+    },
+    "test": {
+      "dependsOn": ["^typecheck"],
+      "outputs": []
+    }
+  }
+}

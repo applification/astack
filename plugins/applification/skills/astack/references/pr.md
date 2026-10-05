@@ -13,7 +13,7 @@ When the PR changes Convex schema, functions, configuration, or client integrati
 
 Use an additional independent reviewer or subagent only when the change's risk or breadth justifies the extra pass and the project permits it. This is separate from the required Convex reviewer skill. Independent review remains advisory; the lead assesses each finding against actual code and intent.
 
-Before marking a PR ready, account for proof media. Attach any screenshots or recordings captured during proof to the PR, or link committed media accessible from it. If none was captured, state briefly why media is unnecessary for review. Video is optional; use it when motion, timing, or a journey needs to be seen.
+Before marking a PR ready, select the screenshots or recordings that help a reviewer assess the result and attach them to the PR, or link committed media accessible from it. Keep redundant captures with the raw runner artifacts; a proof index can map multiple observations to one byte-identical image. If media is unnecessary for review, state why briefly. Video is optional; use it when motion, timing, or a journey needs to be seen. Follow [proportional evidence retention](proof.md#keep-review-evidence-proportional) rather than committing a full run directory.
 
 Keep the PR description brief and useful to a reviewer:
 

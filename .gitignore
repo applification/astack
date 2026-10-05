@@ -2,5 +2,7 @@
 **/dist/
 **/storybook-static/
 **/.turbo/
+/.proof/
 examples/chatgpt-plugin/.data/
 examples/e2e-proof/.e2e/
+examples/chatgpt-plugin/.proof/

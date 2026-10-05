@@ -1,0 +1,9 @@
+{
+  "sourceCommit": "f0f15d5ab1e275a664488adfbda62f253c12272b",
+  "ciCheckout": "8df3aac4ce766eba8ffd99e08c8042902672f6d4",
+  "ciRun": "https://github.com/applification/astack/actions/runs/37302285192",
+  "reconstruction": "Official scaffold from sourceCommit with scaffold.sourceRevision set to the checkout observed in the Actions log; its full source digest matches the original CI readiness report (whose revision prefix remains unversioned outside Git) before retention.",
+  "sourceSha256": "2137d094f96ff599e0c98dccc50ba85da66e550e2b591a5c87184ed0422b412b",
+  "sourceArchiveSha256": "4cb232554a771a0028f467d32d76c4aa10d604877bcc7a93e0c9e29421d38a4e",
+  "archivePolicy": "Original/retained hashes and transforms embedded. Credentials, dependencies and state excluded; native Pen omitted with hash and reason. No byte-exact replay claim for redacted or omitted artifacts."
+}

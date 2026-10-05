@@ -1,0 +1,7 @@
+{
+  "extends": "../config/typescript.json",
+  "include": ["convex/**/*.ts"],
+  "compilerOptions": {
+    "types": ["node"]
+  }
+}
