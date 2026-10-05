@@ -4,7 +4,7 @@ Tested source: `4f72c608b575bef7c931ccfb48e7040326cce724`, in PR 18. PR 17's `81
 
 ## Ownership and reuse
 
-Core astack now owns coordination and three optional delegation/COS references. TypeScript, React, Convex, WorkOS authentication and testing own focused instructions and examples; existing MCP/ChatGPT skills own their technical guidance. Implementation owns the behavior-contract reference. The shared capability-selection detour, duplicate route index and old PR/proof redirects are removed. Worked foundation commands and the fixed SDK compatibility experiment live with the examples. Ordinary direct requests need neither astack nor a handoff record.
+Core astack now owns coordination and three optional delegation/COS references. TypeScript, React, Convex, WorkOS authentication and testing own focused instructions and examples; existing MCP/ChatGPT skills own their technical guidance. Implementation owns the behavior-contract reference. The shared capability-selection detour, duplicate route index and old PR/proof redirects are removed. Worked foundation commands and the fixed SDK compatibility experiment live with the examples. Ordinary direct requests need neither astack nor a handoff record. A final generated-copy check caught and corrected source-checkout-relative skill links in the moved foundation document; repository URLs now survive scaffolding. This documentation correction does not change tested plugin bytes.
 
 | Imported source | Pin and retained substance | Adaptation |
 | --- | --- | --- |
