@@ -1,0 +1,15 @@
+# First-run setup and standalone MCP preview
+
+The owner reproduced three gaps on 5 October 2026: Convex requested AI-file setup, web gave an unexplained `.env.example` instruction, and the bare MCP App at port 5174 self-initialized without a host (`-32601`) then waited indefinitely.
+
+Startup now installs Convex AI files idempotently, saves/applies public WorkOS configuration through `setup:workos` and guarded local startup, and serves a development AppBridge host at port 5174. The web setup state names the configuration and one-time command. The preview uses WorkOS discovery/DCR/PKCE/state and the actual MCP HTML/tool endpoint; production resources contain no development host. WorkOS resources may use HTTP only at the exact local Convex loopback `/mcp` origin. Existing signatures, expiry, exact MCP audience, cross-owner denial and cloud-target guards remain required.
+
+The accepted local build is `5349fcd9da018d80d04134358a0e0627fcb49d90@sha256-dadbad2ab43839dfb5b918122154261b760445936c69ef4337cda0271537ceff` (base commit plus recorded working source), checked against retained source before packaging. The [identity](identity.json), [readiness report](readiness/delivered/report.json), [redacted log](readiness/delivered/runtime.log), and [source archive](source.zip) preserve observations, source hashes and sanitization/omission metadata. Native Pen content is omitted with its original hash and reason; it is never parsed or redacted as text. Historical trial scores/archives remain unchanged.
+
+R1–R9 passed and cleanup completed in isolated local Convex/Vite/Chromium. R9 observed an ordinary preview page without protocol/runtime errors, rejected a mismatched callback and foreign proxy origin, loaded the actual MCP resource with a signed test identity, changed status, confirmed it through a fresh authenticated backend read, refreshed and disconnected. This is host/transport/persistence proof with local test credentials. It is not WorkOS login or installed ChatGPT proof.
+
+![Standalone preview after a persisted status change](readiness/delivered/development-mcp-preview.png)
+
+The deterministic gate passed 38 tests, typed lint/types and all browser/Storybook builds. Root plugin/site validation covered 72 routing examples; all three scaffold regressions passed. The scoped Convex reviewer skill found no remaining actionable issue in this diff; see [review](../convex-review.md). The startup verifier now also checks automatic AI setup and both first-run browser entry points; its next fresh CI run will establish those additions without disturbing the owner's running deployment.
+
+The [sandbox record](../workos-sandbox.md) identifies the real WorkOS configuration and exact local resource. Actual web and preview browser actions reached its [web sign-in](workos/web-authorize.png) and [MCP sign-in](workos/mcp-authorize.png) surfaces without uncaught errors. The smoke-created DCR client was deleted after the check. Completed login/consent, same-user continuity, token refresh and installed-host observations remain pending owner sign-in; no authenticated provider success is claimed. No cloud deployment or data transfer occurred.
