@@ -17,6 +17,8 @@ Applied the Convex reviewer checklist as self-review: existing owner/project sco
 
 Pen is skipped because the agreed trace layout/notice styles are reused; Storybook establishes the new states. A separate broad exploratory run is skipped: the focused browser checks exercise all new states and affected controls, with native reads and real HTTP checks covering delivery. The overall PR retains its earlier draft coverage limits; no new reboot or MacBook proof is claimed.
 
+The shared branch received the separate filter-menu change during publication. It was merged without discarding either feature; the final combined source **20862ec** was rebuilt and deployed on Otis. Strict types, **43 tests / 233 assertions**, UI lint, site/plugin checks, **10 fixture browser tests** and **3 authenticated deployed journeys** passed on that combined build, including filter menus and historical results. The collector source is identical to the compiled fixture above. A final native read finds **263/263 events** for the reported T3 turn, now including completion, and no pending eligible records. The final served build matches `/assets/index-BNLIEuUE.js`. Initial media above remain applicable to the unchanged trace presentation. The existing native filter query's owner/project checks, validator, indexed byte/page bounds and reactive pagination were included in self-review; no confirmed integration finding remains.
+
 ![Synthetic upload waiting state in light mode](evidence/upload-waiting-light.png)
 
 ![Synthetic upload waiting state in narrow dark mode](evidence/upload-waiting-dark-narrow.png)
