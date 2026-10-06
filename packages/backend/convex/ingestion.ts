@@ -12,6 +12,7 @@ import { projectList } from "./projectData";
 import { resolveProject } from "@astack/agent-observability/projects";
 import { paginationOptsValidator } from "convex/server";
 import { queuePrompt, queueStoredPrompt, storeWorkLabel } from "./naming";
+import { storeEvaluation } from "./evaluations";
 
 function capabilities(run: AgentRun) {
   return new Map(run.skills.map((skill) => [capabilityKey(skill), skill]));
@@ -166,6 +167,8 @@ export const ingest = internalMutation({
             lastSeenAt: Date.now(),
             records: 0,
           });
+      } else if (record.kind === "evaluation") {
+        await storeEvaluation(ctx, record.value, args.machineId);
       } else {
         const event = record.value;
         if (

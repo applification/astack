@@ -32,6 +32,7 @@ import { Trace } from "./trace";
 import { Brand, ThemeControl } from "./theme";
 import { ProjectSelector, Projects } from "./projects";
 import type { Project } from "@astack/agent-observability/projects";
+import { Evaluations, EvaluationPage, evaluationLink } from "./evaluations";
 import {
   activityHeading,
   workHeading,
@@ -487,12 +488,15 @@ function RunDetail({ id, projectId }: { id: string; projectId?: string }) {
   const backLink = `#runs${projectId ? `?${new URLSearchParams({ project: projectId })}` : ""}`;
   const raw = useQuery(api.observatory.run, { runId: id, ...scope });
   const names = useQuery(api.naming.labels, { runIds: [id] });
+  const evaluations = useQuery(api.evaluations.forRun, { runId: id, ...scope });
   const trace = usePaginatedQuery(
     api.observatory.trace,
     { runId: id, ...scope },
     { initialNumItems: 100 },
   );
-  const [evidenceId, setEvidenceId] = useState<string | null>(null);
+  const [evidenceId, setEvidenceId] = useState<string | null>(() =>
+    new URLSearchParams(location.hash.split("?")[1]).get("event"),
+  );
   useEffect(() => {
     if (!evidenceId) return;
     const item = document.getElementById(evidenceId);
@@ -570,6 +574,19 @@ function RunDetail({ id, projectId }: { id: string; projectId?: string }) {
         </div>
       ))}
       <RunMetadata run={run} duration={duration(run)} />
+      {!!evaluations?.length && (
+        <div className="notice">
+          <h2>Evaluations of this work</h2>
+          {evaluations.map((evaluation) => (
+            <p key={evaluation.id}>
+              <a href={evaluationLink(evaluation.id, evaluation.projectId)}>
+                {evaluation.title}
+              </a>
+            </p>
+          ))}
+          <p className="subtitle">Up to 20 latest linked evaluations.</p>
+        </div>
+      )}
       <h2>Skills, instructions & workflows</h2>
       <div className="tag-list">
         {run.skills.length ? (
@@ -751,7 +768,8 @@ export function App() {
     new URLSearchParams(route.split("?")[1]).get("project") || undefined;
   const hasRunFilters =
     !route.startsWith("#run/") &&
-    !["skills", "projects", "health"].includes(
+    !route.startsWith("#evaluation/") &&
+    !["skills", "projects", "health", "evaluations"].includes(
       route.slice(1).split("?")[0] ?? "",
     );
   const catalog = usePaginatedQuery(
@@ -779,7 +797,22 @@ export function App() {
     page = (
       <RunDetail key={`${id}:${projectId}`} id={id} projectId={projectId} />
     );
-  } else if (section === "skills")
+  } else if (route.startsWith("#evaluation/")) {
+    section = "evaluations";
+    let id = "";
+    try {
+      id = decodeURIComponent(route.slice(12).split("?")[0] ?? "");
+    } catch {}
+    page = (
+      <EvaluationPage
+        key={id + ":" + projectId}
+        id={id}
+        projectId={projectId}
+      />
+    );
+  } else if (section === "evaluations")
+    page = <Evaluations key={projectId ?? "all"} projectId={projectId} />;
+  else if (section === "skills")
     page = <Capabilities key={projectId ?? "all"} projectId={projectId} />;
   else if (section === "projects") page = <Projects />;
   else if (section === "health") page = <Health />;
@@ -808,7 +841,7 @@ export function App() {
             const params = new URLSearchParams(route.split("?")[1]);
             if (id) params.set("project", id);
             else params.delete("project");
-            location.hash = `${route.startsWith("#run/") ? "#runs" : route.split("?")[0]}${params.size ? `?${params}` : ""}`;
+            location.hash = `${route.startsWith("#run/") ? "#runs" : route.startsWith("#evaluation/") ? "#evaluations" : route.split("?")[0]}${params.size ? `?${params}` : ""}`;
           }}
         />
       }
@@ -843,6 +876,7 @@ export function ObservatoryLayout({
             {[
               ["runs", "Runs"],
               ["work", "Work"],
+              ["evaluations", "Evaluations"],
               ["skills", "Skills & workflows"],
               ["problems", "Problems"],
               ["health", "Capture health"],

@@ -59,7 +59,14 @@ function AccessGate() {
 const root = document.getElementById("root");
 if (!root) throw new Error("Missing application root");
 const url: unknown = import.meta.env.VITE_CONVEX_URL;
-if (typeof url !== "string" || !url.startsWith("https://"))
+const developmentLoopback =
+  import.meta.env.DEV &&
+  typeof url === "string" &&
+  /^http:\/\/(?:127\.0\.0\.1|localhost|\[::1\]):\d+\/?$/.test(url);
+if (
+  typeof url !== "string" ||
+  (!url.startsWith("https://") && !developmentLoopback)
+)
   createRoot(root).render(
     <ThemeProvider>
       <AccessLayout>

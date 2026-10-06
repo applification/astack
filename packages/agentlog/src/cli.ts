@@ -8,15 +8,25 @@ import { resolve, join, basename } from "node:path";
 import { z } from "zod";
 import { workReferenceSchema, eventSchema } from "@astack/agent-observability";
 import { initialize, defaultStateDir, loadConfig } from "./config";
-import { collect, health } from "./collector";
+import { collect, health, readSecretFile } from "./collector";
 import { captureHook, hookDefinitions } from "./hooks";
 import { LocalStore } from "./store";
-import { environmentSecrets } from "@astack/agent-observability/redaction";
+import {
+  environmentSecrets,
+  redact,
+} from "@astack/agent-observability/redaction";
 import { linkSession, refreshRun } from "./context";
 import { runIdentity } from "./adapters/codex";
 import { approvedRun } from "./projects";
 import { configureNaming, namingConfigSchema, nameActivities } from "./naming";
 import { configureT3 } from "./t3-config";
+import { importEvaluation } from "./evaluations";
+import {
+  evaluationManifestSchema,
+  evaluationSchema,
+  evaluateProof,
+} from "@astack/agent-observability/evaluations";
+import { savedEditProof, proofVariantSchema } from "./evaluation-proof";
 
 const program = new Command()
   .name("agentlog")
@@ -24,6 +34,73 @@ const program = new Command()
   .version("0.1.0")
   .option("--state <directory>", "Private state directory", defaultStateDir());
 const state = () => resolve(z.string().parse(program.opts().state));
+const evaluations = program
+  .command("evaluation")
+  .description("Check or queue immutable intent and verification snapshots");
+evaluations
+  .command("demo-proof")
+  .description(
+    "Generate disposable proof using the Bun source CLI in an astack checkout",
+  )
+  .requiredOption("--variant <variant>", "defective, fixed or unavailable")
+  .option(
+    "--output <directory>",
+    "Retained proof directory",
+    ".proof/evaluations",
+  )
+  .action(async (options: unknown) => {
+    const args = z
+      .object({ variant: proofVariantSchema, output: z.string() })
+      .parse(options);
+    const proof = await savedEditProof(args.variant, args.output);
+    process.stdout.write(JSON.stringify(proof, null, 2) + "\n");
+  });
+evaluations
+  .command("check")
+  .requiredOption("--file <path>", "Evaluation manifest JSON")
+  .action(async (options: unknown) => {
+    const args = z.object({ file: z.string() }).parse(options);
+    const input = evaluationManifestSchema.parse(
+      JSON.parse(await readFile(resolve(args.file), "utf8")),
+    );
+    const value = evaluationSchema.parse({
+      ...input,
+      machineId: "00000000-0000-4000-8000-000000000001",
+    });
+    process.stdout.write(
+      JSON.stringify(
+        redact(evaluateProof(value), environmentSecrets(process.env)),
+        null,
+        2,
+      ) + "\n",
+    );
+  });
+evaluations
+  .command("import")
+  .requiredOption(
+    "--file <path>",
+    "Evaluation manifest JSON; run IDs must already be captured",
+  )
+  .action(async (options: unknown) => {
+    const args = z.object({ file: z.string() }).parse(options);
+    const config = await loadConfig(state());
+    const secrets = [
+      ...environmentSecrets(process.env),
+      await readSecretFile(config.tokenFile),
+      ...(await Promise.all(config.secretFiles.map(readSecretFile))),
+    ];
+    const store = new LocalStore(state(), secrets);
+    try {
+      const result = importEvaluation(
+        store,
+        config.machineId,
+        JSON.parse(await readFile(resolve(args.file), "utf8")),
+      );
+      process.stdout.write(JSON.stringify(result) + "\n");
+    } finally {
+      store.close();
+    }
+  });
 program
   .command("t3-configure")
   .description("Add provider-neutral T3 capture alongside native Codex")

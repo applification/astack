@@ -13,6 +13,9 @@
 | Run                   | A bounded agent attempt to perform work, with or without a work reference.                                 |
 | Event                 | An observed action, result or lifecycle fact belonging to a run.                                           |
 | Outcome               | The assessed result of the engineering work, distinct from agent completion.                               |
+| Evaluation            | The intended work, acceptance and evidence against which agent behavior and delivery are assessed.         |
+| Assessment            | A judgment against stated criteria, with reasons and supporting observations.                              |
+| Verification report   | Reported observations of acceptance cases on a named revision and environment, with retained evidence.     |
 | Intervention          | An explicit human interruption or intervention; an ordinary prompt is not sufficient evidence.             |
 | Capability use        | Evidence that a skill, instruction or workflow was read, explicitly supplied, or declared for an attempt.  |
 | Observation-time hash | Identity of capability content when it was inspected, without proof of its historical identity.            |

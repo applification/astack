@@ -151,4 +151,6 @@ MIT. See [LICENSE](LICENSE).
 
 ## Agent Observatory
 
+[Evaluations](docs/observatory-evaluations.md) connect original intent, acceptance cases, skill criteria and structured verification reports across captured turns. The owner separately assesses intent, skill application and outcome. The first slice supports immutable manifest import, retained evidence snapshots and a disposable saved-edit proof; automated model grading and controlled agent trials follow later.
+
 [Agent Observatory](docs/agent-observatory.md) adds Astack’s private agent feedback loop: automatic persisted Codex capture, a portable metadata-only collector with offline buffering, private self-hosted Convex on Otis, and Work → Runs → Trace plus skill-version/problem views. External COS work remains optional parent context. [MacBook setup](docs/agent-observatory-macbook.md) installs only the collector on another machine; [evidence](.astack/agent-observatory/evidence.md) distinguishes live deployment, synthetic tests and remaining gaps.

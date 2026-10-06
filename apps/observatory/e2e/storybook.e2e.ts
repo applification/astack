@@ -1,5 +1,83 @@
 import { test } from "@e2e-dev/web";
 import { expect } from "e2e";
+for (const [story, verification, outcome] of [
+  ["awaiting-review", "Pass", "Awaiting owner review"],
+  ["passing", "Pass", "Pass"],
+  ["failed", "Fail", "Fail"],
+  ["inconclusive", "Inconclusive", "Inconclusive"],
+  ["missing-proof", "Inconclusive", "Awaiting owner review"],
+] as const) {
+  test(
+    "evaluation " + story + " distinguishes verification from assessed outcome",
+    async ({ app, screen, browser }) => {
+      await app.open(
+        "/iframe.html?id=observatory-evaluations--" + story + "&viewMode=story",
+      );
+      await expect(
+        screen.getByRole("heading", "Preserve edits after reopening"),
+      ).toBeVisible();
+      await expect(
+        screen.getByText("Reported verification: " + verification),
+      ).toBeVisible();
+      await expect(
+        screen.getByText("Assessed outcome: " + outcome),
+      ).toBeVisible();
+      await expect(screen.getByText("2 captured turns")).toBeVisible();
+      if (story === "failed") {
+        await app.screenshot("evaluation-failed-light");
+        await browser.setViewport({ width: 390, height: 844 });
+      await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+      await screen.getByText("Verification context & artifact references").tap();
+        expect(
+          await browser.evaluate(
+            () => document.documentElement.scrollWidth <= window.innerWidth,
+          ),
+        ).toBe(true);
+        await app.screenshot("evaluation-failed-narrow-dark");
+      }
+    },
+  );
+}
+test("owner assessment form saves explicit judgments and preserves the failed-write draft", async ({
+  app,
+  screen,
+}) => {
+  for (const story of ["review-failure", "review"]) {
+    await app.open(
+      "/iframe.html?id=observatory-evaluations--" + story + "&viewMode=story",
+    );
+    for (const name of ["Intent", "bug-fix", "verify", "Outcome"]) {
+      await screen
+        .getByLabel(name + " verdict")
+        .selectOption({ value: "pass" });
+      await screen
+        .getByLabel("Reason for " + name)
+        .fill("Reviewed the acceptance evidence and relevant captured work.");
+    }
+    await screen.getByRole("button", "Save assessment").tap();
+    if (story === "review-failure") {
+      await expect(screen.getByRole("alert")).toContainText(
+        "Assessment could not be saved",
+      );
+      await expect(screen.getByLabel("Reason for Outcome")).toHaveValue(
+        "Reviewed the acceptance evidence and relevant captured work.",
+      );
+      await expect(screen.getByRole("button", "Save assessment")).toBeEnabled();
+    } else {
+      await expect(screen.getByText("Assessed outcome: Pass")).toBeVisible();
+      await expect(screen.getByText("Assessment saved.")).toBeVisible();
+      await app.screenshot("evaluation-owner-assessment");
+    }
+  }
+});
+test("empty evaluation scope is explicit", async ({ app, screen }) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--empty&viewMode=story",
+  );
+  await expect(
+    screen.getByText("No evaluations in this project scope yet."),
+  ).toBeVisible();
+});
 const authStory =
   "/iframe.html?id=observatory-authentication--remembered-access&viewMode=story";
 test("successful owner login remembers the trimmed key and obtains a fresh session after reload", async ({

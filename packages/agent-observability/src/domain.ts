@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { evaluationSchema } from "./evaluations";
 
 const id = z.string().min(1).max(512);
 const text = z.string().max(4096);
@@ -128,6 +129,7 @@ export const runSchema = z
 export const recordSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("run"), value: runSchema }).strict(),
   z.object({ kind: z.literal("event"), value: eventSchema }).strict(),
+  z.object({ kind: z.literal("evaluation"), value: evaluationSchema }).strict(),
 ]);
 export const envelopeSchema = z
   .object({

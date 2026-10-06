@@ -23,7 +23,7 @@ type CaptureAdapter = AgentAdapter & {
   readonly deferredTurns?: number;
 };
 
-async function readSecretFile(path: string) {
+export async function readSecretFile(path: string) {
   const info = await lstat(path);
   if (!info.isFile() || info.size > 1024 * 1024)
     throw new Error("Invalid credential file");

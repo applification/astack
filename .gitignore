@@ -11,3 +11,4 @@ infra/observatory/.env
 **/.agentlog/
 /.e2e/
 /.e2e-live/
+/.e2e-evaluations-local/
