@@ -1,5 +1,74 @@
 import { test } from "@e2e-dev/web";
 import { expect, secrets } from "e2e";
+test("deployed astack workflow connects the actual route, phases and evidence without assigning owner grades", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  const id =
+    "bbb1fd30-527f-4326-b685-fb9c2e021092:evaluation:13e793a1-5d1d-4d44-891f-55f871d86d75";
+  await app.open(
+    "/#evaluation/" +
+      encodeURIComponent(id) +
+      "?project=a20a2fb3-646f-40fe-9b12-c64f759afaea",
+  );
+  await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect(
+    screen.getByRole(
+      "heading",
+      "Observatory — astack route and workflow tracking",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("astack → New feature", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("heading", "Path taken", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("heading", "How the work unfolded"),
+  ).not.toBeVisible();
+  await screen
+    .getByText("Captured conversation · 2 turns", { exact: true })
+    .tap();
+  await expect(
+    screen.getByRole("heading", "How the work unfolded"),
+  ).toBeVisible();
+  await screen.getByText("Route selection evidence", { exact: true }).tap();
+  await screen
+    .getByRole("link", "Declaration in trace", { exact: true })
+    .first()
+    .tap();
+  await expect(
+    screen.getByRole("heading", "Workflow annotation", { exact: true }),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () =>
+        document
+          .querySelector(".trace-event[open] .event-content pre")
+          ?.textContent?.includes('"action": "select"') ?? false,
+    ),
+  ).toBe(true);
+  await browser.back();
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () =>
+        document.documentElement.scrollWidth <=
+        document.documentElement.clientWidth,
+    ),
+  ).toBe(true);
+  await screen
+    .getByText("Detailed intent and skill review", { exact: true })
+    .tap();
+  await expect(screen.getByLabel("Include a flow assessment")).toBeVisible();
+  await expect(
+    screen.getByText("No detailed assessment yet.", { exact: true }),
+  ).toBeVisible();
+});
 test("deployed evaluation links the captured request, retained proof and owner review form", async ({
   app,
   screen,
