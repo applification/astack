@@ -1,5 +1,43 @@
 import { test } from "@e2e-dev/web";
 import { expect, secrets } from "e2e";
+test("owner access survives reload and browser restart, and Claude rows show the captured CLI version", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open();
+  await expect(
+    screen.getByRole("heading", "Private Observatory"),
+  ).toBeVisible();
+  await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect(screen.getByRole("heading", "Agent runs")).toBeVisible();
+  expect(
+    await browser.evaluate(() => Object.keys(localStorage).sort()),
+  ).toEqual(["astack-observatory-access-key"]);
+  await browser.reload();
+  await expect(screen.getByRole("heading", "Agent runs")).toBeVisible();
+  await expect(screen.getByRole("heading", "Private Observatory")).toHaveCount(
+    0,
+  );
+  await app.restart();
+  await expect(screen.getByRole("heading", "Agent runs")).toBeVisible();
+  await expect(screen.getByRole("heading", "Private Observatory")).toHaveCount(
+    0,
+  );
+  await screen.getByLabel("Selected project").selectOption({ label: "Astack" });
+  await screen.getByRole("button", "Filters", { exact: true }).tap();
+  await screen
+    .getByLabel("Agent", { exact: true })
+    .selectOption({ value: "claude" });
+  await expect(
+    screen
+      .getByRole("region", "Agent runs table")
+      .getByText("2.1.291 · Otis", { exact: true })
+      .first(),
+  ).toBeVisible({ timeout: 30_000 });
+});
+
 test("the annotated run has compact metadata, readable naming, real provider assets and no missing-time placeholders", async ({
   app,
   screen,
