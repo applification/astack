@@ -1,14 +1,16 @@
 import { test } from "@e2e-dev/web";
 import { expect } from "e2e";
-for (const [story, verification, outcome] of [
-  ["awaiting-review", "Pass", "Awaiting owner review"],
-  ["passing", "Pass", "Pass"],
-  ["failed", "Fail", "Fail"],
-  ["inconclusive", "Inconclusive", "Inconclusive"],
-  ["missing-proof", "Inconclusive", "Awaiting owner review"],
+for (const [story, checkStatus, outcome] of [
+  ["awaiting-review", "Checks passed", null],
+  ["passing", "Checks passed", "Pass"],
+  ["failed", "Checks found a problem", "Fail"],
+  ["inconclusive", "Checks incomplete", "Inconclusive"],
+  ["missing-proof", "Checks incomplete", null],
 ] as const) {
   test(
-    "evaluation " + story + " distinguishes verification from assessed outcome",
+    "evaluation " +
+      story +
+      " explains checks and keeps technical grading separate",
     async ({ app, screen, browser }) => {
       await app.open(
         "/iframe.html?id=observatory-evaluations--" + story + "&viewMode=story",
@@ -17,28 +19,82 @@ for (const [story, verification, outcome] of [
         screen.getByRole("heading", "Preserve edits after reopening"),
       ).toBeVisible();
       await expect(
-        screen.getByText("Reported verification: " + verification),
+        screen.getByText(checkStatus, { exact: true }),
       ).toBeVisible();
       await expect(
-        screen.getByText("Assessed outcome: " + outcome),
+        screen.getByText("Your review pending", { exact: true }),
       ).toBeVisible();
       await expect(screen.getByText("2 captured turns")).toBeVisible();
+      await expect(
+        screen.getByRole("heading", "How the work unfolded"),
+      ).toBeVisible();
+      expect(
+        await browser.evaluate(() =>
+          [...document.querySelectorAll(".evaluation-flow > li h3")].map(
+            (item) => item.textContent,
+          ),
+        ),
+      ).toEqual(["Reproduce a lost saved edit", "Repair saved edits"]);
+      if (story === "awaiting-review") {
+        await app.screenshot("evaluation-timeline-default-light");
+        await browser.setViewport({ width: 1280, height: 900 });
+        await browser.evaluate(() => {
+          const section = document.querySelector(
+            '[aria-label="Work timeline"]',
+          );
+          if (section)
+            window.scrollTo(
+              0,
+              section.getBoundingClientRect().top + window.scrollY - 90,
+            );
+        });
+        await app.screenshot("evaluation-work-timeline-light");
+      }
+      await expect(
+        screen.getByRole("heading", "Skill application & output criteria"),
+      ).not.toBeVisible();
+      if (outcome) {
+        await screen
+          .getByText("Detailed intent and skill review", { exact: true })
+          .tap();
+        await expect(
+          screen.getByText("Outcome: " + outcome, { exact: true }),
+        ).toBeVisible();
+      }
       if (story === "failed") {
-        await app.screenshot("evaluation-failed-light");
+        await app.screenshot("evaluation-timeline-failed-light");
         await browser.setViewport({ width: 390, height: 844 });
-      await screen.getByLabel("Color theme").selectOption({ value: "dark" });
-      await screen.getByText("Verification context & artifact references").tap();
+        await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+        await screen
+          .getByText("0 of 1 checks passed · what was checked?", {
+            exact: true,
+          })
+          .tap();
+        await screen
+          .getByText(
+            "The saved edit survives reopening and a fresh store read.",
+            { exact: true },
+          )
+          .first()
+          .tap();
+        await expect(
+          screen
+            .getByText("Reopened document contains the old value.", {
+              exact: true,
+            })
+            .first(),
+        ).toBeVisible();
         expect(
           await browser.evaluate(
             () => document.documentElement.scrollWidth <= window.innerWidth,
           ),
         ).toBe(true);
-        await app.screenshot("evaluation-failed-narrow-dark");
+        await app.screenshot("evaluation-timeline-failed-narrow-dark");
       }
     },
   );
 }
-test("owner assessment form saves explicit judgments and preserves the failed-write draft", async ({
+test("outcome review needs only a choice, retains failed-write answers and shows saved history", async ({
   app,
   screen,
 }) => {
@@ -46,29 +102,114 @@ test("owner assessment form saves explicit judgments and preserves the failed-wr
     await app.open(
       "/iframe.html?id=observatory-evaluations--" + story + "&viewMode=story",
     );
-    for (const name of ["Intent", "bug-fix", "verify", "Outcome"]) {
-      await screen
-        .getByLabel(name + " verdict")
-        .selectOption({ value: "pass" });
-      await screen
-        .getByLabel("Reason for " + name)
-        .fill("Reviewed the acceptance evidence and relevant captured work.");
-    }
-    await screen.getByRole("button", "Save assessment").tap();
+    await screen.getByRole("button", "Save review", { exact: true }).tap();
+    await expect(screen.getByRole("alert")).toContainText("Choose how well");
+    await screen.getByRole("button", "Partly", { exact: true }).tap();
+    await screen
+      .getByLabel("What worked or should change? (optional)")
+      .fill("The result is useful, but the review flow needs refinement.");
+    await screen.getByRole("button", "Save review", { exact: true }).tap();
     if (story === "review-failure") {
       await expect(screen.getByRole("alert")).toContainText(
-        "Assessment could not be saved",
+        "Your review could not be saved",
       );
-      await expect(screen.getByLabel("Reason for Outcome")).toHaveValue(
-        "Reviewed the acceptance evidence and relevant captured work.",
+      await expect(
+        screen.getByLabel("What worked or should change? (optional)"),
+      ).toHaveValue(
+        "The result is useful, but the review flow needs refinement.",
       );
-      await expect(screen.getByRole("button", "Save assessment")).toBeEnabled();
+      await expect(
+        screen.getByRole("button", "Partly", { exact: true }),
+      ).toHaveAttribute("aria-pressed", "true");
+      await expect(
+        screen.getByRole("button", "Save review", { exact: true }),
+      ).toBeEnabled();
     } else {
-      await expect(screen.getByText("Assessed outcome: Pass")).toBeVisible();
-      await expect(screen.getByText("Assessment saved.")).toBeVisible();
-      await app.screenshot("evaluation-owner-assessment");
+      await expect(
+        screen.getByText("Your review: Partly", { exact: true }).first(),
+      ).toBeVisible();
+      await expect(screen.getByRole("status")).toContainText(
+        "Your review is saved.",
+      );
+      await screen.getByText("Review history · 1", { exact: true }).tap();
+      await expect(
+        screen
+          .getByText(
+            "The result is useful, but the review flow needs refinement.",
+            { exact: true },
+          )
+          .last(),
+      ).toBeVisible();
+      await expect(
+        screen.getByRole("button", "Save review", { exact: true }),
+      ).toBeEnabled();
+      await app.screenshot("evaluation-outcome-review");
     }
   }
+});
+test("detailed owner assessment remains available with explicit evidence", async ({
+  app,
+  screen,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--review&viewMode=story",
+  );
+  await screen
+    .getByText("Detailed intent and skill review", { exact: true })
+    .tap();
+  for (const name of ["Intent", "bug-fix", "verify", "Outcome"]) {
+    await screen.getByLabel(name + " verdict").selectOption({ value: "pass" });
+    await screen
+      .getByLabel("Reason for " + name)
+      .fill("Reviewed the acceptance evidence and relevant captured work.");
+  }
+  await screen.getByRole("button", "Save assessment").tap();
+  await expect(
+    screen.getByText("Outcome: Pass", { exact: true }),
+  ).toBeVisible();
+  await expect(screen.getByText("Assessment saved.")).toBeVisible();
+  await expect(
+    screen.getByText("Your review pending", { exact: true }),
+  ).toBeVisible();
+});
+test("missing captured content has an honest fallback and responsive review choices", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--missing-content&viewMode=story",
+  );
+  await expect(
+    screen
+      .getByText("No request excerpt available for this turn.", {
+        exact: true,
+      })
+      .first(),
+  ).toBeVisible();
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--review&viewMode=story",
+  );
+  await screen.getByRole("button", "Yes", { exact: true }).tap();
+  await screen.getByRole("button", "Save review", { exact: true }).tap();
+  await expect(
+    screen.getByText("Your review: Yes", { exact: true }).first(),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await expect(
+    screen.getByRole("button", "Save review", { exact: true }),
+  ).toBeEnabled();
+  await app.screenshot("evaluation-timeline-review-narrow");
 });
 test("empty evaluation scope is explicit", async ({ app, screen }) => {
   await app.open(

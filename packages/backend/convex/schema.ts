@@ -2,6 +2,14 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  evaluationFeedback: defineTable({
+    feedbackId: v.string(),
+    evaluationId: v.string(),
+    reviewedAt: v.number(),
+    data: v.string(),
+  })
+    .index("by_feedbackId", ["feedbackId"])
+    .index("by_evaluationId_and_reviewedAt", ["evaluationId", "reviewedAt"]),
   evaluations: defineTable({
     evaluationId: v.string(),
     projectId: v.string(),

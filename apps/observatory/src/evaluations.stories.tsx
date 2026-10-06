@@ -1,6 +1,9 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { assessmentSchema } from "@astack/agent-observability/evaluations";
+import {
+  assessmentSchema,
+  outcomeFeedbackSchema,
+} from "@astack/agent-observability/evaluations";
 import {
   evaluationDetailSchema,
   evaluationSummarySchema,
@@ -19,11 +22,38 @@ function detail(status: "pass" | "fail" | "inconclusive", assessed = false) {
   const evaluation = evaluationFixture(status);
   return evaluationDetailSchema.parse({
     evaluation,
-    runs: ["reproduce", "repair"].map((turn) => ({
-      run: evaluationRun(turn),
+    runs: ["repair", "reproduce"].map((turn) => ({
+      run: {
+        ...evaluationRun(turn),
+        startedAt: turn === "repair" ? 1500 : 1000,
+      },
       revision: 1,
     })),
     source: { event: evaluationPrompt(), revision: 1 },
+    timeline: ["reproduce", "repair"].map((turn) => ({
+      runId: evaluationRun(turn).id,
+      title: evaluationRun(turn).title,
+      request: {
+        eventId: evaluationRun(turn).id + ":prompt",
+        revision: 1,
+        text:
+          turn === "reproduce"
+            ? "Fix edits disappearing after saving and reopening."
+            : "Repair the cause and verify a fresh store read.",
+      },
+      response: {
+        eventId: evaluationRun(turn).id + ":response",
+        revision: 1,
+        text:
+          turn === "reproduce"
+            ? "Reproduced the lost edit: reopening returns the old value. The save path writes a stale snapshot."
+            : status === "pass"
+              ? "Updated the save path. The edit now survives reopening and a fresh store read."
+              : status === "fail"
+                ? "The edit still disappears when reopening. The repair did not fix the persistence problem."
+                : "The fixture could not start, so the saved edit could not be verified.",
+      },
+    })),
     moreAssessments: false,
     assessments: assessed
       ? [
@@ -70,6 +100,9 @@ export const MissingProof: Story = {
     },
   },
 };
+export const MissingContent: Story = {
+  args: { detail: { ...detail("pass"), timeline: [] } },
+};
 export const Empty: Story = { render: () => <EvaluationTable rows={[]} /> };
 export const Listing: Story = {
   render: () => (
@@ -99,6 +132,22 @@ function Editable({
   return (
     <EvaluationView
       detail={value}
+      saveFeedback={async (input, requestId) => {
+        if (reject) throw new Error("Fixture write unavailable");
+        setValue((previous) => ({
+          ...previous,
+          feedback: [
+            outcomeFeedbackSchema.parse({
+              ...input,
+              id: requestId,
+              evaluationId: previous.evaluation.id,
+              reviewedAt: Date.now(),
+              reviewer: "owner",
+            }),
+            ...previous.feedback,
+          ],
+        }));
+      }}
       save={async (input, requestId) => {
         if (reject) throw new Error("Fixture write unavailable");
         setValue((previous) => ({

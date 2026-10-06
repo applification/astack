@@ -27,23 +27,41 @@ test("deployed evaluation links the captured request, retained proof and owner r
     ),
   ).toBeVisible();
   await expect(
-    screen.getByText("Reported verification: Pass", { exact: true }),
+    screen.getByText("Checks passed", { exact: true }),
   ).toBeVisible();
   await expect(
     screen.getByText("3 captured turns", { exact: true }),
   ).toBeVisible();
   await expect(
-    screen.getByRole("heading", "Skill application & output criteria"),
+    screen.getByRole("heading", "How the work unfolded"),
   ).toBeVisible();
   await expect(
-    screen.getByRole("heading", "Add an owner assessment"),
+    screen.getByRole("heading", "Did this deliver what you wanted?"),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("button", "Yes", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("button", "Partly", { exact: true }),
+  ).toBeVisible();
+  await expect(screen.getByRole("button", "No", { exact: true })).toBeVisible();
+  await expect(
+    screen.getByRole("button", "Not sure yet", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByLabel("What worked or should change? (optional)"),
   ).toBeVisible();
   await expect(
     screen.getByLabel("Reason for Intent", { exact: true }),
-  ).toBeVisible();
-  await expect(
-    screen.getByLabel("Reason for Outcome", { exact: true }),
-  ).toBeVisible();
+  ).not.toBeVisible();
+  expect(
+    await browser.evaluate(() => ({
+      steps: document.querySelectorAll(".evaluation-flow > li").length,
+      technicalHeadings: [
+        ...document.querySelectorAll(".evaluation-flow > li h3"),
+      ].some((item) => /turn [a-f0-9]{8}/.test(item.textContent ?? "")),
+    })),
+  ).toEqual({ steps: 3, technicalHeadings: false });
   await screen
     .getByRole("link", "Original request in trace", { exact: true })
     .tap();
@@ -65,6 +83,9 @@ test("deployed evaluation links the captured request, retained proof and owner r
     .getByRole("link", "Observatory evaluations — first implementation", {
       exact: true,
     })
+    .tap();
+  await screen
+    .getByText("5 checks passed · what was checked?", { exact: true })
     .tap();
   await screen
     .getByText("Verification context & artifact references", { exact: true })

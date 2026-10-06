@@ -15,6 +15,7 @@
 | Outcome               | The assessed result of the engineering work, distinct from agent completion.                               |
 | Evaluation            | The intended work, acceptance and evidence against which agent behavior and delivery are assessed.         |
 | Assessment            | A judgment against stated criteria, with reasons and supporting observations.                              |
+| Outcome feedback      | The owner's view of whether a result delivered what they wanted, independently of technical grades.        |
 | Verification report   | Reported observations of acceptance cases on a named revision and environment, with retained evidence.     |
 | Intervention          | An explicit human interruption or intervention; an ordinary prompt is not sufficient evidence.             |
 | Capability use        | Evidence that a skill, instruction or workflow was read, explicitly supplied, or declared for an attempt.  |

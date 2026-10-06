@@ -147,7 +147,40 @@ for (const [variant, verdict] of [
   let id: string;
   try {
     store.setMeta("projectPolicy", JSON.stringify([project]));
-    for (const run of runs) store.put({ kind: "run", value: run });
+    for (const run of runs) {
+      store.put({ kind: "run", value: run });
+      store.put({
+        kind: "event",
+        value: {
+          ...prompt,
+          id: run.id + ":request",
+          runId: run.id,
+          sequence: 1,
+          data: {
+            content:
+              run.id === first.id
+                ? "Reproduce the lost edit."
+                : "Repair persistence and check a fresh read.",
+          },
+        },
+      });
+      store.put({
+        kind: "event",
+        value: {
+          ...prompt,
+          id: run.id + ":response",
+          runId: run.id,
+          sequence: 10,
+          kind: "assistant_output",
+          data: {
+            content:
+              run.id === first.id
+                ? "The edit is lost on reopen. The fixture reproduces the problem."
+                : "Ran save, reopen and fresh disk checks. The retained report records the result.",
+          },
+        },
+      });
+    }
     store.put({ kind: "event", value: prompt });
     const imported = importEvaluation(store, fixtureMachine, manifest);
     id = imported.id;

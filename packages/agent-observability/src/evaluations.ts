@@ -203,6 +203,23 @@ export const assessmentSchema = assessmentInputSchema.extend({
 });
 export type AssessmentInput = z.infer<typeof assessmentInputSchema>;
 export type Assessment = z.infer<typeof assessmentSchema>;
+
+// Outcome feedback is an owner's experience of the result, not a technical grade.
+export const outcomeChoiceSchema = z.enum(["yes", "partly", "no", "unsure"]);
+export const outcomeFeedbackInputSchema = z
+  .object({
+    choice: outcomeChoiceSchema,
+    comment: z.string().trim().max(4096),
+  })
+  .strict();
+export const outcomeFeedbackSchema = outcomeFeedbackInputSchema.extend({
+  id,
+  evaluationId: id,
+  reviewedAt: z.number().finite().nonnegative(),
+  reviewer: z.literal("owner"),
+});
+export type OutcomeFeedbackInput = z.infer<typeof outcomeFeedbackInputSchema>;
+export type OutcomeFeedback = z.infer<typeof outcomeFeedbackSchema>;
 export function validateAssessment(
   evaluation: Evaluation,
   assessment: AssessmentInput,

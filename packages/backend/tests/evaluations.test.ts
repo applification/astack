@@ -2,7 +2,11 @@ import { beforeEach, expect, test } from "bun:test";
 import { convexTest } from "convex-test";
 import schema from "../convex/schema";
 import { api, internal } from "../convex/_generated/api";
-import { evaluationDetailSchema } from "@astack/agent-observability/evaluation-view";
+import {
+  evaluationDetailSchema,
+  evaluationSummarySchema,
+} from "@astack/agent-observability/evaluation-view";
+import { activityNameKey } from "@astack/agent-observability/naming";
 import {
   evaluationFixture,
   evaluationRun,
@@ -319,4 +323,172 @@ test("large cited traces are rejected without saving a partial assessment", asyn
     ),
   );
   expect(detail.assessments).toEqual([]);
+});
+
+test("outcome feedback persists independently of proof and detailed grades, with owner-only immutable retries", async () => {
+  const { t, owner, evaluation } = await setup("fail");
+  const args = {
+    evaluationId: evaluation.id,
+    requestId: crypto.randomUUID(),
+    feedback: JSON.stringify({
+      choice: "yes",
+      comment: "Useful result; the failing check still needs attention.",
+    }),
+  };
+  await expect(t.mutation(api.evaluations.reviewOutcome, args)).rejects.toThrow(
+    "Unauthorized",
+  );
+  await expect(
+    t
+      .withIdentity({ subject: "machine" })
+      .mutation(api.evaluations.reviewOutcome, args),
+  ).rejects.toThrow("Unauthorized");
+  const id = await owner.mutation(api.evaluations.reviewOutcome, args);
+  expect(await owner.mutation(api.evaluations.reviewOutcome, args)).toBe(id);
+  await expect(
+    owner.mutation(api.evaluations.reviewOutcome, {
+      ...args,
+      feedback: JSON.stringify({ choice: "no", comment: "Changed" }),
+    }),
+  ).rejects.toThrow("reused");
+  await expect(
+    owner.mutation(api.evaluations.reviewOutcome, {
+      ...args,
+      evaluationId: "missing",
+    }),
+  ).rejects.toThrow("unavailable");
+  await expect(
+    owner.mutation(api.evaluations.reviewOutcome, {
+      ...args,
+      requestId: crypto.randomUUID(),
+      feedback: JSON.stringify({ choice: "pass", comment: "" }),
+    }),
+  ).rejects.toThrow();
+  await owner.mutation(api.evaluations.reviewOutcome, {
+    ...args,
+    requestId: crypto.randomUUID(),
+    feedback: JSON.stringify({ choice: "partly", comment: "" }),
+  });
+  const detail = evaluationDetailSchema.parse(
+    JSON.parse(
+      (await owner.query(api.evaluations.detail, {
+        evaluationId: evaluation.id,
+      })) ?? "null",
+    ),
+  );
+  expect(detail.feedback).toHaveLength(2);
+  expect(detail.feedback[0]?.choice).toBe("partly");
+  expect(detail.feedback[1]?.comment).toContain("failing check");
+  expect(detail.assessments).toEqual([]);
+  expect(detail.runs.every(({ run }) => run.outcome === "unknown")).toBe(true);
+  const listing = await owner.query(api.evaluations.list, {
+    projectId: fixtureProject,
+    paginationOpts: { numItems: 20, cursor: null },
+  });
+  const row = evaluationSummarySchema.parse(
+    JSON.parse(listing.page[0] ?? "null"),
+  );
+  expect(row.feedback).toBe("partly");
+  expect(row.verification).toBe("fail");
+  expect(row.outcome).toBeNull();
+  expect(
+    (
+      await owner.query(api.evaluations.list, {
+        projectId: "other",
+        paginationOpts: { numItems: 20, cursor: null },
+      })
+    ).page,
+  ).toEqual([]);
+});
+
+test("timeline excerpts use real captured content and names, exclude context and withheld data, and honor current enrollment", async () => {
+  const { t, owner, evaluation } = await setup();
+  const run = evaluationRun("repair");
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries([
+      {
+        kind: "event",
+        value: {
+          ...evaluationPrompt(),
+          id: run.id + ":prompt",
+          runId: run.id,
+          data: {
+            content:
+              "<environment_context>Private setup</environment_context>\nRepair the saved edit.",
+          },
+        },
+      },
+      {
+        kind: "event",
+        value: {
+          ...evaluationPrompt(),
+          id: run.id + ":response",
+          runId: run.id,
+          sequence: 10,
+          kind: "assistant_output",
+          data: { content: "Save and reopen now preserve the edit." },
+        },
+      },
+    ]),
+  });
+  await t.run(async (ctx) => {
+    const name = await ctx.db
+      .query("names")
+      .withIndex("by_key", (q) =>
+        q.eq("key", activityNameKey(fixtureProject, run.id)),
+      )
+      .unique();
+    if (!name) throw new Error("Missing naming fixture");
+    await ctx.db.patch(name._id, {
+      state: "ready",
+      title: "Repair saved edit persistence",
+    });
+  });
+  const read = async () =>
+    evaluationDetailSchema.parse(
+      JSON.parse(
+        (await owner.query(api.evaluations.detail, {
+          evaluationId: evaluation.id,
+        })) ?? "null",
+      ),
+    );
+  const step = (await read()).timeline.find((item) => item.runId === run.id);
+  expect(step?.title).toBe("Repair saved edit persistence");
+  expect(step?.request?.text).toBe("Repair the saved edit.");
+  expect(step?.response?.eventId).toBe(run.id + ":response");
+  expect(step?.response?.revision).toBe(1);
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries(
+      [
+        {
+          kind: "event",
+          value: {
+            ...evaluationPrompt(),
+            id: run.id + ":response",
+            runId: run.id,
+            sequence: 10,
+            kind: "assistant_output",
+            data: { content: "[WITHHELD]" },
+          },
+        },
+      ],
+      2,
+    ),
+  });
+  expect(
+    (await read()).timeline.find((item) => item.runId === run.id)?.response,
+  ).toBeNull();
+  await t.run(async (ctx) => {
+    const current = await ctx.db
+      .query("runs")
+      .withIndex("by_runId", (q) => q.eq("runId", run.id))
+      .unique();
+    if (!current) throw new Error("Fixture missing");
+    await ctx.db.patch(current._id, { enrolled: false });
+  });
+  expect(
+    (await read()).timeline.find((item) => item.runId === run.id)?.request,
+  ).toBeNull();
 });

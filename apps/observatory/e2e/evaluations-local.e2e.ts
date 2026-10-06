@@ -35,17 +35,17 @@ for (const item of result.results) {
       await expect(
         screen.getByRole("heading", "Saved edits / " + item.variant),
       ).toBeVisible();
-      const verdict =
-        item.variant === "fixed"
-          ? "Pass"
-          : item.variant === "defective"
-            ? "Fail"
-            : "Inconclusive";
       await expect(
-        screen.getByText("Reported verification: " + verdict),
+        screen.getByText(
+          item.variant === "fixed"
+            ? "Checks passed"
+            : item.variant === "defective"
+              ? "Checks found a problem"
+              : "Checks incomplete",
+        ),
       ).toBeVisible();
       await expect(
-        screen.getByText("Assessed outcome: " + verdict),
+        screen.getByRole("heading", "How the work unfolded"),
       ).toBeVisible();
       if (item.variant === "fixed") {
         await browser.setViewport({ width: 390, height: 844 });
@@ -54,6 +54,28 @@ for (const item of result.results) {
             () => document.documentElement.scrollWidth <= window.innerWidth,
           ),
         ).toBe(true);
+        const feedbackId = crypto.randomUUID();
+        await screen.getByRole("button", "Partly", { exact: true }).tap();
+        await screen
+          .getByLabel("What worked or should change? (optional)")
+          .fill("Local persisted outcome feedback " + feedbackId);
+        await screen.getByRole("button", "Save review", { exact: true }).tap();
+        await expect(screen.getByRole("status")).toContainText(
+          "Your review is saved.",
+        );
+        await browser.reload();
+        await expect(
+          screen.getByText("Your review: Partly", { exact: true }).first(),
+        ).toBeVisible();
+        await screen.getByText("Review history", { exact: false }).tap();
+        await expect(
+          screen.getByText("Local persisted outcome feedback " + feedbackId, {
+            exact: true,
+          }),
+        ).toBeVisible();
+        await screen
+          .getByText("Detailed intent and skill review", { exact: true })
+          .tap();
         const reviewId = crypto.randomUUID();
         for (const name of ["Intent", "bug-fix", "verify", "Outcome"]) {
           await screen
@@ -71,6 +93,9 @@ for (const item of result.results) {
         await screen.getByRole("button", "Save assessment").tap();
         await expect(screen.getByText("Assessment saved.")).toBeVisible();
         await browser.reload();
+        await screen
+          .getByText("Detailed intent and skill review", { exact: true })
+          .tap();
         await expect(
           screen.getByText(
             "Local browser reviewed Outcome against retained observations. " +
@@ -80,6 +105,13 @@ for (const item of result.results) {
         await screen.getByRole("link", "Original request in trace").tap();
         await expect(
           screen.getByRole("heading", "Reproduce a lost saved edit"),
+        ).toBeVisible();
+        await expect(
+          screen
+            .getByText("Fix edits disappearing after saving and reopening.", {
+              exact: true,
+            })
+            .last(),
         ).toBeVisible();
         expect(
           await browser.evaluate(() => {
@@ -99,6 +131,11 @@ for (const item of result.results) {
         });
       }
       if (item.variant === "defective") {
+        await screen
+          .getByText("0 of 1 checks passed · what was checked?", {
+            exact: true,
+          })
+          .tap();
         await screen
           .getByText("Verification context & artifact references")
           .tap();

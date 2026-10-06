@@ -10,6 +10,7 @@ import {
   verdictSchema,
   type AssessmentInput,
   type Evaluation,
+  type OutcomeFeedbackInput,
 } from "@astack/agent-observability/evaluations";
 import {
   evaluationDetailSchema,
@@ -18,27 +19,23 @@ import {
   type EvaluationSummary,
 } from "@astack/agent-observability/evaluation-view";
 
+import {
+  AssessmentHistory,
+  feedbackLabels,
+  runLink,
+  textPreview,
+  VerificationEvidence,
+  verdictLabel,
+  WorkTimeline,
+} from "./evaluation-evidence";
+import { OutcomeFeedbackForm } from "./outcome-feedback";
+
 export const evaluationLink = (id: string, projectId: string) =>
   "#evaluation/" +
   encodeURIComponent(id) +
   "?" +
   new URLSearchParams({ project: projectId });
-const runLink = (runId: string, projectId: string, eventId?: string) =>
-  "#run/" +
-  encodeURIComponent(runId) +
-  "?" +
-  new URLSearchParams({
-    project: projectId,
-    ...(eventId ? { event: eventId } : {}),
-  });
-const label = (value: string | null) =>
-  value === null
-    ? "Awaiting owner review"
-    : value === "pass"
-      ? "Pass"
-      : value === "fail"
-        ? "Fail"
-        : "Inconclusive";
+const label = verdictLabel;
 
 export function EvaluationTable({ rows }: { rows: EvaluationSummary[] }) {
   return rows.length ? (
@@ -48,8 +45,8 @@ export function EvaluationTable({ rows }: { rows: EvaluationSummary[] }) {
           <tr>
             <th>Evaluation</th>
             <th>Captured turns</th>
-            <th>Reported verification</th>
-            <th>Assessed outcome</th>
+            <th>Checks</th>
+            <th>Your review</th>
           </tr>
         </thead>
         <tbody>
@@ -62,8 +59,20 @@ export function EvaluationTable({ rows }: { rows: EvaluationSummary[] }) {
                 </span>
               </td>
               <td>{row.turns}</td>
-              <td>{label(row.verification)}</td>
-              <td>{label(row.outcome)}</td>
+              <td>
+                {row.verification === "pass"
+                  ? "Passed"
+                  : row.verification === "fail"
+                    ? "Problems found"
+                    : "Incomplete"}
+              </td>
+              <td>
+                {row.feedback
+                  ? feedbackLabels[row.feedback]
+                  : row.outcome
+                    ? "Detailed assessment: " + label(row.outcome)
+                    : "Review pending"}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -303,246 +312,167 @@ export function AssessmentForm({
 export function EvaluationView({
   detail,
   save,
+  saveFeedback,
 }: {
   detail: EvaluationDetail;
   save?: (assessment: AssessmentInput, requestId: string) => Promise<void>;
+  saveFeedback?: (
+    feedback: OutcomeFeedbackInput,
+    requestId: string,
+  ) => Promise<void>;
 }) {
-  const { evaluation, assessments } = detail;
+  const { evaluation, feedback } = detail;
   const verification = evaluateProof(evaluation);
-  const latest = assessments[0];
+  const resultStep = [...detail.runs]
+    .sort((a, b) => b.run.startedAt - a.run.startedAt)
+    .map(({ run }) => detail.timeline.find((step) => step.runId === run.id))
+    .find((step) => step?.response);
+  const checkStatus =
+    verification.verdict === "pass"
+      ? "Checks passed"
+      : verification.verdict === "fail"
+        ? "Checks found a problem"
+        : "Checks incomplete";
   return (
-    <>
-      <p className="eyebrow">Intent, skills & outcome</p>
-      <h1>{evaluation.title}</h1>
-      <div className="tag-list">
-        <Badge>Reported verification: {label(verification.verdict)}</Badge>
-        <Badge>
-          Assessed outcome: {label(latest?.outcome.verdict ?? null)}
-        </Badge>
-        <Badge>{evaluation.runIds.length} captured turns</Badge>
-      </div>
-      <p className="subtitle">
-        Criteria {evaluation.criteriaVersion} · {verification.evaluatorVersion}.
-        Verification observations are supplied reports; owner assessments are
-        separate.
-      </p>
-      <h2>Original intent</h2>
-      <p>{evaluation.intent.request}</p>
-      <p className="subtitle">
-        {detail.source
-          ? "Linked to the captured original request."
-          : "Declared request; no captured prompt reference supplied."}
-      </p>
-      {detail.source && (
-        <a
-          href={runLink(
-            detail.source.event.runId,
-            evaluation.projectId,
-            detail.source.event.id,
-          )}
-        >
-          Original request in trace
-        </a>
-      )}
-      {evaluation.intent.clarifications.length > 0 && (
-        <ul>
-          {evaluation.intent.clarifications.map((item, index) => (
-            <li key={index}>{item}</li>
-          ))}
-        </ul>
-      )}
-      <h2>Acceptance results</h2>
-      {evaluation.cases.map((item) => {
-        const result = verification.cases.find((row) => row.caseId === item.id);
-        const report = evaluation.proof?.cases.find(
-          (row) => row.caseId === item.id,
-        );
-        return (
-          <section key={item.id} className="notice" id={"case-" + item.id}>
-            <h3>
-              {item.id} · {item.expected}
-            </h3>
-            <Badge>{label(result?.verdict ?? "inconclusive")}</Badge>
-            {result?.flaky && <Badge>Flaky</Badge>}
-            <p>{result?.reason}</p>
-            {report?.attempts.map((attempt, index) => (
-              <details key={index}>
-                <summary>
-                  Attempt {index + 1} · {attempt.status}
-                </summary>
-                <p>{attempt.observed}</p>
-                {attempt.independentObservation && (
-                  <p>
-                    Independent observation: {attempt.independentObservation}
-                  </p>
-                )}
-                {attempt.artifacts.map((artifact) => (
-                  <div key={artifact.path}>
-                    <strong>{artifact.label}</strong>
-                    <pre>{artifact.path + "\nSHA-256: " + artifact.sha256}</pre>
-                  </div>
-                ))}
-              </details>
-            ))}
-          </section>
-        );
-      })}
-      {evaluation.proof && (
-        <details className="notice">
-          <summary>Verification context & artifact references</summary>
-          <dl className="break-all">
-            <dt>Revision</dt>
-            <dd>
-              {evaluation.proof.revision} ·{" "}
-              {evaluation.proof.dirty ? "Dirty checkout" : "Clean checkout"}
-            </dd>
-            <dt>Source digest</dt>
-            <dd>
-              <code>{evaluation.proof.sourceDigest}</code>
-            </dd>
-            <dt>Target</dt>
-            <dd>{evaluation.proof.target}</dd>
-            <dt>Actor / fixture</dt>
-            <dd>
-              {evaluation.proof.actor} · {evaluation.proof.fixture}
-            </dd>
-            <dt>Command</dt>
-            <dd>
-              <code>{evaluation.proof.command}</code>
-            </dd>
-          </dl>
-          <p className="subtitle">
-            Artifact paths and digests are supplied references. Artifact bytes
-            are retained by the verification route and are not uploaded here.
+    <div className="evaluation-page">
+      <p className="eyebrow">Evaluation</p>
+      <h1 className="run-heading">{evaluation.title}</h1>
+      <section className="evaluation-intent">
+        <h2>Original intent</h2>
+        <p className="whitespace-pre-wrap">{evaluation.intent.request}</p>
+        {detail.source ? (
+          <a
+            href={runLink(
+              detail.source.event.runId,
+              evaluation.projectId,
+              detail.source.event.id,
+            )}
+          >
+            Original request in trace
+          </a>
+        ) : (
+          <p className="secondary">
+            Declared request; no captured prompt reference supplied.
           </p>
-        </details>
-      )}
-      <h2>Skill application & output criteria</h2>
-      {evaluation.skillCriteria.length ? (
-        evaluation.skillCriteria.map((item) => (
-          <p key={item.id}>
-            <strong>{item.skill}</strong> · {item.expected}
-          </p>
-        ))
-      ) : (
-        <p className="subtitle">
-          No skill criteria declared for this evaluation.
-        </p>
-      )}
-      <h2>Captured work</h2>
-      {detail.runs.map(({ run, revision }) => (
-        <details key={run.id} className="notice">
-          <summary>
-            {run.title} · {run.agent} · {run.agentVersion ?? "Version unknown"}
-          </summary>
-          <a href={runLink(run.id, evaluation.projectId)}>Open captured turn</a>
-          <p className="subtitle">
-            Snapshot at ingestion revision {revision} · Model{" "}
-            {run.model ?? "unknown"} · Capture-time commit{" "}
-            {run.commit ?? "unknown"}
-          </p>
-          <div className="tag-list">
-            {run.skills.map((skill, index) => (
-              <Badge key={index}>
-                {skill.name} · {skill.hash ?? "Unknown hash"} ·{" "}
-                {skill.provenance}
-              </Badge>
-            ))}
-          </div>
-          {run.coverage.map((gap, index) => (
-            <p key={index} className="subtitle">
-              {gap}
-            </p>
-          ))}
-        </details>
-      ))}
-      <h2>Assessment history</h2>
-      {!assessments.length && (
-        <p className="empty">
-          No owner assessment yet. Agent completion and reported verification do
-          not assign an engineering outcome.
-        </p>
-      )}
-      {assessments.map((assessment) => (
-        <section className="notice" key={assessment.id}>
-          <h3>
-            Owner · {new Date(assessment.assessedAt).toLocaleString()} ·{" "}
-            {assessment.evaluatorVersion}
-          </h3>
-          {[
-            { name: "Intent", ...assessment.intent },
-            ...assessment.skills.map((item) => ({
-              name:
-                evaluation.skillCriteria.find((c) => c.id === item.criterionId)
-                  ?.skill ?? item.criterionId,
-              ...item,
-            })),
-            { name: "Outcome", ...assessment.outcome },
-          ].map((judgment, index) => (
-            <div key={index}>
-              <strong>
-                {judgment.name}: {label(judgment.verdict)}
-              </strong>
-              <p>{judgment.reason}</p>
-              <div className="tag-list">
-                {judgment.evidence.map((evidence, i) =>
-                  evidence.kind === "case" ? (
-                    <a
-                      key={i}
-                      href={"#case-" + evidence.caseId}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        document
-                          .getElementById("case-" + evidence.caseId)
-                          ?.scrollIntoView();
-                      }}
-                    >
-                      {evidence.caseId} acceptance evidence
-                    </a>
-                  ) : (
-                    <a
-                      key={i}
-                      href={runLink(
-                        evidence.runId,
-                        evaluation.projectId,
-                        evidence.eventId,
-                      )}
-                    >
-                      Trace evidence
-                    </a>
-                  ),
-                )}
-              </div>
-            </div>
-          ))}
-          {assessment.traces.length > 0 && (
-            <details>
-              <summary>
-                Evidence snapshots retained with this assessment
-              </summary>
-              {assessment.traces.map(({ event, revision }) => (
-                <div key={event.id}>
-                  <h4>
-                    {event.title} · revision {revision}
-                  </h4>
-                  <pre>{JSON.stringify(event.data, null, 2)}</pre>
-                </div>
+        )}
+        {evaluation.intent.clarifications.length > 0 && (
+          <details className="metadata-details">
+            <summary>
+              Agreed scope · {evaluation.intent.clarifications.length}{" "}
+              {evaluation.intent.clarifications.length === 1
+                ? "clarification"
+                : "clarifications"}
+            </summary>
+            <ul>
+              {evaluation.intent.clarifications.map((item, index) => (
+                <li key={index}>{item}</li>
               ))}
-            </details>
+            </ul>
+          </details>
+        )}
+      </section>
+      <section className="evaluation-result" aria-label="Result summary">
+        <h2>Result</h2>
+        {resultStep?.response ? (
+          <>
+            <p>{textPreview(resultStep.response.text, 320)}</p>
+            <a
+              href={runLink(
+                resultStep.runId,
+                evaluation.projectId,
+                resultStep.response.eventId,
+              )}
+            >
+              Read the agent’s response
+            </a>
+          </>
+        ) : (
+          <p>
+            No response excerpt available. The work and verification evidence
+            are linked below.
+          </p>
+        )}
+        <div className="tag-list">
+          <span
+            className={
+              verification.verdict === "fail"
+                ? "text-destructive"
+                : verification.verdict === "pass"
+                  ? "text-success"
+                  : "text-muted-foreground"
+            }
+          >
+            <Badge>{checkStatus}</Badge>
+          </span>
+          <Badge>
+            {feedback[0]
+              ? "Your review: " + feedbackLabels[feedback[0].choice]
+              : "Your review pending"}
+          </Badge>
+          <Badge>{evaluation.runIds.length} captured turns</Badge>
+        </div>
+        <p className="secondary">
+          The agent’s response and reported checks are evidence for your review.
+        </p>
+      </section>
+      <WorkTimeline detail={detail} />
+      <VerificationEvidence evaluation={evaluation} />
+      {saveFeedback && (
+        <OutcomeFeedbackForm key={evaluation.id} save={saveFeedback} />
+      )}
+      {feedback.length > 0 && (
+        <details className="evaluation-disclosure">
+          <summary>
+            Review history · {feedback.length}
+            {detail.moreFeedback ? "+" : ""}
+          </summary>
+          {feedback.map((item) => (
+            <section className="evaluation-review-record" key={item.id}>
+              <strong>Your review: {feedbackLabels[item.choice]}</strong>
+              <p className="secondary">
+                {new Date(item.reviewedAt).toLocaleString()}
+              </p>
+              {item.comment && (
+                <p className="whitespace-pre-wrap">{item.comment}</p>
+              )}
+            </section>
+          ))}
+          {detail.moreFeedback && (
+            <p className="secondary">Showing the latest 20 reviews.</p>
           )}
-        </section>
-      ))}
-      {detail.moreAssessments && (
-        <p className="subtitle">Showing the latest 20 assessments.</p>
+        </details>
       )}
-      {save && (
-        <AssessmentForm
-          key={evaluation.id}
-          evaluation={evaluation}
-          save={save}
-        />
-      )}
-    </>
+      <details className="evaluation-disclosure">
+        <summary>Detailed intent and skill review</summary>
+        <p className="subtitle">
+          Use this when you want to assess the approach and outputs against
+          specific criteria. Outcome feedback above does not assign these
+          grades.
+        </p>
+        <h2>Skill application & output criteria</h2>
+        {evaluation.skillCriteria.length ? (
+          evaluation.skillCriteria.map((item) => (
+            <p key={item.id}>
+              <strong>{item.skill}</strong> · {item.expected}
+            </p>
+          ))
+        ) : (
+          <p className="subtitle">No skill criteria declared.</p>
+        )}
+        <AssessmentHistory detail={detail} />
+        {save && (
+          <AssessmentForm
+            key={evaluation.id}
+            evaluation={evaluation}
+            save={save}
+          />
+        )}
+        <p className="secondary">
+          Criteria {evaluation.criteriaVersion} ·{" "}
+          {verification.evaluatorVersion}
+        </p>
+      </details>
+    </div>
   );
 }
 export function Evaluations({ projectId }: { projectId?: string }) {
@@ -556,8 +486,8 @@ export function Evaluations({ projectId }: { projectId?: string }) {
       <p className="eyebrow">Harness feedback</p>
       <h1>Evaluations</h1>
       <p className="subtitle">
-        Intent and verification snapshots across captured turns, with separate
-        owner assessments.
+        Review what was asked, how the work unfolded and whether the result
+        delivered.
       </p>
       {query.status === "LoadingFirstPage" ? (
         <p role="status">Loading evaluations…</p>
@@ -594,6 +524,7 @@ export function EvaluationPage({
     ...(projectId ? { projectId } : {}),
   });
   const assess = useMutation(api.evaluations.assess);
+  const reviewOutcome = useMutation(api.evaluations.reviewOutcome);
   if (raw === undefined) return <p role="status">Loading evaluation…</p>;
   if (raw === null)
     return (
@@ -605,6 +536,13 @@ export function EvaluationPage({
   return (
     <EvaluationView
       detail={evaluationDetailSchema.parse(JSON.parse(raw))}
+      saveFeedback={async (feedback, requestId) => {
+        await reviewOutcome({
+          evaluationId: id,
+          requestId,
+          feedback: JSON.stringify(feedback),
+        });
+      }}
       save={async (assessment, requestId) => {
         await assess({
           evaluationId: id,

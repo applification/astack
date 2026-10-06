@@ -8,6 +8,8 @@ import {
   evaluateProof,
   evaluationSchema,
   validateAssessment,
+  outcomeFeedbackInputSchema,
+  outcomeFeedbackSchema,
   type Evaluation,
 } from "@astack/agent-observability/evaluations";
 import {
@@ -15,7 +17,12 @@ import {
   evaluationSummarySchema,
   eventSnapshotSchema,
   storedAssessmentSchema,
+  capturedExcerptSchema,
 } from "@astack/agent-observability/evaluation-view";
+import {
+  activityHeading,
+  activityNameKey,
+} from "@astack/agent-observability/naming";
 import { redact } from "@astack/agent-observability/redaction";
 import {
   mutation,
@@ -24,6 +31,7 @@ import {
   type QueryCtx,
 } from "./_generated/server";
 import { requireOwner } from "./access";
+import type { Doc } from "./_generated/dataModel";
 import { getProject } from "./projectData";
 import { resolveProject } from "@astack/agent-observability/projects";
 
@@ -37,6 +45,109 @@ const boundedJson = (value: unknown, maximumBytes = 512 * 1024) => {
     throw new Error("Evaluation snapshot exceeds its byte budget");
   return data;
 };
+// Read only the bounded beginning/end of a turn. Full traces stay on their own route.
+async function timelineStep(
+  ctx: QueryCtx,
+  run: EvaluationDetailRun,
+  project: NonNullable<Awaited<ReturnType<typeof getProject>>>,
+  budget: { bytes: number },
+) {
+  const current = await ctx.db
+    .query("runs")
+    .withIndex("by_runId", (q) => q.eq("runId", run.id))
+    .unique();
+  if (
+    !current?.enrolled ||
+    current.projectId !== project.projectId ||
+    current.machineId !== run.machineId
+  )
+    return {
+      runId: run.id,
+      title: activityHeading(run),
+      request: null,
+      response: null,
+    };
+  const currentRun = runSchema.parse(JSON.parse(current.data));
+  if (
+    !currentRun.contentCapture ||
+    resolveProject([project], currentRun)?.projectId !== project.projectId
+  )
+    return {
+      runId: run.id,
+      title: activityHeading(run),
+      request: null,
+      response: null,
+    };
+  const name = await ctx.db
+    .query("names")
+    .withIndex("by_key", (q) =>
+      q.eq("key", activityNameKey(project.projectId, run.id)),
+    )
+    .unique();
+  const ends: Doc<"events">[][] = [];
+  for (const order of ["asc", "desc"] as const) {
+    const rows = [];
+    let bytes = 0;
+    if (budget.bytes < 256 * 1024) {
+      for await (const row of ctx.db
+        .query("events")
+        .withIndex("by_runId_and_sequence", (q) => q.eq("runId", run.id))
+        .order(order)) {
+        const size = new TextEncoder().encode(row.data).byteLength;
+        rows.push(row);
+        bytes += size;
+        budget.bytes += size;
+        if (
+          rows.length >= 12 ||
+          bytes >= 32 * 1024 ||
+          budget.bytes >= 256 * 1024
+        )
+          break;
+      }
+    }
+    ends.push(rows);
+  }
+  const excerpt = (
+    kind: "user_prompt" | "assistant_output",
+    rows: (typeof ends)[number],
+  ) => {
+    for (const row of rows) {
+      if (row.machineId !== run.machineId) continue;
+      const event = eventSchema.parse(redact(JSON.parse(row.data)));
+      if (
+        event.kind !== kind ||
+        typeof event.data.content !== "string" ||
+        event.data.content === "[WITHHELD]"
+      )
+        continue;
+      const text = event.data.content
+        .replace(
+          /<(environment_context|user_instructions|skills_instructions)>[\s\S]*?<\/\1>/gi,
+          "",
+        )
+        .trim();
+      if (text)
+        return capturedExcerptSchema.parse({
+          eventId: event.id,
+          revision: row.revision,
+          text: text.slice(0, 1200),
+        });
+    }
+    return null;
+  };
+  return {
+    runId: run.id,
+    title: activityHeading(
+      run,
+      name?.state === "ready" && name.title
+        ? { runId: run.id, activity: name.title }
+        : undefined,
+    ),
+    request: excerpt("user_prompt", ends[0] ?? []),
+    response: excerpt("assistant_output", ends[1] ?? []),
+  };
+}
+type EvaluationDetailRun = z.infer<typeof runSchema>;
 async function stored(ctx: Pick<QueryCtx, "db">, id: string) {
   return ctx.db
     .query("evaluations")
@@ -166,6 +277,13 @@ export const list = query({
       const assessment = latest[0]
         ? storedAssessmentSchema.parse(JSON.parse(latest[0].data))
         : null;
+      const feedback = await ctx.db
+        .query("evaluationFeedback")
+        .withIndex("by_evaluationId_and_reviewedAt", (q) =>
+          q.eq("evaluationId", row.evaluationId),
+        )
+        .order("desc")
+        .first();
       summaries.push(
         JSON.stringify(
           evaluationSummarySchema.parse({
@@ -176,6 +294,9 @@ export const list = query({
             turns: evaluation.runIds.length,
             verification: evaluateProof(evaluation).verdict,
             outcome: assessment?.outcome.verdict ?? null,
+            feedback: feedback
+              ? outcomeFeedbackSchema.parse(JSON.parse(feedback.data)).choice
+              : null,
           }),
         ),
       );
@@ -193,10 +314,11 @@ export const detail = query({
   handler: async (ctx, args) => {
     await requireOwner(ctx);
     const row = await stored(ctx, args.evaluationId);
+    const project = row ? await getProject(ctx, row.projectId) : null;
     if (
       !row ||
       (args.projectId && row.projectId !== args.projectId) ||
-      !(await getProject(ctx, row.projectId))
+      !project
     )
       return null;
     const assessments = await ctx.db
@@ -206,16 +328,83 @@ export const detail = query({
       )
       .order("desc")
       .take(21);
+    const snapshot = snapshotSchema.parse(JSON.parse(row.snapshot));
+    const timeline = [];
+    const budget = { bytes: 0 };
+    for (const { run } of [...snapshot.runs].sort(
+      (a, b) => b.run.startedAt - a.run.startedAt,
+    ))
+      timeline.push(await timelineStep(ctx, run, project, budget));
+    const feedback = await ctx.db
+      .query("evaluationFeedback")
+      .withIndex("by_evaluationId_and_reviewedAt", (q) =>
+        q.eq("evaluationId", row.evaluationId),
+      )
+      .order("desc")
+      .take(21);
     return JSON.stringify(
       evaluationDetailSchema.parse({
         evaluation: evaluationSchema.parse(JSON.parse(row.data)),
-        ...snapshotSchema.parse(JSON.parse(row.snapshot)),
+        ...snapshot,
+        timeline,
+        feedback: feedback
+          .slice(0, 20)
+          .map((item) => outcomeFeedbackSchema.parse(JSON.parse(item.data))),
+        moreFeedback: feedback.length > 20,
         assessments: assessments
           .slice(0, 20)
           .map((item) => storedAssessmentSchema.parse(JSON.parse(item.data))),
         moreAssessments: assessments.length > 20,
       }),
     );
+  },
+});
+export const reviewOutcome = mutation({
+  args: {
+    evaluationId: v.string(),
+    requestId: v.string(),
+    feedback: v.string(),
+  },
+  returns: v.string(),
+  handler: async (ctx, args) => {
+    await requireOwner(ctx);
+    z.string().uuid().parse(args.requestId);
+    if (new TextEncoder().encode(args.feedback).byteLength > 32 * 1024)
+      throw new Error("Feedback too large");
+    const row = await stored(ctx, args.evaluationId);
+    if (!row || !(await getProject(ctx, row.projectId)))
+      throw new Error("Evaluation unavailable");
+    const input = outcomeFeedbackInputSchema.parse(
+      redact(JSON.parse(args.feedback)),
+    );
+    const id = row.evaluationId + ":feedback:" + args.requestId;
+    const previous = await ctx.db
+      .query("evaluationFeedback")
+      .withIndex("by_feedbackId", (q) => q.eq("feedbackId", id))
+      .unique();
+    if (previous) {
+      const saved = outcomeFeedbackSchema.parse(JSON.parse(previous.data));
+      if (
+        JSON.stringify({ choice: saved.choice, comment: saved.comment }) !==
+        JSON.stringify(input)
+      )
+        throw new Error("Feedback request ID reused with different content");
+      return id;
+    }
+    const feedback = outcomeFeedbackSchema.parse({
+      ...input,
+      id,
+      evaluationId: row.evaluationId,
+      reviewedAt: Date.now(),
+      reviewer: "owner",
+    });
+    await ctx.db.insert("evaluationFeedback", {
+      feedbackId: id,
+      evaluationId: row.evaluationId,
+      reviewedAt: feedback.reviewedAt,
+      data: boundedJson(feedback, 32 * 1024),
+    });
+    return id;
   },
 });
 export const forRun = query({
