@@ -17,3 +17,9 @@ The approved interactive HTML concept established the badge and grouped sequence
 Only presentation and local selection state change. Existing workflow records and their ordering/pairing remain authoritative; no backend schema, capture behavior, skill invocation order, historical hashes or grades are inferred. A declaration in an omitted phase stays visible as an omitted declaration. Icons identify skills, never a passing verdict. Supporting links describe the recorded phase rather than uniquely attributed skill execution.
 
 Verification results and selected synthetic screenshots are retained in `evidence/`. Live authentication uses the owner's existing private key through the project runner; private screenshots and keys are not retained here.
+
+## Observed proof
+
+UI revision `3e29104` passes strict types, UI lint, site/plugin integrity, production and Storybook builds, 97 native tests and all 34 component browser cases. Selected synthetic screenshots include desktop/light, narrow/dark and custom-name states; final capture waits for theme colors to settle and accounts for the sticky header.
+
+Otis serves the matching HTML, JS and CSS. Seven authenticated live journeys pass, including S4 on the existing evaluation's eight persisted workflow records. The first badge-to-trace check was inconclusive because its locator matched both start and finish declarations; selecting the finish resolved the test ambiguity without changing the UI. That first observation and final live source hash are retained in `evidence/deployment.json`. Deployment wrote no owner judgments. UI-only rollout copied assets before replacing the entry page and kept the previous UI privately for recovery.

@@ -44,8 +44,10 @@ test("deployed astack workflow connects the actual route, phases and evidence wi
     exact: true,
   });
   await expect(skillEvidence).toContainText("Recorded name: testing.");
+  // The actual phase declares Testing at both start and finish; inspect the finish.
   await skillEvidence
     .getByRole("link", "Declaration in trace", { exact: true })
+    .last()
     .tap();
   await expect(
     screen.getByRole("heading", "Workflow annotation", { exact: true }),

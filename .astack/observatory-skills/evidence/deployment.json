@@ -1,0 +1,83 @@
+{
+  "at": "2026-10-06T22:03:43.899Z",
+  "runtimeRevision": "3e29104",
+  "evaluationId": "bbb1fd30-527f-4326-b685-fb9c2e021092:evaluation:13e793a1-5d1d-4d44-891f-55f871d86d75",
+  "projectId": "a20a2fb3-646f-40fe-9b12-c64f759afaea",
+  "actualWorkflowRecords": 8,
+  "actualPhases": 5,
+  "selectedRoute": "implement",
+  "supportingReferencesAvailable": true,
+  "anonymousDenied": true,
+  "wrongProjectHidden": true,
+  "ownerJudgmentWrittenByDeployment": false,
+  "servedAssetsMatchBuild": true,
+  "hashes": [
+    {
+      "asset": "/assets/index-BFSz0zik.js",
+      "sha256": "a4a9fa74f1c8866abf790ca7349fae16f5c886e59ffebff124997838f115f735"
+    },
+    {
+      "asset": "/assets/index-CpP059iE.css",
+      "sha256": "13a97228943e7ef195070599401603fa384ce555a84d39b08a7d32f3ed0615cd"
+    }
+  ],
+  "backupRetained": true,
+  "deploymentScope": "UI assets only; assets copied before atomic entry-page replacement; existing backend and collector retained",
+  "live": {
+    "runId": "01a1133f-6f0c-73c8-ab5e-784ec43162d6",
+    "summary": {
+      "discovered": 7,
+      "selected": 7,
+      "executed": 7,
+      "passed": 7,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 0
+    },
+    "reportSha256": "9529a7c4be65e38ab4caabf60a0e082971c69203bfb05f1d5edeb6e7c54cb50f",
+    "cases": [
+      {
+        "title": "deployed astack workflow connects the actual route, phases and evidence without assigning owner grades",
+        "status": "passed"
+      },
+      {
+        "title": "deployed evaluation links the captured request, retained proof and owner review form",
+        "status": "passed"
+      },
+      {
+        "title": "owner access survives reload and browser restart, and Claude rows show the captured CLI version",
+        "status": "passed"
+      },
+      {
+        "title": "the annotated run has compact metadata, readable naming, real provider assets and no missing-time placeholders",
+        "status": "passed"
+      },
+      {
+        "title": "the reported T3 run exposes uploaded progress and conversation details",
+        "status": "passed"
+      },
+      {
+        "title": "live project filter menus work across Runs, Work and Problems and find historical branch results",
+        "status": "passed"
+      },
+      {
+        "title": "private deployment gates access and supports live run/trace/work/skills navigation",
+        "status": "passed"
+      }
+    ]
+  },
+  "finalLiveTestSource": {
+    "path": "apps/observatory/e2e/live.e2e.ts",
+    "sha256": "734c9be3c2fe9aa21da83eecc22cbec072e41cdf49788ebbf0b4f96ecf0fa045",
+    "strictTypes": "pass"
+  },
+  "initialLiveObservation": {
+    "status": "inconclusive for badge-to-trace navigation; six other journeys passed",
+    "reason": "The test locator matched both actual start and finish declaration links. It now selects the finish; no UI repair or redeployment was needed.",
+    "reportSha256": "fa7da7f6b57606af90e7db5c3eb5861dd97a0aaed28fe80c6c0abd63cb18f001",
+    "automaticRetry": false
+  },
+  "acceptance": {
+    "S4": "pass: actual persisted evaluation; skill sequence; badge-to-declaration trace; narrow viewport; owner grades remain unwritten"
+  }
+}
