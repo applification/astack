@@ -32,5 +32,23 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+  dashboard:
+    image: ghcr.io/get-convex/convex-dashboard@sha256:f85cf0d0448b9c835ae3df5c7c1c6f0145dd4c8f0f92eb0245daf304efdd9f1a
+    restart: unless-stopped
+    stop_signal: SIGINT
+    stop_grace_period: 10s
+    ports:
+      - '127.0.0.1:6792:6791'
+    environment:
+      NEXT_PUBLIC_DEPLOYMENT_URL: ${CONVEX_CLOUD_ORIGIN:?}
+      NEXT_PUBLIC_LOAD_MONACO_INTERNALLY: 'true'
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:6791/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      start_period: 20s
+    depends_on:
+      backend:
+        condition: service_healthy
 volumes:
   observatory-data:

@@ -13,6 +13,13 @@ function run(args: string[], cwd = root) {
   execFileSync(args[0] ?? "", args.slice(1), { cwd, stdio: "inherit" });
 }
 run(["bun", "run", "observatory:build"]);
+await writeFile(
+  join(runtime, "compose.yml"),
+  (await readFile(join(root, "infra/observatory/compose.yml"), "utf8")).replace(
+    "../../apps/observatory/dist:",
+    "./dist:",
+  ),
+);
 await cp(join(root, "apps/observatory/dist"), join(runtime, "dist"), {
   recursive: true,
 });
@@ -41,7 +48,10 @@ await writeFile(
   { mode: 0o600 },
 );
 run(["docker", "compose", "up", "-d", "--wait"], runtime);
-run(["docker", "compose", "exec", "-T", "web", "nginx", "-s", "reload"], runtime);
+run(
+  ["docker", "compose", "exec", "-T", "web", "nginx", "-s", "reload"],
+  runtime,
+);
 run([
   "tailscale",
   "serve",
@@ -49,6 +59,14 @@ run([
   "--https=8450",
   "--yes",
   "http://127.0.0.1:4180",
+]);
+run([
+  "tailscale",
+  "serve",
+  "--bg",
+  "--https=8453",
+  "--yes",
+  "http://127.0.0.1:6792",
 ]);
 if (process.platform === "darwin")
   run([

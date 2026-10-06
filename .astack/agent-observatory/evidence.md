@@ -1,5 +1,11 @@
 # Agent Observatory evidence
 
+## Convex admin dashboard, 2026-10-06
+
+Installed the official Convex dashboard pinned at `sha256:f85cf0d0448b9c835ae3df5c7c1c6f0145dd4c8f0f92eb0245daf304efdd9f1a` alongside the existing backend. Docker binds it only to `127.0.0.1:6792`; Tailscale Serve exposes private HTTPS on port 8453. The container health check passed, the HTTPS page returned 200, and the browser displayed the Convex login form with the correct deployment URL (`https://otis.tail12a0a0.ts.net:8451`). The existing private admin key successfully listed the five expected tables through the native CLI. Credentials were copied directly to the local clipboard without being printed; browser sign-in is left to the owner. This dashboard uses the actual Observatory database.
+
+Strict types, all 22 tests and the existing site/plugin checks passed. Deployment now synchronizes the runtime Compose definition and establishes the dashboard route; the existing login startup starts the new service. Pen/Storybook are not applicable to the unchanged vendor UI; HTTP, container health and the observed login page establish startup. No authenticated browser dashboard session or post-reboot test is claimed.
+
 ## Readable content update, 2026-10-06
 
 Implemented and deployed revision `2eeebee` on Otis. This supersedes the initial metadata-only privacy decision below. New collectors default to redacted content; explicit existing metadata-only settings remain respected. Otis enables readable capture and includes its separate viewer credential in private known-secret matching. Trace titles remain metadata, with readable previews and expanded Message/Command/Output/Arguments/Result/Error sections controlled by Show content.
