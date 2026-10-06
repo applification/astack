@@ -195,3 +195,84 @@ test("theme choice survives reload and system mode follows the browser", async (
     ),
   ).toEqual(["astack-observatory-theme"]);
 });
+
+test("project management adds/edits/pauses a project and keeps the selector readable on narrow screens", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open("/iframe.html?id=observatory-projects--mixed&viewMode=story");
+  await expect(screen.getByRole("heading", "Projects")).toBeVisible();
+  await screen.getByLabel("Project name").fill("Checkout");
+  await screen
+    .getByLabel("Repository URLs")
+    .fill("git@github.com:fixture/checkout.git");
+  await screen.getByRole("button", "Save project", { exact: true }).tap();
+  await expect(
+    screen.getByRole("link", "Checkout", { exact: true }),
+  ).toBeVisible();
+  await screen.getByRole("button", "Edit Checkout", { exact: true }).tap();
+  await screen.getByLabel("Project name").fill("Checkout app");
+  await screen.getByRole("button", "Save project", { exact: true }).tap();
+  await expect(
+    screen.getByRole("link", "Checkout app", { exact: true }),
+  ).toBeVisible();
+  await screen.getByRole("button", "Pause Astack", { exact: true }).tap();
+  await expect(
+    screen.getByRole("button", "Resume Astack", { exact: true }),
+  ).toBeVisible();
+  await screen
+    .getByLabel("Selected project")
+    .selectOption({ value: "00000000-0000-4000-8000-000000000100" });
+  await app.screenshot("projects-managed");
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await app.screenshot("projects-narrow-dark");
+});
+test("project empty/loading/failed-save states keep unsaved input and do not claim persistence", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-projects--loading&viewMode=story",
+  );
+  await expect(
+    screen.getByText("Loading projects…", { exact: true }),
+  ).toBeVisible();
+  await expect(screen.getByLabel("Selected project")).toBeDisabled();
+  await expect(
+    screen.getByRole("button", "Save project", { exact: true }),
+  ).toHaveCount(0);
+  await app.open("/iframe.html?id=observatory-projects--empty&viewMode=story");
+  await expect(
+    screen.getByText(
+      "No projects enrolled. Add your first project to start capture.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await app.open(
+    "/iframe.html?id=observatory-projects--save-error&viewMode=story",
+  );
+  await screen.getByLabel("Project name").fill("Unsaved project");
+  await screen
+    .getByLabel("Repository URLs")
+    .fill("https://github.com/fixture/unsaved");
+  await screen.getByRole("button", "Save project", { exact: true }).tap();
+  await expect(screen.getByRole("alert")).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () =>
+        document.querySelector<HTMLInputElement>('[aria-label="Project name"]')
+          ?.value ?? null,
+    ),
+  ).toBe("Unsaved project");
+  await expect(
+    screen.getByRole("link", "Unsaved project", { exact: true }),
+  ).toHaveCount(0);
+});

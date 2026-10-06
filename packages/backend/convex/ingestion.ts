@@ -6,7 +6,10 @@ import {
   type AgentRun,
   type SkillUse,
 } from "@astack/agent-observability";
-import { internalMutation } from "./_generated/server";
+import { internalMutation, type MutationCtx } from "./_generated/server";
+import type { Doc } from "./_generated/dataModel";
+import { projectList } from "./projectData";
+import { resolveProject } from "@astack/agent-observability/projects";
 import { paginationOptsValidator } from "convex/server";
 
 function capabilities(run: AgentRun) {
@@ -36,6 +39,81 @@ function facets(run: AgentRun) {
     ...new Map(pairs.map((pair) => [JSON.stringify(pair), pair])).values(),
   ].slice(0, 900);
 }
+export async function storeRun(
+  ctx: MutationCtx,
+  run: AgentRun,
+  revision: number,
+  previous: Doc<"runs"> | null,
+) {
+  const before = previous?.enrolled
+    ? runSchema.parse(JSON.parse(previous.data))
+    : null;
+  const row = {
+    runId: run.id,
+    machineId: run.machineId,
+    revision,
+    startedAt: run.startedAt,
+    status: run.status,
+    data: JSON.stringify(run),
+    projectId: run.projectId,
+    enrolled: !!run.projectId,
+  };
+  if (previous) await ctx.db.patch(previous._id, row);
+  else await ctx.db.insert("runs", row);
+  const oldFacets = await ctx.db
+    .query("facets")
+    .withIndex("by_runId", (q) => q.eq("runId", run.id))
+    .take(901);
+  for (const facet of oldFacets) await ctx.db.delete(facet._id);
+  for (const [dimension, value] of facets(run))
+    await ctx.db.insert("facets", {
+      dimension,
+      value,
+      runId: run.id,
+      startedAt: run.startedAt,
+    });
+  const oldSkills = before ? capabilities(before) : new Map<string, SkillUse>();
+  const newSkills = capabilities(run);
+  const scopes = new Set(["all", before?.projectId, run.projectId]);
+  for (const projectId of scopes) {
+    if (!projectId) continue;
+    for (const key of new Set([...oldSkills.keys(), ...newSkills.keys()])) {
+      const skill = newSkills.get(key) ?? oldSkills.get(key);
+      if (!skill) continue;
+      const oldHas =
+        oldSkills.has(key) &&
+        !!before?.projectId &&
+        (projectId === "all" || before.projectId === projectId);
+      const newHas =
+        newSkills.has(key) &&
+        !!run.projectId &&
+        (projectId === "all" || run.projectId === projectId);
+      const count = Number(newHas) - Number(oldHas);
+      const bad =
+        Number(newHas && run.findings.some((f) => f.severity !== "info")) -
+        Number(oldHas && before?.findings.some((f) => f.severity !== "info"));
+      if (!count && !bad) continue;
+      const existing = await ctx.db
+        .query("projectCapabilities")
+        .withIndex("by_projectId_and_key", (q) =>
+          q.eq("projectId", projectId).eq("key", key),
+        )
+        .unique();
+      const value = {
+        projectId,
+        key,
+        name: skill.name,
+        kind: skill.kind,
+        hash: skill.hash,
+        provenance: skill.provenance,
+        runs: (existing?.runs ?? 0) + count,
+        problematic: (existing?.problematic ?? 0) + bad,
+      };
+      if (existing) await ctx.db.patch(existing._id, value);
+      else await ctx.db.insert("projectCapabilities", value);
+    }
+  }
+}
 export const ingest = internalMutation({
   args: {
     machineId: v.string(),
@@ -43,7 +121,8 @@ export const ingest = internalMutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    if (args.records.length > 3) throw new Error("Batch too large");
+    if (args.records.length > 2) throw new Error("Batch too large");
+    const projects = await projectList(ctx);
     for (const entry of args.records) {
       const record = recordSchema.parse(JSON.parse(entry.record));
       if (!Number.isSafeInteger(entry.revision) || entry.revision <= 0)
@@ -55,69 +134,31 @@ export const ingest = internalMutation({
           !run.id.startsWith(`${args.machineId}:`)
         )
           throw new Error("Machine mismatch");
+        const project = resolveProject(projects, run);
+        if (!project || run.projectId !== project.projectId)
+          throw new Error("Project not enabled for capture");
         const previous = await ctx.db
           .query("runs")
           .withIndex("by_runId", (q) => q.eq("runId", run.id))
           .unique();
         if (previous && previous.revision >= entry.revision) continue;
-        const before = previous
-          ? runSchema.parse(JSON.parse(previous.data))
-          : null;
-        const row = {
-          runId: run.id,
-          machineId: args.machineId,
-          revision: entry.revision,
-          startedAt: run.startedAt,
-          status: run.status,
-          data: JSON.stringify(run),
-        };
-        if (previous) await ctx.db.patch(previous._id, row);
-        else await ctx.db.insert("runs", row);
-        const oldFacets = await ctx.db
-          .query("facets")
-          .withIndex("by_runId", (q) => q.eq("runId", run.id))
-          .take(901);
-        for (const facet of oldFacets) await ctx.db.delete(facet._id);
-        for (const [dimension, value] of facets(run))
-          await ctx.db.insert("facets", {
-            dimension,
-            value,
-            runId: run.id,
-            startedAt: run.startedAt,
+        await storeRun(ctx, run, entry.revision, previous);
+        const machine = await ctx.db
+          .query("machines")
+          .withIndex("by_machineId", (q) => q.eq("machineId", args.machineId))
+          .unique();
+        if (machine)
+          await ctx.db.patch(machine._id, {
+            name: run.machineName,
+            lastSeenAt: Date.now(),
           });
-        const oldSkills = before
-          ? capabilities(before)
-          : new Map<string, SkillUse>();
-        const newSkills = capabilities(run);
-        for (const key of new Set([...oldSkills.keys(), ...newSkills.keys()])) {
-          const skill = newSkills.get(key) ?? oldSkills.get(key);
-          if (!skill) continue;
-          const existing = await ctx.db
-            .query("capabilities")
-            .withIndex("by_key", (q) => q.eq("key", key))
-            .unique();
-          const count = Number(newSkills.has(key)) - Number(oldSkills.has(key));
-          const bad =
-            Number(
-              newSkills.has(key) &&
-                run.findings.some((f) => f.severity !== "info"),
-            ) -
-            Number(
-              oldSkills.has(key) &&
-                before?.findings.some((f) => f.severity !== "info"),
-            );
-          const value = {
-            key,
-            name: skill.name,
-            kind: skill.kind,
-            hash: skill.hash,
-            provenance: skill.provenance,
-            runs: (existing?.runs ?? 0) + count,
-            problematic: (existing?.problematic ?? 0) + bad,
-          };
-          if (existing) await ctx.db.patch(existing._id, value);
-          else await ctx.db.insert("capabilities", value);
-        }
+        else
+          await ctx.db.insert("machines", {
+            machineId: args.machineId,
+            name: run.machineName,
+            lastSeenAt: Date.now(),
+            records: 0,
+          });
       } else {
         const event = record.value;
         if (
@@ -125,6 +166,14 @@ export const ingest = internalMutation({
           !event.id.startsWith(`${event.runId}:`)
         )
           throw new Error("Machine mismatch");
+        const parent = await ctx.db
+          .query("runs")
+          .withIndex("by_runId", (q) => q.eq("runId", event.runId))
+          .unique();
+        const run = parent ? runSchema.parse(JSON.parse(parent.data)) : null;
+        const project = run ? resolveProject(projects, run) : null;
+        if (!run || !project || run.projectId !== project.projectId)
+          throw new Error("Project not enabled for capture");
         const previous = await ctx.db
           .query("events")
           .withIndex("by_eventId", (q) => q.eq("eventId", event.id))
@@ -142,18 +191,6 @@ export const ingest = internalMutation({
         else await ctx.db.insert("events", row);
       }
     }
-    const machine = await ctx.db
-      .query("machines")
-      .withIndex("by_machineId", (q) => q.eq("machineId", args.machineId))
-      .unique();
-    if (machine) await ctx.db.patch(machine._id, { lastSeenAt: Date.now() });
-    else
-      await ctx.db.insert("machines", {
-        machineId: args.machineId,
-        name: args.machineId,
-        lastSeenAt: Date.now(),
-        records: 0,
-      });
     return null;
   },
 });

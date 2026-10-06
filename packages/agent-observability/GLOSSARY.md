@@ -2,6 +2,8 @@
 
 | Term                  | Meaning                                                                                                   |
 | --------------------- | --------------------------------------------------------------------------------------------------------- |
+| Project               | An owner-enrolled body of work whose related conversations belong together across computers and checkouts. |
+| Capture policy        | The owner's selection of projects whose conversations may be observed.                                    |
 | Work reference        | Identity of work owned by another system; optional parent context for one or more runs.                   |
 | Session               | A conversation that can contain multiple execution attempts.                                              |
 | Run                   | A bounded agent attempt to perform work, with or without a work reference.                                |

@@ -88,9 +88,13 @@ export function ThemeControl() {
     </label>
   );
 }
-export function Brand() {
+export function Brand({ projectId }: { projectId?: string }) {
   return (
-    <a className="brand" href="#runs" aria-label="Astack Observatory home">
+    <a
+      className="brand"
+      href={`#runs${projectId ? `?${new URLSearchParams({ project: projectId })}` : ""}`}
+      aria-label="Astack Observatory home"
+    >
       astack<span>.</span>
     </a>
   );

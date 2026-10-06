@@ -17,6 +17,8 @@ import { Button, Badge, Input } from "@astack/ui";
 import { Activity, ArrowLeft, ExternalLink, ShieldCheck } from "lucide-react";
 import { Trace } from "./trace";
 import { Brand, ThemeControl } from "./theme";
+import { ProjectSelector, Projects } from "./projects";
+import type { Project } from "@astack/agent-observability/projects";
 
 type Filter = { dimension: string; value: string };
 const duration = (run: AgentRun) => {
@@ -33,9 +35,15 @@ const date = (time: number) =>
     hour: "2-digit",
     minute: "2-digit",
   });
-const runLink = (id: string) => `#run/${encodeURIComponent(id)}`;
-const listLink = (dimension: string, value: string) =>
-  `#runs?${new URLSearchParams({ [dimension]: value })}`;
+const runLink = (id: string, projectId?: string) =>
+  `#run/${encodeURIComponent(id)}${projectId ? `?${new URLSearchParams({ project: projectId })}` : ""}`;
+const listLink = (
+  dimension: string,
+  value: string,
+  projectId = new URLSearchParams(location.hash.split("?")[1]).get("project") ??
+    "",
+) =>
+  `#runs?${new URLSearchParams({ ...(projectId ? { project: projectId } : {}), [dimension]: value })}`;
 function useRoute() {
   const [hash, setHash] = useState(location.hash || "#runs");
   useEffect(() => {
@@ -86,7 +94,13 @@ function Status({ run }: { run: AgentRun }) {
     </span>
   );
 }
-export function RunTable({ runs }: { runs: readonly AgentRun[] }) {
+export function RunTable({
+  runs,
+  projects = [],
+}: {
+  runs: readonly AgentRun[];
+  projects?: readonly Project[];
+}) {
   return (
     <>
       <p className="table-hint">Scroll horizontally to see all columns.</p>
@@ -99,6 +113,7 @@ export function RunTable({ runs }: { runs: readonly AgentRun[] }) {
         <table>
           <thead>
             <tr>
+              <th>Project</th>
               <th>Run / repository</th>
               <th>Agent / machine</th>
               <th>Duration</th>
@@ -110,7 +125,14 @@ export function RunTable({ runs }: { runs: readonly AgentRun[] }) {
             {runs.map((run) => (
               <tr key={run.id}>
                 <td>
-                  <a className="row-title" href={runLink(run.id)}>
+                  {projects.find((p) => p.projectId === run.projectId)?.name ??
+                    "Unassigned"}
+                </td>
+                <td>
+                  <a
+                    className="row-title"
+                    href={runLink(run.id, run.projectId)}
+                  >
                     {run.title}
                   </a>
                   <span className="secondary">{run.repo ?? run.cwd}</span>
@@ -122,7 +144,7 @@ export function RunTable({ runs }: { runs: readonly AgentRun[] }) {
                   {run.work && (
                     <a
                       className="secondary"
-                      href={listLink("work", run.work.id)}
+                      href={listLink("work", run.work.id, run.projectId)}
                     >
                       Work {run.work.id}
                     </a>
@@ -169,7 +191,6 @@ export function RunTable({ runs }: { runs: readonly AgentRun[] }) {
 const filterDimensions = [
   ["repo", "Repository"],
   ["work", "Work reference"],
-  ["project", "Project"],
   ["agent", "Agent"],
   ["version", "Agent version"],
   ["machine", "Machine ID"],
@@ -183,17 +204,23 @@ function Runs({
   route,
   problems = false,
   workView = false,
+  projectId,
+  projects,
 }: {
   route: string;
   problems?: boolean;
   workView?: boolean;
+  projectId?: string;
+  projects: readonly Project[];
 }) {
   const initial = new URLSearchParams(route.split("?")[1] ?? "");
   const [filters, setFilters] = useState<Filter[]>(() =>
     [...initial]
       .map(([dimension, value]) => ({ dimension, value }))
       .filter(
-        (f) => filterSchema.shape.dimension.safeParse(f.dimension).success,
+        (f) =>
+          f.dimension !== "project" &&
+          filterSchema.shape.dimension.safeParse(f.dimension).success,
       ),
   );
   const [after, setAfter] = useState("");
@@ -201,6 +228,7 @@ function Runs({
   const query = usePaginatedQuery(
     api.observatory.runs,
     {
+      ...(projectId ? { projectId } : {}),
       filters: [
         ...(problems ? [{ dimension: "problem", value: "yes" }] : []),
         ...filters,
@@ -228,9 +256,10 @@ function Runs({
   const workGroups = new Map<string, AgentRun[]>();
   for (const run of runs)
     if (run.work) {
-      const group = workGroups.get(run.work.id) ?? [];
+      const workKey = JSON.stringify([run.projectId, run.work.id]);
+      const group = workGroups.get(workKey) ?? [];
       group.push(run);
-      workGroups.set(run.work.id, group);
+      workGroups.set(workKey, group);
     }
   return (
     <>
@@ -323,9 +352,9 @@ function Runs({
             <div className="notice">
               <strong>No linked work in these pages.</strong>
               <p>
-                There is no COS work store yet. Capture continues for standalone
-                runs. Future launch context can supply work and project
-                references automatically.
+                There is no COS work store yet. Enrolled projects capture
+                standalone runs; launch context can supply external work
+                references.
               </p>
             </div>
           )}
@@ -343,8 +372,21 @@ function Runs({
                 {[...workGroups].map(([id, group]) => (
                   <tr key={id}>
                     <td>
-                      <a href={listLink("work", id)}>
-                        {group[0]?.work?.label ?? id}
+                      <a
+                        href={listLink(
+                          "work",
+                          group[0]?.work?.id ?? id,
+                          group[0]?.projectId,
+                        )}
+                      >
+                        {group[0]?.work?.label ?? group[0]?.work?.id ?? id}
+                        <span className="secondary">
+                          {
+                            projects.find(
+                              (p) => p.projectId === group[0]?.projectId,
+                            )?.name
+                          }
+                        </span>
                       </a>
                       {group[0]?.work?.url && (
                         <a
@@ -385,10 +427,10 @@ function Runs({
             </table>
           </div>
           <h2>Captured activity</h2>
-          <RunTable runs={runs} />
+          <RunTable runs={runs} projects={projects} />
         </>
       ) : runs.length ? (
-        <RunTable runs={runs} />
+        <RunTable runs={runs} projects={projects} />
       ) : (
         <div className="empty">
           <h2>No matching runs in this page</h2>
@@ -404,11 +446,13 @@ function Runs({
   );
 }
 
-function RunDetail({ id }: { id: string }) {
-  const raw = useQuery(api.observatory.run, { runId: id });
+function RunDetail({ id, projectId }: { id: string; projectId?: string }) {
+  const scope = projectId ? { projectId } : {};
+  const backLink = `#runs${projectId ? `?${new URLSearchParams({ project: projectId })}` : ""}`;
+  const raw = useQuery(api.observatory.run, { runId: id, ...scope });
   const trace = usePaginatedQuery(
     api.observatory.trace,
-    { runId: id },
+    { runId: id, ...scope },
     { initialNumItems: 100 },
   );
   const [evidenceId, setEvidenceId] = useState<string | null>(null);
@@ -428,7 +472,7 @@ function RunDetail({ id }: { id: string }) {
       <div className="empty">
         <h1>Run unavailable</h1>
         <p>This run has not been ingested or is no longer available.</p>
-        <a href="#runs">Back to runs</a>
+        <a href={backLink}>Back to runs</a>
       </div>
     );
   const run = runSchema.parse(JSON.parse(raw));
@@ -437,7 +481,7 @@ function RunDetail({ id }: { id: string }) {
   );
   return (
     <>
-      <a href="#runs">
+      <a href={backLink}>
         <ArrowLeft size={14} aria-hidden="true" /> Back to runs
       </a>
       <h1>{run.title}</h1>
@@ -449,7 +493,7 @@ function RunDetail({ id }: { id: string }) {
       {run.work && (
         <p className="notice">
           Work{" "}
-          <a href={listLink("work", run.work.id)}>
+          <a href={listLink("work", run.work.id, run.projectId)}>
             {run.work.label ?? run.work.id}
           </a>
           {run.work.url && (
@@ -527,7 +571,7 @@ function RunDetail({ id }: { id: string }) {
           run.skills.map((skill, i) => (
             <a
               key={`${skill.name}:${i}`}
-              href={listLink("capability", capabilityKey(skill))}
+              href={listLink("capability", capabilityKey(skill), run.projectId)}
             >
               <Badge>
                 {skill.name} · {skill.hash?.slice(0, 8) ?? "unknown hash"} ·{" "}
@@ -558,10 +602,10 @@ function RunDetail({ id }: { id: string }) {
   );
 }
 
-function Capabilities() {
+function Capabilities({ projectId }: { projectId?: string }) {
   const query = usePaginatedQuery(
     api.observatory.capabilities,
-    {},
+    projectId ? { projectId } : {},
     { initialNumItems: 50 },
   );
   const rows = query.results.map((value) =>
@@ -572,7 +616,7 @@ function Capabilities() {
       <p className="eyebrow">Harness feedback</p>
       <h1>Skills & workflows</h1>
       <p className="subtitle">
-        Version groups across all ingested runs. Correlations describe
+        Version groups within the selected project scope. Correlations describe
         observations; they do not establish causation.
       </p>
       <div className="notice">
@@ -633,8 +677,9 @@ function Health() {
         <strong>Automatic persisted capture</strong>
         <p>
           Codex desktop, CLI and T3 Code sessions in configured Codex homes are
-          read without resuming them. Each turn is a run. Ephemeral and
-          cloud-only sessions require an additional supported source.
+          matched against enrolled projects before full turns are collected,
+          without resuming them. Each turn is a run. Ephemeral and cloud-only
+          sessions require an additional supported source.
         </p>
       </div>
       <h2>Machines with ingested records</h2>
@@ -663,9 +708,9 @@ function Health() {
       </p>
       <h2>Content policy</h2>
       <p>
-        Metadata capture is the default. The collector redacts credentials and
-        environment assignments before buffering or forwarding. Prompt text,
-        command output, code and MCP payloads are withheld by default.
+        Readable content is enabled by default, with credentials redacted before
+        buffering or forwarding. Show content controls display; machine settings
+        can separately use metadata-only capture.
       </p>
       <h2>More precise event times</h2>
       <p>
@@ -680,22 +725,31 @@ function Health() {
 export function App() {
   const route = useRoute();
   const connection = useConvexConnectionState();
+  const projects = useQuery(api.projects.list, {});
+  const projectId =
+    new URLSearchParams(route.split("?")[1]).get("project") || undefined;
   let page: React.ReactNode;
   let section = route.slice(1).split("?")[0];
   if (route.startsWith("#run/")) {
     section = "runs";
     let id = "";
     try {
-      id = decodeURIComponent(route.slice(5));
+      id = decodeURIComponent(route.slice(5).split("?")[0] ?? "");
     } catch {}
-    page = <RunDetail key={id} id={id} />;
-  } else if (section === "skills") page = <Capabilities />;
+    page = (
+      <RunDetail key={`${id}:${projectId}`} id={id} projectId={projectId} />
+    );
+  } else if (section === "skills")
+    page = <Capabilities key={projectId ?? "all"} projectId={projectId} />;
+  else if (section === "projects") page = <Projects />;
   else if (section === "health") page = <Health />;
   else
     page = (
       <Runs
         key={route}
         route={route}
+        projectId={projectId}
+        projects={projects ?? []}
         problems={section === "problems"}
         workView={section === "work"}
       />
@@ -703,6 +757,19 @@ export function App() {
   return (
     <ObservatoryLayout
       section={section}
+      projectId={projectId}
+      projectControl={
+        <ProjectSelector
+          projects={projects}
+          selected={projectId}
+          choose={(id) => {
+            const params = new URLSearchParams(route.split("?")[1]);
+            if (id) params.set("project", id);
+            else params.delete("project");
+            location.hash = `${route.startsWith("#run/") ? "#runs" : route.split("?")[0]}${params.size ? `?${params}` : ""}`;
+          }}
+        />
+      }
       connectionLabel={connection.isWebSocketConnected ? "Live" : "Connecting…"}
     >
       {page}
@@ -712,10 +779,14 @@ export function App() {
 export function ObservatoryLayout({
   section = "runs",
   connectionLabel = "Fixture data",
+  projectId,
+  projectControl,
   children,
 }: {
   section?: string;
   connectionLabel?: string;
+  projectId?: string;
+  projectControl?: ReactNode;
   children: ReactNode;
 }) {
   return (
@@ -723,7 +794,7 @@ export function ObservatoryLayout({
       <header className="app-header">
         <div className="header-inner">
           <div className="brand-lockup">
-            <Brand />
+            <Brand projectId={projectId} />
             <span className="product-label">Observatory</span>
           </div>
           <nav className="navigation" aria-label="Observatory">
@@ -733,9 +804,10 @@ export function ObservatoryLayout({
               ["skills", "Skills & workflows"],
               ["problems", "Problems"],
               ["health", "Capture health"],
+              ["projects", "Projects"],
             ].map(([key, label]) => (
               <a
-                href={`#${key}`}
+                href={`#${key}${projectId ? `?${new URLSearchParams({ project: projectId })}` : ""}`}
                 key={key}
                 aria-current={section === key ? "page" : undefined}
               >
@@ -755,10 +827,13 @@ export function ObservatoryLayout({
         </div>
       </header>
       <main className="workspace" id="main">
-        <div className="status-strip">
-          <ShieldCheck size={15} aria-hidden="true" />
-          Private over Tailscale · <Activity size={15} aria-hidden="true" />
-          {connectionLabel}
+        <div className="scope-bar">
+          {projectControl}
+          <div className="status-strip">
+            <ShieldCheck size={15} aria-hidden="true" />
+            Private over Tailscale · <Activity size={15} aria-hidden="true" />
+            {connectionLabel}
+          </div>
         </div>
         {children}
       </main>

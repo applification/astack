@@ -18,6 +18,10 @@ import { redact, redactText } from "@astack/agent-observability/redaction";
 import { CodexReader } from "./rpc";
 import type { CollectorConfig } from "../config";
 import type { LocalStore } from "../store";
+import {
+  resolveProject,
+  type Project,
+} from "@astack/agent-observability/projects";
 
 const base = { id: z.string() };
 const inputSchema = z.discriminatedUnion("type", [
@@ -586,16 +590,21 @@ export async function normalizeTurn(options: {
 
 export class CodexAdapter {
   readonly agent = "codex";
-  private reader: CodexReader;
+  private reader: Pick<CodexReader, "initialize" | "request" | "close">;
   private initialized = false;
+  private projects: readonly Project[] = [];
+  setProjects(projects: readonly Project[]) {
+    this.projects = projects;
+  }
   constructor(
     private config: CollectorConfig,
     private home: string,
     private store: LocalStore,
     private signatureKey: string,
     private readonly knownSecrets: readonly string[] = [],
+    reader?: Pick<CodexReader, "initialize" | "request" | "close">,
   ) {
-    this.reader = new CodexReader(config.codexBinary, home);
+    this.reader = reader ?? new CodexReader(config.codexBinary, home);
   }
   async *collect(): AsyncIterable<AgentSnapshot> {
     if (!this.initialized) {
@@ -626,6 +635,14 @@ export class CodexAdapter {
             break;
           }
           newest = Math.max(newest, thread.updatedAt);
+          const project = resolveProject(this.projects, {
+            machineId: this.config.machineId,
+            cwd: thread.cwd,
+            ...(thread.gitInfo?.originUrl
+              ? { repo: thread.gitInfo.originUrl }
+              : {}),
+          });
+          if (!project) continue;
           let turnCursor: string | null = null;
           do {
             const turns = turnListSchema.parse(
@@ -655,6 +672,7 @@ export class CodexAdapter {
                 knownSecrets: this.knownSecrets,
                 observedAt: Date.now(),
                 ...parsed,
+                projectId: project.projectId,
               });
             }
             turnCursor = turns.nextCursor;

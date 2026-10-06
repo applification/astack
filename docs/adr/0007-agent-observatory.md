@@ -16,6 +16,12 @@ V1 redacts before local buffering. Following the owner's 2026-10-06 request, new
 
 Self-host Convex with a persistent volume and loopback bindings on Otis. Tailscale Serve provides private HTTPS. Use bounded, indexed projections and descriptive capability-version correlations rather than AI analysis or causal claims.
 
+### Project capture amendment, 2026-10-06
+
+The owner narrowed capture from system-wide history to explicitly enrolled projects, while retaining a shared private service across machines. Store each project's stable identity and repository/folder matching policy centrally. Resolve thread metadata before reading full turns and independently enforce enabled membership during ingestion. Repository identity covers clones/worktrees across machines; explicit folder roots belong to one machine. Conflicting matches fail closed. External work references remain optional and cannot override project classification.
+
+Keep previously retained unmatched history for recovery, outside enrolled reports and forwarding, rather than deleting it during this scope change. Assign only reliable metadata matches in bounded, repeatable passes. Pausing a project preserves its existing reports and immediately denies future ingestion. Offline collectors retain the last accepted policy, so local pause enforcement waits for reconnection; fresh collectors without a policy capture nothing.
+
 ## Consequences
 
 The system observes ordinary persisted runs without needing the future COS. A launcher can automatically bind its externally owned identity when receiving the agent session ID. Readable capture supports diagnosis of failures; hiding content is a screen preference and does not erase private stored data. Metadata-only capture remains available, and current persisted APIs lack item timestamps and token counts. Skill hashes distinguish observation-time from hook-time snapshots; historical versions cannot be invented. Ephemeral/cloud capture and Claude adapters require additional supported sources later.

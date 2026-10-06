@@ -13,6 +13,8 @@ import type * as auth from "../auth.js";
 import type * as http from "../http.js";
 import type * as ingestion from "../ingestion.js";
 import type * as observatory from "../observatory.js";
+import type * as projectData from "../projectData.js";
+import type * as projects from "../projects.js";
 
 import type {
   ApiFromModules,
@@ -27,6 +29,8 @@ const fullApi: ApiFromModules<{
   http: typeof http;
   ingestion: typeof ingestion;
   observatory: typeof observatory;
+  projectData: typeof projectData;
+  projects: typeof projects;
 }> = anyApi as any;
 
 /**

@@ -14,6 +14,7 @@ import { LocalStore } from "./store";
 import { environmentSecrets } from "@astack/agent-observability/redaction";
 import { linkSession, refreshRun } from "./context";
 import { runIdentity } from "./adapters/codex";
+import { approvedRun } from "./projects";
 
 const program = new Command()
   .name("agentlog")
@@ -156,13 +157,14 @@ program
     const config = await loadConfig(state());
     const store = new LocalStore(state(), environmentSecrets(process.env));
     try {
-      const record = store.getRecord(
-        `run:${runIdentity(config.machineId, args.session, args.turn)}`,
+      const run = approvedRun(
+        store,
+        runIdentity(config.machineId, args.session, args.turn),
       );
-      if (record?.kind !== "run") throw new Error("Run unavailable");
+      if (!run) throw new Error("Run outside enabled project capture");
       store.put({
         kind: "run",
-        value: { ...record.value, outcome: args.value },
+        value: { ...run, outcome: args.value },
       });
     } finally {
       store.close();
@@ -303,6 +305,8 @@ program
     const store = new LocalStore(state(), environmentSecrets(process.env));
     try {
       const runId = runIdentity(config.machineId, args.session, args.turn);
+      if (!approvedRun(store, runId))
+        throw new Error("Run outside enabled project capture");
       store.put({
         kind: "event",
         value: eventSchema.parse({

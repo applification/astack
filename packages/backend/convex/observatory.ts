@@ -8,6 +8,7 @@ import {
 } from "@astack/agent-observability";
 import { query } from "./_generated/server";
 import { requireOwner } from "./access";
+import { getProject } from "./projectData";
 
 const matches = (
   run: z.infer<typeof runSchema>,
@@ -45,6 +46,7 @@ const matches = (
 };
 export const runs = query({
   args: {
+    projectId: v.optional(v.string()),
     filters: v.array(v.object({ dimension: v.string(), value: v.string() })),
     after: v.optional(v.number()),
     before: v.optional(v.number()),
@@ -60,7 +62,12 @@ export const runs = query({
     await requireOwner(ctx);
     if (args.filters.length > 13 || args.paginationOpts.numItems > 100)
       throw new Error("Invalid page");
-    const filters = args.filters.map((f) => filterSchema.parse(f));
+    const filters = [
+      ...(args.projectId
+        ? [{ dimension: "project", value: args.projectId }]
+        : []),
+      ...args.filters,
+    ].map((f) => filterSchema.parse(f));
     const first = filters[0];
     if (first) {
       const page = await ctx.db
@@ -76,7 +83,7 @@ export const runs = query({
           .query("runs")
           .withIndex("by_runId", (q) => q.eq("runId", facet.runId))
           .unique();
-        if (!row) continue;
+        if (!row?.enrolled) continue;
         const run = runSchema.parse(JSON.parse(row.data));
         if (
           filters.every((f) => matches(run, f.dimension, f.value)) &&
@@ -94,8 +101,8 @@ export const runs = query({
     }
     const page = await ctx.db
       .query("runs")
-      .withIndex("by_startedAt", (q) => {
-        let range = q.gte("startedAt", args.after ?? 0);
+      .withIndex("by_enrolled_and_startedAt", (q) => {
+        let range = q.eq("enrolled", true).gte("startedAt", args.after ?? 0);
         return args.before === undefined
           ? range
           : range.lte("startedAt", args.before);
@@ -111,7 +118,7 @@ export const runs = query({
   },
 });
 export const run = query({
-  args: { runId: v.string() },
+  args: { runId: v.string(), projectId: v.optional(v.string()) },
   returns: v.union(v.string(), v.null()),
   handler: async (ctx, args) => {
     await requireOwner(ctx);
@@ -119,11 +126,22 @@ export const run = query({
       .query("runs")
       .withIndex("by_runId", (q) => q.eq("runId", args.runId))
       .unique();
-    return row?.data ?? null;
+    if (
+      !row?.projectId ||
+      !row.enrolled ||
+      (args.projectId && args.projectId !== row.projectId) ||
+      !(await getProject(ctx, row.projectId))
+    )
+      return null;
+    return row.data;
   },
 });
 export const trace = query({
-  args: { runId: v.string(), paginationOpts: paginationOptsValidator },
+  args: {
+    runId: v.string(),
+    projectId: v.optional(v.string()),
+    paginationOpts: paginationOptsValidator,
+  },
   returns: v.object({
     page: v.array(v.string()),
     continueCursor: v.string(),
@@ -132,6 +150,17 @@ export const trace = query({
   handler: async (ctx, args) => {
     await requireOwner(ctx);
     if (args.paginationOpts.numItems > 200) throw new Error("Invalid page");
+    const parent = await ctx.db
+      .query("runs")
+      .withIndex("by_runId", (q) => q.eq("runId", args.runId))
+      .unique();
+    if (
+      !parent?.projectId ||
+      !parent.enrolled ||
+      (args.projectId && args.projectId !== parent.projectId) ||
+      !(await getProject(ctx, parent.projectId))
+    )
+      return { page: [], continueCursor: "", isDone: true };
     const page = await ctx.db
       .query("events")
       .withIndex("by_runId_and_sequence", (q) => q.eq("runId", args.runId))
@@ -144,7 +173,10 @@ export const trace = query({
   },
 });
 export const capabilities = query({
-  args: { paginationOpts: paginationOptsValidator },
+  args: {
+    projectId: v.optional(v.string()),
+    paginationOpts: paginationOptsValidator,
+  },
   returns: v.object({
     page: v.array(v.string()),
     continueCursor: v.string(),
@@ -154,8 +186,10 @@ export const capabilities = query({
     await requireOwner(ctx);
     if (args.paginationOpts.numItems > 100) throw new Error("Invalid page");
     const page = await ctx.db
-      .query("capabilities")
-      .withIndex("by_problematic")
+      .query("projectCapabilities")
+      .withIndex("by_projectId_and_problematic", (q) =>
+        q.eq("projectId", args.projectId ?? "all"),
+      )
       .order("desc")
       .paginate(args.paginationOpts);
     return {
@@ -167,11 +201,18 @@ export const capabilities = query({
 });
 export const machines = query({
   args: {},
-  returns: v.array(v.object({ machineId: v.string(), lastSeenAt: v.number() })),
+  returns: v.array(
+    v.object({
+      machineId: v.string(),
+      name: v.string(),
+      lastSeenAt: v.number(),
+    }),
+  ),
   handler: async (ctx) => {
     await requireOwner(ctx);
     return (await ctx.db.query("machines").take(100)).map((row) => ({
       machineId: row.machineId,
+      name: row.name,
       lastSeenAt: row.lastSeenAt,
     }));
   },

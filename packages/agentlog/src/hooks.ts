@@ -14,6 +14,8 @@ import { linkSession, refreshRun } from "./context";
 import { runIdentity, capability } from "./adapters/codex";
 import { LocalStore } from "./store";
 import { loadConfig } from "./config";
+import { cachedProjects } from "./projects";
+import { resolveProject } from "@astack/agent-observability/projects";
 
 const hookSchema = z.object({
   session_id: z.string(),
@@ -43,8 +45,17 @@ export async function captureHook(directory: string, raw: unknown) {
     token,
   ]);
   try {
+    const prior = store
+      .runsForSession(hook.session_id)
+      .find((r) => r.cwd === hook.cwd);
+    const project = resolveProject(cachedProjects(store), {
+      machineId: config.machineId,
+      cwd: hook.cwd,
+      ...(prior?.repo ? { repo: prior.repo } : {}),
+    });
+    if (!project) return;
     const workId = process.env.ASTACK_WORK_ID;
-    const projectId = process.env.ASTACK_PROJECT_ID;
+    const projectId = project.projectId;
     if (workId || projectId)
       linkSession(store, hook.session_id, {
         ...(workId

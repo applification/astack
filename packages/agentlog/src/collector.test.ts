@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   eventSchema,
+  envelopeSchema,
   runSchema,
   type AgentSnapshot,
 } from "@astack/agent-observability";
@@ -14,6 +15,11 @@ import { linkSession } from "./context";
 import { execFileSync } from "node:child_process";
 import { capability } from "./adapters/codex";
 import { initialize, loadConfig } from "./config";
+import { configSchema } from "./config";
+import { projectSchema } from "@astack/agent-observability/projects";
+import { syncProjects, cachedProjects } from "./projects";
+import { CodexAdapter } from "./adapters/codex";
+import { z } from "zod";
 
 const directories: string[] = [];
 afterEach(async () => {
@@ -29,6 +35,36 @@ async function directory() {
   return path;
 }
 const machineId = "00000000-0000-4000-8000-000000000001";
+const project = projectSchema.parse({
+  projectId: "00000000-0000-4000-8000-000000000100",
+  name: "Fixture",
+  enabled: true,
+  repositories: [],
+  folders: [{ machineId, path: "/fixture" }],
+});
+const parent = () =>
+  runSchema.parse({
+    id: event().runId,
+    machineId,
+    machineName: "Fixture",
+    agent: "codex",
+    sessionId: "session",
+    attemptId: "turn",
+    source: "cli",
+    cwd: "/fixture",
+    projectId: project.projectId,
+    title: "Fixture",
+    startedAt: 100,
+    completedAt: 200,
+    status: "completed",
+    lastObservedAt: 200,
+    skills: [],
+    tools: [],
+    findings: [],
+    eventCount: 1,
+    contentCapture: true,
+    coverage: [],
+  });
 const event = () =>
   eventSchema.parse({
     id: `${machineId}:test:r:e`,
@@ -45,9 +81,11 @@ test("offline restart retains only redacted records and retries after an HTTP fa
   const dir = await directory();
   let store = new LocalStore(dir);
   store.put({ kind: "event", value: event() });
+  store.put({ kind: "run", value: parent() });
+  store.setMeta("projectPolicy", JSON.stringify([project]));
   store.close();
   store = new LocalStore(dir);
-  expect(store.pending()).toBe(1);
+  expect(store.pending()).toBe(2);
   expect(JSON.stringify(store.getRecord(`event:${event().id}`))).not.toContain(
     "hiddenvalue",
   );
@@ -69,11 +107,11 @@ test("offline restart retains only redacted records and retries after an HTTP fa
     await expect(forward(store, config, "credential")).rejects.toThrow(
       "ingestion_http_503",
     );
-    expect(store.pending()).toBe(1);
+    expect(store.pending()).toBe(2);
     fail = false;
     await forward(store, config, "credential");
     expect(store.pending()).toBe(0);
-    expect(received).toBe(2);
+    expect(received).toBe(4);
   } finally {
     server.stop(true);
     store.close();
@@ -523,4 +561,177 @@ test("special skill files cannot block hashing or capture", async () => {
   ]);
   expect(result?.hash).toBeNull();
   expect(result?.name).toBeTruthy();
+});
+
+test("capture checks metadata before fetching full turns, including initial empty and paused policies", async () => {
+  const dir = await directory();
+  const store = new LocalStore(dir);
+  const config = configSchema.parse({
+    schemaVersion: 1,
+    machineId,
+    machineName: "Fixture",
+    endpoint: "http://127.0.0.1:1234",
+    tokenFile: "/unused",
+    homes: [{ path: dir, label: "fixture" }],
+    since: 0,
+  });
+  const reads: string[] = [];
+  const good = threadSchema.parse({
+    id: "good",
+    cwd: "/fixture/worktree",
+    source: "cli",
+    cliVersion: "fixture",
+    createdAt: 1,
+    updatedAt: 100,
+  });
+  const reader = {
+    initialize: async () => {},
+    close: async () => {},
+    request: async (method: string, raw: unknown) => {
+      if (method === "thread/list") {
+        const args = z.object({ archived: z.boolean() }).parse(raw);
+        return {
+          data: args.archived
+            ? []
+            : [good, { ...good, id: "excluded", cwd: "/private" }],
+          nextCursor: null,
+        };
+      }
+      if (method === "thread/turns/list") {
+        const args = z.object({ threadId: z.string() }).parse(raw);
+        reads.push(args.threadId);
+        return {
+          data: [
+            {
+              id: "turn",
+              status: "completed",
+              startedAt: 1,
+              completedAt: 2,
+              items: [],
+            },
+          ],
+          nextCursor: null,
+        };
+      }
+      throw new Error("Unexpected source operation");
+    },
+  };
+  const adapter = new CodexAdapter(config, dir, store, "fixture", [], reader);
+  const capture = async () => {
+    const out: AgentSnapshot[] = [];
+    for await (const snapshot of adapter.collect()) out.push(snapshot);
+    return out;
+  };
+  expect(await capture()).toHaveLength(0);
+  expect(reads).toEqual([]);
+  adapter.setProjects([project]);
+  expect((await capture())[0]?.run.projectId).toBe(project.projectId);
+  expect(reads).toEqual(["good"]);
+  adapter.setProjects([{ ...project, enabled: false }]);
+  expect(await capture()).toHaveLength(0);
+  expect(reads).toEqual(["good"]);
+  await adapter.close();
+  store.close();
+});
+test("policy refresh suppresses excluded queue entries, preserves offline capture and restores replay without deleting history", async () => {
+  const dir = await directory();
+  const store = new LocalStore(dir);
+  store.put({ kind: "run", value: parent() });
+  store.put({ kind: "event", value: event() });
+  store.put({
+    kind: "run",
+    value: { ...parent(), id: `${parent().id}:private`, cwd: "/private" },
+  });
+  let mode = "online";
+  const server = Bun.serve({
+    port: 0,
+    hostname: "127.0.0.1",
+    fetch: () =>
+      mode === "online"
+        ? Response.json([project])
+        : mode === "paused"
+          ? Response.json([{ ...project, enabled: false }])
+          : new Response("offline", { status: mode === "denied" ? 401 : 503 }),
+  });
+  const config = configSchema.parse({
+    schemaVersion: 1,
+    machineId,
+    machineName: "Fixture",
+    endpoint: `http://127.0.0.1:${server.port}/agentlog/ingest`,
+    tokenFile: "/unused",
+    homes: [{ path: dir, label: "fixture" }],
+    since: 0,
+  });
+  try {
+    await syncProjects(store, config, "fixture");
+    expect(store.pending()).toBe(2);
+    expect(store.runsForSession()).toHaveLength(2);
+    mode = "offline";
+    expect(await syncProjects(store, config, "fixture")).toHaveLength(1);
+    mode = "paused";
+    await syncProjects(store, config, "fixture");
+    expect(store.pending()).toBe(0);
+    expect(store.events(parent().id)).toHaveLength(1);
+    mode = "online";
+    await syncProjects(store, config, "fixture");
+    expect(store.pending()).toBe(2);
+    let sent = false;
+    store.put({
+      kind: "event",
+      value: {
+        ...event(),
+        id: `${event().runId}:orphan`,
+        runId: `${event().runId}:unknown`,
+      },
+    });
+    await forward(store, config, "fixture", async () => {
+      sent = true;
+      return Response.json({ schemaVersion: 1, accepted: 3 });
+    });
+    expect(sent).toBe(false); // The mixed batch is reselected after excluding its unknown parent.
+    mode = "denied";
+    await syncProjects(store, config, "fixture");
+    expect(cachedProjects(store)).toEqual([]);
+    expect(store.pending()).toBe(0);
+  } finally {
+    server.stop(true);
+    store.close();
+  }
+});
+test("an approved parent restores early hook events and work bindings cannot replace its enrolled project", async () => {
+  const dir = await directory();
+  const store = new LocalStore(dir);
+  store.setMeta("projectPolicy", JSON.stringify([project]));
+  store.put({ kind: "event", value: event() });
+  await forward(
+    store,
+    { machineId, endpoint: "http://unused" },
+    "fixture",
+    async () => {
+      throw new Error("An orphan event must not be sent");
+    },
+  );
+  expect(store.pending()).toBe(0);
+  persistSnapshot(store, { run: parent(), events: [] });
+  expect(store.pending()).toBe(2);
+  linkSession(store, "session", {
+    work: { id: "AST-fixture" },
+    projectId: "external-project",
+  });
+  expect(store.runsForSession("session")[0]?.projectId).toBe(project.projectId);
+  expect(store.runsForSession("session")[0]?.work?.id).toBe("AST-fixture");
+  const uploaded: string[] = [];
+  await forward(
+    store,
+    { machineId, endpoint: "http://unused" },
+    "fixture",
+    async (_input, init) => {
+      const body = envelopeSchema.parse(JSON.parse(String(init?.body)));
+      uploaded.push(...body.records.map((entry) => entry.record.kind));
+      return Response.json({ schemaVersion: 1, accepted: body.records.length });
+    },
+  );
+  expect(uploaded).toEqual(["run", "event"]);
+  expect(store.pending()).toBe(0);
+  store.close();
 });

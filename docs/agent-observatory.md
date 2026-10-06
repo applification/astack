@@ -1,14 +1,15 @@
 # Agent Observatory
 
-Agent Observatory is Astack’s private feedback system for coding-agent behavior. It captures persisted Codex desktop, CLI and T3-backed Codex turns, groups them by optional external work references, and shows traces and skill-version correlations. It lives in this repository. There is no COS work store or agent dispatcher in Astack today; Observatory does not create either.
+Agent Observatory is Astack’s private feedback system for coding-agent behavior. It captures persisted Codex desktop, CLI and T3-backed Codex turns belonging to enrolled projects, groups them by project and optional external work references, and shows traces and skill-version correlations. It lives in this repository. There is no COS work store or agent dispatcher in Astack today; Observatory does not create either.
 
 ```mermaid
 flowchart LR
-  C[Codex homes] --> A[Codex adapter]
+  P[Owner's project capture policy] --> A
+  C[Codex homes: thread metadata] --> A[Codex adapter: match project before full turns]
   A --> L[agentlog: metadata, redaction, SQLite queue]
   L -->|private HTTPS over Tailscale| I[Authenticated ingestion on Otis]
   I --> V[Self-hosted Convex]
-  V --> U[Observatory: Work, Runs, Trace, Skills, Problems]
+  V --> U[Observatory: Projects, Work, Runs, Trace, Skills, Problems]
   W[External work identity or launch context] --> L
 ```
 
@@ -38,19 +39,30 @@ New collectors capture readable content with mandatory secret redaction. An exis
 
 The collector always redacts its ingestion key and known environment secrets. Add paths to single-credential files in `secretFiles` in the private collector config for additional known-secret matching; Otis includes the owner's viewer-key file. These values are read privately before capture and never included in telemetry. Structured credentials, environment assignments and common token formats are also redacted in either capture mode.
 
-Otis is already installed. The runtime is at `~/.local/share/astack/observatory`, the collector state at `~/.agentlog`, and two user LaunchAgents supervise capture and start the Docker deployment at login. The permanent runtime is independent of a disposable Codex worktree. Convex uses a named Docker volume and pinned backend/nginx images. Docker ports bind to loopback; Tailscale Serve exposes HTTPS ports 8450–8452 privately. Existing Serve routes are preserved; no Funnel is configured.
+Otis is already installed. The runtime is at `~/.local/share/astack/observatory`, the collector state at `~/.agentlog`, and two user LaunchAgents supervise capture and start the Docker deployment at login. The permanent runtime is independent of a disposable Codex worktree. Convex uses a named Docker volume and pinned backend/nginx/dashboard images. Docker ports bind to loopback; Tailscale Serve exposes HTTPS ports 8450–8453 privately. Existing Serve routes are preserved; no Funnel is configured.
 
 ```sh
 "$HOME/.local/share/astack/observatory/bin/agentlog" status
 docker compose --project-directory "$HOME/.local/share/astack/observatory" ps
 ```
 
-The status command reports queued records, source health and forwarding health. A stopped backend does not stop the coding agent: the independent collector retains its SQLite queue and retries with backoff. Restarting the collector preserves identity, checkpoints, signatures and undelivered revisions.
+The status command reports queued records, project-policy health, source health and forwarding health. A stopped backend does not stop the coding agent: the independent collector retains its eligible SQLite queue and retries with backoff. Restarting the collector preserves identity, checkpoints, signatures and undelivered revisions.
+
+## Enroll and select projects
+
+Open [Projects](https://otis.tail12a0a0.ts.net:8450/#projects), enter a name and one or more repository URLs, and save. SSH and HTTPS URLs for the same repository share an identity, so clones and worktrees on either computer match automatically when Codex records their Git origin. A repository can belong to one project. For non-Git projects, or sessions without a recorded origin, add an absolute project folder on its registered computer. Folder matching includes subfolders and respects path boundaries. Conflicting project matches are excluded rather than guessed.
+
+The **Project** selector scopes Runs, Work, Skills, Problems and their drill-downs. **All enrolled projects** combines registered history. Work references with the same ID in different projects remain separate. Project names are editable; **Pause capture** stops future uploads for that project while preserving its existing history. Astack is enrolled on Otis with its repository and known checkout folders. Additional projects require owner enrollment.
+
+The collector fetches the owner's policy before reading full turns, and ingestion independently checks membership again. An offline collector uses its last accepted policy; a new machine without a policy captures no turns. Pausing takes effect at the backend immediately, and at an offline collector when it reconnects. Machine credentials can read only repository definitions and folders for their own computer, not telemetry or other computers' folders. The Health page describes computer-wide operations, while project reports remain scoped.
+
+Saving a project schedules a bounded pass over retained backend history, and its next collector refresh replays available matching source history. Only confident repository/folder matches are assigned. Existing unmatched or ambiguous history stays stored outside reports and is excluded from forwarding; no source files or previously retained records are deleted. Project registration is bounded to 100 projects and 16 KiB of configuration per project.
 
 ## What the data means
 
 | Concept | Meaning in v1 |
 | --- | --- |
+| Project | Owner-enrolled grouping and capture boundary across machines, clones and worktrees. |
 | Run | An execution attempt; one persisted Codex turn. Session and parent-session identities remain available. |
 | Completion | The agent turn ended. Engineering outcome remains `unknown` until explicitly supplied. |
 | Trace | Native item order, augmented by separately labelled hook observations. Persisted items usually have no wall-clock time. |
@@ -60,13 +72,13 @@ The status command reports queued records, source health and forwarding health. 
 | Workflow | Explicitly declared workflow step. Conversation text is not guessed into a workflow. |
 | Problem | Deterministic evidence of repeated failures, failed turns, or no completion with stale persisted session activity. Interventions and long runs are additional informational findings. |
 
-The Skills view groups by kind, name, hash and provenance. Its counts span all ingested runs; drill-down selects that exact group. Run-list and Work-view totals describe loaded pages. Filters use exact values and indexed candidate pages; combined filters may need **Load more** to scan further candidates.
+The Skills view groups by kind, name, hash and provenance. Its counts span the selected project's enrolled runs, or all enrolled projects; drill-down selects that exact group. Run-list and Work-view totals describe loaded pages. Filters use exact values and indexed candidate pages; combined filters may need **Load more** to scan further candidates.
 
 ## Privacy and coverage
 
-V1 is **metadata-only**. Prompt text, assistant text, command text/output, code, MCP arguments/results, environment dumps and hidden reasoning are withheld. The collector rejects `captureContent: true`. Tool names, exit status, durations when available, changed/read paths, skill hashes and keyed command signatures remain useful. Redaction runs again before every durable record write. Record detail and network batches have byte budgets; omission is explicit.
+Readable capture includes visible messages, commands and supported tool arguments/results after mandatory redaction. Metadata-only capture withholds these details. Hidden reasoning is always omitted. Tool names, exit status, durations when available, changed/read paths, skill hashes and keyed command signatures remain useful in either mode. Redaction runs again before every durable record write. Record detail and network batches have byte budgets; omission is explicit.
 
-Capture reads supported app-server methods without resuming or starting turns. It requests every source kind and separately enumerates archived threads. All persisted history is captured by default. Separate T3/Codex homes must be configured. Ephemeral, cloud-only and unpersisted sessions have no recoverable local history. Persisted token usage is unavailable. The paginated full-item API is experimental and verified with Codex **0.160.0**; inspect source health after upgrading Codex.
+Capture reads supported app-server methods without resuming or starting turns. It enumerates thread metadata from every source kind and separately includes archived threads. It requests full turns only for enabled, uniquely matched projects. Available matching history is included by default. Separate T3/Codex homes must be configured. Ephemeral, cloud-only and unpersisted sessions have no recoverable local history. Persisted token usage is unavailable. The paginated full-item API is experimental and verified with Codex **0.160.0**; inspect source health after upgrading Codex.
 
 Capability hashes skip special files, remote/cloud/protected macOS locations and reads exceeding the deadline; their hashes stay unknown. Skill reads exposed only inside an opaque composite tool call may not have direct native read evidence. Hash provenance is visible rather than reconstructed from a current checkout's commit. The system does not infer ignored/late skills without an expected-skill declaration, prove causation from correlations, or compare agents in v1.
 
@@ -78,7 +90,7 @@ The parent identity belongs to the external work system. It can bind a session w
 agentlog link --session SESSION_ID --work AST-142 --project PROJECT_ID --url https://your-work-system.example/work/AST-142
 ```
 
-Bindings update already-captured runs immediately and apply to later turns. An Astack launcher should call that binding when it receives the session identity. The optional JSON launch wrapper does this automatically from `thread.started`:
+Bindings update already-captured runs immediately and apply to later turns. `PROJECT_ID` is the enrolled Observatory project UUID; an external work system's separate project identity can remain in the work reference. Capture policy owns run classification: launch context cannot override an already enrolled project or authorize capture of an unregistered folder. An Astack launcher should call that binding when it receives the session identity. The optional JSON launch wrapper does this automatically from `thread.started`:
 
 ```sh
 agentlog run --work AST-142 --project PROJECT_ID -- codex exec --json "Your work request"
@@ -105,7 +117,7 @@ Hooks write only local metadata, emit inert `{}` and fail open. Async observatio
 
 ## Development and operations
 
-See [MacBook setup](agent-observatory-macbook.md), [architecture decision](adr/0007-agent-observatory.md), [research](../.astack/agent-observatory/research.md), [contract](../.astack/agent-observatory/behavior-contract.md), and [verification](../.astack/agent-observatory/evidence.md).
+See [MacBook setup](agent-observatory-macbook.md), [architecture decision](adr/0007-agent-observatory.md), [research](../.astack/agent-observatory/research.md), [contract](../.astack/agent-observatory/behavior-contract.md), [project capture contract](../.astack/agent-observatory/project-capture.md), and [verification](../.astack/agent-observatory/evidence.md).
 
 ```sh
 bun install --frozen-lockfile
@@ -122,4 +134,4 @@ bun run observatory:test:e2e
 
 For a changed facet projection, `bun packages/backend/scripts/rebuild-facets.ts` performs bounded internal repairs without changing source records or capability counts. For historical recapture, stop the collector, run `agentlog backfill` (or `--since ISO_DATE`), then reinstall its service. Capture keys and the durable queue are preserved.
 
-For backups use the installed Convex CLI's `convex export --path /private/backup.zip`, and separately protect the runtime configuration/signing files and collector identity/token/SQLite directory. Do not put exports in the public repository. To stop this deployment, boot out its two LaunchAgents, disable only Serve ports 8450–8452, and run `docker compose down` in the runtime directory. Keep the named volume for recovery.
+For backups use the installed Convex CLI's `convex export --path /private/backup.zip`, and separately protect the runtime configuration/signing files and collector identity/token/SQLite directory. Do not put exports in the public repository. To stop this deployment, boot out its two LaunchAgents, disable only Serve ports 8450–8453, and run `docker compose down` in the runtime directory. Keep the named volume for recovery.

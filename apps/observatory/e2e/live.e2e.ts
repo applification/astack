@@ -20,6 +20,11 @@ test("private deployment gates access and supports live run/trace/work/skills na
   await screen.getByRole("button", "Open Observatory").tap();
   await expect(screen.getByRole("heading", "Agent runs")).toBeVisible();
   await expect(screen.getByText("runs loaded")).toBeVisible();
+  await screen.getByLabel("Selected project").selectOption({ label: "Astack" });
+  const selectedProject = await browser.evaluate(() =>
+    new URLSearchParams(location.hash.split("?")[1]).get("project"),
+  );
+  expect(typeof selectedProject).toBe("string");
   await screen.getByLabel("Agent").fill("codex");
   await expect(
     screen.getByRole("columnheader", "Agent / machine"),
@@ -29,6 +34,11 @@ test("private deployment gates access and supports live run/trace/work/skills na
     .first()
     .tap();
   await expect(screen.getByRole("heading", "Activity trace")).toBeVisible();
+  expect(
+    await browser.evaluate(() =>
+      new URLSearchParams(location.hash.split("?")[1]).get("project"),
+    ),
+  ).toBe(selectedProject);
   expect(
     await browser.evaluate(
       () => document.querySelector(".event-preview") !== null,
@@ -54,10 +64,20 @@ test("private deployment gates access and supports live run/trace/work/skills na
   await expect(
     screen.getByRole("heading", "Work & agent activity"),
   ).toBeVisible();
+  expect(
+    await browser.evaluate(() =>
+      new URLSearchParams(location.hash.split("?")[1]).get("project"),
+    ),
+  ).toBe(selectedProject);
   await screen.getByRole("link", "Skills & workflows", { exact: true }).tap();
   await expect(screen.getByRole("heading", "Skills & workflows")).toBeVisible();
   await screen.getByRole("table").getByRole("link").first().tap();
   await expect(screen.getByRole("heading", "Agent runs")).toBeVisible();
+  expect(
+    await browser.evaluate(() =>
+      new URLSearchParams(location.hash.split("?")[1]).get("project"),
+    ),
+  ).toBe(selectedProject);
   expect(
     await browser.evaluate(() =>
       new URLSearchParams(location.hash.split("?")[1]).has("capability"),
@@ -71,6 +91,21 @@ test("private deployment gates access and supports live run/trace/work/skills na
   await expect(screen.getByRole("heading", "Capture health")).toBeVisible();
   await expect(
     screen.getByRole("heading", "Machines with ingested records"),
+  ).toBeVisible();
+  await screen.getByRole("link", "Projects", { exact: true }).tap();
+  await expect(
+    screen.getByRole("heading", "Projects", { exact: true }),
+  ).toBeVisible();
+  await screen.getByRole("button", "Edit Astack", { exact: true }).tap();
+  await expect(
+    screen.getByRole("heading", "Edit Astack", { exact: true }),
+  ).toBeVisible();
+  await screen.getByRole("button", "Save project", { exact: true }).tap();
+  await expect(
+    screen.getByRole("heading", "Add a project", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("link", "Astack", { exact: true }),
   ).toBeVisible();
   await screen.getByLabel("Color theme").selectOption({ value: "light" });
   expect(

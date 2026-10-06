@@ -11,6 +11,8 @@ import { environmentSecrets } from "@astack/agent-observability/redaction";
 import { CodexAdapter } from "./adapters/codex";
 import { LocalStore, forward } from "./store";
 import { loadConfig, type CollectorConfig } from "./config";
+import { syncProjects, cachedProjects } from "./projects";
+import { resolveProject } from "@astack/agent-observability/projects";
 
 async function readSecretFile(path: string) {
   const info = await lstat(path);
@@ -87,6 +89,11 @@ export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
   run.eventCount = events.length;
   run.findings = detectProblems(run, events);
   store.put({ kind: "run", value: runSchema.parse(run) });
+  if (
+    resolveProject(cachedProjects(store), run)?.projectId === run.projectId &&
+    run.projectId
+  )
+    store.requeueExcluded(run.id);
 }
 
 export async function collect(
@@ -105,7 +112,7 @@ export async function collect(
   const signatureKey =
     store.getMeta("signatureKey") ?? randomBytes(32).toString("hex");
   store.setMeta("signatureKey", signatureKey);
-  const adapters: { home: string; adapter: AgentAdapter }[] = config.homes.map(
+  const adapters: { home: string; adapter: CodexAdapter }[] = config.homes.map(
     (home) => ({
       home: home.path,
       adapter: new CodexAdapter(
@@ -121,6 +128,8 @@ export async function collect(
   let retryAt = 0;
   try {
     do {
+      const projects = await syncProjects(store, config, token);
+      for (const entry of adapters) entry.adapter.setProjects(projects);
       for (const entry of adapters) {
         try {
           for await (const snapshot of entry.adapter.collect())
@@ -158,6 +167,7 @@ export async function collect(
         }
       }
       for (const run of store.runsForSession()) {
+        if (!resolveProject(projects, run)) continue;
         if (run.completedAt !== null) continue;
         const findings = detectProblems(run, store.events(run.id));
         if (JSON.stringify(findings) !== JSON.stringify(run.findings))
@@ -221,6 +231,9 @@ export function health(directory: string, config: CollectorConfig) {
       machineName: config.machineName,
       contentCapture: config.captureContent,
       pending: store.pending(),
+      projects: store.getMeta("projectHealth")
+        ? JSON.parse(store.getMeta("projectHealth") ?? "{}")
+        : null,
       forward: store.getMeta("forwardHealth")
         ? JSON.parse(store.getMeta("forwardHealth") ?? "{}")
         : null,

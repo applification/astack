@@ -10,6 +10,11 @@ import {
   type AgentRun,
 } from "@astack/agent-observability";
 import { redact } from "@astack/agent-observability/redaction";
+import {
+  projectPolicySchema,
+  resolveProject,
+  type Project,
+} from "@astack/agent-observability/projects";
 
 type Row = { key: string; payload: string; revision: number };
 export class LocalStore {
@@ -132,7 +137,7 @@ export class LocalStore {
   batch(machineId: string) {
     const rows = this.db
       .query<Row, []>(
-        "SELECT key,payload,revision FROM records WHERE delivered=0 ORDER BY revision LIMIT 50",
+        "SELECT key,payload,revision FROM records WHERE delivered=0 ORDER BY kind DESC,revision LIMIT 50",
       )
       .all();
     if (!rows.length) return null;
@@ -192,6 +197,38 @@ export class LocalStore {
   close() {
     this.db.close();
   }
+  applyProjectPolicy(projects: readonly Project[]) {
+    for (const run of this.runsForSession()) {
+      const project = resolveProject(projects, run);
+      if (project) {
+        if (run.projectId !== project.projectId)
+          this.put({
+            kind: "run",
+            value: { ...run, projectId: project.projectId },
+          });
+        this.db
+          .query(
+            "UPDATE records SET delivered=0 WHERE run_id=? AND delivered=2",
+          )
+          .run(run.id);
+      } else
+        this.db
+          .query("UPDATE records SET delivered=2 WHERE run_id=?")
+          .run(run.id);
+    }
+    this.db.exec(
+      "UPDATE records SET delivered=2 WHERE kind='event' AND run_id NOT IN (SELECT run_id FROM records WHERE kind='run')",
+    );
+  }
+  exclude(keys: string[]) {
+    for (const key of keys)
+      this.db.query("UPDATE records SET delivered=2 WHERE key=?").run(key);
+  }
+  requeueExcluded(runId: string) {
+    this.db
+      .query("UPDATE records SET delivered=0 WHERE run_id=? AND delivered=2")
+      .run(runId);
+  }
   resetCaptureCheckpoints() {
     this.db.exec("DELETE FROM meta WHERE key GLOB 'codex:*:updated'");
   }
@@ -201,10 +238,32 @@ export async function forward(
   store: LocalStore,
   config: { machineId: string; endpoint: string },
   token: string,
-  fetcher: typeof fetch = fetch,
+  fetcher: (
+    ...args: Parameters<typeof fetch>
+  ) => ReturnType<typeof fetch> = fetch,
 ) {
+  const parsed = projectPolicySchema.safeParse(
+    JSON.parse(store.getMeta("projectPolicy") ?? "[]"),
+  );
+  const projects = parsed.success ? parsed.data : [];
   const batch = store.batch(config.machineId);
   if (!batch) return { delivered: 0 };
+  const excluded = batch.envelope.records.flatMap((entry, index) => {
+    const record = entry.record;
+    const parent =
+      record.kind === "event"
+        ? store.getRecord(`run:${record.value.runId}`)
+        : record;
+    const run = parent?.kind === "run" ? parent.value : null;
+    const project = run ? resolveProject(projects, run) : null;
+    return run && project && run.projectId === project.projectId
+      ? []
+      : [batch.keys[index]?.key ?? ""];
+  });
+  if (excluded.length) {
+    store.exclude(excluded);
+    return { delivered: 0 };
+  }
   const response = await fetcher(config.endpoint, {
     method: "POST",
     headers: {

@@ -30,6 +30,7 @@ const credentials = z
     z.object({
       machineId: z.string().uuid(),
       tokenHash: z.string().regex(/^[a-f0-9]{64}$/),
+      machineName: z.string().optional(),
     }),
   )
   .max(100)
@@ -40,7 +41,11 @@ const credentials = z
   );
 const next = [
   ...credentials.filter((value) => value.machineId !== enrollment.machineId),
-  { machineId: enrollment.machineId, tokenHash: enrollment.tokenHash },
+  {
+    machineId: enrollment.machineId,
+    tokenHash: enrollment.tokenHash,
+    machineName: enrollment.machineName,
+  },
 ];
 if (next.length > 100) throw new Error("Machine limit reached");
 const value = JSON.stringify(next);

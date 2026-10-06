@@ -4,6 +4,24 @@ import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 
 const router = httpRouter();
+router.route({
+  path: "/agentlog/projects",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const auth = request.headers.get("authorization");
+    const machineId =
+      auth?.startsWith("Bearer ") && auth.length <= 1024
+        ? await ctx.runAction(internal.auth.machine, {
+            credential: auth.slice(7),
+          })
+        : null;
+    if (!machineId) return new Response("Unauthorized", { status: 401 });
+    return Response.json(
+      await ctx.runQuery(internal.projects.policy, { machineId }),
+      { headers: { "cache-control": "no-store" } },
+    );
+  }),
+});
 const cors = (request: Request) => {
   const origin = request.headers.get("origin");
   const permitted = process.env.OBSERVATORY_UI_ORIGIN;
@@ -94,10 +112,10 @@ router.route({
         return new Response("Payload too large", { status: 413 });
       const envelope = envelopeSchema.parse(JSON.parse(body));
       if (envelope.machineId !== machineId) return denied();
-      for (let index = 0; index < envelope.records.length; index += 3)
+      for (let index = 0; index < envelope.records.length; index += 2)
         await ctx.runMutation(internal.ingestion.ingest, {
           machineId,
-          records: envelope.records.slice(index, index + 3).map((entry) => ({
+          records: envelope.records.slice(index, index + 2).map((entry) => ({
             revision: entry.revision,
             record: JSON.stringify(entry.record),
           })),

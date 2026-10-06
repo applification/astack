@@ -13,7 +13,7 @@ Otis is ready; **nothing has been installed on the MacBook**. Run these steps th
      --name "Dave Hudson's MacBook"
    ```
 
-   This creates a fresh stable machine UUID and random ingestion key in `~/.agentlog`, signs the compiled binary, and starts a user LaunchAgent. It resolves the absolute Codex executable path. Before enrollment, capture can queue locally but forwarding reports unauthorized. Keep the existing state when reinstalling so this machine keeps its identity.
+   This creates a fresh stable machine UUID and random ingestion key in `~/.agentlog`, signs the compiled binary, and starts a user LaunchAgent. It resolves the absolute Codex executable path. Before machine enrollment, it cannot fetch a project policy and captures no turns. Keep the existing state when reinstalling so this machine keeps its identity.
 
 3. Copy **`~/.agentlog/enrollment.json`** to Otis via your normal private file-transfer method. It contains the machine UUID/name and a SHA-256 credential hash, **not the ingestion key**. Keep `ingest-token` on the MacBook.
 
@@ -25,14 +25,16 @@ Otis is ready; **nothing has been installed on the MacBook**. Run these steps th
 
    The command retains existing machine credentials and updates the private Convex configuration. Do not paste keys into chats, commit them, or reuse Otis’s ingestion key on another machine.
 
-5. On the MacBook, check capture and forwarding:
+5. Open [Projects](https://otis.tail12a0a0.ts.net:8450/#projects). Astack's existing repository enrollment covers MacBook clones and worktrees when their Codex thread metadata includes that Git origin. Enroll other repositories you want to observe. For a non-Git project or missing origin metadata, edit its project and add its absolute MacBook folder using **Dave Hudson's MacBook** in the Computer selector. Register the machine first so it appears even before its first captured run.
+
+6. On the MacBook, check capture and forwarding:
 
    ```sh
    "$HOME/.local/share/astack/observatory/bin/agentlog" status
    launchctl print "gui/$(id -u)/net.applification.astack-agentlog"
    ```
 
-   Source health and forwarding should become `ok`; a historical backlog drains in bounded batches. Open [Observatory](https://otis.tail12a0a0.ts.net:8450) over Tailscale and filter runs by the machine UUID printed at installation. All persisted history is included unless you set a later `since` in config.
+   Project policy, source health and forwarding should become `ok`; matching historical runs drain in bounded batches. Open [Observatory](https://otis.tail12a0a0.ts.net:8450) over Tailscale, select a project and filter runs by the machine UUID printed at installation. All available history matching enabled projects is included unless you set a later `since` in config. Unregistered and ambiguous conversations are excluded. After its first policy fetch, an offline MacBook uses the last accepted policy until it reconnects.
 
 ## Codex desktop and T3 Code homes
 

@@ -33,5 +33,9 @@ export function linkSession(
   store.setMeta(`context:${sessionId}`, JSON.stringify(context));
   // Completed sessions may never change again. Apply bindings immediately too.
   for (const run of store.runsForSession(sessionId))
-    refreshRun(store, { ...run, ...context });
+    refreshRun(store, {
+      ...run,
+      ...context,
+      ...(run.projectId ? { projectId: run.projectId } : {}),
+    });
 }

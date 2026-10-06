@@ -15,9 +15,11 @@ const modules = {
   "../convex/observatory.ts": () => import("../convex/observatory"),
   "../convex/ingestion.ts": () => import("../convex/ingestion"),
   "../convex/auth.ts": () => import("../convex/auth"),
+  "../convex/projects.ts": () => import("../convex/projects"),
   "../convex/http.ts": () => import("../convex/http"),
 };
 const machineId = "00000000-0000-4000-8000-000000000001";
+const projectId = "00000000-0000-4000-8000-000000000100";
 const secondId = "00000000-0000-4000-8000-000000000002";
 const credential = "test-only-ingestion-key-123456";
 const hash = (value: string) =>
@@ -41,6 +43,7 @@ function run(id = machineId, attempt = "turn") {
     attemptId: attempt,
     source: "vscode",
     cwd: "/fixture",
+    projectId,
     title: "Fixture turn",
     startedAt: 1000,
     completedAt: 2000,
@@ -57,6 +60,22 @@ function run(id = machineId, attempt = "turn") {
 function entry(value = run(), revision = 1) {
   return { revision, record: JSON.stringify({ kind: "run", value }) };
 }
+async function setup() {
+  const t = convexTest(schema, modules);
+  await t.run(async (ctx) => {
+    await ctx.db.insert("projects", {
+      projectId,
+      name: "Fixture",
+      enabled: true,
+      repositories: [],
+      folders: [
+        { machineId, path: "/fixture" },
+        { machineId: secondId, path: "/fixture" },
+      ],
+    });
+  });
+  return t;
+}
 beforeEach(() => {
   process.env.OBSERVATORY_OWNER = "owner@example.test";
   process.env.OBSERVATORY_OWNER_ID = "00000000-0000-4000-8000-000000000010";
@@ -67,7 +86,7 @@ beforeEach(() => {
   ]);
 });
 test("every data query denies anonymous users and the wrong signed subject", async () => {
-  const t = convexTest(schema, modules);
+  const t = await setup();
   await expect(
     t.query(api.observatory.runs, { filters: [], paginationOpts }),
   ).rejects.toThrow("Unauthorized");
@@ -87,7 +106,7 @@ test("every data query denies anonymous users and the wrong signed subject", asy
   ).rejects.toThrow("Unauthorized");
 });
 test("replay and stale revisions keep one logical run and one capability contribution", async () => {
-  const t = convexTest(schema, modules);
+  const t = await setup();
   await t.mutation(internal.ingestion.ingest, {
     machineId,
     records: [entry()],
@@ -136,7 +155,7 @@ test("replay and stale revisions keep one logical run and one capability contrib
   });
 });
 test("two machines ingest independently; credentials cannot impersonate another machine or read", async () => {
-  const t = convexTest(schema, modules);
+  const t = await setup();
   const post = (id: string, value = run(id)) =>
     t.fetch("/agentlog/ingest", {
       method: "POST",
@@ -179,7 +198,7 @@ test("two machines ingest independently; credentials cannot impersonate another 
   ).toHaveLength(2);
 });
 test("version drill-down, combined filters and event pagination use stored evidence", async () => {
-  const t = convexTest(schema, modules);
+  const t = await setup();
   await t.mutation(internal.ingestion.ingest, {
     machineId,
     records: [
@@ -235,10 +254,242 @@ test("version drill-down, combined filters and event pagination use stored evide
   expect(next.page.map((value) => JSON.parse(value).sequence)).toEqual([2]);
 });
 test("invalid credential configuration fails closed", async () => {
-  const t = convexTest(schema, modules);
+  const t = await setup();
   process.env.AGENTLOG_MACHINES = "invalid-json";
   expect(await t.action(internal.auth.machine, { credential })).toBeNull();
   expect(await t.action(internal.auth.viewer, { credential: "wrong" })).toBe(
     false,
   );
+});
+
+test("project registration requires owner identity and machine policy reveals no telemetry", async () => {
+  const t = await setup();
+  const draft = {
+    projectId: "00000000-0000-4000-8000-000000000101",
+    name: "Second project",
+    enabled: true,
+    repositories: ["git@github.com:Team/Second.git"],
+    folders: [],
+  };
+  await expect(
+    t.mutation(api.projects.save, { project: draft }),
+  ).rejects.toThrow("Unauthorized");
+  await expect(
+    t
+      .withIdentity({ subject: "wrong" })
+      .mutation(api.projects.save, { project: draft }),
+  ).rejects.toThrow("Unauthorized");
+  await expect(t.query(api.projects.list, {})).rejects.toThrow("Unauthorized");
+  const owner = t.withIdentity({ subject: process.env.OBSERVATORY_OWNER_ID });
+  await owner.mutation(api.projects.save, { project: draft });
+  expect(
+    (await owner.query(api.projects.list, {})).find(
+      (p) => p.projectId === draft.projectId,
+    )?.repositories,
+  ).toEqual(["github.com/team/second"]);
+  expect((await t.fetch("/agentlog/projects")).status).toBe(401);
+  const response = await t.fetch("/agentlog/projects", {
+    headers: { authorization: `Bearer ${credential}` },
+  });
+  expect(response.status).toBe(200);
+  expect(response.headers.get("cache-control")).toBe("no-store");
+  const policy = await response.json();
+  expect(policy).toHaveLength(2);
+  expect(policy[0].folders).toEqual([{ machineId, path: "/fixture" }]);
+  expect(JSON.stringify(policy)).not.toContain("records");
+});
+test("unmatched/spoofed/orphan and paused-project uploads are denied while paused history stays readable", async () => {
+  const t = await setup();
+  const owner = t.withIdentity({ subject: process.env.OBSERVATORY_OWNER_ID });
+  for (const value of [
+    { ...run(), cwd: "/private" },
+    { ...run(), projectId: "other-project" },
+  ])
+    await expect(
+      t.mutation(internal.ingestion.ingest, {
+        machineId,
+        records: [entry(value)],
+      }),
+    ).rejects.toThrow("Project not enabled");
+  const e = eventSchema.parse({
+    id: `${run().id}:e`,
+    runId: run().id,
+    sequence: 0,
+    kind: "user_prompt",
+    timestamp: null,
+    observedAt: 100,
+    timing: "unavailable",
+    title: "Prompt",
+  });
+  await expect(
+    t.mutation(internal.ingestion.ingest, {
+      machineId,
+      records: [
+        { revision: 1, record: JSON.stringify({ kind: "event", value: e }) },
+      ],
+    }),
+  ).rejects.toThrow("Project not enabled");
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [entry()],
+  });
+  const p = (await owner.query(api.projects.list, {}))[0];
+  if (!p) throw new Error("Missing fixture project");
+  await owner.mutation(api.projects.save, {
+    project: { ...p, enabled: false },
+  });
+  await expect(
+    t.mutation(internal.ingestion.ingest, {
+      machineId,
+      records: [entry(run(), 2)],
+    }),
+  ).rejects.toThrow("Project not enabled");
+  await expect(
+    t.mutation(internal.ingestion.ingest, {
+      machineId,
+      records: [
+        { revision: 2, record: JSON.stringify({ kind: "event", value: e }) },
+      ],
+    }),
+  ).rejects.toThrow("Project not enabled");
+  expect(
+    (
+      await owner.query(api.observatory.runs, {
+        filters: [],
+        projectId,
+        paginationOpts,
+      })
+    ).page,
+  ).toHaveLength(1);
+  expect(
+    await owner.query(api.observatory.run, {
+      runId: run().id,
+      projectId: "wrong",
+    }),
+  ).toBeNull();
+  expect(
+    (
+      await owner.query(api.observatory.trace, {
+        runId: run().id,
+        projectId: "wrong",
+        paginationOpts,
+      })
+    ).page,
+  ).toEqual([]);
+});
+test("the owner cannot enroll the same repository twice using another transport", async () => {
+  const t = await setup();
+  const owner = t.withIdentity({ subject: process.env.OBSERVATORY_OWNER_ID });
+  const p = (await owner.query(api.projects.list, {}))[0];
+  if (!p) throw new Error("Missing fixture project");
+  await owner.mutation(api.projects.save, {
+    project: { ...p, repositories: ["git@github.com:Team/Repo.git"] },
+  });
+  await expect(
+    owner.mutation(api.projects.save, {
+      project: {
+        ...p,
+        projectId: "00000000-0000-4000-8000-000000000101",
+        repositories: ["https://github.com/team/repo.git"],
+      },
+    }),
+  ).rejects.toThrow("That repository is already enrolled");
+  expect(await owner.query(api.projects.list, {})).toHaveLength(1);
+});
+test("bounded history migration excludes unmatched history and keeps project/global rollups correct across replay/reassignment", async () => {
+  const t = await setup();
+  const owner = t.withIdentity({ subject: process.env.OBSERVATORY_OWNER_ID });
+  await t.run(async (ctx) => {
+    for (const value of [
+      run(),
+      { ...run(machineId, "private"), cwd: "/private" },
+    ])
+      await ctx.db.insert("runs", {
+        runId: value.id,
+        machineId,
+        revision: 1,
+        startedAt: value.startedAt,
+        status: value.status,
+        data: JSON.stringify(value),
+      });
+  });
+  expect(
+    (await owner.query(api.observatory.runs, { filters: [], paginationOpts }))
+      .page,
+  ).toHaveLength(0);
+  expect(
+    await owner.query(api.observatory.run, { runId: run().id }),
+  ).toBeNull();
+  expect(
+    (
+      await t.mutation(internal.projects.migrate, {
+        paginationOpts: { numItems: 2, cursor: null },
+      })
+    ).assigned,
+  ).toBe(1);
+  expect(
+    (
+      await t.mutation(internal.projects.migrate, {
+        paginationOpts: { numItems: 2, cursor: null },
+      })
+    ).assigned,
+  ).toBe(0);
+  expect(
+    (await owner.query(api.observatory.runs, { filters: [], paginationOpts }))
+      .page,
+  ).toHaveLength(1);
+  expect(await t.run((ctx) => ctx.db.query("runs").take(3))).toHaveLength(2);
+  expect(
+    JSON.parse(
+      (
+        await owner.query(api.observatory.capabilities, {
+          projectId,
+          paginationOpts,
+        })
+      ).page[0] ?? "{}",
+    ).runs,
+  ).toBe(1);
+  const p = (await owner.query(api.projects.list, {}))[0];
+  if (!p) throw new Error("Missing fixture");
+  await owner.mutation(api.projects.save, {
+    project: { ...p, folders: [{ machineId, path: "/different" }] },
+  });
+  const otherId = "00000000-0000-4000-8000-000000000101";
+  await owner.mutation(api.projects.save, {
+    project: {
+      ...p,
+      projectId: otherId,
+      name: "Other",
+      folders: [{ machineId, path: "/fixture" }],
+    },
+  });
+  await t.mutation(internal.projects.migrate, {
+    paginationOpts: { numItems: 2, cursor: null },
+  });
+  expect(
+    JSON.parse(
+      (
+        await owner.query(api.observatory.capabilities, {
+          projectId: otherId,
+          paginationOpts,
+        })
+      ).page[0] ?? "{}",
+    ).runs,
+  ).toBe(1);
+  expect(
+    JSON.parse(
+      (
+        await owner.query(api.observatory.capabilities, {
+          projectId,
+          paginationOpts,
+        })
+      ).page[0] ?? "{}",
+    ).runs,
+  ).toBe(0);
+  expect(
+    JSON.parse(
+      (await owner.query(api.observatory.capabilities, { paginationOpts }))
+        .page[0] ?? "{}",
+    ).runs,
+  ).toBe(1);
 });
