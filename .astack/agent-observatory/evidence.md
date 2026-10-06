@@ -1,5 +1,26 @@
 # Agent Observatory evidence
 
+## Current traces and upload progress, 2026-10-06
+
+Implemented and deployed source `789ef9e` on Otis. Current turns now upload their summaries and details together ahead of older turns; every fourth batch retains oldest-first selection. One independent, serial worker drains bounded batches while capture continues, preserving retry backoff, project gates, redaction and revision acknowledgements. `--once` remains bounded. The trace reports exact upload counts only after exhausting server pagination; while more pages exist it reports a lower bound and the loaded count.
+
+| Acceptance | Observed proof |
+| --- | --- |
+| RECENT | Before the change (`cc9ec07`), a fixture with 200 historical events and 10 current events uploaded **zero** current events in its first batch. The same regression passes after the change with all 10 current events and their parent summary in that batch. |
+| DRAIN | Real SQLite/HTTP checks pass for historical progress in the fourth batch under sustained recent traffic, capture during a held HTTP request, draining beyond 20 batches, request cancellation without acknowledgement, and retry after HTTP 503. Existing replay/redaction/project-gate checks pass. The signed, compiled continuous CLI delivered **1,051 records in 22 batches in 1,478 ms**, before its 30-second capture polling interval elapsed, through a real fixture HTTP server and native Codex app-server with an empty fixture home. |
+| PROGRESS | **8 fixture browser tests** pass, including waiting (0/169), partial (5/169), more-pages lower bounds, initial checking, full upload, loading more, a lagging summary, and failure-filter independence. Light/dark and narrow rendering passed; selected fixture captures are below. |
+| OTIS | **2 authenticated deployed UI journeys** pass, including the reported T3 run with uploaded progress, command/message details, privacy controls and project navigation. A fresh scoped native read finds **237/237 events** for the reported run, **177/177** for an older T3 run and **115/115** for a Desktop comparison. The eligible queue is empty at observation; capture, policy and forwarding are healthy with two enabled projects. Served HTML/JavaScript exactly match the production build. Backend/dashboard are healthy and web is running. |
+
+Strict types, **42 tests / 214 assertions**, UI lint, site/plugin checks, production/Storybook builds and signed collector build passed. The compiled fixture's first launch failed on an incorrect diagnostic-script import, corrected before execution. The first targeted live browser attempt missed headings that include message previews because its locator required exact text; the locator was corrected and both journeys then passed, with the first report retained privately. These were proof setup failures, with no production repair or automatic flaky retry. No production screenshots or conversation content are retained.
+
+Applied the Convex reviewer checklist as self-review: existing owner/project scope, runtime parsing, indexed bounded queries and native pagination remain authoritative. No backend count scan, schema, function, auth or subscription mutation was introduced. Queue selection sends each current parent before its details, existing old-first batches retain summary ordering, and revision acknowledgements preserve concurrent capture updates. No confirmed review finding remains for this addition.
+
+Pen is skipped because the agreed trace layout/notice styles are reused; Storybook establishes the new states. A separate broad exploratory run is skipped: the focused browser checks exercise all new states and affected controls, with native reads and real HTTP checks covering delivery. The overall PR retains its earlier draft coverage limits; no new reboot or MacBook proof is claimed.
+
+![Synthetic upload waiting state in light mode](evidence/upload-waiting-light.png)
+
+![Synthetic upload waiting state in narrow dark mode](evidence/upload-waiting-dark-narrow.png)
+
 ## Dynamic worktree fallback, 2026-10-06
 
 Implemented and installed collector source `836f8c0` on Otis. Missing native repository origins now resolve through local Git configuration before full turns are requested, including shared linked-worktree and worktree-specific configuration. The canonical origin is retained with the run and marked as a capture-time local observation. Provided native origins remain authoritative; historical branch/commit facts are not reconstructed. Trusted early hooks use the same lookup. See acceptance **G1–G4** in [project capture](project-capture.md).

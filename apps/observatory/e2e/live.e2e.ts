@@ -16,10 +16,10 @@ test("the reported T3 run exposes uploaded progress and conversation details", a
   const trace = screen.getByRole("region", "Activity trace");
   await expect(trace.getByRole("status")).toContainText("events uploaded.");
   await expect(
-    trace.getByText("Shell command", { exact: true }).first(),
+    trace.getByText(/^Shell command/).first(),
   ).toBeVisible();
   await expect(
-    trace.getByText("Assistant output", { exact: true }).first(),
+    trace.getByText(/^Assistant output/).first(),
   ).toBeVisible();
   await expect(trace.getByText("No events captured yet.")).toHaveCount(0);
 });
