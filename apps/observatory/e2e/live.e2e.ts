@@ -291,5 +291,16 @@ test("private deployment gates access and supports live run/trace/work/skills na
   ).toBe("light");
   expect(
     await browser.evaluate(() => Object.keys(localStorage).sort()),
-  ).toEqual(["astack-observatory-show-content", "astack-observatory-theme"]);
+  ).toEqual([
+    "astack-observatory-access-key",
+    "astack-observatory-show-content",
+    "astack-observatory-theme",
+  ]);
+  await browser.reload();
+  await expect(
+    screen.getByRole("heading", "Projects", { exact: true }),
+  ).toBeVisible();
+  await expect(screen.getByRole("heading", "Private Observatory")).toHaveCount(
+    0,
+  );
 });

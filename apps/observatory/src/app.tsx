@@ -523,8 +523,9 @@ function RunDetail({ id, projectId }: { id: string; projectId?: string }) {
       </a>
       <h1 className="run-heading">{activityHeading(run, names?.[0])}</h1>
       <p className="subtitle">
-        <ProviderLabel agent={run.agent} /> {run.agentVersion} ·{" "}
-        {run.machineName} · {!run.startTimeKnown && "Session date · "}
+        <ProviderLabel agent={run.agent} />{" "}
+        {run.agentVersion ?? "Version unknown"} · {run.machineName} ·{" "}
+        {!run.startTimeKnown && "Session date · "}
         {date(run.startedAt)} · <Status run={run} />
       </p>
       {run.work && (

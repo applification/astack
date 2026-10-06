@@ -5,11 +5,12 @@ import {
   ConvexReactClient,
   useConvexAuth,
 } from "convex/react";
-import { Button, Input } from "@astack/ui";
+import { Button } from "@astack/ui";
 import "@astack/ui/styles.css";
 import { App } from "./app";
 import { useOwnerAuth, OwnerAuthProvider } from "./auth";
 import { AccessLayout, ThemeProvider, initializeTheme } from "./theme";
+import { PrivateAccess } from "./private-access";
 
 initializeTheme();
 
@@ -46,44 +47,12 @@ function AccessGate() {
     );
   if (!auth.isAuthenticated)
     return (
-      <AccessLayout>
-        <p className="eyebrow">Private agent feedback</p>
-        <h1>Private Observatory</h1>
-        <p>
-          {access.state === "offline"
-            ? "The private service is unavailable. Check Tailscale and retry."
-            : "Connect with your permitted Tailscale identity or the owner’s private access key."}
-        </p>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            access.authenticate(key);
-          }}
-        >
-          <label>
-            Private access key
-            <Input
-              aria-label="Private access key"
-              type="password"
-              autoComplete="off"
-              value={key}
-              onChange={(e) => setKey(e.target.value)}
-            />
-          </label>
-          <div className="toolbar">
-            <Button type="submit" disabled={!key.trim()}>
-              Open Observatory
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => location.reload()}
-            >
-              Retry connection
-            </Button>
-          </div>
-        </form>
-      </AccessLayout>
+      <PrivateAccess
+        offline={access.state === "offline"}
+        value={key}
+        onChange={setKey}
+        authenticate={access.authenticate}
+      />
     );
   return <App />;
 }

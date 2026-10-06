@@ -1,5 +1,192 @@
 import { test } from "@e2e-dev/web";
 import { expect } from "e2e";
+const authStory =
+  "/iframe.html?id=observatory-authentication--remembered-access&viewMode=story";
+test("successful owner login remembers the trimmed key and obtains a fresh session after reload", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  const requests: { method: string; authorization: string | undefined }[] = [];
+  await browser.route("**/auth/session", async (route) => {
+    requests.push({
+      method: route.request.method,
+      authorization: route.request.headers.authorization,
+    });
+    await route.fulfill(
+      route.request.headers.authorization === "Bearer fixture-owner-key"
+        ? { json: { token: "fixture-short-lived-jwt" } }
+        : { status: 401, json: {} },
+    );
+  });
+  await app.open(authStory);
+  await expect(
+    screen.getByRole("heading", "Private Observatory"),
+  ).toBeVisible();
+  await app.screenshot("remembered-access-login");
+  await screen.getByLabel("Private access key").fill("  fixture-owner-key  ");
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect(
+    screen.getByRole("heading", "Authenticated fixture"),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(() =>
+      localStorage.getItem("astack-observatory-access-key"),
+    ),
+  ).toBe("fixture-owner-key");
+  expect(
+    await browser.evaluate(() => JSON.stringify(localStorage)),
+  ).not.toContain("fixture-short-lived-jwt");
+  const beforeReload = requests.length;
+  await browser.reload();
+  await expect(
+    screen.getByRole("heading", "Authenticated fixture"),
+  ).toBeVisible();
+  expect(
+    requests
+      .slice(beforeReload)
+      .every(
+        (request) =>
+          request.method === "POST" &&
+          request.authorization === "Bearer fixture-owner-key",
+      ),
+  ).toBe(true);
+  expect(requests.length).toBeGreaterThan(beforeReload);
+});
+
+test("offline sessions preserve the saved key, while rejected keys are removed and can be replaced", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  let mode: "accepted" | "offline" | "denied" = "accepted";
+  await browser.route("**/auth/session", async (route) => {
+    const authorized =
+      route.request.headers.authorization === "Bearer fixture-owner-key";
+    await route.fulfill(
+      mode === "offline"
+        ? { status: 503, json: {} }
+        : mode === "accepted" && authorized
+          ? { json: { token: "fixture-short-lived-jwt" } }
+          : { status: 401, json: {} },
+    );
+  });
+  await app.open(authStory);
+  await screen.getByLabel("Private access key").fill("fixture-owner-key");
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect(
+    screen.getByRole("heading", "Authenticated fixture"),
+  ).toBeVisible();
+  mode = "offline";
+  await browser.reload();
+  await expect(
+    screen.getByText(
+      "The private service is unavailable. Check Tailscale and retry.",
+    ),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(() =>
+      localStorage.getItem("astack-observatory-access-key"),
+    ),
+  ).toBe("fixture-owner-key");
+  mode = "accepted";
+  await screen.getByRole("button", "Retry connection").tap();
+  await expect(
+    screen.getByRole("heading", "Authenticated fixture"),
+  ).toBeVisible();
+  mode = "denied";
+  await screen.getByRole("button", "Refresh session").tap();
+  await expect(
+    screen.getByRole("heading", "Private Observatory"),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(() =>
+      localStorage.getItem("astack-observatory-access-key"),
+    ),
+  ).toBeNull();
+  await screen.getByLabel("Private access key").fill("invalid-fixture-key");
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect(
+    screen.getByRole("heading", "Private Observatory"),
+  ).toBeVisible();
+  // The runner forbids reading password values; an enabled retry proves the draft survives.
+  await expect(screen.getByRole("button", "Open Observatory")).toBeEnabled();
+  expect(
+    await browser.evaluate(() =>
+      localStorage.getItem("astack-observatory-access-key"),
+    ),
+  ).toBeNull();
+  mode = "accepted";
+  await screen.getByLabel("Private access key").fill("fixture-owner-key");
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect(
+    screen.getByRole("heading", "Authenticated fixture"),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(() =>
+      localStorage.getItem("astack-observatory-access-key"),
+    ),
+  ).toBe("fixture-owner-key");
+});
+
+test("unavailable browser storage still permits in-memory login", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await browser.route("**/auth/session", async (route) => {
+    await route.fulfill(
+      route.request.headers.authorization === "Bearer fixture-owner-key"
+        ? { json: { token: "fixture-short-lived-jwt" } }
+        : { status: 401, json: {} },
+    );
+  });
+  await app.open(authStory);
+  await expect(
+    screen.getByRole("heading", "Private Observatory"),
+  ).toBeVisible();
+  await browser.evaluate(() => {
+    for (const method of ["getItem", "setItem", "removeItem"])
+      Object.defineProperty(Storage.prototype, method, {
+        configurable: true,
+        value: () => {
+          throw new Error("fixture-storage-denied");
+        },
+      });
+    return true;
+  });
+  await screen.getByLabel("Private access key").fill("fixture-owner-key");
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect(
+    screen.getByRole("heading", "Authenticated fixture"),
+  ).toBeVisible();
+});
+
+test("run rows display Claude CLI versions independently of model names, retaining unknown and Codex versions", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-runs--claude-cli-versions&viewMode=story",
+  );
+  const table = screen.getByRole("region", "Agent runs table");
+  await expect(
+    table.getByText("2.1.291 · Otis", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    table.getByText("0.160.1 · Otis", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    table.getByText("Version unknown · Dave’s MacBook", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    table.getByText("claude-sonnet-5-5", { exact: true }),
+  ).toHaveCount(0);
+  await browser.setViewport({ width: 1280, height: 1120 });
+  await app.screenshot("claude-cli-versions");
+});
+
 test("compact metadata preserves full identifiers and reports clipboard success and failure", async ({
   app,
   screen,

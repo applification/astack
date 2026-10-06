@@ -3,15 +3,26 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
+
+export const credentialStorageKey = "astack-observatory-access-key";
+function readCredential() {
+  try {
+    return localStorage.getItem(credentialStorageKey)?.trim() ?? "";
+  } catch {
+    return "";
+  }
+}
 
 function useAuthentication() {
   const [state, setState] = useState<
     "loading" | "authenticated" | "denied" | "offline"
   >("loading");
-  const [credential, setCredential] = useState("");
+  const [credential, setCredential] = useState(readCredential);
+  const currentCredential = useRef(credential);
   const fetchAccessToken = useCallback(async () => {
     try {
       const response = await fetch(
@@ -25,24 +36,42 @@ function useAuthentication() {
           signal: AbortSignal.timeout(10_000),
         },
       );
+      if (currentCredential.current !== credential) return null;
       if (!response.ok) {
+        if (response.status === 401 && credential) {
+          try {
+            if (localStorage.getItem(credentialStorageKey) === credential)
+              localStorage.removeItem(credentialStorageKey);
+          } catch {
+            // Restricted storage still permits in-memory authentication.
+          }
+        }
         setState(response.status === 401 ? "denied" : "offline");
         return null;
       }
       const result: unknown = await response.json();
+      if (currentCredential.current !== credential) return null;
       if (
         typeof result !== "object" ||
         result === null ||
         !("token" in result) ||
-        typeof result.token !== "string"
+        typeof result.token !== "string" ||
+        !result.token
       ) {
         setState("offline");
         return null;
       }
+      if (credential) {
+        try {
+          localStorage.setItem(credentialStorageKey, credential);
+        } catch {
+          // Restricted storage still permits in-memory authentication.
+        }
+      }
       setState("authenticated");
       return result.token;
     } catch {
-      setState("offline");
+      if (currentCredential.current === credential) setState("offline");
       return null;
     }
   }, [credential]);
@@ -50,9 +79,11 @@ function useAuthentication() {
     void fetchAccessToken();
   }, [fetchAccessToken]);
   const authenticate = (value: string) => {
+    const nextCredential = value.trim();
+    currentCredential.current = nextCredential;
     setState("loading");
-    if (value.trim() === credential) void fetchAccessToken();
-    else setCredential(value.trim());
+    if (nextCredential === credential) void fetchAccessToken();
+    else setCredential(nextCredential);
   };
   return {
     isLoading: state === "loading",

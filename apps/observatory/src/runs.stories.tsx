@@ -83,6 +83,17 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Mixed: Story = {};
+export const ClaudeCliVersions: Story = {
+  args: {
+    runs: runs.map((run, index) => ({
+      ...run,
+      agent: index === 0 ? "codex" : "claude",
+      agentVersion:
+        index === 0 ? "0.160.1" : index === 1 ? "2.1.291" : undefined,
+      model: index === 0 ? "gpt-6.1-sol" : "claude-sonnet-5-5",
+    })),
+  },
+};
 export const NamedWorkAndActivities: Story = {
   args: {
     runs: runs.map((run, index) => ({
