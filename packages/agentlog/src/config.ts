@@ -44,6 +44,13 @@ export const configSchema = z
       .array(z.object({ path: z.string(), label: z.string() }).strict())
       .min(1),
     t3Sources: z.array(t3SourceSchema).max(20).default([]),
+    claudeHome: z
+      .string()
+      .min(1)
+      .default(
+        () =>
+          process.env.CLAUDE_CONFIG_DIR?.trim() || join(homedir(), ".claude"),
+      ),
     pollSeconds: z.number().int().min(10).max(3600).default(30),
     captureContent: z.boolean().default(true),
     secretFiles: z.array(z.string().min(1)).max(100).default([]),

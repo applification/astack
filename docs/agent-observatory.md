@@ -32,13 +32,13 @@ Open **https://otis.tail12a0a0.ts.net:8450** while connected to Tailscale. A per
 pbcopy < "$HOME/.local/share/astack/observatory/viewer-access-key"
 ```
 
-Paste it into the private access form. The UI keeps it in memory and stores neither keys nor JWTs in localStorage. The machine ingestion key cannot open the UI or query telemetry.
+Paste it into the private access form. After successful sign-in, the UI remembers the owner access key in this browser's localStorage and reuses it after refreshes and deployments on the same origin. A rejected saved key is cleared; temporary service outages keep it for retry. Short-lived Convex JWTs stay in memory. Clearing site data removes the remembered key. The machine ingestion key cannot open the UI or query telemetry.
 
 The header's **Color theme** control offers System, Light and Dark on both the access screen and authenticated views. System follows your OS appearance; explicit choices persist across reloads. Typography and colors follow the public Astack site; fonts are bundled with the private UI and require no third-party font requests.
 
 The trace omits a time when its source did not record one, with one explanation above the events. Available agent times and hook observation times remain labelled; recorded order is unchanged. Collector observation time is available in expanded details and is not presented as the event time.
 
-The trace's **Show content** toggle defaults on. Expand events to read captured messages, commands and tool arguments/results. Uncheck it to hide that content, including previews; timing, failures and skill evidence remain visible. Your choice survives reloads. Only theme and content-visibility preferences are stored in localStorage, never conversation content or credentials. Hiding details does not stop capture or erase privately stored content.
+The trace's **Show content** toggle defaults on. Expand events to read captured messages, commands and tool arguments/results. Uncheck it to hide that content, including previews; timing, failures and skill evidence remain visible. Your choice survives reloads. Theme, content visibility and the remembered owner access key are stored in localStorage; conversation content and Convex JWTs are not. Hiding details does not stop capture or erase privately stored content.
 
 New collectors capture readable content with mandatory secret redaction. An existing `captureContent: false` setting stays metadata-only until explicitly enabled. To change a machine's collection mode, run `agentlog content on` or `agentlog content off` and restart its collector. Changing modes re-reads available configured source history using the same event identities. History that a source no longer retains cannot be reconstructed, and stopping capture does not guarantee deletion of older records whose source has disappeared. Large content remains bounded by the record limits. Hidden reasoning is never collected.
 
@@ -54,6 +54,8 @@ docker compose --project-directory "$HOME/.local/share/astack/observatory" ps
 The status command reports queued records, project-policy health, source health and forwarding health. A stopped backend does not stop the coding agent: the independent collector retains its eligible SQLite queue and retries with backoff. Restarting the collector preserves identity, checkpoints, signatures and undelivered revisions.
 
 ## Optional multi-provider T3 capture
+
+Claude run versions come from native `user`/`assistant` records in the matching T3 session's local transcript during that provider turn. The collector reads only this version metadata; it does not import native conversation content. It uses `claudeHome` in the collector config, defaulting to `CLAUDE_CONFIG_DIR` or `~/.claude`. Missing logs, weak session identities, conflicting versions and files above the 32 MiB limit remain unknown. Upgrading this collector replays unchanged T3 threads once to enrich existing run IDs. The installed CLI's current version is never substituted for a historical run.
 
 Native Codex homes remain configured independently. To also observe T3's recorded Claude, Codex and other provider turns, install the updated agentlog binary and add a T3 source on the computer hosting that T3 environment and its workspaces. No provider settings or launch paths need to change. This adapter does not collect standalone Claude sessions launched outside T3.
 

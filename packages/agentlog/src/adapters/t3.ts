@@ -20,6 +20,7 @@ import type { LocalStore } from "../store";
 import { localRepository } from "../git";
 import { capability, runIdentity } from "./codex";
 import { T3Reader } from "./t3-rpc";
+import { claudeVersion } from "./claude-version";
 
 const id = z.string().min(1).max(512);
 const date = z.iso
@@ -273,6 +274,29 @@ export async function normalizeT3Turn(options: {
     "Times are recorded by T3; unavailable native facts remain unknown",
     "Skill hashes are observation-time evidence; automatically supplied instructions are not inferred",
   ];
+  let agentVersion =
+    previous?.kind === "run" ? previous.value.agentVersion : undefined;
+  if (agent === "claude") {
+    const session =
+      provider.nativeThreadRef?.driver === "claudeAgent" &&
+      provider.nativeThreadRef.strength === "strong"
+        ? provider.nativeThreadRef.nativeId
+        : null;
+    if (session && turn.startedAt !== null) {
+      const version = await claudeVersion({
+        home: config.claudeHome,
+        cwd: options.cwd,
+        sessionId: session,
+        startedAt: turn.startedAt,
+        completedAt: turn.completedAt,
+      });
+      if (version.kind === "known") agentVersion = version.version;
+      else if (version.kind === "conflicting") agentVersion = undefined;
+    }
+    coverage.push(
+      "Claude CLI version uses matching native session records within this turn; missing or conflicting evidence remains unknown",
+    );
+  }
   const emit = (
     itemId: string,
     sequence: number,
@@ -609,6 +633,7 @@ export async function normalizeT3Turn(options: {
   const run = runSchema.parse({
     id: runId,
     agent,
+    ...(agentVersion ? { agentVersion } : {}),
     machineId: config.machineId,
     machineName: config.machineName,
     sessionId,
@@ -707,7 +732,7 @@ export class T3Adapter {
       if (!project) continue;
       const checkpoint = `t3:${this.source.environmentId}:${thread.id}:updated`;
       const fingerprint = createHash("sha256")
-        .update(JSON.stringify(thread))
+        .update(JSON.stringify({ captureVersion: 2, thread }))
         .digest("hex");
       if (
         !["running", "starting", "waiting", "preparing"].includes(

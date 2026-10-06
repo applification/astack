@@ -69,6 +69,7 @@ async function fixture() {
     tokenFile: join(dir, "ingest.token"),
     homes: [{ path: join(dir, "codex"), label: "native" }],
     t3Sources: [source],
+    claudeHome: join(dir, "claude"),
     since: 0,
   });
   const store = new LocalStore(join(dir, "state"), [secret]);
@@ -254,6 +255,76 @@ test("Claude uses shared T3 records for readable redacted traces, failures, edit
   if (!result) throw new Error("missing snapshot");
   persistSnapshot(f.store, result);
   expect(f.store.events(result.run.id)).toHaveLength(10);
+});
+
+test("T3 Claude enriches existing runs with CLI metadata from the strong native session without importing content", async () => {
+  const f = await fixture();
+  const raw = projection();
+  const session = "00000000-0000-4000-8000-000000000099";
+  for (const provider of raw.providerThreads)
+    provider.nativeThreadRef.nativeId = session;
+  const original = await snapshot(f, raw, false);
+  if (!original) throw new Error("missing original capture");
+  expect(original.run.agentVersion).toBeUndefined();
+  persistSnapshot(f.store, original);
+  const project = join(
+    f.config.claudeHome,
+    "projects",
+    f.dir.replace(/[^a-zA-Z0-9]/g, "-"),
+  );
+  await mkdir(project, { recursive: true });
+  await writeFile(
+    join(project, `${session}.jsonl`),
+    JSON.stringify({
+      type: "assistant",
+      sessionId: session,
+      cwd: f.dir,
+      timestamp: time,
+      version: "2.1.291",
+      message: { content: "native content must not be imported" },
+    }) + "\n",
+  );
+  const enriched = await snapshot(f, raw, false);
+  expect(enriched?.run.agentVersion).toBe("2.1.291");
+  expect(enriched?.run.id).toBe(original.run.id);
+  expect(enriched?.events.map((event) => event.id)).toEqual(
+    original.events.map((event) => event.id),
+  );
+  expect(JSON.stringify(enriched)).not.toContain(
+    "native content must not be imported",
+  );
+  if (!enriched) throw new Error("missing enriched capture");
+  persistSnapshot(f.store, enriched);
+  const transcript = join(project, `${session}.jsonl`);
+  await writeFile(
+    transcript,
+    (await readFile(transcript, "utf8")) +
+      JSON.stringify({
+        type: "user",
+        sessionId: session,
+        cwd: f.dir,
+        timestamp: time,
+        version: "2.1.292",
+      }) +
+      "\n",
+  );
+  expect((await snapshot(f, raw, false))?.run.agentVersion).toBeUndefined();
+  await rm(project, { recursive: true });
+  expect((await snapshot(f, raw, false))?.run.agentVersion).toBe("2.1.291");
+  for (const provider of raw.providerThreads)
+    provider.nativeThreadRef.strength = "weak";
+  const other = await snapshot(
+    f,
+    {
+      ...raw,
+      providerThreads: raw.providerThreads.map((provider) => ({
+        ...provider,
+        providerInstanceId: "other",
+      })),
+    },
+    false,
+  );
+  expect(other?.run.agentVersion).toBeUndefined();
 });
 
 test("metadata-only replay keeps stable identities and observations and removes readable T3 content", async () => {
@@ -485,6 +556,17 @@ test("T3 matches enrollment before reading history, includes archives, and commi
   const count = calls.filter((id) => id === "app-thread").length;
   await drain();
   expect(calls.filter((id) => id === "app-thread")).toHaveLength(count);
+  // A checkpoint from the previous collector must replay once after the upgrade.
+  f.store.setMeta(
+    `t3:${environmentId}:app-thread:updated`,
+    createHash("sha256")
+      .update(JSON.stringify(shellState.threads[0]))
+      .digest("hex"),
+  );
+  await drain();
+  expect(calls.filter((id) => id === "app-thread")).toHaveLength(count + 1);
+  await drain();
+  expect(calls.filter((id) => id === "app-thread")).toHaveLength(count + 1);
   f.store.resetCaptureCheckpoints();
   archivedThreads = shellState.threads;
   shellState.threads = [];
@@ -619,7 +701,10 @@ test("an archived removed worktree can match T3's reported fork origin without i
   );
 });
 
-async function transportFixture(f: Awaited<ReturnType<typeof fixture>>) {
+async function transportFixture(
+  f: Awaited<ReturnType<typeof fixture>>,
+  raw = projection(),
+) {
   const calls: string[] = [];
   const server = Bun.serve<{ method?: string }>({
     port: 0,
@@ -668,7 +753,7 @@ async function transportFixture(f: Awaited<ReturnType<typeof fixture>>) {
       if (url.pathname === "/api/orchestration/shell")
         return Response.json(shell(f.dir));
       if (url.pathname === "/api/orchestration/threads/app-thread")
-        return Response.json({ projection: projection() });
+        return Response.json({ projection: raw });
       return new Response("missing", { status: 404 });
     },
     websocket: {
@@ -813,7 +898,27 @@ test("pairing exchange requests read-only access and saves the bearer privately 
 
 test("the complete collector captures and forwards both sources; a T3 outage leaves native Codex working", async () => {
   const f = await fixture();
-  const { source } = await transportFixture(f);
+  const raw = projection();
+  const session = "00000000-0000-4000-8000-000000000099";
+  for (const provider of raw.providerThreads)
+    provider.nativeThreadRef.nativeId = session;
+  const project = join(
+    f.config.claudeHome,
+    "projects",
+    f.dir.replace(/[^a-zA-Z0-9]/g, "-"),
+  );
+  await mkdir(project, { recursive: true });
+  await writeFile(
+    join(project, `${session}.jsonl`),
+    JSON.stringify({
+      type: "user",
+      sessionId: session,
+      cwd: f.dir,
+      timestamp: time,
+      version: "2.1.291",
+    }) + "\n",
+  );
+  const { source } = await transportFixture(f, raw);
   const records: z.infer<typeof envelopeSchema>["records"] = [];
   const ownerId = "00000000-0000-4000-8000-000000000010";
   const ownerBefore = process.env.OBSERVATORY_OWNER_ID;
@@ -940,6 +1045,7 @@ createInterface({ input: process.stdin }).on("line", line => {
   const storedClaude = page.page[0];
   if (!storedClaude) throw new Error("missing stored Claude run");
   expect(JSON.parse(storedClaude).agent).toBe("claude");
+  expect(JSON.parse(storedClaude).agentVersion).toBe("2.1.291");
   const choices = await owner.query(api.observatory.filterOptions, {
     projectId,
     paginationOpts: { numItems: 50, cursor: null },
@@ -951,6 +1057,14 @@ createInterface({ input: process.stdin }).on("line", line => {
       .map((choice) => choice.value)
       .sort(),
   ).toEqual(["claude", "codex"]);
+  expect(
+    choices.page
+      .flatMap((raw) => filterOptionsSchema.parse(JSON.parse(raw)))
+      .some(
+        (choice) =>
+          choice.dimension === "version" && choice.value === "2.1.291",
+      ),
+  ).toBe(true);
   expect(JSON.stringify(records)).not.toContain(secret);
   expect(health(f.dir, config).t3[0]?.health.status).toBe("ok");
   const unavailable = {
