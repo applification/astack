@@ -47,6 +47,11 @@ export default defineSchema({
   })
     .index("by_runId", ["runId"])
     .index("by_startedAt", ["startedAt"])
+    .index("by_enrolled_and_projectId_and_startedAt", [
+      "enrolled",
+      "projectId",
+      "startedAt",
+    ])
     .index("by_enrolled_and_startedAt", ["enrolled", "startedAt"]),
   events: defineTable({
     eventId: v.string(),

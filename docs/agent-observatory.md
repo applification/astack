@@ -74,7 +74,9 @@ Saving a project schedules a bounded pass over retained backend history, and its
 | Workflow | Explicitly declared workflow step. Conversation text is not guessed into a workflow. |
 | Problem | Deterministic evidence of repeated failures, failed turns, or no completion with stale persisted session activity. Interventions and long runs are additional informational findings. |
 
-The Skills view groups by kind, name, hash and provenance. Its counts span the selected project's enrolled runs, or all enrolled projects; drill-down selects that exact group. Run-list and Work-view totals describe loaded pages. Filters use exact values and indexed candidate pages; combined filters may need **Load more** to scan further candidates.
+The Skills view groups by kind, name, hash and provenance. Its counts span the selected project's enrolled runs, or all enrolled projects; drill-down selects that exact group. Run-list and Work-view totals describe loaded pages.
+
+Runs, Work and Problems share select menus for repository, work reference, agent, version, machine, branch, status, work outcome, skill/workflow and tool/MCP. Status and outcome offer their supported values; the other menus load distinct values from the selected project's full enrolled history, independently of the current results and date range. Machine and work choices include readable names alongside their exact IDs. **Any** removes that restriction. Dates use calendar controls, and **Clear filters** resets categories and dates. Existing drill-down selections remain visible if their value is no longer available. Empty indexed candidate pages are scanned automatically until a match is found or history is exhausted; **Load more** still loads further results.
 
 ## Privacy and coverage
 

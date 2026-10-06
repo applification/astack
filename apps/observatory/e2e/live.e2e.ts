@@ -1,5 +1,63 @@
 import { test } from "@e2e-dev/web";
 import { expect, secrets } from "e2e";
+test("live project filter menus work across Runs, Work and Problems and find historical branch results", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open();
+  await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect(screen.getByRole("heading", "Agent runs")).toBeVisible();
+  await screen.getByLabel("Selected project").selectOption({ label: "Astack" });
+  await expect(
+    screen.getByText("Loading filter choices…", { exact: true }),
+  ).toHaveCount(0, { timeout: 30_000 });
+  const branches = await screen
+    .getByLabel("Branch", { exact: true })
+    .getByRole("option")
+    .count();
+  expect(branches).toBeGreaterThan(1);
+  await screen
+    .getByLabel("Branch", { exact: true })
+    .selectOption({ index: branches - 1 });
+  await expect(
+    screen.getByRole("region", "Agent runs table").getByRole("row").nth(1),
+  ).toBeVisible({ timeout: 30_000 });
+  await expect(
+    screen.getByLabel("Branch", { exact: true }).getByRole("option"),
+  ).toHaveCount(branches);
+  await screen.getByRole("button", "Clear filters", { exact: true }).tap();
+  for (const page of ["Runs", "Work", "Problems"]) {
+    await screen.getByRole("link", page, { exact: true }).tap();
+    expect(
+      await browser.evaluate(
+        () => document.querySelectorAll(".filters select").length,
+      ),
+    ).toBe(10);
+    expect(
+      await browser.evaluate(
+        () => document.querySelectorAll('.filters input[type="text"]').length,
+      ),
+    ).toBe(0);
+    await expect(
+      screen.getByLabel("Status", { exact: true }).getByRole("option"),
+    ).toHaveCount(6);
+    await expect(
+      screen.getByLabel("Work outcome", { exact: true }).getByRole("option"),
+    ).toHaveCount(4);
+    await screen
+      .getByLabel("Agent", { exact: true })
+      .selectOption({ value: "codex" });
+    await expect(screen.getByLabel("Agent", { exact: true })).toHaveValue(
+      "codex",
+    );
+    await screen.getByLabel("From date").fill("2026-10-01");
+    await screen.getByRole("button", "Clear filters", { exact: true }).tap();
+    await expect(screen.getByLabel("Agent", { exact: true })).toHaveValue("");
+    await expect(screen.getByLabel("From date")).toHaveValue("");
+  }
+});
 test("private deployment gates access and supports live run/trace/work/skills navigation", async ({
   app,
   screen,
@@ -25,7 +83,12 @@ test("private deployment gates access and supports live run/trace/work/skills na
     new URLSearchParams(location.hash.split("?")[1]).get("project"),
   );
   expect(typeof selectedProject).toBe("string");
-  await screen.getByLabel("Agent").fill("codex");
+  await screen.getByLabel("Agent").selectOption({ value: "codex" });
+  // Running turns can arrive before their queued events. Use a settled turn
+  // for the separate content-visibility assertions below.
+  await screen
+    .getByLabel("Status", { exact: true })
+    .selectOption({ value: "completed" });
   await expect(
     screen.getByRole("columnheader", "Agent / machine"),
   ).toBeVisible();
@@ -39,11 +102,11 @@ test("private deployment gates access and supports live run/trace/work/skills na
       new URLSearchParams(location.hash.split("?")[1]).get("project"),
     ),
   ).toBe(selectedProject);
-  expect(
-    await browser.evaluate(
-      () => document.querySelector(".event-preview") !== null,
-    ),
-  ).toBe(true);
+  await expect
+    .poll(() =>
+      browser.evaluate(() => document.querySelector(".event-preview") !== null),
+    )
+    .toBe(true);
   await screen.getByLabel("Show content").uncheck();
   expect(
     await browser.evaluate(

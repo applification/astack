@@ -6,9 +6,57 @@ import {
   filterSchema,
   capabilityKey,
 } from "@astack/agent-observability";
+import {
+  mergeFilterOptions,
+  runFilterOptions,
+} from "@astack/agent-observability/filters";
 import { query } from "./_generated/server";
 import { requireOwner } from "./access";
 import { getProject } from "./projectData";
+
+// Choices have their own cursor and project scope, independent of result filters.
+// Return only categorical metadata, deduplicated within each bounded page.
+export const filterOptions = query({
+  args: {
+    projectId: v.optional(v.string()),
+    paginationOpts: paginationOptsValidator,
+  },
+  returns: v.object({
+    page: v.array(v.string()),
+    continueCursor: v.string(),
+    isDone: v.boolean(),
+  }),
+  handler: async (ctx, args) => {
+    await requireOwner(ctx);
+    if (
+      !Number.isInteger(args.paginationOpts.numItems) ||
+      args.paginationOpts.numItems < 1 ||
+      args.paginationOpts.numItems > 50
+    )
+      throw new Error("Invalid page");
+    if (args.projectId && !(await getProject(ctx, args.projectId)))
+      return { page: [], continueCursor: "", isDone: true };
+    const page = await ctx.db
+      .query("runs")
+      .withIndex("by_enrolled_and_projectId_and_startedAt", (q) =>
+        args.projectId
+          ? q.eq("enrolled", true).eq("projectId", args.projectId)
+          : q.eq("enrolled", true),
+      )
+      .order("desc")
+      .paginate({ ...args.paginationOpts, maximumBytesRead: 1_000_000 });
+    const options = mergeFilterOptions(
+      page.page.flatMap((row) =>
+        runFilterOptions(runSchema.parse(JSON.parse(row.data))),
+      ),
+    );
+    return {
+      page: [JSON.stringify(options)],
+      continueCursor: page.continueCursor,
+      isDone: page.isDone,
+    };
+  },
+});
 
 const matches = (
   run: z.infer<typeof runSchema>,
