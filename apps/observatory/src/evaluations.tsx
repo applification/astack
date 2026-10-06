@@ -29,6 +29,7 @@ import {
   WorkTimeline,
 } from "./evaluation-evidence";
 import { OutcomeFeedbackForm } from "./outcome-feedback";
+import { WorkflowEvidence } from "./workflow-evidence";
 
 export const evaluationLink = (id: string, projectId: string) =>
   "#evaluation/" +
@@ -95,12 +96,14 @@ function JudgmentEditor({
   change,
   evaluation,
   allowPass = true,
+  traceOptions,
 }: {
   name: string;
   value: DraftJudgment;
   change: (value: DraftJudgment) => void;
   evaluation: Evaluation;
   allowPass?: boolean;
+  traceOptions?: { runId: string; eventId: string; label: string }[];
 }) {
   return (
     <fieldset className="project-form min-w-0">
@@ -133,53 +136,86 @@ function JudgmentEditor({
           onChange={(event) => change({ ...value, reason: event.target.value })}
         />
       </label>
-      <label>
-        Acceptance evidence for {name}
-        <select
-          value={value.caseId}
-          onChange={(event) => change({ ...value, caseId: event.target.value })}
-        >
-          {evaluation.cases.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.id} · {item.expected}
-            </option>
-          ))}
-        </select>
-      </label>
-      <details>
-        <summary>Cite a captured trace event instead</summary>
+      {traceOptions ? (
         <label>
-          Captured turn for {name}
+          Captured evidence for {name}
           <select
-            value={value.runId}
-            onChange={(event) =>
-              change({ ...value, runId: event.target.value })
-            }
+            value={value.eventId}
+            onChange={(event) => {
+              const ref = traceOptions.find(
+                (item) => item.eventId === event.target.value,
+              );
+              if (ref)
+                change({ ...value, runId: ref.runId, eventId: ref.eventId });
+            }}
           >
-            {evaluation.runIds.map((id) => (
-              <option key={id}>{id}</option>
+            {traceOptions.map((item) => (
+              <option key={item.eventId} value={item.eventId}>
+                {item.label}
+              </option>
             ))}
           </select>
+          {value.eventId && (
+            <a href={runLink(value.runId, evaluation.projectId, value.eventId)}>
+              Inspect selected evidence
+            </a>
+          )}
         </label>
-        <label>
-          Trace event ID for {name}
-          <Input
-            value={value.eventId}
-            onChange={(event) =>
-              change({ ...value, eventId: event.target.value })
-            }
-          />
-        </label>
-      </details>
+      ) : (
+        <>
+          <label>
+            Acceptance evidence for {name}
+            <select
+              value={value.caseId}
+              onChange={(event) =>
+                change({ ...value, caseId: event.target.value })
+              }
+            >
+              {evaluation.cases.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.id} · {item.expected}
+                </option>
+              ))}
+            </select>
+          </label>
+          <details>
+            <summary>Cite a captured trace event instead</summary>
+            <label>
+              Captured turn for {name}
+              <select
+                value={value.runId}
+                onChange={(event) =>
+                  change({ ...value, runId: event.target.value })
+                }
+              >
+                {evaluation.runIds.map((id) => (
+                  <option key={id}>{id}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Trace event ID for {name}
+              <Input
+                value={value.eventId}
+                onChange={(event) =>
+                  change({ ...value, eventId: event.target.value })
+                }
+              />
+            </label>
+          </details>
+        </>
+      )}
     </fieldset>
   );
 }
 export function AssessmentForm({
   evaluation,
   save,
+  workflow,
 }: {
   evaluation: Evaluation;
   save: (assessment: AssessmentInput, requestId: string) => Promise<void>;
+  workflow?: EvaluationDetail["workflow"];
 }) {
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
@@ -191,6 +227,60 @@ export function AssessmentForm({
     runId: evaluation.runIds[0] ?? "",
     eventId: "",
   };
+  const selection = workflow?.records.find(
+    (record) => record.annotation.action === "select",
+  );
+  const transition = workflow?.records.findLast(
+    (record) => record.annotation.action === "phase",
+  );
+  const routeOptions = (workflow?.records ?? []).flatMap((record) =>
+    record.annotation.action !== "phase"
+      ? [
+          {
+            runId: record.runId,
+            eventId: record.eventId,
+            label:
+              record.annotation.route +
+              " · " +
+              record.annotation.action +
+              " · " +
+              textPreview(record.annotation.reason, 90),
+          },
+        ]
+      : [],
+  );
+  const executionOptions = [
+    ...new Map(
+      (workflow?.records ?? [])
+        .flatMap((record) => [
+          {
+            runId: record.runId,
+            eventId: record.eventId,
+            label:
+              record.annotation.action === "phase"
+                ? record.annotation.phase +
+                  " · " +
+                  record.annotation.status +
+                  " · declaration"
+                : "Route · " + record.annotation.action,
+          },
+          ...record.evidence.flatMap((item) =>
+            item.state === "available"
+              ? [
+                  {
+                    ...item.reference,
+                    label:
+                      item.kind.replace(/_/g, " ") +
+                      " · " +
+                      textPreview(item.title, 90),
+                  },
+                ]
+              : [],
+          ),
+        ])
+        .map((item) => [item.eventId, item]),
+    ).values(),
+  ];
   const judgment = (value: DraftJudgment) => ({
     verdict: value.verdict,
     reason: value.reason,
@@ -206,6 +296,17 @@ export function AssessmentForm({
         criterionId: item.id,
       })),
       outcome: draft,
+      includeFlow: false,
+      route: {
+        ...draft,
+        runId: selection?.runId ?? draft.runId,
+        eventId: selection?.eventId ?? "",
+      },
+      execution: {
+        ...draft,
+        runId: transition?.runId ?? selection?.runId ?? draft.runId,
+        eventId: transition?.eventId ?? selection?.eventId ?? "",
+      },
     },
     onSubmit: async ({ value }) => {
       setError("");
@@ -219,6 +320,14 @@ export function AssessmentForm({
             criterionId: item.criterionId,
           })),
           outcome: judgment(value.outcome),
+          ...(value.includeFlow
+            ? {
+                flow: {
+                  route: judgment(value.route),
+                  execution: judgment(value.execution),
+                },
+              }
+            : {}),
         });
         validateAssessment(evaluation, input);
         const content = JSON.stringify(input);
@@ -293,6 +402,54 @@ export function AssessmentForm({
           />
         )}
       </form.Field>
+      {selection && (
+        <form.Field name="includeFlow">
+          {(field) => (
+            <>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={field.state.value}
+                  onChange={(event) => field.handleChange(event.target.checked)}
+                />
+                Include a flow assessment
+              </label>
+              {field.state.value && (
+                <>
+                  <p className="subtitle">
+                    Assess whether the route matched the request and whether the
+                    path and skill application were supported by evidence. Cite
+                    trace events; completion declarations alone do not establish
+                    success.
+                  </p>
+                  <form.Field name="route">
+                    {(route) => (
+                      <JudgmentEditor
+                        name="Route choice"
+                        evaluation={evaluation}
+                        value={route.state.value}
+                        change={route.handleChange}
+                        traceOptions={routeOptions}
+                      />
+                    )}
+                  </form.Field>
+                  <form.Field name="execution">
+                    {(execution) => (
+                      <JudgmentEditor
+                        name="Flow execution"
+                        evaluation={evaluation}
+                        value={execution.state.value}
+                        change={execution.handleChange}
+                        traceOptions={executionOptions}
+                      />
+                    )}
+                  </form.Field>
+                </>
+              )}
+            </>
+          )}
+        </form.Field>
+      )}
       {error && (
         <p role="alert" className="negative">
           {error}
@@ -371,6 +528,7 @@ export function EvaluationView({
           </details>
         )}
       </section>
+      <WorkflowEvidence detail={detail} view="selection" />
       <section className="evaluation-result" aria-label="Result summary">
         <h2>Result</h2>
         {resultStep?.response ? (
@@ -415,7 +573,19 @@ export function EvaluationView({
           The agent’s response and reported checks are evidence for your review.
         </p>
       </section>
-      <WorkTimeline detail={detail} />
+      {detail.workflow.records.length > 0 ? (
+        <>
+          <WorkflowEvidence detail={detail} view="path" />
+          <details className="evaluation-disclosure">
+            <summary>
+              Captured conversation · {evaluation.runIds.length} turns
+            </summary>
+            <WorkTimeline detail={detail} />
+          </details>
+        </>
+      ) : (
+        <WorkTimeline detail={detail} />
+      )}
       <VerificationEvidence evaluation={evaluation} />
       {saveFeedback && (
         <OutcomeFeedbackForm key={evaluation.id} save={saveFeedback} />
@@ -465,6 +635,7 @@ export function EvaluationView({
             key={evaluation.id}
             evaluation={evaluation}
             save={save}
+            workflow={detail.workflow}
           />
         )}
         <p className="secondary">

@@ -44,6 +44,13 @@ for (const item of result.results) {
               : "Checks incomplete",
         ),
       ).toBeVisible();
+      await expect(screen.getByRole("heading", "Path taken")).toBeVisible();
+      await expect(
+        screen.getByText("astack → Bug fix", { exact: true }),
+      ).toBeVisible();
+      await screen
+        .getByText("Captured conversation · 2 turns", { exact: true })
+        .tap();
       await expect(
         screen.getByRole("heading", "How the work unfolded"),
       ).toBeVisible();
@@ -77,6 +84,17 @@ for (const item of result.results) {
           .getByText("Detailed intent and skill review", { exact: true })
           .tap();
         const reviewId = crypto.randomUUID();
+        await screen.getByLabel("Include a flow assessment").check();
+        for (const name of ["Route choice", "Flow execution"]) {
+          await screen
+            .getByLabel(name + " verdict", { exact: true })
+            .selectOption({ value: "inconclusive" });
+          await screen
+            .getByLabel("Reason for " + name, { exact: true })
+            .fill(
+              "Local browser reviewed the synthetic captured flow. " + reviewId,
+            );
+        }
         for (const name of ["Intent", "bug-fix", "verify", "Outcome"]) {
           await screen
             .getByLabel(name + " verdict")
@@ -101,6 +119,23 @@ for (const item of result.results) {
             "Local browser reviewed Outcome against retained observations. " +
               reviewId,
           ),
+        ).toBeVisible();
+        await expect(
+          screen.getByText("Route choice: Inconclusive", { exact: true }),
+        ).toBeVisible();
+        await screen
+          .getByText("Route selection evidence", { exact: true })
+          .tap();
+        await screen
+          .getByRole("link", "Declaration in trace", { exact: true })
+          .first()
+          .tap();
+        await expect(
+          screen.getByRole("heading", "Workflow annotation", { exact: true }),
+        ).toBeVisible();
+        await browser.back();
+        await expect(
+          screen.getByRole("heading", "Saved edits / fixed", { exact: true }),
         ).toBeVisible();
         await screen.getByRole("link", "Original request in trace").tap();
         await expect(

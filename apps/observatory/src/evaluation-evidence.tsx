@@ -335,6 +335,12 @@ export function AssessmentHistory({ detail }: { detail: EvaluationDetail }) {
                 )?.skill ?? item.criterionId,
               ...item,
             })),
+            ...(assessment.flow
+              ? [
+                  { name: "Route choice", ...assessment.flow.route },
+                  { name: "Flow execution", ...assessment.flow.execution },
+                ]
+              : []),
             { name: "Outcome", ...assessment.outcome },
           ].map((judgment, index) => (
             <div key={index}>
@@ -382,6 +388,9 @@ export function AssessmentHistory({ detail }: { detail: EvaluationDetail }) {
                     {event.title} · revision {revision}
                   </h4>
                   <pre>{JSON.stringify(event.data, null, 2)}</pre>
+                  {event.workflow && (
+                    <pre>{JSON.stringify(event.workflow, null, 2)}</pre>
+                  )}
                 </div>
               ))}
             </details>

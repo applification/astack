@@ -1,5 +1,162 @@
 import { test } from "@e2e-dev/web";
 import { expect } from "e2e";
+test("astack bug-fix flow preserves verification retries and links declared skills to captured evidence", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--bug-fix-flow&viewMode=story",
+  );
+  await expect(
+    screen.getByText("astack → Bug fix", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText(
+      "Restore existing save behaviour and reproduce the reported symptom.",
+      { visible: true },
+    ),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(() =>
+      [...document.querySelectorAll(".astack-flow > li h4")].map(
+        (item) => item.textContent,
+      ),
+    ),
+  ).toEqual(["Reproduce", "Repair", "Verify", "Repair", "Verify"]);
+  await expect(
+    screen.getByText("Failed · agent reported", { exact: true }),
+  ).toBeVisible();
+  await screen.getByText("View phase evidence", { exact: true }).first().tap();
+  await expect(
+    screen.getByRole("link", "Before fix: reopening loses the saved edit"),
+  ).toBeVisible();
+  const link = await screen
+    .getByRole("link", "Before fix: reopening loses the saved edit")
+    .getAttribute("href");
+  expect(link).toContain("event=");
+  await app.screenshot("astack-bug-fix-flow-light");
+  await browser.setViewport({ width: 390, height: 844 });
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await app.screenshot("astack-bug-fix-flow-narrow-dark");
+});
+test("astack new-feature flow explains omissions and leaves unfinished phases ungraded", async ({
+  app,
+  screen,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--new-feature-flow&viewMode=story",
+  );
+  await expect(
+    screen.getByText("astack → New feature", { exact: true }),
+  ).toBeVisible();
+  await expect(screen.getByText("Omitted", { exact: true })).toBeVisible();
+  await expect(
+    screen.getByText(
+      "Reuse the agreed editor layout; no new interaction design is required.",
+      { visible: true },
+    ),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Started · no finish recorded", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Your review pending", { exact: true }),
+  ).toBeVisible();
+  await app.screenshot("astack-new-feature-flow");
+});
+test("astack route changes, missing selection and unavailable evidence stay explicit", async ({
+  app,
+  screen,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--changed-flow&viewMode=story",
+  );
+  await expect(
+    screen.getByText("astack → Investigation", { exact: true }),
+  ).toBeVisible();
+  await expect(screen.getByText("Now: Bug fix", { exact: true })).toBeVisible();
+  await expect(
+    screen.getByRole("heading", "Changed route → Bug fix"),
+  ).toBeVisible();
+  await expect(
+    screen
+      .getByText(
+        "The reproduction confirmed a persistence defect; continue through the repair route.",
+      )
+      .first(),
+  ).toBeVisible();
+  await app.screenshot("astack-route-change");
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--missing-flow-selection&viewMode=story",
+  );
+  await expect(
+    screen.getByText("astack → Route not recorded", { exact: true }),
+  ).toBeVisible();
+  await expect(screen.getByRole("status")).toContainText("display limit");
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--missing-flow-evidence&viewMode=story",
+  );
+  await screen.getByText("View phase evidence", { exact: true }).first().tap();
+  await expect(
+    screen.getByText("Referenced trace event has not been captured.", {
+      exact: true,
+      visible: true,
+    }),
+  ).toBeVisible();
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--awaiting-review&viewMode=story",
+  );
+  await expect(
+    screen.getByText("Flow not recorded in the linked readable capture.", {
+      exact: false,
+    }),
+  ).toBeVisible();
+});
+test("owner flow judgments select captured evidence and remain separate from outcome feedback", async ({
+  app,
+  screen,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--flow-review&viewMode=story",
+  );
+  await screen
+    .getByText("Detailed intent and skill review", { exact: true })
+    .tap();
+  await screen.getByLabel("Include a flow assessment").check();
+  for (const name of [
+    "Intent",
+    "bug-fix",
+    "verify",
+    "Outcome",
+    "Route choice",
+    "Flow execution",
+  ])
+    await screen
+      .getByLabel("Reason for " + name, { exact: true })
+      .fill(
+        "Reviewed the captured declarations and supporting before/after evidence.",
+      );
+  await screen
+    .getByLabel("Route choice verdict", { exact: true })
+    .selectOption({ value: "pass" });
+  await screen.getByRole("button", "Save assessment", { exact: true }).tap();
+  await expect(screen.getByRole("status")).toContainText("Assessment saved");
+  await expect(
+    screen.getByText("Route choice: Pass", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Flow execution: Inconclusive", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Your review pending", { exact: true }),
+  ).toBeVisible();
+});
 for (const [story, checkStatus, outcome] of [
   ["awaiting-review", "Checks passed", null],
   ["passing", "Checks passed", "Pass"],

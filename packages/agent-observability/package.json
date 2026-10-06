@@ -13,7 +13,10 @@
     "./presentation": "./src/presentation.ts",
     "./evaluations": "./src/evaluations.ts",
     "./evaluation-view": "./src/evaluation-view.ts",
-    "./evaluation-fixtures": "./src/evaluation-fixtures.ts"
+    "./evaluation-fixtures": "./src/evaluation-fixtures.ts",
+    "./workflow": "./src/workflow.ts",
+    "./workflow-view": "./src/workflow-view.ts",
+    "./workflow-fixtures": "./src/workflow-fixtures.ts"
   },
   "dependencies": {
     "zod": "4.6.5"

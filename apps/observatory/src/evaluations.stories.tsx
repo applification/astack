@@ -17,6 +17,7 @@ import {
 } from "@astack/agent-observability/evaluation-fixtures";
 import { EvaluationView, EvaluationTable } from "./evaluations";
 import { ObservatoryLayout } from "./app";
+import { workflowViewFixture } from "@astack/agent-observability/workflow-fixtures";
 
 function detail(status: "pass" | "fail" | "inconclusive", assessed = false) {
   const evaluation = evaluationFixture(status);
@@ -103,6 +104,60 @@ export const MissingProof: Story = {
 export const MissingContent: Story = {
   args: { detail: { ...detail("pass"), timeline: [] } },
 };
+export const BugFixFlow: Story = {
+  args: { detail: { ...detail("pass"), workflow: workflowViewFixture() } },
+};
+export const NewFeatureFlow: Story = {
+  args: {
+    detail: {
+      ...detail("pass"),
+      source: null,
+      evaluation: {
+        ...evaluationFixture(),
+        title: "Add saved-edit persistence",
+        intent: {
+          request: "Add saving so edits survive reopening the document.",
+          clarifications: [],
+        },
+      },
+      workflow: workflowViewFixture("feature"),
+    },
+  },
+};
+export const ChangedFlow: Story = {
+  args: {
+    detail: { ...detail("pass"), workflow: workflowViewFixture("changed") },
+  },
+};
+export const MissingFlowSelection: Story = {
+  args: {
+    detail: {
+      ...detail("pass"),
+      workflow: {
+        records: workflowViewFixture().records.slice(1, 4),
+        truncated: true,
+      },
+    },
+  },
+};
+export const MissingFlowEvidence: Story = {
+  args: {
+    detail: {
+      ...detail("pass"),
+      workflow: {
+        ...workflowViewFixture(),
+        records: workflowViewFixture().records.map((record) => ({
+          ...record,
+          evidence: record.evidence.map((item) => ({
+            state: "unavailable",
+            reference: item.reference,
+            reason: "Referenced trace event has not been captured.",
+          })),
+        })),
+      },
+    },
+  },
+};
 export const Empty: Story = { render: () => <EvaluationTable rows={[]} /> };
 export const Listing: Story = {
   render: () => (
@@ -176,4 +231,11 @@ export const Review: Story = {
 };
 export const ReviewFailure: Story = {
   render: () => <Editable initial={detail("pass")} reject />,
+};
+export const FlowReview: Story = {
+  render: () => (
+    <Editable
+      initial={{ ...detail("pass"), workflow: workflowViewFixture() }}
+    />
+  ),
 };

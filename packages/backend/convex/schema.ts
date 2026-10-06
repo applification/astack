@@ -119,10 +119,12 @@ export default defineSchema({
     machineId: v.string(),
     revision: v.number(),
     sequence: v.number(),
+    kind: v.optional(v.string()),
     data: v.string(),
   })
     .index("by_eventId", ["eventId"])
-    .index("by_runId_and_sequence", ["runId", "sequence"]),
+    .index("by_runId_and_sequence", ["runId", "sequence"])
+    .index("by_runId_and_kind_and_sequence", ["runId", "kind", "sequence"]),
   facets: defineTable({
     dimension: v.string(),
     value: v.string(),

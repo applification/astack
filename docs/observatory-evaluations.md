@@ -23,6 +23,18 @@ Use **Detailed intent and skill review** when a criterion-level assessment is us
 
 All declared cases are material in this first schema. Missing cases, skipped/setup-inconclusive attempts, missing required independent observations and absent retained artifacts remain inconclusive. Retry passes retain the first failure and are flagged flaky. Passing assessed outcomes require sufficient reported proof plus owner review; process grades remain independent. Criteria and evaluator versions (`proof-v1`, `human-v1`) stay visible.
 
+## Astack route and workflow evidence
+
+**Astack approach** shows the explicitly selected route and its reason, suggested or customized phases, and the path the agent reported. Phase transitions can span the evaluation's linked turns. Failed attempts, retries, omission reasons and changes of route remain visible. Expand a phase to inspect its declarations, applied-skill claims and supporting trace event links. Declarations do not prove application or delivery. Current-capture references are distinct from the preserved original request and immutable assessment snapshots.
+
+Use the [agent recording instructions](../skills/astack/references/observatory.md#record-the-route-and-path) at route selection and meaningful transitions. Flow IDs belong to capture; external work identities remain owned by their original dispatcher. Record an initial choice before work where possible; a late declaration keeps its actual timestamp and does not retroactively establish a task-start decision. Existing unstructured workflow calls and skill reads are retained, but older captures say **Flow not recorded** rather than infer a route.
+
+The first selected plans support bug-fix and new-feature (`implement`) delivery; the other astack route IDs are also accepted. Plans may change. Workflow previews are bounded to 64 records per turn, 80 overall and 256 KiB, with at most 32 supporting event previews. Missing references, missing selection and display limits stay visible. Evidence is resolved only in linked turns within the currently enabled readable project/machine capture.
+
+In **Detailed intent and skill review**, optionally select **Include a flow assessment**. Judge **Route choice** and **Flow execution** independently, with a reason and captured trace evidence for both; route judgment must cite a recorded selection or change. Owner-only writes retain the cited event/annotation revisions. Flow grades do not assign outcome feedback, change proof results or certify skill application automatically.
+
+Upgrade the backend before the collector to use structured workflow annotations. The additive event field and optional indexed projection need no historical backfill. Existing evaluations and assessments remain readable; installing the updated astack instructions in an agent host is separate from deploying Observatory's runtime.
+
 ## Disposable saved-edit proof
 
 ```sh

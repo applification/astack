@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { eventSchema, runSchema } from "./domain";
+import { workflowCaptureSchema } from "./workflow-view";
 import {
   assessmentSchema,
   evaluationSchema,
@@ -35,6 +36,7 @@ export const evaluationDetailSchema = z.object({
   timeline: z.array(evaluationStepSchema).max(20).default([]),
   feedback: z.array(outcomeFeedbackSchema).max(20).default([]),
   moreFeedback: z.boolean().default(false),
+  workflow: workflowCaptureSchema.default({ records: [], truncated: false }),
 });
 export const evaluationSummarySchema = z.object({
   id: z.string(),

@@ -195,6 +195,7 @@ export const ingest = internalMutation({
           machineId: args.machineId,
           revision: entry.revision,
           sequence: event.sequence,
+          kind: event.kind,
           data: JSON.stringify(event),
         };
         if (previous) await ctx.db.patch(previous._id, row);

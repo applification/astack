@@ -16,6 +16,7 @@ import {
   fixtureProject,
 } from "@astack/agent-observability/evaluation-fixtures";
 import type { TelemetryRecord } from "@astack/agent-observability";
+import { workflowFixture } from "@astack/agent-observability/workflow-fixtures";
 
 const modules = {
   "../convex/_generated/server.ts": () => import("../convex/_generated/server"),
@@ -33,6 +34,16 @@ beforeEach(() => {
 });
 const entries = (records: TelemetryRecord[], revision = 1) =>
   records.map((record) => ({ revision, record: JSON.stringify(record) }));
+async function ingestWorkflow(
+  t: ReturnType<typeof convexTest>,
+  records: TelemetryRecord[],
+) {
+  for (let index = 0; index < records.length; index += 2)
+    await t.mutation(internal.ingestion.ingest, {
+      machineId: fixtureMachine,
+      records: entries(records.slice(index, index + 2), 10 + index),
+    });
+}
 async function setup(
   status: "pass" | "fail" | "inconclusive" = "pass",
   request?: string,
@@ -73,6 +84,199 @@ async function setup(
   });
   return { t, evaluation, owner: t.withIdentity({ subject: ownerId }) };
 }
+test("workflow detail resolves multi-turn evidence, hides foreign references and respects readable capture", async () => {
+  const { t, evaluation, owner } = await setup();
+  const { annotations, support } = workflowFixture("changed");
+  await ingestWorkflow(
+    t,
+    [...support, ...annotations].map((value) => ({ kind: "event", value })),
+  );
+  const read = async () =>
+    evaluationDetailSchema.parse(
+      JSON.parse(
+        (await owner.query(api.evaluations.detail, {
+          evaluationId: evaluation.id,
+          projectId: fixtureProject,
+        })) ?? "null",
+      ),
+    );
+  let detail = await read();
+  expect(detail.workflow.records).toHaveLength(annotations.length);
+  expect(
+    detail.workflow.records
+      .flatMap((record) => record.evidence)
+      .every((item) => item.state === "available"),
+  ).toBe(true);
+  expect(
+    detail.workflow.records.some(
+      (record) => record.annotation.action === "change",
+    ),
+  ).toBe(true);
+  const phase = annotations.find((event) => event.workflow?.action === "phase");
+  if (phase?.workflow?.action !== "phase")
+    throw new Error("Missing phase fixture");
+  await ingestWorkflow(t, [
+    {
+      kind: "event",
+      value: {
+        ...phase,
+        id: phase.runId + ":workflow:foreign-ref",
+        workflow: {
+          ...phase.workflow,
+          evidence: [{ runId: "foreign", eventId: evaluationPrompt().id }],
+        },
+      },
+    },
+  ]);
+  detail = await read();
+  const unknown = detail.workflow.records.find((record) =>
+    record.eventId.endsWith("foreign-ref"),
+  );
+  expect(unknown?.evidence[0]).toMatchObject({ state: "unavailable" });
+  expect(JSON.stringify(unknown?.evidence)).not.toContain(
+    evaluationPrompt().title,
+  );
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries(
+      [{ kind: "run", value: { ...evaluationRun(), contentCapture: false } }],
+      1000,
+    ),
+  });
+  expect(
+    (await read()).workflow.records.every(
+      (record) => record.runId === evaluationRun("reproduce").id,
+    ),
+  ).toBe(true);
+  await owner.mutation(api.projects.save, {
+    project: {
+      projectId: fixtureProject,
+      name: "Fixture",
+      enabled: false,
+      repositories: [],
+      folders: [{ machineId: fixtureMachine, path: "/fixture" }],
+    },
+  });
+  expect((await read()).workflow.records).toEqual([]);
+});
+test("legacy workflow reads do not become a selected route and annotation previews stay bounded", async () => {
+  const { t, evaluation, owner } = await setup();
+  const { annotations } = workflowFixture();
+  const selection = annotations[0];
+  const phase = annotations.find((event) => event.workflow?.action === "phase");
+  if (!selection || phase?.workflow?.action !== "phase")
+    throw new Error("Missing workflow fixture");
+  const { workflow: _, ...legacy } = selection;
+  await ingestWorkflow(t, [
+    { kind: "event", value: { ...legacy, id: legacy.runId + ":legacy" } },
+  ]);
+  let raw = await owner.query(api.evaluations.detail, {
+    evaluationId: evaluation.id,
+  });
+  expect(
+    evaluationDetailSchema.parse(JSON.parse(raw ?? "null")).workflow.records,
+  ).toEqual([]);
+  await ingestWorkflow(t, [
+    { kind: "event", value: selection },
+    ...Array.from({ length: 70 }, (_unused, index) => ({
+      kind: "event" as const,
+      value: {
+        ...phase,
+        id: phase.runId + ":bounded:" + index,
+        sequence: 1000 + index,
+      },
+    })),
+  ]);
+  raw = await owner.query(api.evaluations.detail, {
+    evaluationId: evaluation.id,
+  });
+  const detail = evaluationDetailSchema.parse(JSON.parse(raw ?? "null"));
+  expect(detail.workflow.records.length).toBeLessThanOrEqual(65);
+  expect(detail.workflow.truncated).toBe(true);
+});
+test("flow judgments are owner-only, require route evidence and preserve annotation snapshots and outcome independence", async () => {
+  const { t, evaluation, owner } = await setup();
+  const { annotations } = workflowFixture();
+  await ingestWorkflow(
+    t,
+    annotations.map((value) => ({ kind: "event", value })),
+  );
+  const selection = annotations[0];
+  const phase = annotations.at(-1);
+  if (!selection || !phase) throw new Error("Missing flow evidence");
+  const judgment = (event: typeof selection) => ({
+    verdict: "pass",
+    reason: "Reviewed the route and its supporting before/after evidence.",
+    evidence: [{ kind: "trace", runId: event.runId, eventId: event.id }],
+  });
+  const input = {
+    ...fixtureAssessment("fail"),
+    flow: { route: judgment(selection), execution: judgment(phase) },
+  };
+  const args = {
+    evaluationId: evaluation.id,
+    requestId: crypto.randomUUID(),
+    assessment: JSON.stringify(input),
+  };
+  await expect(t.mutation(api.evaluations.assess, args)).rejects.toThrow(
+    "Unauthorized",
+  );
+  await expect(
+    owner.mutation(api.evaluations.assess, {
+      ...args,
+      assessment: JSON.stringify({
+        ...input,
+        flow: { route: judgment(phase), execution: judgment(phase) },
+      }),
+    }),
+  ).rejects.toThrow("selection evidence");
+  const id = await owner.mutation(api.evaluations.assess, args);
+  expect(await owner.mutation(api.evaluations.assess, args)).toBe(id);
+  await expect(
+    owner.mutation(api.evaluations.assess, {
+      ...args,
+      assessment: JSON.stringify({
+        ...input,
+        flow: {
+          ...input.flow,
+          route: { ...input.flow.route, reason: "Changed reason" },
+        },
+      }),
+    }),
+  ).rejects.toThrow("reused");
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries(
+      [
+        {
+          kind: "event",
+          value: { ...selection, title: "Later capture revision" },
+        },
+      ],
+      10000,
+    ),
+  });
+  const detail = evaluationDetailSchema.parse(
+    JSON.parse(
+      (await owner.query(api.evaluations.detail, {
+        evaluationId: evaluation.id,
+      })) ?? "null",
+    ),
+  );
+  expect(detail.assessments[0]?.flow?.route.verdict).toBe("pass");
+  expect(detail.assessments[0]?.outcome.verdict).toBe("fail");
+  expect(
+    detail.assessments[0]?.traces.find(
+      (trace) => trace.event.id === selection.id,
+    )?.event.title,
+  ).toBe(selection.title);
+  expect(
+    detail.assessments[0]?.traces.find(
+      (trace) => trace.event.id === selection.id,
+    )?.event.workflow,
+  ).toEqual(selection.workflow);
+  expect(detail.feedback).toEqual([]);
+});
 test("evaluation snapshots preserve original intent and captured turns without changing their outcomes", async () => {
   const { t, owner, evaluation } = await setup(
     "pass",

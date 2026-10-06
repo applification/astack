@@ -2,6 +2,8 @@
 
 The [evaluation workflow](../docs/observatory-evaluations.md) documents manifest import, proof-report contracts, the saved-edit CLI fixture and anonymous local integration checks. Use `bun packages/backend/scripts/verify-evaluations-local.ts` with an owned anonymous backend; `e2e.evaluations-local.config.ts` exercises the real adapter on port 7410. These commands do not deploy to Otis.
 
+For substantive engineering work with Observatory capture available, state the selected astack route and its reason, then use the [route/phase recording instructions](../skills/astack/references/observatory.md#record-the-route-and-path). Preserve one flow across follow-up turns and attach actual skill/action/verification references. Recording is optional, requires trusted captured identities and must never block delivery. Route and phase declarations do not grade the outcome.
+
 The root repository continues distributing Astack skills, examples and the public static site. The new companion runtime lives in `apps/observatory`, `packages/agent-observability`, `packages/agentlog`, `packages/backend` and `packages/ui`; do not confuse it with the independent foundation example or an external COS work store.
 
 Bun 1.4.0 workspaces, React 19.3/Vite 8.3, Convex 1.46, Zod 4.6, Tailwind 4.3 and shared shadcn primitives form the runtime. The stable TypeScript 6.0.2 package alias exposes `tsc6`; the root checker deliberately uses that binary. Package pins and generated Convex APIs are committed.

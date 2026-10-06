@@ -40,10 +40,23 @@ function EventData({
   event: AgentEvent;
   showContent: boolean;
 }) {
-  const details = contentFields.flatMap(({ key, label }) => {
-    const value = event.data[key];
-    return value === undefined || value === null ? [] : [{ key, label, value }];
-  });
+  const details = [
+    ...contentFields.flatMap(({ key, label }) => {
+      const value = event.data[key];
+      return value === undefined || value === null
+        ? []
+        : [{ key, label, value }];
+    }),
+    ...(event.workflow
+      ? [
+          {
+            key: "workflow",
+            label: "Workflow annotation",
+            value: event.workflow,
+          },
+        ]
+      : []),
+  ];
   const metadata = Object.fromEntries(
     Object.entries(event.data).filter(
       ([key]) => !contentFields.some((field) => field.key === key),
@@ -82,6 +95,7 @@ function EventData({
 function EventIcon({ event }: { event: AgentEvent }) {
   if (event.failed || event.kind === "error")
     return <AlertCircle size={16} aria-hidden="true" />;
+  if (event.workflow) return <GitBranch size={16} aria-hidden="true" />;
   if (event.skill) return <BookOpen size={16} aria-hidden="true" />;
   if (event.kind === "file_edit")
     return <FilePenLine size={16} aria-hidden="true" />;
@@ -233,6 +247,13 @@ export function Trace({
                       )}
                   </span>
                   {event.failed && <Badge>Failed</Badge>}
+                  {event.workflow && (
+                    <Badge>
+                      {event.workflow.action === "phase"
+                        ? event.workflow.phase + " · " + event.workflow.status
+                        : event.workflow.route + " · " + event.workflow.action}
+                    </Badge>
+                  )}
                   <span className="event-kind">
                     {event.kind.replaceAll("_", " ")}
                   </span>

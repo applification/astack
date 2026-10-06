@@ -4,6 +4,7 @@ import { z } from "zod";
 import { eventSchema, runSchema } from "@astack/agent-observability";
 import {
   assessmentInputSchema,
+  assessmentJudgments,
   assessmentSchema,
   evaluateProof,
   evaluationSchema,
@@ -34,6 +35,7 @@ import { requireOwner } from "./access";
 import type { Doc } from "./_generated/dataModel";
 import { getProject } from "./projectData";
 import { resolveProject } from "@astack/agent-observability/projects";
+import { evaluationWorkflow } from "./evaluationWorkflow";
 
 const snapshotSchema = evaluationDetailSchema.pick({
   runs: true,
@@ -347,6 +349,7 @@ export const detail = query({
         evaluation: evaluationSchema.parse(JSON.parse(row.data)),
         ...snapshot,
         timeline,
+        workflow: await evaluationWorkflow(ctx, snapshot.runs, project),
         feedback: feedback
           .slice(0, 20)
           .map((item) => outcomeFeedbackSchema.parse(JSON.parse(item.data))),
@@ -460,21 +463,27 @@ export const assess = mutation({
       .withIndex("by_assessmentId", (q) => q.eq("assessmentId", id))
       .unique();
     if (previous) {
-      const { criteriaVersion, intent, skills, outcome } =
+      const { criteriaVersion, intent, skills, outcome, flow } =
         storedAssessmentSchema.parse(JSON.parse(previous.data));
-      const saved = { criteriaVersion, intent, skills, outcome };
+      const saved = {
+        criteriaVersion,
+        intent,
+        skills,
+        outcome,
+        ...(flow ? { flow } : {}),
+      };
       if (JSON.stringify(saved) !== JSON.stringify(input))
         throw new Error("Assessment request ID reused with different content");
       return id;
     }
     const refs = new Map(
-      [input.intent, ...input.skills, input.outcome]
+      assessmentJudgments(input)
         .flatMap((item) => item.evidence)
         .filter((item) => item.kind === "trace")
         .map((item) => [item.eventId, item]),
     );
     if (refs.size > 32) throw new Error("Too many trace references");
-    const traces = [];
+    const traces: z.infer<typeof eventSnapshotSchema>[] = [];
     for (const ref of refs.values()) {
       const parent = await ctx.db
         .query("runs")
@@ -484,6 +493,22 @@ export const assess = mutation({
         throw new Error("Trace evidence outside enrolled project");
       traces.push(await traceSnapshot(ctx, ref.runId, ref.eventId));
     }
+    if (
+      input.flow &&
+      !input.flow.route.evidence.some(
+        (ref) =>
+          ref.kind === "trace" &&
+          traces.some(
+            ({ event }) =>
+              event.id === ref.eventId &&
+              (event.workflow?.action === "select" ||
+                event.workflow?.action === "change"),
+          ),
+      )
+    )
+      throw new Error(
+        "Route assessment requires captured route selection evidence",
+      );
     const assessment = storedAssessmentSchema.parse({
       ...assessmentSchema.parse({
         ...input,

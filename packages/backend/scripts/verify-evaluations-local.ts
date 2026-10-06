@@ -9,6 +9,9 @@ import { api } from "../convex/_generated/api";
 import { LocalStore, forward } from "../../agentlog/src/store";
 import { importEvaluation } from "../../agentlog/src/evaluations";
 import { savedEditProof } from "../../agentlog/src/evaluation-proof";
+import { recordWorkflow } from "../../agentlog/src/workflow";
+import { eventSchema } from "@astack/agent-observability";
+import { workflowFixture } from "@astack/agent-observability/workflow-fixtures";
 import { evaluationManifestSchema } from "@astack/agent-observability/evaluations";
 import {
   evaluationDetailSchema,
@@ -182,6 +185,27 @@ for (const [variant, verdict] of [
       });
     }
     store.put({ kind: "event", value: prompt });
+    // Explicit synthetic route/phase fixtures exercise real queueing and server reads.
+    const fixture = workflowFixture();
+    const remap = (event: Parameters<typeof eventSchema.parse>[0]) => {
+      let data = JSON.stringify(event);
+      for (const run of runs) {
+        const turn = run.id.includes(":reproduce:") ? "reproduce" : "repair";
+        data = data.replaceAll(evaluationRun(turn).id, run.id);
+      }
+      return eventSchema.parse(JSON.parse(data));
+    };
+    for (const event of fixture.support)
+      store.put({ kind: "event", value: remap(event) });
+    for (const event of fixture.annotations) {
+      const mapped = remap(event);
+      if (mapped.workflow)
+        recordWorkflow({
+          store,
+          runId: mapped.runId,
+          annotation: mapped.workflow,
+        });
+    }
     const imported = importEvaluation(store, fixtureMachine, manifest);
     id = imported.id;
     while (store.pending())
@@ -204,6 +228,13 @@ for (const [variant, verdict] of [
     before.runs.some(({ run }) => run.outcome !== "unknown")
   )
     throw new Error("Capture assigned an assessed outcome");
+  if (
+    before.workflow.records.length !== workflowFixture().annotations.length ||
+    before.workflow.records.some((record) =>
+      record.evidence.some((item) => item.state !== "available"),
+    )
+  )
+    throw new Error("Persisted workflow capture or evidence preview missing");
   await owner.mutation(api.evaluations.assess, {
     evaluationId: id,
     requestId: crypto.randomUUID(),
@@ -222,6 +253,7 @@ for (const [variant, verdict] of [
     verdict,
     evaluationId: id,
     turns: after.runs.length,
+    workflowRecords: after.workflow.records.length,
   });
 }
 const listing = await owner.query(api.evaluations.list, {

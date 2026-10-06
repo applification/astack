@@ -27,6 +27,11 @@ import {
   evaluateProof,
 } from "@astack/agent-observability/evaluations";
 import { savedEditProof, proofVariantSchema } from "./evaluation-proof";
+import { recordWorkflow } from "./workflow";
+import {
+  routeSchema,
+  routeDefinitions,
+} from "@astack/agent-observability/workflow";
 
 const program = new Command()
   .name("agentlog")
@@ -476,25 +481,137 @@ program
   });
 program
   .command("workflow")
+  .description(
+    "Record an astack route or phase; declarations do not grade the outcome",
+  )
   .requiredOption("--session <id>")
-  .requiredOption("--turn <id>")
-  .requiredOption("--name <name>")
-  .requiredOption("--step <step>")
+  .option("--turn <id>", "Captured turn ID (required when recording)")
+  .option("--name <name>", "Selected astack route; legacy workflow name")
+  .option("--step <step>", "Phase name; legacy step title")
+  .option("--action <action>", "select, change, phase, or context")
+  .option(
+    "--flow <id>",
+    "Existing flow ID; defaults to the session's last selected flow",
+  )
+  .option("--reason <text>", "Reason for selecting or changing the route")
+  .option(
+    "--plan <phases...>",
+    "Planned phase names; defaults to the route's suggested plan",
+  )
+  .option("--status <status>", "started, completed, failed, or omitted")
+  .option("--summary <text>", "Visible phase observation or omission reason")
+  .option(
+    "--skills <names...>",
+    "Skills the agent declares it applied in this phase",
+  )
+  .option(
+    "--evidence <eventIds...>",
+    "Already captured trace events supporting the phase",
+  )
+  .option(
+    "--request-event <eventId>",
+    "Captured original prompt for route selection",
+  )
   .action(async (options: unknown) => {
     const args = z
       .object({
         session: z.string(),
-        turn: z.string(),
-        name: z.string(),
-        step: z.string(),
+        turn: z.string().optional(),
+        name: z.string().optional(),
+        step: z.string().optional(),
+        action: z.enum(["select", "change", "phase", "context"]).optional(),
+        flow: z.string().optional(),
+        reason: z.string().optional(),
+        plan: z.array(z.string()).optional(),
+        status: z
+          .enum(["started", "completed", "failed", "omitted"])
+          .optional(),
+        summary: z.string().optional(),
+        skills: z.array(z.string()).optional(),
+        evidence: z.array(z.string()).optional(),
+        requestEvent: z.string().optional(),
       })
       .parse(options);
     const config = await loadConfig(state());
     const store = new LocalStore(state(), environmentSecrets(process.env));
     try {
-      const runId = runIdentity(config.machineId, args.session, args.turn);
+      if (args.action === "context") {
+        const runs = store
+          .runsForSession(args.session)
+          .filter((run) => approvedRun(store, run.id))
+          .sort((a, b) => b.startedAt - a.startedAt)
+          .slice(0, 3);
+        process.stdout.write(
+          JSON.stringify({
+            sessionId: args.session,
+            lastFlowId: store.getMeta("workflow:last:" + args.session) ?? null,
+            turns: runs.map((run) => ({
+              runId: run.id,
+              turnId: run.attemptId,
+              status: run.status,
+              prompts: store
+                .events(run.id)
+                .filter((event) => event.kind === "user_prompt")
+                .map((event) => ({ eventId: event.id })),
+            })),
+          }) + "\n",
+        );
+        return;
+      }
+      const runId = runIdentity(
+        config.machineId,
+        args.session,
+        z.string().min(1).parse(args.turn),
+      );
       if (!approvedRun(store, runId))
         throw new Error("Run outside enabled project capture");
+      if (args.action) {
+        const reference = (eventId: string) => {
+          const record = store.getRecord("event:" + eventId);
+          if (record?.kind !== "event")
+            throw new Error("Trace event unavailable");
+          return { runId: record.value.runId, eventId };
+        };
+        const flowId =
+          args.action === "select"
+            ? (args.flow ?? `${runId}:workflow:${crypto.randomUUID()}`)
+            : z
+                .string()
+                .min(1)
+                .parse(
+                  args.flow ?? store.getMeta("workflow:last:" + args.session),
+                );
+        const common = { schemaVersion: 1, flowId } as const;
+        const annotation =
+          args.action === "phase"
+            ? {
+                ...common,
+                action: args.action,
+                phase: z.string().parse(args.step),
+                status: z
+                  .enum(["started", "completed", "failed", "omitted"])
+                  .parse(args.status),
+                summary: z.string().parse(args.summary),
+                skills: args.skills ?? [],
+                evidence: (args.evidence ?? []).map(reference),
+              }
+            : {
+                ...common,
+                action: args.action,
+                route: routeSchema.parse(args.name),
+                reason: z.string().parse(args.reason),
+                plannedPhases:
+                  args.plan ??
+                  routeDefinitions[routeSchema.parse(args.name)].phases,
+                ...(args.action === "select" && args.requestEvent
+                  ? { request: reference(args.requestEvent) }
+                  : {}),
+              };
+        process.stdout.write(
+          JSON.stringify(recordWorkflow({ store, runId, annotation })) + "\n",
+        );
+        return;
+      }
       store.put({
         kind: "event",
         value: eventSchema.parse({
@@ -502,12 +619,12 @@ program
           runId,
           sequence: Math.floor(Date.now() / 1000),
           kind: "workflow_step",
-          title: args.step,
+          title: z.string().min(1).parse(args.step),
           timestamp: Date.now(),
           observedAt: Date.now(),
           timing: "hook",
           skill: {
-            name: args.name,
+            name: z.string().min(1).parse(args.name),
             kind: "workflow",
             hash: null,
             provenance: "declared",

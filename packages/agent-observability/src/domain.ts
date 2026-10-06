@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { evaluationSchema } from "./evaluations";
+import { workflowAnnotationSchema } from "./workflow";
 
 const id = z.string().min(1).max(512);
 const text = z.string().max(4096);
@@ -65,9 +66,13 @@ export const eventSchema = z
     failed: z.boolean().default(false),
     durationMs: time.optional(),
     skill: skillUseSchema.optional(),
+    workflow: workflowAnnotationSchema.optional(),
     data: z.record(z.string().max(128), z.json()).default({}),
   })
-  .strict();
+  .strict()
+  .refine((event) => !event.workflow || event.kind === "workflow_step", {
+    message: "Workflow annotations require a workflow_step event",
+  });
 export const findingSchema = z
   .object({
     rule: z.enum([
@@ -150,6 +155,20 @@ export const envelopeSchema = z
   .strict();
 export type WorkReference = z.infer<typeof workReferenceSchema>;
 export type SkillUse = z.infer<typeof skillUseSchema>;
+export function eventCapabilities(event: AgentEvent): SkillUse[] {
+  return [
+    ...(event.skill ? [event.skill] : []),
+    ...(event.workflow?.action === "phase"
+      ? event.workflow.skills.map((name): SkillUse => ({
+          name,
+          kind: "skill",
+          hash: null,
+          provenance: "declared",
+          evidence: "declared",
+        }))
+      : []),
+  ];
+}
 export type AgentEvent = z.infer<typeof eventSchema>;
 export type AgentRun = z.infer<typeof runSchema>;
 export type Finding = z.infer<typeof findingSchema>;

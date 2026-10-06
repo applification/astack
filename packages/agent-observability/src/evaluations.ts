@@ -180,6 +180,10 @@ const judgmentSchema = z
     evidence: z.array(evidenceReferenceSchema).min(1).max(10),
   })
   .strict();
+const flowJudgmentSchema = judgmentSchema.refine(
+  (value) => value.evidence.some((item) => item.kind === "trace"),
+  "Flow judgments require captured trace evidence",
+);
 export const assessmentInputSchema = z
   .object({
     criteriaVersion: text,
@@ -192,6 +196,10 @@ export const assessmentInputSchema = z
         "Duplicate skill judgment",
       ),
     outcome: judgmentSchema,
+    flow: z
+      .object({ route: flowJudgmentSchema, execution: flowJudgmentSchema })
+      .strict()
+      .optional(),
   })
   .strict();
 export const assessmentSchema = assessmentInputSchema.extend({
@@ -203,6 +211,12 @@ export const assessmentSchema = assessmentInputSchema.extend({
 });
 export type AssessmentInput = z.infer<typeof assessmentInputSchema>;
 export type Assessment = z.infer<typeof assessmentSchema>;
+export const assessmentJudgments = (input: AssessmentInput) => [
+  input.intent,
+  ...input.skills,
+  input.outcome,
+  ...(input.flow ? [input.flow.route, input.flow.execution] : []),
+];
 
 // Outcome feedback is an owner's experience of the result, not a technical grade.
 export const outcomeChoiceSchema = z.enum(["yes", "partly", "no", "unsure"]);
@@ -234,11 +248,7 @@ export function validateAssessment(
     )
   )
     throw new Error("Assess every declared skill criterion");
-  for (const judgment of [
-    assessment.intent,
-    ...assessment.skills,
-    assessment.outcome,
-  ])
+  for (const judgment of assessmentJudgments(assessment))
     for (const evidence of judgment.evidence)
       if (evidence.kind === "case") {
         if (!evaluation.cases.some((item) => item.id === evidence.caseId))
