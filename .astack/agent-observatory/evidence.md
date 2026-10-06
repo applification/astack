@@ -1,5 +1,30 @@
 # Agent Observatory evidence
 
+## Project capture and reports, 2026-10-06
+
+Implemented and deployed source revision `62955e3` on Otis, based on `9b82856`. This narrows the original system-wide capture decision to explicitly enrolled projects. Projects now have stable portable identities, names, repository matches and computer-specific folder roots. The selector scopes Runs, Work, Skills, Problems and their drill-downs; global reports combine enrolled history. Pausing preserves reports while denying new ingestion. See the [project contract](project-capture.md).
+
+| Acceptance | Observed result |
+| --- | --- |
+| P1 | Owner registration, editing, duplicate-repository rejection and anonymous/wrong-owner denial pass in native-function tests. Astack was enrolled through the deployed owner API; the live browser edited/saved that existing definition and observed the reactive roster. No synthetic project was saved in production. Registered computers are selectable before their first captured run. |
+| P2 | An isolated supported-reader test proves that full turns are never requested for initial empty, unmatched or paused policies, and are requested after enrollment. Real collector policy/source health reports `ok` with one enabled project. Thread metadata is enumerated across all configured sources; this may contain previews, but excluded full turns are not fetched or persisted. |
+| P3 | Collector regressions cover excluded queues, early orphan hook events restored after an approved parent, parent-before-event upload order and work bindings unable to replace enrolled classification. Backend tests reject unmatched/forged/orphan/paused records. Deployed machine policy returned 200 with authorization, 401 without it; an unregistered upload returned 400 and was not stored. |
+| P4 | Domain tests cover SSH/HTTPS normalization, credential removal, explicit ports, clone/worktree identity, machine-specific roots, path boundaries and conflicting evidence. Duplicate repository enrollment through another transport is rejected. The aggregate configuration budget is tested. |
+| P5 | Scoped native queries and capability deltas pass across replay, stale updates and reassignment without double counting. Wrong-project direct run/trace reads are hidden in both tests and the deployed service. Seven fixture browser tests pass, including add/edit/pause, selector, unsaved-error/loading/empty states and narrow dark rendering. The live browser preserves project scope through run, work, skill and problem navigation. |
+| P6 | A permission-restricted Convex export was made before assignment. The bounded native history pass matched 108 Astack runs and retained 1,214 unmatched runs outside reports. Both selected/global enrolled queries showed 108 runs at that observation, with 48 loaded skill groups. Tests prove repeatable migration and unmatched retention. The eligible collector backlog drained to zero; later small pending counts are normal new observations. No source or existing telemetry was deleted. |
+
+Strict types, all **32 tests / 168 assertions**, UI lint, public site/plugin checks, production UI and signed collector builds, Storybook build, **7 fixture browser tests** and **1 authenticated deployed UI journey** passed. Native owner read, anonymous project read/write denial, machine policy access, unmatched upload denial and wrong-project drill-down denial passed. Docker backend/web/dashboard health passed; served HTML and JavaScript exactly match the final production build. Browser tests preceded a final health-copy clarification from “contents” to “full turns”; the final copy built and served successfully. Vite reports the 500 kB chunk advisory (production JS 529.72 kB / 155.68 kB gzip); it does not fail the build.
+
+Applied the Convex reviewer checklist as **self-review**, checking owner/machine boundaries, argument/return validators, internal visibility, bounded indexed reads/writes and scheduled migration, project/global rollup deltas and revision replay. Review fixes include aggregate project configuration bounds, duplicate repository rejection, orphan-event replay and preserving classified project identity during manual work binding. Their regressions pass. The policy endpoint returns normalized repositories and only the requesting computer's folders; it returns no telemetry or credential hashes. Migration has no public invocation.
+
+Offline collectors use the last accepted policy; backend pause enforcement is immediate, while local policy changes wait for reconnection. Fresh machines without a policy capture no turns. Optional hooks without a matching folder or previously observed repository context are skipped. MacBook installation remains the owner's deferred action; its guide now includes project enrollment. No new reboot or physical second-machine proof is claimed. Pen is skipped for this addition because the agreed layout and controls are reused; the original feature's separate Pen comparison gap still keeps the overall PR draft.
+
+These captures contain synthetic data. Astack is paused only in the fixture; the real enrolled Astack project is enabled.
+
+![Synthetic project roster](evidence/projects-managed.png)
+
+![Synthetic narrow dark project selector](evidence/projects-narrow-dark.png)
+
 ## Dashboard navigation link, 2026-10-06
 
 Added **Convex dashboard** to the shared authenticated navigation, opening private port 8453 in a new tab with `noopener noreferrer` and no credential in the URL. On the working tree based on `72feb86`, UI lint, strict types and all 22 tests, production/Storybook builds, five existing synthetic browser tests, one authenticated deployed UI journey and site/plugin checks passed. Direct browser inspection confirmed the link destination/new-tab attributes and no horizontal overflow at 1051px and 390px. Otis's served HTML and JavaScript exactly matched the built UI; Observatory and the dashboard returned HTTP 200. Only web assets were deployed. The existing navigation layout is reused, so no separate Pen exploration or new component story was needed.
