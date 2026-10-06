@@ -596,7 +596,18 @@ function RunDetail({ id, projectId }: { id: string; projectId?: string }) {
           ))}
         </ul>
       </details>
-      <Trace events={events} />
+      <Trace
+        events={events}
+        upload={{
+          capturedCount: run.eventCount,
+          pageState:
+            trace.status === "Exhausted"
+              ? "exhausted"
+              : trace.status === "CanLoadMore"
+                ? "more"
+                : "loading",
+        }}
+      />
       <LoadMore status={trace.status} loadMore={trace.loadMore} />
     </>
   );

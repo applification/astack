@@ -93,7 +93,43 @@ function EventIcon({ event }: { event: AgentEvent }) {
     return <MessageSquare size={16} aria-hidden="true" />;
   return <Wrench size={16} aria-hidden="true" />;
 }
-export function Trace({ events }: { events: readonly AgentEvent[] }) {
+type UploadProgress = {
+  capturedCount: number;
+  pageState: "loading" | "more" | "exhausted";
+};
+function UploadStatus({
+  events,
+  upload,
+}: {
+  events: number;
+  upload: UploadProgress;
+}) {
+  const more = upload.pageState !== "exhausted";
+  const pending = !more && events < upload.capturedCount;
+  return (
+    <p role="status" className={pending ? "notice" : "subtitle"}>
+      {upload.pageState === "loading" && !events
+        ? "Checking uploaded events…"
+        : events > upload.capturedCount
+          ? `${more ? "At least " : ""}${events} events uploaded. Capture summary updating.`
+          : `${more ? "At least " : ""}${events} of ${upload.capturedCount} events uploaded.`}
+      {events > 0 && more
+        ? ` ${events} loaded here. ${upload.pageState === "loading" ? "Loading more…" : "More events are available below."}`
+        : pending
+          ? " Syncing the remaining events…"
+          : !more && events === upload.capturedCount
+            ? " Trace up to date."
+            : ""}
+    </p>
+  );
+}
+export function Trace({
+  events,
+  upload,
+}: {
+  events: readonly AgentEvent[];
+  upload?: UploadProgress;
+}) {
   const [problemsOnly, setProblemsOnly] = useState(false);
   const [showContent, setShowContent] = useState(initialShowContent);
   const visible = events.filter(
@@ -138,6 +174,7 @@ export function Trace({ events }: { events: readonly AgentEvent[] }) {
           </span>
         </label>
       </div>
+      {upload && <UploadStatus events={events.length} upload={upload} />}
       <p className="subtitle">
         Recorded item order. Agent timestamps and hook observation times are
         labelled; missing times stay unknown.
@@ -148,11 +185,13 @@ export function Trace({ events }: { events: readonly AgentEvent[] }) {
           : "Conversation and tool content is hidden on this screen. Capture continues privately."}
       </p>
       {!visible.length ? (
-        <p className="empty">
-          {problemsOnly
-            ? "No failures or interventions in the loaded trace."
-            : "No events captured yet."}
-        </p>
+        (!upload || !upload.capturedCount || problemsOnly) && (
+          <p className="empty">
+            {problemsOnly
+              ? "No failures or interventions in the loaded trace."
+              : "No events captured yet."}
+          </p>
+        )
       ) : (
         <div className="trace">
           {visible.map((event) => {

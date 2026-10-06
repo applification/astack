@@ -85,6 +85,27 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 export const Mixed: Story = {};
 export const Empty: Story = { args: { events: [] } };
+export const WaitingForUpload: Story = {
+  args: { events: [], upload: { capturedCount: 169, pageState: "exhausted" } },
+};
+export const PartlyUploaded: Story = {
+  args: { upload: { capturedCount: 169, pageState: "exhausted" } },
+};
+export const MoreUploadedEvents: Story = {
+  args: { upload: { capturedCount: 169, pageState: "more" } },
+};
+export const UploadComplete: Story = {
+  args: { upload: { capturedCount: events.length, pageState: "exhausted" } },
+};
+export const CheckingUpload: Story = {
+  args: { events: [], upload: { capturedCount: 169, pageState: "loading" } },
+};
+export const SummaryUpdating: Story = {
+  args: { upload: { capturedCount: 3, pageState: "exhausted" } },
+};
+export const LoadingMoreUploads: Story = {
+  args: { upload: { capturedCount: 169, pageState: "loading" } },
+};
 export const Failure: Story = {
   args: { events: events.filter((e) => e.failed) },
 };

@@ -1,5 +1,28 @@
 import { test } from "@e2e-dev/web";
 import { expect, secrets } from "e2e";
+test("the reported T3 run exposes uploaded progress and conversation details", async ({
+  app,
+  screen,
+}) => {
+  await app.open();
+  await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect(screen.getByRole("heading", "Agent runs")).toBeVisible();
+  const runId =
+    "bbb1fd30-527f-4326-b685-fb9c2e021092:codex:01a11053-86c2-7292-a528-bbd248930600:01a11055-b225-75b1-91ae-8d3ba00772ca";
+  await app.open(
+    `/#run/${encodeURIComponent(runId)}?project=a20a2fb3-646f-40fe-9b12-c64f759afaea`,
+  );
+  const trace = screen.getByRole("region", "Activity trace");
+  await expect(trace.getByRole("status")).toContainText("events uploaded.");
+  await expect(
+    trace.getByText("Shell command", { exact: true }).first(),
+  ).toBeVisible();
+  await expect(
+    trace.getByText("Assistant output", { exact: true }).first(),
+  ).toBeVisible();
+  await expect(trace.getByText("No events captured yet.")).toHaveCount(0);
+});
 test("private deployment gates access and supports live run/trace/work/skills navigation", async ({
   app,
   screen,

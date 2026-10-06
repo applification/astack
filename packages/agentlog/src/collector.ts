@@ -9,7 +9,8 @@ import {
 import { detectProblems } from "@astack/agent-observability/analysis";
 import { environmentSecrets } from "@astack/agent-observability/redaction";
 import { CodexAdapter } from "./adapters/codex";
-import { LocalStore, forward } from "./store";
+import { LocalStore } from "./store";
+import { drainQueue } from "./delivery";
 import { loadConfig, type CollectorConfig } from "./config";
 import { syncProjects, cachedProjects } from "./projects";
 import { resolveProject } from "@astack/agent-observability/projects";
@@ -124,12 +125,24 @@ export async function collect(
       ),
     }),
   );
-  let failureCount = 0;
-  let retryAt = 0;
+  const deliveryController = new AbortController();
+  const signal = AbortSignal.any([
+    deliveryController.signal,
+    ...(options.signal ? [options.signal] : []),
+  ]);
+  let delivery: Promise<void> | undefined;
+  let deliveryFailure: unknown;
   try {
     do {
       const projects = await syncProjects(store, config, token);
       for (const entry of adapters) entry.adapter.setProjects(projects);
+      if (!options.once && !delivery)
+        delivery = drainQueue(store, config, token, { signal }).catch(
+          (error: unknown) => {
+            deliveryFailure = error;
+            deliveryController.abort();
+          },
+        );
       for (const entry of adapters) {
         try {
           for await (const snapshot of entry.adapter.collect())
@@ -173,51 +186,25 @@ export async function collect(
         if (JSON.stringify(findings) !== JSON.stringify(run.findings))
           store.put({ kind: "run", value: { ...run, findings } });
       }
-      if (Date.now() >= retryAt) {
-        try {
-          // Bound each flush so capturing other homes and shutdown remain responsive.
-          for (let batches = 0; batches < 20 && store.pending(); batches++)
-            await forward(store, config, token);
-          failureCount = 0;
-          retryAt = 0;
-          store.setMeta(
-            "forwardHealth",
-            JSON.stringify({ status: "ok", at: Date.now() }),
-          );
-        } catch (error) {
-          retryAt =
-            Date.now() +
-            Math.min(300_000, 1000 * 2 ** Math.min(++failureCount, 8)) +
-            Math.random() * 1000;
-          const diagnostic =
-            error instanceof Error &&
-            /^(ingestion_http_\d+|invalid_ingestion_ack)$/.test(error.message)
-              ? error.message
-              : "network_unavailable";
-          store.setMeta(
-            "forwardHealth",
-            JSON.stringify({
-              status: "offline",
-              at: Date.now(),
-              retryAt,
-              diagnostic,
-            }),
-          );
-        }
+      if (options.once) {
+        await drainQueue(store, config, token, { signal, once: true });
+        return { pending: store.pending() };
       }
-      if (options.once) return { pending: store.pending() };
       await new Promise<void>((resolve) => {
         const done = () => {
           clearTimeout(timer);
-          options.signal?.removeEventListener("abort", done);
+          signal.removeEventListener("abort", done);
           resolve();
         };
         const timer = setTimeout(done, config.pollSeconds * 1000);
-        options.signal?.addEventListener("abort", done, { once: true });
-        if (options.signal?.aborted) done();
+        signal.addEventListener("abort", done, { once: true });
+        if (signal.aborted) done();
       });
-    } while (!options.signal?.aborted);
+    } while (!signal.aborted);
+    if (deliveryFailure) throw deliveryFailure;
   } finally {
+    deliveryController.abort();
+    await delivery;
     await Promise.all(adapters.map((entry) => entry.adapter.close()));
     store.close();
   }

@@ -134,10 +134,16 @@ export class LocalStore {
       .get(key);
     return row ? recordSchema.parse(JSON.parse(row.payload)) : null;
   }
-  batch(machineId: string) {
+  batch(machineId: string, priority: "recent" | "oldest" = "recent") {
     const rows = this.db
       .query<Row, []>(
-        "SELECT key,payload,revision FROM records WHERE delivered=0 ORDER BY kind DESC,revision LIMIT 50",
+        priority === "recent"
+          ? `SELECT pending.key,pending.payload,pending.revision FROM records pending
+             LEFT JOIN records parent ON parent.key='run:' || pending.run_id
+             WHERE pending.delivered=0
+             ORDER BY COALESCE(json_extract(parent.payload,'$.value.startedAt'),0) DESC,
+                      pending.kind DESC,pending.revision LIMIT 50`
+          : "SELECT key,payload,revision FROM records WHERE delivered=0 ORDER BY kind DESC,revision LIMIT 50",
       )
       .all();
     if (!rows.length) return null;
@@ -241,12 +247,13 @@ export async function forward(
   fetcher: (
     ...args: Parameters<typeof fetch>
   ) => ReturnType<typeof fetch> = fetch,
+  options: { priority?: "recent" | "oldest"; signal?: AbortSignal } = {},
 ) {
   const parsed = projectPolicySchema.safeParse(
     JSON.parse(store.getMeta("projectPolicy") ?? "[]"),
   );
   const projects = parsed.success ? parsed.data : [];
-  const batch = store.batch(config.machineId);
+  const batch = store.batch(config.machineId, options.priority);
   if (!batch) return { delivered: 0 };
   const excluded = batch.envelope.records.flatMap((entry, index) => {
     const record = entry.record;
@@ -271,7 +278,10 @@ export async function forward(
       "content-type": "application/json",
     },
     body: JSON.stringify(batch.envelope),
-    signal: AbortSignal.timeout(10_000),
+    signal: AbortSignal.any([
+      AbortSignal.timeout(10_000),
+      ...(options.signal ? [options.signal] : []),
+    ]),
     redirect: "error",
   });
   if (!response.ok) throw new Error(`ingestion_http_${response.status}`);

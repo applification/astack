@@ -1,5 +1,68 @@
 import { test } from "@e2e-dev/web";
 import { expect } from "e2e";
+test("upload progress distinguishes waiting, partial, paginated and complete traces", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-trace--waiting-for-upload&viewMode=story",
+  );
+  await expect(screen.getByRole("status")).toHaveText(
+    "0 of 169 events uploaded. Syncing the remaining events…",
+  );
+  await expect(screen.getByText("No events captured yet.")).toHaveCount(0);
+  await screen.getByLabel("Color theme").selectOption({ value: "light" });
+  await app.screenshot("trace-waiting-upload-light");
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await app.screenshot("trace-waiting-upload-dark-narrow");
+  await app.open(
+    "/iframe.html?id=observatory-trace--partly-uploaded&viewMode=story",
+  );
+  await expect(screen.getByRole("status")).toHaveText(
+    "5 of 169 events uploaded. Syncing the remaining events…",
+  );
+  await screen.getByLabel("Failures and interventions only").check();
+  await expect(screen.getByRole("status")).toContainText(
+    "5 of 169 events uploaded.",
+  );
+  await app.open(
+    "/iframe.html?id=observatory-trace--more-uploaded-events&viewMode=story",
+  );
+  await expect(screen.getByRole("status")).toHaveText(
+    "At least 5 of 169 events uploaded. 5 loaded here. More events are available below.",
+  );
+  await app.open(
+    "/iframe.html?id=observatory-trace--upload-complete&viewMode=story",
+  );
+  await expect(screen.getByRole("status")).toHaveText(
+    "5 of 5 events uploaded. Trace up to date.",
+  );
+  await app.open(
+    "/iframe.html?id=observatory-trace--checking-upload&viewMode=story",
+  );
+  await expect(screen.getByRole("status")).toHaveText(
+    "Checking uploaded events…",
+  );
+  await app.open(
+    "/iframe.html?id=observatory-trace--summary-updating&viewMode=story",
+  );
+  await expect(screen.getByRole("status")).toHaveText(
+    "5 events uploaded. Capture summary updating.",
+  );
+  await app.open(
+    "/iframe.html?id=observatory-trace--loading-more-uploads&viewMode=story",
+  );
+  await expect(screen.getByRole("status")).toHaveText(
+    "At least 5 of 169 events uploaded. 5 loaded here. Loading more…",
+  );
+});
 test("trace expands failure evidence, preserves unknown times and filters failures", async ({
   app,
   screen,
