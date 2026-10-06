@@ -63,6 +63,98 @@ test("upload progress distinguishes waiting, partial, paginated and complete tra
     "At least 5 of 169 events uploaded. 5 loaded here. Loading more…",
   );
 });
+test("categorical menus keep choices available after selection and clear categories and dates", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open("/iframe.html?id=observatory-filters--choices&viewMode=story");
+  await screen.getByLabel("Color theme").selectOption({ value: "light" });
+  expect(
+    await browser.evaluate(
+      () => document.querySelectorAll(".filters select").length,
+    ),
+  ).toBe(10);
+  expect(
+    await browser.evaluate(
+      () => document.querySelectorAll('.filters input[type="text"]').length,
+    ),
+  ).toBe(0);
+  await screen
+    .getByLabel("Status", { exact: true })
+    .selectOption({ value: "failed" });
+  await expect(screen.getByLabel("Status", { exact: true })).toHaveValue(
+    "failed",
+  );
+  await screen
+    .getByLabel("Branch", { exact: true })
+    .selectOption({ value: "older-history-branch" });
+  await screen
+    .getByLabel("Machine", { exact: true })
+    .selectOption({ label: "Dave’s MacBook · fixture-macbook" });
+  await expect(screen.getByLabel("Machine", { exact: true })).toHaveValue(
+    "fixture-macbook",
+  );
+  await screen
+    .getByLabel("Branch", { exact: true })
+    .selectOption({ value: "codex/observatory" });
+  await screen
+    .getByLabel("Status", { exact: true })
+    .selectOption({ value: "" });
+  await screen.getByLabel("From date").fill("2026-10-01");
+  await screen.getByLabel("Through date").fill("2026-10-06");
+  await app.screenshot("filter-menus-light");
+  await screen.getByRole("button", "Clear filters", { exact: true }).tap();
+  await expect(screen.getByLabel("Machine", { exact: true })).toHaveValue("");
+  await expect(screen.getByLabel("Branch", { exact: true })).toHaveValue("");
+  await expect(screen.getByLabel("From date")).toHaveValue("");
+  await expect(screen.getByLabel("Through date")).toHaveValue("");
+  await screen.getByLabel("From date").fill("2026-10-01");
+  await expect(
+    screen.getByRole("button", "Clear filters", { exact: true }),
+  ).toBeVisible();
+  await screen.getByRole("button", "Clear filters", { exact: true }).tap();
+  await expect(screen.getByLabel("From date")).toHaveValue("");
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await app.screenshot("filter-menus-narrow-dark");
+});
+test("filter loading, empty and unavailable URL selections remain usable", async ({
+  app,
+  screen,
+}) => {
+  await app.open("/iframe.html?id=observatory-filters--loading&viewMode=story");
+  await expect(screen.getByLabel("Branch", { exact: true })).toBeDisabled();
+  await expect(screen.getByLabel("Status", { exact: true })).toBeEnabled();
+  await expect(
+    screen.getByText("Loading filter choices…", { exact: true }),
+  ).toBeVisible();
+  await app.open("/iframe.html?id=observatory-filters--empty&viewMode=story");
+  await expect(screen.getByLabel("Branch", { exact: true })).toBeEnabled();
+  await expect(
+    screen.getByLabel("Branch", { exact: true }).getByRole("option"),
+  ).toHaveCount(1);
+  await app.open(
+    "/iframe.html?id=observatory-filters--unavailable-selection&viewMode=story",
+  );
+  await expect(screen.getByLabel("Branch", { exact: true })).toHaveValue(
+    "removed-branch",
+  );
+  await expect(
+    screen
+      .getByLabel("Branch", { exact: true })
+      .getByRole("option", "removed-branch · unavailable", { exact: true }),
+  ).toBeAttached();
+  await screen
+    .getByLabel("Branch", { exact: true })
+    .selectOption({ value: "" });
+  await expect(screen.getByLabel("Branch", { exact: true })).toHaveValue("");
+});
 test("trace expands failure evidence, preserves unknown times and filters failures", async ({
   app,
   screen,

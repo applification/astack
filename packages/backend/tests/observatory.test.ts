@@ -8,6 +8,10 @@ import {
   eventSchema,
   runSchema,
 } from "@astack/agent-observability";
+import {
+  filterOptionsSchema,
+  mergeFilterOptions,
+} from "@astack/agent-observability/filters";
 
 // Explicit module loaders work in Bun without a Vite-only import.meta.glob.
 const modules = {
@@ -100,10 +104,169 @@ test("every data query denies anonymous users and the wrong signed subject", asy
     "Unauthorized",
   );
   await expect(
+    t.query(api.observatory.filterOptions, {
+      paginationOpts: { numItems: 50, cursor: null },
+    }),
+  ).rejects.toThrow("Unauthorized");
+  await expect(
+    t
+      .withIdentity({ subject: "other@example.test" })
+      .query(api.observatory.filterOptions, {
+        paginationOpts: { numItems: 50, cursor: null },
+      }),
+  ).rejects.toThrow("Unauthorized");
+  await expect(
     t
       .withIdentity({ subject: "other@example.test" })
       .query(api.observatory.run, { runId: run().id }),
   ).rejects.toThrow("Unauthorized");
+});
+test("filter choices span project history, paginate independently, and reflect updated metadata without exposing other projects", async () => {
+  const t = await setup();
+  const owner = t.withIdentity({ subject: process.env.OBSERVATORY_OWNER_ID });
+  const otherId = "00000000-0000-4000-8000-000000000101";
+  await t.run(async (ctx) => {
+    await ctx.db.insert("projects", {
+      projectId: otherId,
+      name: "Other",
+      enabled: true,
+      repositories: [],
+      folders: [{ machineId, path: "/other" }],
+    });
+    const hidden = {
+      ...run(machineId, "unregistered"),
+      cwd: "/private",
+      branch: "private-branch",
+    };
+    await ctx.db.insert("runs", {
+      runId: hidden.id,
+      machineId,
+      revision: 1,
+      startedAt: hidden.startedAt,
+      status: hidden.status,
+      data: JSON.stringify(hidden),
+    });
+  });
+  const older: ReturnType<typeof run> = {
+    ...run(machineId, "older"),
+    startedAt: 100,
+    branch: "older-branch",
+    work: { id: "AST-142", label: "Checkout repair" },
+    skills: [{ ...skill, kind: "workflow", name: "implement" }],
+    tools: ["mcp__convex__query"],
+  };
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [entry(older), entry({ ...run(), branch: "current-branch" })],
+  });
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [
+      entry({
+        ...run(machineId, "other"),
+        cwd: "/other",
+        projectId: otherId,
+        branch: "other-branch",
+      }),
+    ],
+  });
+  const first = await owner.query(api.observatory.filterOptions, {
+    projectId,
+    paginationOpts: { numItems: 1, cursor: null },
+  });
+  const initial = first.page.flatMap((page) =>
+    filterOptionsSchema.parse(JSON.parse(page)),
+  );
+  expect(initial).toContainEqual({
+    dimension: "branch",
+    value: "current-branch",
+    label: "current-branch",
+  });
+  expect(initial.some((option) => option.value === "older-branch")).toBe(false);
+  expect(first.isDone).toBe(false);
+  const second = await owner.query(api.observatory.filterOptions, {
+    projectId,
+    paginationOpts: { numItems: 1, cursor: first.continueCursor },
+  });
+  const choices = mergeFilterOptions([
+    ...initial,
+    ...second.page.flatMap((page) =>
+      filterOptionsSchema.parse(JSON.parse(page)),
+    ),
+  ]);
+  expect(choices.filter((option) => option.dimension === "agent")).toHaveLength(
+    1,
+  );
+  expect(choices).toContainEqual({
+    dimension: "branch",
+    value: "older-branch",
+    label: "older-branch",
+  });
+  expect(choices).toContainEqual({
+    dimension: "machine",
+    value: machineId,
+    label: `Fixture · ${machineId}`,
+  });
+  expect(choices).toContainEqual({
+    dimension: "work",
+    value: "AST-142",
+    label: "Checkout repair · AST-142",
+  });
+  expect(choices).toContainEqual({
+    dimension: "skill",
+    value: "implement",
+    label: "implement",
+  });
+  expect(choices).toContainEqual({
+    dimension: "tool",
+    value: "mcp__convex__query",
+    label: "mcp__convex__query",
+  });
+  expect(
+    choices.some(
+      (option) =>
+        option.value === "other-branch" || option.value === "private-branch",
+    ),
+  ).toBe(false);
+  expect(JSON.stringify(choices)).not.toContain("Fixture turn");
+  const all = await owner.query(api.observatory.filterOptions, {
+    paginationOpts: { numItems: 50, cursor: null },
+  });
+  const allChoices = all.page.flatMap((page) =>
+    filterOptionsSchema.parse(JSON.parse(page)),
+  );
+  expect(allChoices.some((option) => option.value === "other-branch")).toBe(
+    true,
+  );
+  expect(allChoices.some((option) => option.value === "private-branch")).toBe(
+    false,
+  );
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [entry({ ...older, branch: "replacement-branch" }, 2)],
+  });
+  const updated = await owner.query(api.observatory.filterOptions, {
+    projectId,
+    paginationOpts: { numItems: 50, cursor: null },
+  });
+  const updatedChoices = updated.page.flatMap((page) =>
+    filterOptionsSchema.parse(JSON.parse(page)),
+  );
+  expect(updatedChoices.some((option) => option.value === "older-branch")).toBe(
+    false,
+  );
+  expect(
+    updatedChoices.some((option) => option.value === "replacement-branch"),
+  ).toBe(true);
+  expect(
+    await owner.query(api.observatory.filterOptions, {
+      projectId: "missing-project",
+      paginationOpts: { numItems: 50, cursor: null },
+    }),
+  ).toMatchObject({ page: [], isDone: true });
+  await expect(
+    owner.query(api.observatory.filterOptions, { paginationOpts }),
+  ).rejects.toThrow("Invalid page");
 });
 test("replay and stale revisions keep one logical run and one capability contribution", async () => {
   const t = await setup();

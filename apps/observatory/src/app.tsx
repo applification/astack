@@ -13,14 +13,19 @@ import {
   capabilityKey,
   filterSchema,
 } from "@astack/agent-observability";
-import { Button, Badge, Input } from "@astack/ui";
+import { Button, Badge } from "@astack/ui";
+import {
+  filterOptionsSchema,
+  type FilterOption,
+  type RunFilter,
+} from "@astack/agent-observability/filters";
+import { RunFilters } from "./filters";
 import { Activity, ArrowLeft, ExternalLink, ShieldCheck } from "lucide-react";
 import { Trace } from "./trace";
 import { Brand, ThemeControl } from "./theme";
 import { ProjectSelector, Projects } from "./projects";
 import type { Project } from "@astack/agent-observability/projects";
 
-type Filter = { dimension: string; value: string };
 const duration = (run: AgentRun) => {
   if (!run.startTimeKnown) return "Unknown";
   const elapsed = (run.completedAt ?? run.lastObservedAt) - run.startedAt;
@@ -188,40 +193,29 @@ export function RunTable({
   );
 }
 
-const filterDimensions = [
-  ["repo", "Repository"],
-  ["work", "Work reference"],
-  ["agent", "Agent"],
-  ["version", "Agent version"],
-  ["machine", "Machine ID"],
-  ["branch", "Branch"],
-  ["status", "Status"],
-  ["outcome", "Work outcome"],
-  ["skill", "Skill / workflow"],
-  ["tool", "Tool / MCP"],
-] as const;
 function Runs({
   route,
   problems = false,
   workView = false,
   projectId,
   projects,
+  options,
+  optionsLoading,
 }: {
   route: string;
   problems?: boolean;
   workView?: boolean;
   projectId?: string;
   projects: readonly Project[];
+  options: readonly FilterOption[] | undefined;
+  optionsLoading: boolean;
 }) {
   const initial = new URLSearchParams(route.split("?")[1] ?? "");
-  const [filters, setFilters] = useState<Filter[]>(() =>
-    [...initial]
-      .map(([dimension, value]) => ({ dimension, value }))
-      .filter(
-        (f) =>
-          f.dimension !== "project" &&
-          filterSchema.shape.dimension.safeParse(f.dimension).success,
-      ),
+  const [filters, setFilters] = useState<RunFilter[]>(() =>
+    [...initial].flatMap(([dimension, value]) => {
+      const parsed = filterSchema.safeParse({ dimension, value });
+      return parsed.success && dimension !== "project" ? [parsed.data] : [];
+    }),
   );
   const [after, setAfter] = useState("");
   const [before, setBefore] = useState("");
@@ -239,6 +233,11 @@ function Runs({
     { initialNumItems: 50 },
   );
   const runs = query.results.map((value) => runSchema.parse(JSON.parse(value)));
+  useEffect(() => {
+    // An indexed candidate page can be empty after applying combined filters.
+    // Keep looking until there is a match or the project history is exhausted.
+    if (!runs.length && query.status === "CanLoadMore") query.loadMore(50);
+  }, [runs.length, query.status, query.loadMore]);
   const problematic = runs.filter((run) =>
     run.findings.some((f) => f.severity !== "info"),
   ).length;
@@ -290,59 +289,28 @@ function Runs({
           <span>machines in this view</span>
         </div>
       </div>
-      <form className="filters" onSubmit={(e) => e.preventDefault()}>
-        {filterDimensions.map(([dimension, label]) => (
-          <label key={dimension}>
-            {label}
-            <Input
-              aria-label={label}
-              value={
-                filters.find((f) => f.dimension === dimension)?.value ?? ""
-              }
-              placeholder="Any"
-              onChange={(e) =>
-                setFilters((previous) => [
-                  ...previous.filter((f) => f.dimension !== dimension),
-                  ...(e.target.value
-                    ? [{ dimension, value: e.target.value }]
-                    : []),
-                ])
-              }
-            />
-          </label>
-        ))}
-        <label>
-          From date
-          <Input
-            aria-label="From date"
-            type="date"
-            value={after}
-            onChange={(e) => setAfter(e.target.value)}
-          />
-        </label>
-        <label>
-          Through date
-          <Input
-            aria-label="Through date"
-            type="date"
-            value={before}
-            onChange={(e) => setBefore(e.target.value)}
-          />
-        </label>
-      </form>
-      {!!filters.length && (
-        <Button
-          variant="ghost"
-          onClick={() => {
-            setFilters([]);
-            setAfter("");
-            setBefore("");
-          }}
-        >
-          Clear filters
-        </Button>
-      )}
-      {query.status === "LoadingFirstPage" ? (
+      <RunFilters
+        options={options}
+        loading={optionsLoading}
+        filters={filters}
+        after={after}
+        before={before}
+        change={(dimension, value) =>
+          setFilters((previous) => [
+            ...previous.filter((f) => f.dimension !== dimension),
+            ...(value ? [{ dimension, value }] : []),
+          ])
+        }
+        changeAfter={setAfter}
+        changeBefore={setBefore}
+        clear={() => {
+          setFilters([]);
+          setAfter("");
+          setBefore("");
+        }}
+      />
+      {query.status === "LoadingFirstPage" ||
+      (!runs.length && query.status !== "Exhausted") ? (
         <p role="status" className="empty">
           Loading runs…
         </p>
@@ -739,6 +707,25 @@ export function App() {
   const projects = useQuery(api.projects.list, {});
   const projectId =
     new URLSearchParams(route.split("?")[1]).get("project") || undefined;
+  const hasRunFilters =
+    !route.startsWith("#run/") &&
+    !["skills", "projects", "health"].includes(
+      route.slice(1).split("?")[0] ?? "",
+    );
+  const catalog = usePaginatedQuery(
+    api.observatory.filterOptions,
+    hasRunFilters ? (projectId ? { projectId } : {}) : "skip",
+    { initialNumItems: 50 },
+  );
+  useEffect(() => {
+    if (hasRunFilters && catalog.status === "CanLoadMore") catalog.loadMore(50);
+  }, [hasRunFilters, catalog.status, catalog.loadMore]);
+  const options =
+    catalog.status === "LoadingFirstPage"
+      ? undefined
+      : catalog.results.flatMap((value) =>
+          filterOptionsSchema.parse(JSON.parse(value)),
+        );
   let page: React.ReactNode;
   let section = route.slice(1).split("?")[0];
   if (route.startsWith("#run/")) {
@@ -761,6 +748,8 @@ export function App() {
         route={route}
         projectId={projectId}
         projects={projects ?? []}
+        options={options}
+        optionsLoading={catalog.status !== "Exhausted"}
         problems={section === "problems"}
         workView={section === "work"}
       />
