@@ -16,6 +16,10 @@ flowchart LR
   W[External work identity or launch context] --> L
 ```
 
+## Evaluations
+
+The [evaluation workflow](observatory-evaluations.md) joins original intent, acceptance cases, skill criteria and verification reports across captured turns. Owner assessments remain separate from capture and retain their evidence. It is deployed on Otis: open [Evaluations](https://otis.tail12a0a0.ts.net:8450/#evaluations) and select **Observatory evaluations — first implementation** to review the actual captured request, three turns and retained proof. Its owner assessment starts pending.
+
 ## Use on Otis
 
 The **Convex admin dashboard** is at [https://otis.tail12a0a0.ts.net:8453](https://otis.tail12a0a0.ts.net:8453), or [http://127.0.0.1:6792](http://127.0.0.1:6792) directly on Otis. Observatory's top navigation includes **Convex dashboard**, which opens it in a new tab. It connects to the same persistent backend used by Observatory. Keep the pre-filled deployment URL and log in with the existing `CONVEX_SELF_HOSTED_ADMIN_KEY` from the permission-restricted `~/.local/share/astack/observatory/deployment.env`. This is separate from the Observatory viewer key. To copy the admin key without printing it:

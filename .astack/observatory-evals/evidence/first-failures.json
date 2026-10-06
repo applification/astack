@@ -1,0 +1,21 @@
+{
+  "revision": "255971c with evaluation implementation changes",
+  "localBrowserRuns": [
+    {
+      "runId": "01a112c7-f873-7caa-8f93-89327959dbae",
+      "observed": [
+        "Expanded proof context overflowed a 390px viewport.",
+        "The e2e runner denied screenshots after an authenticated secret fill."
+      ],
+      "response": [
+        "Wrap long values in the proof context and retain the exact narrow-width regression.",
+        "Use synthetic Storybook media and retain authenticated checks as assertions."
+      ]
+    },
+    {
+      "runId": "01a112ca-8846-7d03-8865-ab2ddc7e11f0",
+      "observed": "The original-request text locator matched both trace preview and expanded content.",
+      "response": "Assert the linked event's expanded state and its exact retained content."
+    }
+  ]
+}

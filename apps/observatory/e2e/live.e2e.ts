@@ -1,5 +1,208 @@
 import { test } from "@e2e-dev/web";
 import { expect, secrets } from "e2e";
+test("deployed astack workflow connects the actual route, phases and evidence without assigning owner grades", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  const id =
+    "bbb1fd30-527f-4326-b685-fb9c2e021092:evaluation:13e793a1-5d1d-4d44-891f-55f871d86d75";
+  await app.open(
+    "/#evaluation/" +
+      encodeURIComponent(id) +
+      "?project=a20a2fb3-646f-40fe-9b12-c64f759afaea",
+  );
+  await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect(
+    screen.getByRole(
+      "heading",
+      "Observatory — astack route and workflow tracking",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("astack → New feature", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("heading", "Path taken", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("heading", "How the work unfolded"),
+  ).not.toBeVisible();
+  await expect(
+    screen.getByRole("button", "View PR across this flow"),
+  ).toBeVisible();
+  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
+  await expect(
+    screen.getByRole("list", "Recorded skill sequence"),
+  ).toBeVisible();
+  await screen
+    .getByRole("button", "View Testing in Verify", { exact: true })
+    .tap();
+  const skillEvidence = screen.getByRole("region", "Testing skill evidence", {
+    exact: true,
+  });
+  await expect(skillEvidence).toContainText("Recorded name: testing.");
+  // The actual phase declares Testing at both start and finish; inspect the finish.
+  await skillEvidence
+    .getByRole("link", "Declaration in trace", { exact: true })
+    .last()
+    .tap();
+  await expect(
+    screen.getByRole("heading", "Workflow annotation", { exact: true }),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () =>
+        document
+          .querySelector(".trace-event[open] .event-content pre")
+          ?.textContent?.includes('"testing"') ?? false,
+    ),
+  ).toBe(true);
+  await browser.back();
+  await screen
+    .getByText("Captured conversation · 2 turns", { exact: true })
+    .tap();
+  await expect(
+    screen.getByRole("heading", "How the work unfolded"),
+  ).toBeVisible();
+  await screen.getByText("Route selection evidence", { exact: true }).tap();
+  await screen
+    .getByRole("link", "Declaration in trace", { exact: true })
+    .first()
+    .tap();
+  await expect(
+    screen.getByRole("heading", "Workflow annotation", { exact: true }),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () =>
+        document
+          .querySelector(".trace-event[open] .event-content pre")
+          ?.textContent?.includes('"action": "select"') ?? false,
+    ),
+  ).toBe(true);
+  await browser.back();
+  await browser.setViewport({ width: 390, height: 844 });
+  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
+  await expect(
+    screen.getByRole("list", "Recorded skill sequence"),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () =>
+        document.documentElement.scrollWidth <=
+        document.documentElement.clientWidth,
+    ),
+  ).toBe(true);
+  await screen
+    .getByText("Detailed intent and skill review", { exact: true })
+    .tap();
+  await expect(screen.getByLabel("Include a flow assessment")).toBeVisible();
+  await expect(
+    screen.getByText("No detailed assessment yet.", { exact: true }),
+  ).toBeVisible();
+});
+test("deployed evaluation links the captured request, retained proof and owner review form", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open();
+  await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect(screen.getByRole("heading", "Agent runs")).toBeVisible();
+  await screen.getByLabel("Selected project").selectOption({ label: "Astack" });
+  await screen.getByRole("link", "Evaluations", { exact: true }).tap();
+  await expect(
+    screen.getByRole("heading", "Evaluations", { exact: true }),
+  ).toBeVisible();
+  await screen
+    .getByRole("link", "Observatory evaluations — first implementation", {
+      exact: true,
+    })
+    .tap();
+  await expect(
+    screen.getByRole(
+      "heading",
+      "Observatory evaluations — first implementation",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Checks passed", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("3 captured turns", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("heading", "How the work unfolded"),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("heading", "Did this deliver what you wanted?"),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("button", "Yes", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("button", "Partly", { exact: true }),
+  ).toBeVisible();
+  await expect(screen.getByRole("button", "No", { exact: true })).toBeVisible();
+  await expect(
+    screen.getByRole("button", "Not sure yet", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByLabel("What worked or should change? (optional)"),
+  ).toBeVisible();
+  await expect(
+    screen.getByLabel("Reason for Intent", { exact: true }),
+  ).not.toBeVisible();
+  expect(
+    await browser.evaluate(() => ({
+      steps: document.querySelectorAll(".evaluation-flow > li").length,
+      technicalHeadings: [
+        ...document.querySelectorAll(".evaluation-flow > li h3"),
+      ].some((item) => /turn [a-f0-9]{8}/.test(item.textContent ?? "")),
+    })),
+  ).toEqual({ steps: 3, technicalHeadings: false });
+  await screen
+    .getByRole("link", "Original request in trace", { exact: true })
+    .tap();
+  await expect(screen.getByRole("heading", "Activity trace")).toBeVisible();
+  expect(
+    await browser.evaluate(() => {
+      const id = new URLSearchParams(location.hash.split("?")[1]).get("event");
+      const event = document.getElementById(id ?? "");
+      return {
+        open: event instanceof HTMLDetailsElement && event.open,
+        matchesRequest:
+          event
+            ?.querySelector(".event-content pre")
+            ?.textContent?.includes("astack observatory") ?? false,
+      };
+    }),
+  ).toEqual({ open: true, matchesRequest: true });
+  await screen
+    .getByRole("link", "Observatory evaluations — first implementation", {
+      exact: true,
+    })
+    .tap();
+  await screen
+    .getByText("5 checks passed · what was checked?", { exact: true })
+    .tap();
+  await screen
+    .getByText("Verification context & artifact references", { exact: true })
+    .tap();
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () =>
+        document.documentElement.scrollWidth <=
+        document.documentElement.clientWidth,
+    ),
+  ).toBe(true);
+});
 test("owner access survives reload and browser restart, and Claude rows show the captured CLI version", async ({
   app,
   screen,

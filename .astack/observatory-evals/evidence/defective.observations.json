@@ -1,0 +1,12 @@
+{
+  "runId": "2c33513e-4795-498a-99e2-edc76844d7f2",
+  "saveStatus": 200,
+  "reopened": {
+    "value": "Original edit"
+  },
+  "independent": {
+    "value": "Original edit"
+  },
+  "identity": true,
+  "expected": "Saved edit"
+}

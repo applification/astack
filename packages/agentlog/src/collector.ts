@@ -2,6 +2,7 @@ import { readFile, lstat } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import {
+  eventCapabilities,
   runSchema,
   type AgentSnapshot,
   type AgentAdapter,
@@ -23,7 +24,7 @@ type CaptureAdapter = AgentAdapter & {
   readonly deferredTurns?: number;
 };
 
-async function readSecretFile(path: string) {
+export async function readSecretFile(path: string) {
   const info = await lstat(path);
   if (!info.isFile() || info.size > 1024 * 1024)
     throw new Error("Invalid credential file");
@@ -91,15 +92,10 @@ export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
   }
   run.skills = [
     ...new Map(
-      events.flatMap((e) =>
-        e.skill
-          ? [
-              [JSON.stringify(e.skill), e.skill] satisfies [
-                string,
-                NonNullable<typeof e.skill>,
-              ],
-            ]
-          : [],
+      events.flatMap((event) =>
+        eventCapabilities(event).map(
+          (skill) => [JSON.stringify(skill), skill] as const,
+        ),
       ),
     ).values(),
   ].slice(0, 250);

@@ -10,6 +10,8 @@
 
 import type * as access from "../access.js";
 import type * as auth from "../auth.js";
+import type * as evaluationWorkflow from "../evaluationWorkflow.js";
+import type * as evaluations from "../evaluations.js";
 import type * as http from "../http.js";
 import type * as ingestion from "../ingestion.js";
 import type * as naming from "../naming.js";
@@ -27,6 +29,8 @@ import { anyApi, componentsGeneric } from "convex/server";
 const fullApi: ApiFromModules<{
   access: typeof access;
   auth: typeof auth;
+  evaluationWorkflow: typeof evaluationWorkflow;
+  evaluations: typeof evaluations;
   http: typeof http;
   ingestion: typeof ingestion;
   naming: typeof naming;

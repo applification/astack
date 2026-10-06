@@ -44,7 +44,9 @@ export class LocalStore {
         safe.value.data = {
           omitted: "Large event detail omitted at the 128 KiB record budget",
         };
-      else {
+      else if (safe.kind === "evaluation") {
+        throw new Error("Evaluation exceeds the 128 KiB record budget");
+      } else {
         safe.value.skills = safe.value.skills.slice(0, 25);
         safe.value.tools = safe.value.tools.slice(0, 25);
         safe.value.findings = safe.value.findings.slice(0, 10);
@@ -79,6 +81,24 @@ export class LocalStore {
       }
       const payload = JSON.stringify(safe);
       if (existing?.payload === payload) return false;
+      if (existing && safe.kind === "evaluation")
+        throw new Error(
+          "Evaluation is immutable; use a new ID for revised intent or proof",
+        );
+      if (safe.kind === "evaluation" && safe.value.intent.source) {
+        const source = this.getRecord(
+          "event:" + safe.value.intent.source.eventId,
+        );
+        if (
+          source?.kind !== "event" ||
+          source.value.runId !== safe.value.intent.source.runId ||
+          source.value.kind !== "user_prompt" ||
+          source.value.data.content !== safe.value.intent.request
+        )
+          throw new Error(
+            "Original request does not match an already captured prompt",
+          );
+      }
       this.db.exec(
         "UPDATE meta SET value=CAST(value AS INTEGER)+1 WHERE key='revision'",
       );
@@ -89,7 +109,11 @@ export class LocalStore {
         )
         .run(
           key,
-          safe.kind === "run" ? safe.value.id : safe.value.runId,
+          safe.kind === "run"
+            ? safe.value.id
+            : safe.kind === "event"
+              ? safe.value.runId
+              : (safe.value.runIds[0] ?? ""),
           safe.kind,
           payload,
           revision,
@@ -135,15 +159,30 @@ export class LocalStore {
     return row ? recordSchema.parse(JSON.parse(row.payload)) : null;
   }
   batch(machineId: string, priority: "recent" | "oldest" = "recent") {
+    // Assessments reference several turns. Upload their parents and original
+    // prompt before the evaluation, even when recent-first ordering separates them.
+    const ready = `pending.delivered=0 AND (pending.kind!='evaluation' OR (
+      NOT EXISTS (
+        SELECT 1 FROM json_each(json_extract(pending.payload,'$.value.runIds')) dependency
+        LEFT JOIN records parent_run ON parent_run.key='run:' || dependency.value
+        WHERE parent_run.delivered IS NULL OR parent_run.delivered!=1
+      ) AND (
+        json_extract(pending.payload,'$.value.intent.source.eventId') IS NULL OR
+        EXISTS (SELECT 1 FROM records source_event
+          WHERE source_event.key='event:' || json_extract(pending.payload,'$.value.intent.source.eventId')
+          AND source_event.delivered=1)
+      )
+    ))`;
     const rows = this.db
       .query<Row, []>(
         priority === "recent"
           ? `SELECT pending.key,pending.payload,pending.revision FROM records pending
              LEFT JOIN records parent ON parent.key='run:' || pending.run_id
-             WHERE pending.delivered=0
+             WHERE ${ready}
              ORDER BY COALESCE(json_extract(parent.payload,'$.value.startedAt'),0) DESC,
                       pending.kind DESC,pending.revision LIMIT 50`
-          : "SELECT key,payload,revision FROM records WHERE delivered=0 ORDER BY kind DESC,revision LIMIT 50",
+          : `SELECT pending.key,pending.payload,pending.revision FROM records pending
+             WHERE ${ready} ORDER BY pending.kind DESC,pending.revision LIMIT 50`,
       )
       .all();
     if (!rows.length) return null;
@@ -225,6 +264,23 @@ export class LocalStore {
     this.db.exec(
       "UPDATE records SET delivered=2 WHERE kind='event' AND run_id NOT IN (SELECT run_id FROM records WHERE kind='run')",
     );
+    for (const row of this.db
+      .query<{ key: string; payload: string }, []>(
+        "SELECT key,payload FROM records WHERE kind='evaluation'",
+      )
+      .all()) {
+      const record = recordSchema.parse(JSON.parse(row.payload));
+      if (record.kind !== "evaluation") continue;
+      const permitted = record.value.runIds.every((id) => {
+        const parent = this.getRecord("run:" + id);
+        const project =
+          parent?.kind === "run"
+            ? resolveProject(projects, parent.value)
+            : null;
+        return project?.projectId === record.value.projectId;
+      });
+      if (!permitted) this.exclude([row.key]);
+    }
   }
   exclude(keys: string[]) {
     for (const key of keys)
@@ -263,6 +319,17 @@ export async function forward(
   if (!batch) return { delivered: 0 };
   const excluded = batch.envelope.records.flatMap((entry, index) => {
     const record = entry.record;
+    if (record.kind === "evaluation") {
+      const permitted = record.value.runIds.every((id) => {
+        const parent = store.getRecord("run:" + id);
+        const project =
+          parent?.kind === "run"
+            ? resolveProject(projects, parent.value)
+            : null;
+        return project?.projectId === record.value.projectId;
+      });
+      return permitted ? [] : [batch.keys[index]?.key ?? ""];
+    }
     const parent =
       record.kind === "event"
         ? store.getRecord(`run:${record.value.runId}`)

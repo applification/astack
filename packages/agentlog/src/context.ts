@@ -1,5 +1,6 @@
 import {
   launchContextSchema,
+  eventCapabilities,
   type AgentRun,
 } from "@astack/agent-observability";
 import { detectProblems } from "@astack/agent-observability/analysis";
@@ -10,9 +11,9 @@ export function refreshRun(store: LocalStore, run: AgentRun) {
   run.skills = [
     ...new Map(
       events.flatMap((event) =>
-        event.skill
-          ? [[JSON.stringify(event.skill), event.skill] as const]
-          : [],
+        eventCapabilities(event).map(
+          (skill) => [JSON.stringify(skill), skill] as const,
+        ),
       ),
     ).values(),
   ].slice(0, 250);

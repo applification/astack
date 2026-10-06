@@ -1,0 +1,37 @@
+{
+  "featureRevision": "24e178fa8790e5482f5fd28d9e46805b06e2b31b",
+  "runs": [
+    {
+      "id": "01a112d4-04f4-760d-a3d8-a3e0b9463029",
+      "status": "passed",
+      "startedAt": "2026-10-06T20:07:27.510Z",
+      "finishedAt": "2026-10-06T20:07:44.948Z",
+      "summary": {
+        "discovered": 25,
+        "selected": 25,
+        "executed": 25,
+        "passed": 25,
+        "failed": 0,
+        "flaky": 0,
+        "skipped": 0
+      },
+      "target": "storybook"
+    },
+    {
+      "id": "01a112d4-04f4-733c-98bf-71b09d17b911",
+      "status": "passed",
+      "startedAt": "2026-10-06T20:07:27.571Z",
+      "finishedAt": "2026-10-06T20:07:31.246Z",
+      "summary": {
+        "discovered": 3,
+        "selected": 3,
+        "executed": 3,
+        "passed": 3,
+        "failed": 0,
+        "flaky": 0,
+        "skipped": 0
+      },
+      "target": "local-evaluations"
+    }
+  ]
+}

@@ -2,6 +2,38 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  evaluationFeedback: defineTable({
+    feedbackId: v.string(),
+    evaluationId: v.string(),
+    reviewedAt: v.number(),
+    data: v.string(),
+  })
+    .index("by_feedbackId", ["feedbackId"])
+    .index("by_evaluationId_and_reviewedAt", ["evaluationId", "reviewedAt"]),
+  evaluations: defineTable({
+    evaluationId: v.string(),
+    projectId: v.string(),
+    machineId: v.string(),
+    createdAt: v.number(),
+    data: v.string(),
+    snapshot: v.string(),
+  })
+    .index("by_evaluationId", ["evaluationId"])
+    .index("by_projectId_and_createdAt", ["projectId", "createdAt"])
+    .index("by_createdAt", ["createdAt"]),
+  evaluationRuns: defineTable({
+    evaluationId: v.string(),
+    runId: v.string(),
+    createdAt: v.number(),
+  }).index("by_runId_and_createdAt", ["runId", "createdAt"]),
+  assessments: defineTable({
+    assessmentId: v.string(),
+    evaluationId: v.string(),
+    assessedAt: v.number(),
+    data: v.string(),
+  })
+    .index("by_assessmentId", ["assessmentId"])
+    .index("by_evaluationId_and_assessedAt", ["evaluationId", "assessedAt"]),
   names: defineTable({
     key: v.string(),
     kind: v.union(v.literal("activity"), v.literal("work")),
@@ -87,10 +119,12 @@ export default defineSchema({
     machineId: v.string(),
     revision: v.number(),
     sequence: v.number(),
+    kind: v.optional(v.string()),
     data: v.string(),
   })
     .index("by_eventId", ["eventId"])
-    .index("by_runId_and_sequence", ["runId", "sequence"]),
+    .index("by_runId_and_sequence", ["runId", "sequence"])
+    .index("by_runId_and_kind_and_sequence", ["runId", "kind", "sequence"]),
   facets: defineTable({
     dimension: v.string(),
     value: v.string(),
