@@ -177,7 +177,9 @@ export function Trace({
       {upload && <UploadStatus events={events.length} upload={upload} />}
       <p className="subtitle">
         Recorded item order. Agent timestamps and hook observation times are
-        labelled; missing times stay unknown.
+        labelled.{" "}
+        {events.some((event) => event.timestamp === null) &&
+          "Some recorded items have no event timestamp; their time is omitted. Collector observation time remains available in expanded details."}
       </p>
       <p className="subtitle">
         {showContent
@@ -201,11 +203,22 @@ export function Trace({
             return (
               <details className="trace-event" key={event.id} id={event.id}>
                 <summary>
-                  <span className="event-time">
-                    {event.timestamp === null
-                      ? "Time unavailable"
-                      : clock(event.timestamp)}
-                  </span>
+                  {event.timestamp !== null && (
+                    <time
+                      className="event-time"
+                      dateTime={new Date(event.timestamp).toISOString()}
+                      title={
+                        event.timing === "hook"
+                          ? "Hook observation time"
+                          : "Recorded agent time"
+                      }
+                    >
+                      {clock(event.timestamp)}
+                      {event.timing === "hook" && (
+                        <span className="time-source">Hook</span>
+                      )}
+                    </time>
+                  )}
                   <span className={event.failed ? "negative" : "neutral"}>
                     <EventIcon event={event} />
                   </span>
