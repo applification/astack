@@ -14,7 +14,7 @@ import {
   filterSchema,
 } from "@astack/agent-observability";
 import { Button, Badge, Input } from "@astack/ui";
-import { Activity, ArrowLeft, ShieldCheck } from "lucide-react";
+import { Activity, ArrowLeft, ExternalLink, ShieldCheck } from "lucide-react";
 import { Trace } from "./trace";
 import { Brand, ThemeControl } from "./theme";
 
@@ -742,6 +742,14 @@ export function ObservatoryLayout({
                 {label}
               </a>
             ))}
+            <a
+              href="https://otis.tail12a0a0.ts.net:8453/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1"
+            >
+              Convex dashboard <ExternalLink size={14} aria-hidden="true" />
+            </a>
           </nav>
           <ThemeControl />
         </div>

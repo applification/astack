@@ -1,5 +1,9 @@
 # Agent Observatory evidence
 
+## Dashboard navigation link, 2026-10-06
+
+Added **Convex dashboard** to the shared authenticated navigation, opening private port 8453 in a new tab with `noopener noreferrer` and no credential in the URL. On the working tree based on `72feb86`, UI lint, strict types and all 22 tests, production/Storybook builds, five existing synthetic browser tests, one authenticated deployed UI journey and site/plugin checks passed. Direct browser inspection confirmed the link destination/new-tab attributes and no horizontal overflow at 1051px and 390px. Otis's served HTML and JavaScript exactly matched the built UI; Observatory and the dashboard returned HTTP 200. Only web assets were deployed. The existing navigation layout is reused, so no separate Pen exploration or new component story was needed.
+
 ## Convex admin dashboard, 2026-10-06
 
 Installed the official Convex dashboard pinned at `sha256:f85cf0d0448b9c835ae3df5c7c1c6f0145dd4c8f0f92eb0245daf304efdd9f1a` alongside the existing backend. Docker binds it only to `127.0.0.1:6792`; Tailscale Serve exposes private HTTPS on port 8453. The container health check passed, the HTTPS page returned 200, and the browser displayed the Convex login form with the correct deployment URL (`https://otis.tail12a0a0.ts.net:8451`). The existing private admin key successfully listed the five expected tables through the native CLI. Credentials were copied directly to the local clipboard without being printed; browser sign-in is left to the owner. This dashboard uses the actual Observatory database.
