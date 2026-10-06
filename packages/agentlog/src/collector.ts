@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFile, lstat } from "node:fs/promises";
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import {
@@ -11,6 +11,20 @@ import { environmentSecrets } from "@astack/agent-observability/redaction";
 import { CodexAdapter } from "./adapters/codex";
 import { LocalStore, forward } from "./store";
 import { loadConfig, type CollectorConfig } from "./config";
+
+async function readSecretFile(path: string) {
+  const info = await lstat(path);
+  if (!info.isFile() || info.size > 1024 * 1024)
+    throw new Error("Invalid credential file");
+  const value = (
+    await readFile(path, {
+      encoding: "utf8",
+      signal: AbortSignal.timeout(1000),
+    })
+  ).trim();
+  if (!value) throw new Error("Empty credential file");
+  return value;
+}
 
 export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
   for (const event of snapshot.events) {
@@ -82,17 +96,25 @@ export async function collect(
   const config = await loadConfig(directory);
   const token = (await readFile(config.tokenFile, "utf8")).trim();
   if (!token) throw new Error("Missing ingestion credential");
-  const store = new LocalStore(directory, [
+  const secrets = [
     ...environmentSecrets(process.env),
     token,
-  ]);
+    ...(await Promise.all(config.secretFiles.map(readSecretFile))),
+  ];
+  const store = new LocalStore(directory, secrets);
   const signatureKey =
     store.getMeta("signatureKey") ?? randomBytes(32).toString("hex");
   store.setMeta("signatureKey", signatureKey);
   const adapters: { home: string; adapter: AgentAdapter }[] = config.homes.map(
     (home) => ({
       home: home.path,
-      adapter: new CodexAdapter(config, home.path, store, signatureKey),
+      adapter: new CodexAdapter(
+        config,
+        home.path,
+        store,
+        signatureKey,
+        secrets,
+      ),
     }),
   );
   let failureCount = 0;
@@ -131,6 +153,7 @@ export async function collect(
             entry.home,
             store,
             signatureKey,
+            secrets,
           );
         }
       }

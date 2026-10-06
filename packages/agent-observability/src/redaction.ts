@@ -35,7 +35,7 @@ export function redactText(
       "$1=[REDACTED]",
     )
     .replace(
-      /((?:password|passwd|secret|token|api[_-]?key|authorization|credential)\s*[=:]\s*)(?:"[^"\n]*"|'[^'\n]*'|[^\s,;]+)/gi,
+      /(["']?(?:password|passwd|secret|(?:access_|refresh_|id_)?token|api[_-]?key|authorization|credential|cookie|set-cookie)["']?\s*[=:]\s*)(?:"[^"\n]*"|'[^'\n]*'|[^\s,;}]+)/gi,
       "$1[REDACTED]",
     )
     .replace(

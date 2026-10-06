@@ -36,3 +36,11 @@ test("redacts private keys and credential flags without dropping useful failure 
     durationMs: 42,
   });
 });
+test("JSON credentials and cookies embedded in tool output remain redacted while failure text stays readable", () => {
+  const safe = redactText(
+    'Assertion failed: expected 200. {"apiKey":"json-secret","refresh_token":"refresh-secret"} Cookie: session-secret',
+  );
+  for (const value of ["json-secret", "refresh-secret", "session-secret"])
+    expect(safe).not.toContain(value);
+  expect(safe).toContain("Assertion failed: expected 200.");
+});

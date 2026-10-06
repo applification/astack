@@ -36,7 +36,7 @@ Otis is ready; **nothing has been installed on the MacBook**. Run these steps th
 
 ## Codex desktop and T3 Code homes
 
-The default is `CODEX_HOME` or `~/.codex`. If desktop/CLI/T3 uses another home, edit `~/.agentlog/config.json` and add its absolute path to `homes`. Read T3's provider settings to find its selected home; do not assume a shadow home is the default. Keep `captureContent` false.
+The default is `CODEX_HOME` or `~/.codex`. If desktop/CLI/T3 uses another home, edit `~/.agentlog/config.json` and add its absolute path to `homes`. Read T3's provider settings to find its selected home; do not assume a shadow home is the default. New collectors capture readable content with mandatory secret redaction. Use `agentlog content off` and restart the collector for metadata-only capture. The dashboard's Show content toggle separately hides captured details on screen.
 
 ```json
 "homes": [

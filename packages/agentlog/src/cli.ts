@@ -22,6 +22,32 @@ const program = new Command()
   .option("--state <directory>", "Private state directory", defaultStateDir());
 const state = () => resolve(z.string().parse(program.opts().state));
 program
+  .command("content")
+  .description(
+    "Enable redacted conversation/tool content, or capture metadata only",
+  )
+  .argument("<mode>", "on or off")
+  .action(async (mode: unknown) => {
+    const captureContent = z.enum(["on", "off"]).parse(mode) === "on";
+    const config = await loadConfig(state());
+    await writeFile(
+      join(state(), "config.json"),
+      JSON.stringify({ ...config, captureContent }, null, 2) + "\n",
+      { mode: 0o600 },
+    );
+    if (config.captureContent !== captureContent) {
+      const store = new LocalStore(state());
+      try {
+        store.resetCaptureCheckpoints();
+      } finally {
+        store.close();
+      }
+    }
+    process.stdout.write(
+      `${captureContent ? "Redacted content" : "Metadata-only"} capture configured. Restart the collector to apply and re-read available history.\n`,
+    );
+  });
+program
   .command("backfill")
   .option("--since <date>", "ISO date; omitted captures all persisted history")
   .action(async (options: unknown) => {

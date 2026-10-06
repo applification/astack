@@ -29,6 +29,24 @@ test("private deployment gates access and supports live run/trace/work/skills na
     .first()
     .tap();
   await expect(screen.getByRole("heading", "Activity trace")).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () => document.querySelector(".event-preview") !== null,
+    ),
+  ).toBe(true);
+  await screen.getByLabel("Show content").uncheck();
+  expect(
+    await browser.evaluate(
+      () => document.querySelector(".event-preview") === null,
+    ),
+  ).toBe(true);
+  await expect(
+    screen.getByText(
+      "Conversation and tool content is hidden on this screen. Capture continues privately.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await screen.getByLabel("Show content").check();
   await expect(
     screen.getByRole("heading", "Skills, instructions & workflows"),
   ).toBeVisible();
@@ -60,7 +78,7 @@ test("private deployment gates access and supports live run/trace/work/skills na
       document.documentElement.getAttribute("data-theme"),
     ),
   ).toBe("light");
-  expect(await browser.evaluate(() => Object.keys(localStorage))).toEqual([
-    "astack-observatory-theme",
-  ]);
+  expect(
+    await browser.evaluate(() => Object.keys(localStorage).sort()),
+  ).toEqual(["astack-observatory-show-content", "astack-observatory-theme"]);
 });

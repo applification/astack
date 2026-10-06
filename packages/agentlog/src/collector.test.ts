@@ -13,6 +13,7 @@ import { persistSnapshot } from "./collector";
 import { linkSession } from "./context";
 import { execFileSync } from "node:child_process";
 import { capability } from "./adapters/codex";
+import { initialize, loadConfig } from "./config";
 
 const directories: string[] = [];
 afterEach(async () => {
@@ -99,7 +100,7 @@ test("unchanged event replay preserves its first observation time and stays dedu
   expect(store.events(event().runId)).toHaveLength(1);
   store.close();
 });
-test("default Codex capture withholds content, identifies failed tests, and preserves missing timing", async () => {
+test("metadata-only Codex capture withholds content, identifies failed tests, and preserves missing timing", async () => {
   const thread = threadSchema.parse({
     id: "session",
     cwd: "/workspace",
@@ -326,7 +327,7 @@ test("metadata record and network byte budgets retain events while preventing ov
     expect(record.value.data).toHaveProperty("omitted");
   store.close();
 });
-test("legacy unknown turn times and disabled raw capture do not invent measured behavior", async () => {
+test("legacy unknown turn times do not invent measured behavior in either capture mode", async () => {
   const options = {
     thread: threadSchema.parse({
       id: "s",
@@ -345,12 +346,170 @@ test("legacy unknown turn times and disabled raw capture do not invent measured 
   expect(snapshot.run.startTimeKnown).toBe(false);
   expect(snapshot.run.status).toBe("unknown");
   expect(snapshot.run.findings).toHaveLength(0);
-  await expect(
-    normalizeTurn({
-      ...options,
-      machine: { ...options.machine, captureContent: true },
+  const withContent = await normalizeTurn({
+    ...options,
+    machine: { ...options.machine, captureContent: true },
+  });
+  expect(withContent.run.startTimeKnown).toBe(false);
+  expect(withContent.run.status).toBe("unknown");
+  expect(withContent.run.findings).toHaveLength(0);
+});
+test("readable content is redacted before queueing, and capture-mode replay replaces rather than duplicates events", async () => {
+  const dir = await directory();
+  const store = new LocalStore(dir, ["owner-private-value"]);
+  const options = {
+    thread: threadSchema.parse({
+      id: "s",
+      cwd: "/fixture",
+      source: "appServer",
+      cliVersion: "0.160.0",
+      createdAt: 1,
+      updatedAt: 2,
     }),
-  ).rejects.toThrow("raw_capture_disabled");
+    turn: turnSchema.parse({
+      id: "t",
+      status: "completed",
+      startedAt: 1,
+      completedAt: 2,
+      items: [
+        {
+          id: "u",
+          type: "userMessage",
+          content: [
+            {
+              type: "text",
+              text: "Fix the checkout test; owner-private-value",
+            },
+          ],
+        },
+        {
+          id: "a",
+          type: "agentMessage",
+          text: "The checkout assertion failed; I will inspect its fixture.",
+        },
+        {
+          id: "c",
+          type: "commandExecution",
+          command: "bun test --token flag-secret",
+          aggregatedOutput:
+            'Expected 200, received 500. {"apiKey":"json-secret"} HOME=/private/env',
+          exitCode: 1,
+          status: "completed",
+        },
+        {
+          id: "m",
+          type: "mcpToolCall",
+          server: "fixture",
+          tool: "inspect",
+          status: "completed",
+          arguments: {
+            query: "checkout",
+            password: "nested-secret",
+            env: { HOME: "env-secret" },
+          },
+          result: {
+            content: [
+              {
+                type: "text",
+                text: 'Missing fixture. {"refresh_token":"refresh-secret"}',
+              },
+            ],
+          },
+        },
+        {
+          id: "d",
+          type: "dynamicToolCall",
+          tool: "lookup",
+          status: "completed",
+          arguments: { query: "fixture" },
+        },
+        {
+          id: "f",
+          type: "functionCallOutput",
+          name: "lookup",
+          output: "Fixture entry is absent.",
+        },
+        {
+          id: "r",
+          type: "reasoning",
+          text: "hidden-reasoning-must-stay-omitted",
+        },
+      ],
+    }),
+    machine: { machineId, machineName: "fixture", captureContent: false },
+    signatureKey: "key",
+    knownSecrets: ["owner-private-value"],
+    observedAt: 3000,
+  };
+  const metadata = await normalizeTurn(options);
+  persistSnapshot(store, metadata);
+  const readable = await normalizeTurn({
+    ...options,
+    machine: { ...options.machine, captureContent: true },
+    observedAt: 4000,
+  });
+  persistSnapshot(store, readable);
+  expect(store.events(readable.run.id)).toHaveLength(metadata.events.length);
+  expect(
+    store.events(readable.run.id).find((e) => e.kind === "user_prompt")
+      ?.observedAt,
+  ).toBe(3000);
+  const serialized = JSON.stringify(store.batch(machineId)?.envelope);
+  for (const secret of [
+    "owner-private-value",
+    "flag-secret",
+    "json-secret",
+    "/private/env",
+    "nested-secret",
+    "env-secret",
+    "refresh-secret",
+    "hidden-reasoning-must-stay-omitted",
+  ])
+    expect(serialized).not.toContain(secret);
+  for (const useful of [
+    "Fix the checkout test",
+    "Expected 200, received 500",
+    "Missing fixture",
+    "Fixture entry is absent",
+    "bun test",
+    "[REDACTED]",
+  ])
+    expect(serialized).toContain(useful);
+  expect(readable.run.title).toBe(metadata.run.title);
+  expect(readable.run.contentCapture).toBe(true);
+  persistSnapshot(store, await normalizeTurn({ ...options, observedAt: 5000 }));
+  const withheld = JSON.stringify(store.batch(machineId)?.envelope);
+  expect(withheld).not.toContain("Fix the checkout test");
+  expect(withheld).not.toContain("Expected 200");
+  expect(withheld).toContain("[WITHHELD]");
+  store.close();
+});
+test("new collectors default to readable content and the content command can disable capture and replay history", async () => {
+  const dir = await directory();
+  const config = await initialize(dir, {
+    endpoint: "http://127.0.0.1:1234",
+    tokenFile: join(dir, "fake-token"),
+  });
+  expect(config.captureContent).toBe(true);
+  const store = new LocalStore(dir);
+  store.setMeta("codex:fixture:false:updated", "1000");
+  store.close();
+  const child = Bun.spawn(
+    [
+      process.execPath,
+      join(import.meta.dir, "cli.ts"),
+      "--state",
+      dir,
+      "content",
+      "off",
+    ],
+    { stdout: "pipe", stderr: "pipe" },
+  );
+  expect(await child.exited).toBe(0);
+  expect((await loadConfig(dir)).captureContent).toBe(false);
+  const updated = new LocalStore(dir);
+  expect(updated.getMeta("codex:fixture:false:updated")).toBeNull();
+  updated.close();
 });
 test("special skill files cannot block hashing or capture", async () => {
   const dir = await directory();

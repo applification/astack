@@ -10,7 +10,9 @@ test("trace expands failure evidence, preserves unknown times and filters failur
   await expect(screen.getByRole("heading", "Activity trace")).toBeVisible();
   await screen.getByText("Test/check result", { exact: true }).tap();
   await expect(
-    screen.getByText('"output": "[WITHHELD]"', { exact: false }),
+    screen.getByText("Content was not captured for this event.", {
+      exact: true,
+    }),
   ).toBeVisible();
   await expect(screen.getByText("Time unavailable")).toHaveCount(3);
   await screen.getByLabel("Failures and interventions only").check();
@@ -29,6 +31,85 @@ test("trace expands failure evidence, preserves unknown times and filters failur
   expect(
     await browser.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+test("readable trace content defaults on, hides completely and remembers the choice after reload", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  const path = "/iframe.html?id=observatory-trace--readable&viewMode=story";
+  await app.open(path);
+  await expect(
+    screen.getByText(
+      "Fix the checkout test so it accepts an expired session.",
+      { exact: true, visible: true },
+    ),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("bun test checkout --token [REDACTED]", {
+      exact: true,
+      visible: true,
+    }),
+  ).toBeVisible();
+  await screen.getByText("Test/check result", { exact: true }).tap();
+  await expect(
+    screen.getByText("Checkout assertion failed: expected 200, received 401.", {
+      exact: false,
+    }),
+  ).toBeVisible();
+  await screen.getByLabel("Show content").uncheck();
+  expect(
+    await browser.evaluate(() =>
+      document.body.textContent?.includes("expired session"),
+    ),
+  ).toBe(false);
+  expect(
+    await browser.evaluate(() =>
+      document.body.textContent?.includes("bun test checkout"),
+    ),
+  ).toBe(false);
+  expect(
+    await browser.evaluate(() =>
+      document.body.textContent?.includes("expected 200"),
+    ),
+  ).toBe(false);
+  await expect(
+    screen.getByText('"exitCode": 1', { exact: false }),
+  ).toBeVisible();
+  await app.screenshot("trace-content-hidden");
+  await app.restart();
+  await app.open(path);
+  expect(
+    await browser.evaluate(() =>
+      document.body.textContent?.includes("expired session"),
+    ),
+  ).toBe(false);
+  expect(
+    await browser.evaluate(() =>
+      localStorage.getItem("astack-observatory-show-content"),
+    ),
+  ).toBe("hide");
+  await screen.getByLabel("Show content").check();
+  await expect(
+    screen.getByText(
+      "Fix the checkout test so it accepts an expired session.",
+      { exact: true, visible: true },
+    ),
+  ).toBeVisible();
+  await screen.getByText("Test/check result", { exact: true }).tap();
+  await expect(
+    screen.getByText("Checkout assertion failed: expected 200, received 401.", {
+      exact: false,
+    }),
+  ).toBeVisible();
+  await app.screenshot("trace-content-readable");
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
 });

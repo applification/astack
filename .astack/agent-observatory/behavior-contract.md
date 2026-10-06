@@ -8,7 +8,7 @@ Observe how coding agents accomplish engineering work, then use the evidence to 
 
 - CAPTURE: Read persisted turns from every configured Codex home and source kind (active and archived), without starting/resuming/interrupting agent turns. Deduplicate replay and preserve updates. Show capture coverage and unavailable facts.
 - PORTABLE: A compiled agentlog can run independently of the UI/backend source. Adapter translation does not put Codex types into the core domain.
-- PRIVACY: Redact before every local persistence/network boundary. Default to metadata; prompts, outputs, code, MCP arguments/results are withheld. Never enumerate environment values into telemetry. V1 rejects raw content capture; metadata redaction is enforced. Credentials stay in permission-restricted local files.
+- PRIVACY: Redact before every local persistence/network boundary. Capture readable prompts and tool details by default, with a metadata-only machine option and a separate display toggle. Never enumerate environment values into telemetry or collect hidden reasoning. Secret redaction remains mandatory in both modes. Credentials stay in permission-restricted local files.
 - OFFLINE: Killing the collector or losing connectivity retains its queue and checkpoints. Restart and replay deliver each logical record once; telemetry faults never change agent execution.
 - PRIVATE: Persistent Convex on Otis, loopback-only Docker bindings, HTTPS through Tailscale Serve, no Funnel/public exposure. Machine credentials cannot read data or impersonate another machine. Native Convex JWT authentication protects every UI query.
 - LINKS: Runs without work are useful. Trusted launch context/session binding supplies work/project IDs automatically when available. Work view groups external references and supports safe source links without creating work records.
@@ -36,3 +36,14 @@ Owner-selected visual reference: [the live Astack site](https://astack.applifica
 - THEME: Offer System, Light and Dark before and after sign-in. System follows live OS changes; an explicit preference survives page reload. Persist only that preference, never access keys/JWTs. Theme control remains keyboard accessible.
 
 Storybook is selected for isolated light/dark fixture captures and theme interactions, plus a deployed UI check. The owner’s rendered site supplies the visual direction for this refinement; the already unavailable Pen connection is not retried. No Pen artifact/comparison is claimed. Record actual reference-to-browser comparison separately from that original gap.
+
+## Readable trace content, 2026-10-06
+
+Owner requests readable conversation and tool evidence to diagnose skill/workflow failures, with the ability to hide it when needed. This supersedes the initial metadata-only capture decision.
+
+- CONTENT: New collectors default to redacted content capture. Otis explicitly enables it; existing explicit metadata-only configurations retain their choice. Commands, visible messages, MCP arguments/results and supported tool output remain readable after secret redaction. Run/event titles stay metadata so a hidden trace does not leak prompt or command text through headings. Hidden reasoning remains omitted.
+- HIDE: The trace defaults to Show content. Turning it off removes message previews and captured content from the DOM while leaving useful status, timing, skill and failure metadata. This is a display preference, not deletion or a change to collector capture. Persist only the preference alongside the theme, never content or credentials.
+- REPLAY: Changing a machine's capture mode resets capture checkpoints and re-reads available persisted history using existing identities. Events stay deduplicated; first observation times, skill provenance, work links and assessed outcomes remain intact. Missing source history cannot be reconstructed, and metadata-only mode cannot guarantee erasure of records whose source has disappeared.
+- SECRETS: Known secrets, credential fields, bearer tokens, private keys, environment assignments and JSON credentials embedded in outputs are redacted before buffering/networking. Optional permission-restricted credential files supplement known-secret matching before truncation. Existing record and network size bounds remain enforced.
+
+Pen is skipped for this addition: it uses the existing trace layout and checkbox controls without a new visual direction. Storybook is selected for readable/withheld/hidden states, persisted toggle interaction, light/dark and narrow rendering. Real collector replay and authenticated deployed UI checks establish the data path separately.

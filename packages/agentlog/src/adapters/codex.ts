@@ -231,12 +231,14 @@ export async function normalizeTurn(options: {
     captureContent: boolean;
   };
   signatureKey: string;
+  knownSecrets?: readonly string[];
   observedAt: number;
   work?: WorkReference;
   projectId?: string;
 }): Promise<AgentSnapshot> {
   const { thread, turn, machine, observedAt } = options;
-  if (machine.captureContent) throw new Error("raw_capture_disabled");
+  const safeText = (value: string) => redactText(value, options.knownSecrets);
+  const safeData = (value: unknown) => redact(value, options.knownSecrets);
   const runId = runIdentity(machine.machineId, thread.id, turn.id);
   const events: AgentEvent[] = [];
   const signature = (value: string) =>
@@ -295,7 +297,7 @@ export async function normalizeTurn(options: {
           .join("\n");
         emit(`${itemId}:prompt`, seq, "user_prompt", "User prompt", {
           data: machine.captureContent
-            ? { content: redactText(text) }
+            ? { content: safeText(text) }
             : { content: "[WITHHELD]", characters: text.length },
         });
         for (const [i, input] of inputs.entries())
@@ -321,7 +323,7 @@ export async function normalizeTurn(options: {
         const item = itemSchemas.agentMessage.parse(raw);
         emit(itemId, seq, "assistant_output", "Assistant output", {
           data: machine.captureContent
-            ? { content: redactText(item.text) }
+            ? { content: safeText(item.text) }
             : { content: "[WITHHELD]", characters: item.text.length },
         });
         break;
@@ -330,17 +332,21 @@ export async function normalizeTurn(options: {
         const item = itemSchemas.commandExecution.parse(raw);
         const testing = isTest(item.command);
         const commandSignature = signature(item.command);
-        const command = machine.captureContent
-          ? redactText(item.command)
-          : testing
-            ? "Test/check command"
-            : "Shell command";
+        const command = testing ? "Test/check command" : "Shell command";
         emit(
           `${itemId}:call`,
           seq,
           testing ? "test_run" : "shell_command",
           command,
-          { tool: "shell", signature: commandSignature },
+          {
+            tool: "shell",
+            signature: commandSignature,
+            data: {
+              command: machine.captureContent
+                ? safeText(item.command)
+                : "[WITHHELD]",
+            },
+          },
         );
         if (item.status !== "inProgress")
           emit(
@@ -361,7 +367,7 @@ export async function normalizeTurn(options: {
                 status: item.status,
                 exitCode: item.exitCode ?? null,
                 ...(machine.captureContent
-                  ? { output: redactText(item.aggregatedOutput ?? "") }
+                  ? { output: safeText(item.aggregatedOutput ?? "") }
                   : { output: "[WITHHELD]" }),
               },
             },
@@ -372,8 +378,8 @@ export async function normalizeTurn(options: {
               `${itemId}:read:${i}`,
               seq + 2 + i * 2,
               "file_read",
-              `Read ${redactText(action.path)}`,
-              { data: { path: redactText(action.path) } },
+              `Read ${safeText(action.path)}`,
+              { data: { path: safeText(action.path) } },
             );
             const skill = await capability(
               action.path,
@@ -400,7 +406,7 @@ export async function normalizeTurn(options: {
           tool,
           signature: sig,
           data: machine.captureContent
-            ? { arguments: redact(item.arguments) }
+            ? { arguments: safeData(item.arguments) }
             : { arguments: "[WITHHELD]" },
         });
         if (item.status !== "inProgress")
@@ -423,7 +429,10 @@ export async function normalizeTurn(options: {
               data: {
                 status: item.status,
                 ...(machine.captureContent
-                  ? { result: redact(item.result), error: redact(item.error) }
+                  ? {
+                      result: safeData(item.result),
+                      error: safeData(item.error),
+                    }
                   : { result: "[WITHHELD]" }),
               },
             },
@@ -436,7 +445,7 @@ export async function normalizeTurn(options: {
           failed: item.status === "failed",
           data: {
             status: item.status,
-            paths: item.changes.map((c) => redactText(c.path)),
+            paths: item.changes.map((c) => safeText(c.path)),
           },
         });
         break;
@@ -468,7 +477,7 @@ export async function normalizeTurn(options: {
             tool,
             failed: item.success === false || item.status === "failed",
             data: machine.captureContent
-              ? { arguments: redact(item.arguments), status: item.status }
+              ? { arguments: safeData(item.arguments), status: item.status }
               : { status: item.status },
           },
         );
@@ -479,7 +488,7 @@ export async function normalizeTurn(options: {
         emit(itemId, seq, "tool_result", `Tool output: ${item.name}`, {
           tool: item.name,
           data: machine.captureContent
-            ? { output: redact(item.output) }
+            ? { output: safeData(item.output) }
             : { output: "[WITHHELD]" },
         });
         break;
@@ -510,7 +519,7 @@ export async function normalizeTurn(options: {
       failed: true,
       signature: signature(JSON.stringify(turn.error)),
       data: machine.captureContent
-        ? { error: redact(turn.error) }
+        ? { error: safeData(turn.error) }
         : { error: "[WITHHELD]" },
     });
   if (completedAt !== null)
@@ -535,21 +544,16 @@ export async function normalizeTurn(options: {
     source:
       thread.originator ??
       (typeof thread.source === "string" ? thread.source : "subagent"),
-    cwd: redactText(thread.cwd),
+    cwd: safeText(thread.cwd),
     ...(thread.gitInfo?.originUrl
-      ? { repo: redactText(thread.gitInfo.originUrl) }
+      ? { repo: safeText(thread.gitInfo.originUrl) }
       : {}),
     ...(thread.gitInfo?.branch
-      ? { branch: redactText(thread.gitInfo.branch) }
+      ? { branch: safeText(thread.gitInfo.branch) }
       : {}),
     ...(thread.gitInfo?.sha ? { commit: thread.gitInfo.sha } : {}),
     ...(thread.model ? { model: thread.model } : {}),
-    title: machine.captureContent
-      ? String(
-          events.find((e) => e.kind === "user_prompt")?.data.content ??
-            "Agent turn",
-        ).slice(0, 4096)
-      : `${basename(thread.cwd) || "Workspace"} · Codex turn ${turn.id.slice(0, 8)}`,
+    title: `${basename(thread.cwd) || "Workspace"} · Codex turn ${turn.id.slice(0, 8)}`,
     startedAt,
     startTimeKnown: turn.startedAt != null,
     completedAt,
@@ -589,6 +593,7 @@ export class CodexAdapter {
     private home: string,
     private store: LocalStore,
     private signatureKey: string,
+    private readonly knownSecrets: readonly string[] = [],
   ) {
     this.reader = new CodexReader(config.codexBinary, home);
   }
@@ -647,6 +652,7 @@ export class CodexAdapter {
                 turn,
                 machine: this.config,
                 signatureKey: this.signatureKey,
+                knownSecrets: this.knownSecrets,
                 observedAt: Date.now(),
                 ...parsed,
               });

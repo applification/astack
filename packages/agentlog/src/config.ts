@@ -22,7 +22,8 @@ export const configSchema = z
       .array(z.object({ path: z.string(), label: z.string() }).strict())
       .min(1),
     pollSeconds: z.number().int().min(10).max(3600).default(30),
-    captureContent: z.literal(false).default(false),
+    captureContent: z.boolean().default(true),
+    secretFiles: z.array(z.string().min(1)).max(100).default([]),
     since: z.number().nonnegative(),
   })
   .strict();

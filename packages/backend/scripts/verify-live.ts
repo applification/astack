@@ -80,6 +80,9 @@ const page = await owner.query(api.observatory.runs, {
   paginationOpts: { numItems: 100, cursor: null },
 });
 results.runsInFirstPage = page.page.length;
+results.runsWithContentCaptureInPage = page.page
+  .map((value) => runSchema.parse(JSON.parse(value)))
+  .filter((run) => run.contentCapture).length;
 results.runsWithSkillEvidenceInPage = page.page
   .map((value) => runSchema.parse(JSON.parse(value)))
   .filter((run) => run.skills.length > 0).length;
@@ -90,7 +93,7 @@ results.capabilityGroupsInFirstPage = (
 ).page.length;
 const stable = page.page
   .map((value) => runSchema.parse(JSON.parse(value)))
-  .find((run) => run.completedAt !== null);
+  .find((run) => run.completedAt !== null && run.contentCapture);
 if (!stable) throw new Error("A captured completed run is required");
 const before = await owner.query(api.observatory.run, { runId: stable.id });
 const trace = await owner.query(api.observatory.trace, {
@@ -99,6 +102,25 @@ const trace = await owner.query(api.observatory.trace, {
 });
 assert("real_persisted_trace_present", trace.page.length > 0);
 results.traceEventsInFirstPage = trace.page.length;
+assert(
+  "redacted_content_present",
+  trace.page.some((value) => {
+    const event = z
+      .object({ data: z.record(z.string(), z.json()) })
+      .parse(JSON.parse(value));
+    return ["content", "command", "output", "arguments", "result"].some(
+      (key) => {
+        const detail = event.data[key];
+        return (
+          detail !== undefined &&
+          detail !== null &&
+          detail !== "" &&
+          detail !== "[WITHHELD]"
+        );
+      },
+    );
+  }),
+);
 if (process.env.OBSERVATORY_RESTART_PROOF === "1") {
   execFileSync("docker", ["compose", "restart", "backend"], {
     cwd: runtime,

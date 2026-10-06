@@ -88,6 +88,61 @@ export const Empty: Story = { args: { events: [] } };
 export const Failure: Story = {
   args: { events: events.filter((e) => e.failed) },
 };
+export const Readable: Story = {
+  args: {
+    events: [
+      eventSchema.parse({
+        ...events[0],
+        id: "fixture:prompt",
+        sequence: 0,
+        kind: "user_prompt",
+        title: "User prompt",
+        data: {
+          content: "Fix the checkout test so it accepts an expired session.",
+        },
+      }),
+      eventSchema.parse({
+        ...events[0],
+        id: "fixture:assistant",
+        sequence: 1,
+        kind: "assistant_output",
+        title: "Assistant output",
+        data: {
+          content: "I will inspect the fixture and run the checkout tests.",
+        },
+      }),
+      eventSchema.parse({
+        ...events[0],
+        id: "fixture:command",
+        sequence: 2,
+        kind: "test_run",
+        title: "Test/check command",
+        data: { command: "bun test checkout --token [REDACTED]" },
+      }),
+      eventSchema.parse({
+        ...events[2],
+        id: "fixture:readable-result",
+        sequence: 3,
+        data: {
+          exitCode: 1,
+          status: "completed",
+          output:
+            "Checkout assertion failed: expected 200, received 401.\nThe fixture session has expired.",
+        },
+      }),
+      eventSchema.parse({
+        ...events[0],
+        id: "fixture:arguments",
+        sequence: 4,
+        kind: "mcp_call",
+        title: "MCP fixture/inspect",
+        data: {
+          arguments: { query: "checkout session", apiKey: "[REDACTED]" },
+        },
+      }),
+    ],
+  },
+};
 export const MissingTimeAndPrivacy: Story = {
   args: { events: events.filter((e) => e.timestamp === null) },
 };
