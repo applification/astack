@@ -1,11 +1,14 @@
 # Agent Observatory
 
-Agent Observatory is Astack’s private feedback system for coding-agent behavior. It captures persisted Codex desktop, CLI and T3-backed Codex turns belonging to enrolled projects, groups them by project and optional external work references, and shows traces and skill-version correlations. It lives in this repository. There is no COS work store or agent dispatcher in Astack today; Observatory does not create either.
+Agent Observatory is Astack’s private feedback system for coding-agent behavior. It captures native Codex desktop/CLI turns and, when configured, provider turns recorded by T3 Code, including Claude and Codex. It observes enrolled projects, groups runs by project and optional external work references, and shows traces and skill-version correlations. It lives in this repository. There is no COS work store or agent dispatcher in Astack today; Observatory does not create either.
 
 ```mermaid
 flowchart LR
   P[Owner's project capture policy] --> A
   C[Codex homes: thread metadata] --> A[Codex adapter: match project before full turns]
+  T[T3 environment: provider-neutral history] --> B[T3 adapter: match project before full threads]
+  P --> B
+  B --> L
   A --> L[agentlog: metadata, redaction, SQLite queue]
   L -->|private HTTPS over Tailscale| I[Authenticated ingestion on Otis]
   I --> V[Self-hosted Convex]
@@ -35,7 +38,7 @@ The header's **Color theme** control offers System, Light and Dark on both the a
 
 The trace's **Show content** toggle defaults on. Expand events to read captured messages, commands and tool arguments/results. Uncheck it to hide that content, including previews; timing, failures and skill evidence remain visible. Your choice survives reloads. Only theme and content-visibility preferences are stored in localStorage, never conversation content or credentials. Hiding details does not stop capture or erase privately stored content.
 
-New collectors capture readable content with mandatory secret redaction. An existing `captureContent: false` setting stays metadata-only until explicitly enabled. To change a machine's collection mode, run `agentlog content on` or `agentlog content off` and restart its collector. Changing modes re-reads available local Codex history using the same event identities. History that Codex no longer retains cannot be reconstructed, and stopping capture does not guarantee deletion of older records whose source has disappeared. Large content remains bounded by the record limits. Hidden reasoning is never collected.
+New collectors capture readable content with mandatory secret redaction. An existing `captureContent: false` setting stays metadata-only until explicitly enabled. To change a machine's collection mode, run `agentlog content on` or `agentlog content off` and restart its collector. Changing modes re-reads available configured source history using the same event identities. History that a source no longer retains cannot be reconstructed, and stopping capture does not guarantee deletion of older records whose source has disappeared. Large content remains bounded by the record limits. Hidden reasoning is never collected.
 
 The collector always redacts its ingestion key and known environment secrets. Add paths to single-credential files in `secretFiles` in the private collector config for additional known-secret matching; Otis includes the owner's viewer-key file. These values are read privately before capture and never included in telemetry. Structured credentials, environment assignments and common token formats are also redacted in either capture mode.
 
@@ -47,6 +50,27 @@ docker compose --project-directory "$HOME/.local/share/astack/observatory" ps
 ```
 
 The status command reports queued records, project-policy health, source health and forwarding health. A stopped backend does not stop the coding agent: the independent collector retains its eligible SQLite queue and retries with backoff. Restarting the collector preserves identity, checkpoints, signatures and undelivered revisions.
+
+## Optional multi-provider T3 capture
+
+Native Codex homes remain configured independently. To also observe T3's recorded Claude, Codex and other provider turns, install the updated agentlog binary and add a T3 source on the computer hosting that T3 environment and its workspaces. No provider settings or launch paths need to change. This adapter does not collect standalone Claude sessions launched outside T3.
+
+Create an owner-issued T3 pairing grant that includes `orchestration:read`, and save the pairing value in a private file with mode `0600`. Stop the collector while changing configuration, then run:
+
+```sh
+agentlog t3-configure \
+  --url http://127.0.0.1:3773 \
+  --label "T3 Otis" \
+  --pairing-file "$HOME/.agentlog/t3-pairing.token"
+```
+
+Use your T3 server's actual origin; loopback HTTP and private Tailscale HTTPS are supported. The command exchanges the grant for bearer access scoped only to `orchestration:read`, validates active and archived reads, and stores the bearer in a restricted `t3-ENVIRONMENT_ID.token` file. Remove the temporary pairing file after successful setup. An existing bearer can instead be supplied with `--token-file /absolute/private/file`. Never pass a credential value in command arguments or put it in the repository.
+
+The source is appended to `t3Sources` in the existing private config, retaining native homes, machine identity, ingestion credential, capture settings and native checkpoints. Restart the collector using its existing supervision and inspect `agentlog status`: `t3` lists each environment's health separately from `homes`. An expired/revoked credential, incompatible protocol or unreachable T3 server reports a capture error and leaves native capture running. Renew the grant and rerun setup when access expires. The saved environment UUID is checked before any bearer credential is sent on later polls.
+
+The adapter includes active and archived threads, checks project enrollment before fetching full history, and retrieves omitted tool output through T3's full-item read. Local Git identity takes precedence; if a worktree has been removed, reported T3 project identity can still match its repository. A fork's reported origin stays distinct from upstream, and the source of repository evidence is labelled in run coverage. One Observatory run represents one provider turn, since a T3 run can include several turns. T3's own run/thread/turn identities remain in the start event. Codex uses the same canonical native session/turn identity in both adapters: the first collector owns its events, preserving existing history and preventing double counts. Native capture is polled first; a later source cannot enrich a turn already owned by the other source. Weak or missing native Codex references are deferred and retried, with `partial` health and a deferred-turn count.
+
+Shared message, command, tool, file-change, error, interruption and subagent records translate across T3 providers. Provider-specific observations vary; unsupported items are counted in run coverage. Claude `Read` and `Skill` tools can provide direct capability evidence. Automatically supplied instructions and hidden reasoning are not inferred or stored. T3-recorded timestamps are labelled as agent-surfaced observations; completion still leaves engineering outcome unknown. Each response is bounded to 32 MiB; larger histories report `t3_response_budget` and require a future paginated adapter rather than silently losing records. T3 protocol-v2 fixtures and the installed schema were checked; authenticated installed-host Claude capture remains pending an owner read grant. See [T3 evidence](../.astack/agent-observatory/t3-evidence.md).
 
 ## Enroll and select projects
 
@@ -62,17 +86,17 @@ Saving a project schedules a bounded pass over retained backend history, and its
 
 ## What the data means
 
-| Concept | Meaning in v1 |
-| --- | --- |
-| Project | Owner-enrolled grouping and capture boundary across machines, clones and worktrees. |
-| Run | An execution attempt; one persisted Codex turn. Session and parent-session identities remain available. |
-| Completion | The agent turn ended. Engineering outcome remains `unknown` until explicitly supplied. |
-| Trace | Native item order, augmented by separately labelled hook observations. Persisted items usually have no wall-clock time. |
-| Start / duration | Native turn time when present. Legacy session-date fallbacks are labelled and have unknown run duration. |
-| Skill or instruction | Direct read action or explicit skill input. Availability in a catalog is not evidence of use. |
-| Skill hash | File content at first observation, preserved across later polls. A historical run's original version may be unavailable. |
-| Workflow | Explicitly declared workflow step. Conversation text is not guessed into a workflow. |
-| Problem | Deterministic evidence of repeated failures, failed turns, or no completion with stale persisted session activity. Interventions and long runs are additional informational findings. |
+| Concept              | Meaning in v1                                                                                                                                                                         |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Project              | Owner-enrolled grouping and capture boundary across machines, clones and worktrees.                                                                                                   |
+| Run                  | An execution attempt; one native Codex or T3 provider turn. Session and available parent-session identities remain available.                                                         |
+| Completion           | The agent turn ended. Engineering outcome remains `unknown` until explicitly supplied.                                                                                                |
+| Trace                | Recorded item order, augmented by separately labelled hook observations. Native Codex persisted items usually have no wall-clock time; T3 can record item times.                      |
+| Start / duration     | Native turn time when present. Legacy session-date fallbacks are labelled and have unknown run duration.                                                                              |
+| Skill or instruction | Direct read action or explicit skill input. Availability in a catalog is not evidence of use.                                                                                         |
+| Skill hash           | File content at first observation, preserved across later polls. A historical run's original version may be unavailable.                                                              |
+| Workflow             | Explicitly declared workflow step. Conversation text is not guessed into a workflow.                                                                                                  |
+| Problem              | Deterministic evidence of repeated failures, failed turns, or no completion with stale persisted session activity. Interventions and long runs are additional informational findings. |
 
 The Skills view groups by kind, name, hash and provenance. Its counts span the selected project's enrolled runs, or all enrolled projects; drill-down selects that exact group. Run-list and Work-view totals describe loaded pages.
 
@@ -82,7 +106,7 @@ Runs, Work and Problems share select menus for repository, work reference, agent
 
 Readable capture includes visible messages, commands and supported tool arguments/results after mandatory redaction. Metadata-only capture withholds these details. Hidden reasoning is always omitted. Tool names, exit status, durations when available, changed/read paths, skill hashes and keyed command signatures remain useful in either mode. Redaction runs again before every durable record write. Record detail and network batches have byte budgets; omission is explicit.
 
-Capture reads supported app-server methods without resuming or starting turns. It enumerates thread metadata from every source kind and separately includes archived threads. It requests full turns only for enabled, uniquely matched projects. Available matching history is included by default. Separate T3/Codex homes must be configured. Ephemeral, cloud-only and unpersisted sessions have no recoverable local history. Persisted token usage is unavailable. The paginated full-item API is experimental and verified with Codex **0.160.0**; inspect source health after upgrading Codex.
+Native capture reads supported app-server methods without resuming or starting turns. It enumerates thread metadata from every source kind and separately includes archived threads. It requests full turns only for enabled, uniquely matched projects. Available matching history is included by default. Additional native Codex homes and optional T3 environments are configured separately. Ephemeral, cloud-only and unpersisted sessions have no recoverable local history. Token usage is not collected. The paginated full-item API is experimental and verified with Codex **0.160.0**; T3 requires orchestration protocol **2**. Inspect source health after upgrading either source.
 
 Capability hashes skip special files, remote/cloud/protected macOS locations and reads exceeding the deadline; their hashes stay unknown. Skill reads exposed only inside an opaque composite tool call may not have direct native read evidence. Hash provenance is visible rather than reconstructed from a current checkout's commit. The system does not infer ignored/late skills without an expected-skill declaration, prove causation from correlations, or compare agents in v1.
 
@@ -112,7 +136,7 @@ agentlog outcome --session SESSION_ID --turn TURN_ID --value success
 ## Work and activity headings
 
 Work still groups explicit `(projectId, work.id)` references across conversations;
-an activity still represents one native Codex turn. Cached headings make those
+an activity still represents one captured provider turn. Cached headings make those
 identities readable without changing grouping or inferring work success. A supplied
 Work label wins over a generated heading, including when its originating run is
 outside the loaded page. Source Work IDs and native session/turn IDs remain available.

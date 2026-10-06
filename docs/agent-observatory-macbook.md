@@ -36,9 +36,11 @@ Otis is ready; **nothing has been installed on the MacBook**. Run these steps th
 
    Project policy, source health and forwarding should become `ok`; matching historical runs drain in bounded batches. Open [Observatory](https://otis.tail12a0a0.ts.net:8450) over Tailscale, select a project and filter runs by the machine UUID printed at installation. All available history matching enabled projects is included unless you set a later `since` in config. Unregistered and ambiguous conversations are excluded. After its first policy fetch, an offline MacBook uses the last accepted policy until it reconnects.
 
-## Codex desktop and T3 Code homes
+## Native Codex homes and optional T3 capture
 
 The default is `CODEX_HOME` or `~/.codex`. If desktop/CLI/T3 uses another home, edit `~/.agentlog/config.json` and add its absolute path to `homes`. Read T3's provider settings to find its selected home; do not assume a shadow home is the default. New collectors capture readable content with mandatory secret redaction. Use `agentlog content off` and restart the collector for metadata-only capture. The dashboard's Show content toggle separately hides captured details on screen.
+
+Keep native Codex homes when adding multi-provider T3 capture. Configure the MacBook's own T3 environment with `agentlog t3-configure` and an owner-issued read grant, following [T3 setup](agent-observatory.md#optional-multi-provider-t3-capture). This adds Claude and other T3-recorded providers without changing Codex execution. Use the MacBook's loopback server origin, not Otis's workspace paths. Existing repository enrollment still covers its worktrees; source overlap retains one canonical Codex turn.
 
 ```json
 "homes": [

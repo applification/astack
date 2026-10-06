@@ -3,6 +3,28 @@ import { homedir, hostname } from "node:os";
 import { join } from "node:path";
 import { z } from "zod";
 
+export const t3SourceSchema = z
+  .object({
+    url: z.url().refine((value) => {
+      const url = new URL(value);
+      return (
+        !url.username &&
+        !url.password &&
+        !url.search &&
+        !url.hash &&
+        url.pathname === "/" &&
+        ((url.protocol === "https:" && url.hostname.endsWith(".ts.net")) ||
+          (url.protocol === "http:" &&
+            ["127.0.0.1", "localhost", "[::1]"].includes(url.hostname)))
+      );
+    }, "Use a loopback HTTP or private Tailscale HTTPS origin"),
+    environmentId: z.string().uuid(),
+    tokenFile: z.string().min(1),
+    label: z.string().min(1).max(128),
+  })
+  .strict();
+export type T3Source = z.infer<typeof t3SourceSchema>;
+
 export const configSchema = z
   .object({
     schemaVersion: z.literal(1),
@@ -21,6 +43,7 @@ export const configSchema = z
     homes: z
       .array(z.object({ path: z.string(), label: z.string() }).strict())
       .min(1),
+    t3Sources: z.array(t3SourceSchema).max(20).default([]),
     pollSeconds: z.number().int().min(10).max(3600).default(30),
     captureContent: z.boolean().default(true),
     secretFiles: z.array(z.string().min(1)).max(100).default([]),
