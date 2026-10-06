@@ -12,6 +12,7 @@ import type * as access from "../access.js";
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
 import type * as ingestion from "../ingestion.js";
+import type * as naming from "../naming.js";
 import type * as observatory from "../observatory.js";
 import type * as projectData from "../projectData.js";
 import type * as projects from "../projects.js";
@@ -28,6 +29,7 @@ const fullApi: ApiFromModules<{
   auth: typeof auth;
   http: typeof http;
   ingestion: typeof ingestion;
+  naming: typeof naming;
   observatory: typeof observatory;
   projectData: typeof projectData;
   projects: typeof projects;

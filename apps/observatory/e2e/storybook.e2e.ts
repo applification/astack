@@ -1,5 +1,63 @@
 import { test } from "@e2e-dev/web";
 import { expect } from "e2e";
+test("reactive naming subscriptions render pending fallbacks and survive fresh run objects", async ({
+  app,
+  screen,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-runs--reactive-naming-fallback&viewMode=story",
+  );
+  await expect(
+    screen.getByRole("link", "Validate ingestion", { exact: true }),
+  ).toBeVisible();
+  await screen.getByRole("button", "Refresh activity").tap();
+  await expect(screen.getByText("Refreshed 1", { exact: true })).toBeVisible();
+  await expect(
+    screen.getByRole("link", "Validate ingestion", { exact: true }),
+  ).toBeVisible();
+});
+test("Work and activities use readable cached names with source fallbacks and explicit label precedence", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-runs--named-work-and-activities&viewMode=story",
+  );
+  await expect(
+    screen.getByRole("link", "Add readable Work headings", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("link", "Name activities using the Codex subscription", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("link", "astack · Codex turn fixture-2", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("link", "Name Work and agent activity", { exact: false }),
+  ).toHaveCount(3);
+  await browser.setViewport({ width: 1280, height: 1360 });
+  await app.screenshot("work-activity-names-light");
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await app.screenshot("work-activity-names-dark-narrow");
+  await app.open(
+    "/iframe.html?id=observatory-runs--explicit-work-label&viewMode=story",
+  );
+  await expect(
+    screen.getByRole("link", "Owner’s chosen heading", { exact: false }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Generated heading", { exact: true }),
+  ).toHaveCount(0);
+});
 test("upload progress distinguishes waiting, partial, paginated and complete traces", async ({
   app,
   screen,
@@ -294,7 +352,9 @@ test("runs design renders readable status, work links and machine context", asyn
   await expect(screen.getByRole("heading", "Agent runs")).toBeVisible();
   await expect(screen.getByText("Turn completed")).toBeVisible();
   await expect(screen.getByText("No completion observed")).toBeVisible();
-  await expect(screen.getByRole("link", "Work AST-fixture")).toHaveCount(3);
+  await expect(
+    screen.getByRole("link", "Work · Fixture work reference"),
+  ).toHaveCount(3);
   await app.screenshot("runs-mixed");
   await browser.setViewport({ width: 390, height: 844 });
   await expect(screen.getByRole("heading", "Agent runs")).toBeVisible();

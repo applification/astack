@@ -109,6 +109,68 @@ agentlog workflow --session SESSION_ID --turn TURN_ID --name implement --step ve
 agentlog outcome --session SESSION_ID --turn TURN_ID --value success
 ```
 
+## Work and activity headings
+
+Work still groups explicit `(projectId, work.id)` references across conversations;
+an activity still represents one native Codex turn. Cached headings make those
+identities readable without changing grouping or inferring work success. A supplied
+Work label wins over a generated heading, including when its originating run is
+outside the loaded page. Source Work IDs and native session/turn IDs remain available.
+
+The independent naming worker uses `gpt-6-luna` through the owner's saved **ChatGPT
+login in Codex**. It runs `codex exec` with ephemeral sessions, ignored user/project
+configuration, disabled host integrations, a read-only sandbox and an empty working
+directory. Captured requests go through stdin; final JSON is validated and temporary
+files are removed. Capture and delivery never wait for the model. This uses subscription
+quota, with no Platform API key, Convex inference action or Vercel gateway involved.
+See [Codex authentication](https://learn.chatgpt.com/docs/auth) and
+[noninteractive execution](https://learn.chatgpt.com/docs/non-interactive-mode).
+
+The worker batches up to four naming targets in one call. Each activity uses its
+first usable, captured user request; Work samples requests from up to four related
+turns, including different conversations. Each excerpt is limited to 1,200 characters
+and already redacted. Native environment/instruction preambles are excluded. New
+targets wait a minute before claiming so nearby requests can contribute. Successful
+names remain stable: page loads, replay and collector polling do not call the model.
+The initial historical backfill also consumes subscription quota.
+
+Only content-bearing records belonging to currently enabled capture policy can
+be sent for naming. Metadata-only, withheld, unavailable or failed inputs retain
+their original heading/Work ID. The server rechecks current policy, Work membership
+and event revision before accepting a result. Owner JWTs protect both prompts and
+names; machine ingestion credentials cannot operate the naming worker. Failures
+back off; expired claims recover after a worker stops.
+
+After deploying the backend/UI and updated agentlog binary, configure **one** worker
+on the machine whose Codex home is signed in with ChatGPT. Verify that login with
+`codex login status` using the selected `CODEX_HOME`, then use the owner's existing
+viewer credential file (separate from the ingestion token):
+
+```sh
+agentlog names-configure \
+  --backend-url https://otis.tail12a0a0.ts.net:8451 \
+  --auth-url https://otis.tail12a0a0.ts.net:8452/auth/session \
+  --viewer-token-file "$HOME/.local/share/astack/observatory/viewer-access-key" \
+  --codex-home "$HOME/.codex"
+agentlog names --once --backfill
+agentlog names-service --executable "$HOME/.local/share/astack/observatory/bin/agentlog"
+```
+
+`names-service` installs a separate `net.applification.astack-agentlog-names`
+LaunchAgent and resumes bounded historical backfill. Its config, cursor and logs
+live in the private agentlog state directory: `names-config.json`,
+`names-backfill.json`, and `names.{err,out}.log`. The collector keeps its existing
+service and credential. `--once` processes at most one backfill page and one ready
+batch; it can report zero names while newly queued targets are waiting. On Linux,
+supervise `agentlog names --backfill` separately using the same user with Codex auth.
+To rescan previously skipped history after enabling capture, remove only the naming
+cursor file and rerun `names --backfill`; successful names remain cached.
+
+OpenAI's [Sign in with ChatGPT plan-usage preview](https://developers.openai.com/siwc/token-sharing-open-source)
+is a future standalone integration option. It requires the app's own registration
+and consent flow. The current worker reuses supported Codex authentication and
+needs no additional sign-in integration.
+
 ## Optional hooks
 
 Automatic persisted capture needs no hooks. For near-use skill hashes, intervention observations and more timing/context, install the optional asynchronous definitions and **review/trust them through Codex `/hooks`**. Native exact-hash trust is never bypassed. SessionEnd is excluded because it is synchronous even when marked async.
