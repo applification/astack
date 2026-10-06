@@ -40,3 +40,7 @@ Confirmed findings fixed:
 Reports are supplied observations, not authenticated certificates. Artifact bytes are retained by verification and referenced by Observatory. Assessment history is immutable, with the latest 20 shown. Every declared case is material; missing proof stays inconclusive and a retry pass stays flagged flaky. A revised manifest/proof needs a new UUID.
 
 Upgrade the backend before using evaluation records and retain the upgraded collector for queue replay. The first implementation pass performed no deployment; the subsequent owner-authorized Otis rollout is recorded above. No merge was performed. The initial local T3 preview gap and compiled runtime smoke gap are superseded by the observed Otis preview and signed CLI checks. Authenticated captures were disallowed by runner secret policy; retained captures remain synthetic.
+
+## Simplified evaluation review
+
+The follow-up delivers a readable timeline, expandable behavior checks and lightweight outcome feedback, with existing detailed assessments available behind a disclosure. [UX contract](../ux-contract.md) and [proof index](ux-review.json) cover U1–U4, native authorization/idempotency tests, real local save/reload, component states and the deployed Otis journey. Captures use synthetic data; live private pixels and credentials are not retained.
