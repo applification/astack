@@ -1,0 +1,29 @@
+{
+  "command": "bun packages/agentlog/src/cli.ts evaluation demo-proof --variant VARIANT --output .proof/observatory-evals/cli",
+  "results": [
+    {
+      "variant": "defective",
+      "status": "fail",
+      "revision": "24e178fa8790e5482f5fd28d9e46805b06e2b31b",
+      "dirty": true,
+      "sourceDigest": "d604351b46e8beeb25e9442ce73888e3e54eff5b6d2fff85a9f45e6d03107a7a",
+      "exitCode": 0
+    },
+    {
+      "variant": "fixed",
+      "status": "pass",
+      "revision": "24e178fa8790e5482f5fd28d9e46805b06e2b31b",
+      "dirty": true,
+      "sourceDigest": "d604351b46e8beeb25e9442ce73888e3e54eff5b6d2fff85a9f45e6d03107a7a",
+      "exitCode": 0
+    },
+    {
+      "variant": "unavailable",
+      "status": "inconclusive",
+      "revision": "24e178fa8790e5482f5fd28d9e46805b06e2b31b",
+      "dirty": true,
+      "sourceDigest": "d604351b46e8beeb25e9442ce73888e3e54eff5b6d2fff85a9f45e6d03107a7a",
+      "exitCode": 0
+    }
+  ]
+}
