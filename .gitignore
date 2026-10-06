@@ -6,3 +6,8 @@
 examples/chatgpt-plugin/.data/
 examples/e2e-proof/.e2e/
 examples/chatgpt-plugin/.proof/
+**/.env.local
+infra/observatory/.env
+**/.agentlog/
+/.e2e/
+/.e2e-live/

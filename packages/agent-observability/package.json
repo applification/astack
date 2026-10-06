@@ -1,0 +1,16 @@
+{
+  "name": "@astack/agent-observability",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/domain.ts",
+    "./analysis": "./src/analysis.ts",
+    "./filters": "./src/filters.ts",
+    "./redaction": "./src/redaction.ts",
+    "./projects": "./src/projects.ts"
+  },
+  "dependencies": {
+    "zod": "4.6.5"
+  }
+}

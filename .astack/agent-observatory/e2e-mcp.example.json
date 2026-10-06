@@ -1,0 +1,5 @@
+{
+  "mcpServers": {
+    "observatory-e2e": {"command": "bunx", "args": ["--no-install", "e2e", "mcp", "--config", "e2e.config.ts"]}
+  }
+}

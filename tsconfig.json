@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": [
+      "ES2023",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "types": [
+      "bun"
+    ],
+    "noUncheckedIndexedAccess": true
+  },
+  "include": [
+    "apps/observatory/**/*.ts",
+    "apps/observatory/**/*.tsx",
+    "packages/**/*.ts",
+    "packages/**/*.tsx",
+    "infra/observatory/**/*.ts",
+    "e2e*.config.ts"
+  ]
+}

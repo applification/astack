@@ -1,0 +1,17 @@
+{
+  "name": "@astack/agentlog",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "agentlog": "./src/cli.ts"
+  },
+  "dependencies": {
+    "@astack/agent-observability": "workspace:*",
+    "commander": "15.0.0",
+    "zod": "4.6.5"
+  },
+  "scripts": {
+    "build": "bun build src/cli.ts --compile --outfile dist/agentlog"
+  }
+}

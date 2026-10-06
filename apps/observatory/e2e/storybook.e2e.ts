@@ -1,0 +1,433 @@
+import { test } from "@e2e-dev/web";
+import { expect } from "e2e";
+test("upload progress distinguishes waiting, partial, paginated and complete traces", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-trace--waiting-for-upload&viewMode=story",
+  );
+  await expect(screen.getByRole("status")).toHaveText(
+    "0 of 169 events uploaded. Syncing the remaining events…",
+  );
+  await expect(screen.getByText("No events captured yet.")).toHaveCount(0);
+  await screen.getByLabel("Color theme").selectOption({ value: "light" });
+  await app.screenshot("trace-waiting-upload-light");
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await app.screenshot("trace-waiting-upload-dark-narrow");
+  await app.open(
+    "/iframe.html?id=observatory-trace--partly-uploaded&viewMode=story",
+  );
+  await expect(screen.getByRole("status")).toHaveText(
+    "5 of 169 events uploaded. Syncing the remaining events…",
+  );
+  await screen.getByLabel("Failures and interventions only").check();
+  await expect(screen.getByRole("status")).toContainText(
+    "5 of 169 events uploaded.",
+  );
+  await app.open(
+    "/iframe.html?id=observatory-trace--more-uploaded-events&viewMode=story",
+  );
+  await expect(screen.getByRole("status")).toHaveText(
+    "At least 5 of 169 events uploaded. 5 loaded here. More events are available below.",
+  );
+  await app.open(
+    "/iframe.html?id=observatory-trace--upload-complete&viewMode=story",
+  );
+  await expect(screen.getByRole("status")).toHaveText(
+    "5 of 5 events uploaded. Trace up to date.",
+  );
+  await app.open(
+    "/iframe.html?id=observatory-trace--checking-upload&viewMode=story",
+  );
+  await expect(screen.getByRole("status")).toHaveText(
+    "Checking uploaded events…",
+  );
+  await app.open(
+    "/iframe.html?id=observatory-trace--summary-updating&viewMode=story",
+  );
+  await expect(screen.getByRole("status")).toHaveText(
+    "5 events uploaded. Capture summary updating.",
+  );
+  await app.open(
+    "/iframe.html?id=observatory-trace--loading-more-uploads&viewMode=story",
+  );
+  await expect(screen.getByRole("status")).toHaveText(
+    "At least 5 of 169 events uploaded. 5 loaded here. Loading more…",
+  );
+});
+test("categorical menus keep choices available after selection and clear categories and dates", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open("/iframe.html?id=observatory-filters--choices&viewMode=story");
+  await screen.getByLabel("Color theme").selectOption({ value: "light" });
+  expect(
+    await browser.evaluate(
+      () => document.querySelectorAll(".filters select").length,
+    ),
+  ).toBe(10);
+  expect(
+    await browser.evaluate(
+      () => document.querySelectorAll('.filters input[type="text"]').length,
+    ),
+  ).toBe(0);
+  await screen
+    .getByLabel("Status", { exact: true })
+    .selectOption({ value: "failed" });
+  await expect(screen.getByLabel("Status", { exact: true })).toHaveValue(
+    "failed",
+  );
+  await screen
+    .getByLabel("Branch", { exact: true })
+    .selectOption({ value: "older-history-branch" });
+  await screen
+    .getByLabel("Machine", { exact: true })
+    .selectOption({ label: "Dave’s MacBook · fixture-macbook" });
+  await expect(screen.getByLabel("Machine", { exact: true })).toHaveValue(
+    "fixture-macbook",
+  );
+  await screen
+    .getByLabel("Branch", { exact: true })
+    .selectOption({ value: "codex/observatory" });
+  await screen
+    .getByLabel("Status", { exact: true })
+    .selectOption({ value: "" });
+  await screen.getByLabel("From date").fill("2026-10-01");
+  await screen.getByLabel("Through date").fill("2026-10-06");
+  await app.screenshot("filter-menus-light");
+  await screen.getByRole("button", "Clear filters", { exact: true }).tap();
+  await expect(screen.getByLabel("Machine", { exact: true })).toHaveValue("");
+  await expect(screen.getByLabel("Branch", { exact: true })).toHaveValue("");
+  await expect(screen.getByLabel("From date")).toHaveValue("");
+  await expect(screen.getByLabel("Through date")).toHaveValue("");
+  await screen.getByLabel("From date").fill("2026-10-01");
+  await expect(
+    screen.getByRole("button", "Clear filters", { exact: true }),
+  ).toBeVisible();
+  await screen.getByRole("button", "Clear filters", { exact: true }).tap();
+  await expect(screen.getByLabel("From date")).toHaveValue("");
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await app.screenshot("filter-menus-narrow-dark");
+});
+test("filter loading, empty and unavailable URL selections remain usable", async ({
+  app,
+  screen,
+}) => {
+  await app.open("/iframe.html?id=observatory-filters--loading&viewMode=story");
+  await expect(screen.getByLabel("Branch", { exact: true })).toBeDisabled();
+  await expect(screen.getByLabel("Status", { exact: true })).toBeEnabled();
+  await expect(
+    screen.getByText("Loading filter choices…", { exact: true }),
+  ).toBeVisible();
+  await app.open("/iframe.html?id=observatory-filters--empty&viewMode=story");
+  await expect(screen.getByLabel("Branch", { exact: true })).toBeEnabled();
+  await expect(
+    screen.getByLabel("Branch", { exact: true }).getByRole("option"),
+  ).toHaveCount(1);
+  await app.open(
+    "/iframe.html?id=observatory-filters--unavailable-selection&viewMode=story",
+  );
+  await expect(screen.getByLabel("Branch", { exact: true })).toHaveValue(
+    "removed-branch",
+  );
+  await expect(
+    screen
+      .getByLabel("Branch", { exact: true })
+      .getByRole("option", "removed-branch · unavailable", { exact: true }),
+  ).toBeAttached();
+  await screen
+    .getByLabel("Branch", { exact: true })
+    .selectOption({ value: "" });
+  await expect(screen.getByLabel("Branch", { exact: true })).toHaveValue("");
+});
+test("trace expands failure evidence, preserves unknown times and filters failures", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open("/iframe.html?id=observatory-trace--mixed&viewMode=story");
+  await screen.getByLabel("Color theme").selectOption({ value: "light" });
+  await expect(screen.getByRole("heading", "Activity trace")).toBeVisible();
+  await screen.getByText("Test/check result", { exact: true }).tap();
+  await expect(
+    screen.getByText("Content was not captured for this event.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(screen.getByText("Time unavailable")).toHaveCount(3);
+  await screen.getByLabel("Failures and interventions only").check();
+  await expect(
+    screen.getByText("Test/check result", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Skill read: convex-expert", { exact: true }),
+  ).toHaveCount(0);
+  await screen.getByLabel("Failures and interventions only").uncheck();
+  await app.screenshot("trace-failure-expanded");
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  await app.screenshot("trace-failure-dark");
+  await browser.setViewport({ width: 390, height: 844 });
+  await expect(screen.getByRole("heading", "Activity trace")).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+});
+test("readable trace content defaults on, hides completely and remembers the choice after reload", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  const path = "/iframe.html?id=observatory-trace--readable&viewMode=story";
+  await app.open(path);
+  await expect(
+    screen.getByText(
+      "Fix the checkout test so it accepts an expired session.",
+      { exact: true, visible: true },
+    ),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("bun test checkout --token [REDACTED]", {
+      exact: true,
+      visible: true,
+    }),
+  ).toBeVisible();
+  await screen.getByText("Test/check result", { exact: true }).tap();
+  await expect(
+    screen.getByText("Checkout assertion failed: expected 200, received 401.", {
+      exact: false,
+    }),
+  ).toBeVisible();
+  await screen.getByLabel("Show content").uncheck();
+  expect(
+    await browser.evaluate(() =>
+      document.body.textContent?.includes("expired session"),
+    ),
+  ).toBe(false);
+  expect(
+    await browser.evaluate(() =>
+      document.body.textContent?.includes("bun test checkout"),
+    ),
+  ).toBe(false);
+  expect(
+    await browser.evaluate(() =>
+      document.body.textContent?.includes("expected 200"),
+    ),
+  ).toBe(false);
+  await expect(
+    screen.getByText('"exitCode": 1', { exact: false }),
+  ).toBeVisible();
+  await app.screenshot("trace-content-hidden");
+  await app.restart();
+  await app.open(path);
+  expect(
+    await browser.evaluate(() =>
+      document.body.textContent?.includes("expired session"),
+    ),
+  ).toBe(false);
+  expect(
+    await browser.evaluate(() =>
+      localStorage.getItem("astack-observatory-show-content"),
+    ),
+  ).toBe("hide");
+  await screen.getByLabel("Show content").check();
+  await expect(
+    screen.getByText(
+      "Fix the checkout test so it accepts an expired session.",
+      { exact: true, visible: true },
+    ),
+  ).toBeVisible();
+  await screen.getByText("Test/check result", { exact: true }).tap();
+  await expect(
+    screen.getByText("Checkout assertion failed: expected 200, received 401.", {
+      exact: false,
+    }),
+  ).toBeVisible();
+  await app.screenshot("trace-content-readable");
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+});
+test("empty and privacy stories render without inventing data", async ({
+  app,
+  screen,
+}) => {
+  await app.open("/iframe.html?id=observatory-trace--empty&viewMode=story");
+  await expect(screen.getByText("No events captured yet.")).toBeVisible();
+  await app.open(
+    "/iframe.html?id=observatory-trace--missing-time-and-privacy&viewMode=story",
+  );
+  await screen.getByText("Skill read: convex-expert", { exact: true }).tap();
+  await expect(
+    screen.getByText("convex-expert · 0123456789ab · observation time · read", {
+      exact: true,
+    }),
+  ).toBeVisible();
+});
+test("runs design renders readable status, work links and machine context", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open("/iframe.html?id=observatory-runs--mixed&viewMode=story");
+  await screen.getByLabel("Color theme").selectOption({ value: "light" });
+  await expect(screen.getByRole("heading", "Agent runs")).toBeVisible();
+  await expect(screen.getByText("Turn completed")).toBeVisible();
+  await expect(screen.getByText("No completion observed")).toBeVisible();
+  await expect(screen.getByRole("link", "Work AST-fixture")).toHaveCount(3);
+  await app.screenshot("runs-mixed");
+  await browser.setViewport({ width: 390, height: 844 });
+  await expect(screen.getByRole("heading", "Agent runs")).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await app.screenshot("runs-narrow");
+});
+
+test("theme choice survives reload and system mode follows the browser", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open("/iframe.html?id=observatory-runs--mixed&viewMode=story");
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  expect(
+    await browser.evaluate(() =>
+      document.documentElement.getAttribute("data-theme"),
+    ),
+  ).toBe("dark");
+  await expect(screen.getByText("Turn completed")).toBeVisible();
+  await app.screenshot("runs-dark");
+  await app.restart();
+  await app.open("/iframe.html?id=observatory-runs--mixed&viewMode=story");
+  expect(
+    await browser.evaluate(() =>
+      document.documentElement.getAttribute("data-theme"),
+    ),
+  ).toBe("dark");
+  await browser.setViewport({ width: 390, height: 844 });
+  await app.screenshot("runs-narrow-dark");
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await screen.getByLabel("Color theme").selectOption({ value: "system" });
+  expect(
+    await browser.evaluate(
+      () =>
+        document.documentElement.getAttribute("data-theme") ===
+        (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"),
+    ),
+  ).toBe(true);
+  expect(
+    await browser.evaluate(() =>
+      Object.keys(localStorage).filter(
+        (key) => key !== "@storybook/manager/store",
+      ),
+    ),
+  ).toEqual(["astack-observatory-theme"]);
+});
+
+test("project management adds/edits/pauses a project and keeps the selector readable on narrow screens", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open("/iframe.html?id=observatory-projects--mixed&viewMode=story");
+  await expect(screen.getByRole("heading", "Projects")).toBeVisible();
+  await screen.getByLabel("Project name").fill("Checkout");
+  await screen
+    .getByLabel("Repository URLs")
+    .fill("git@github.com:fixture/checkout.git");
+  await screen.getByRole("button", "Save project", { exact: true }).tap();
+  await expect(
+    screen.getByRole("link", "Checkout", { exact: true }),
+  ).toBeVisible();
+  await screen.getByRole("button", "Edit Checkout", { exact: true }).tap();
+  await screen.getByLabel("Project name").fill("Checkout app");
+  await screen.getByRole("button", "Save project", { exact: true }).tap();
+  await expect(
+    screen.getByRole("link", "Checkout app", { exact: true }),
+  ).toBeVisible();
+  await screen.getByRole("button", "Pause Astack", { exact: true }).tap();
+  await expect(
+    screen.getByRole("button", "Resume Astack", { exact: true }),
+  ).toBeVisible();
+  await screen
+    .getByLabel("Selected project")
+    .selectOption({ value: "00000000-0000-4000-8000-000000000100" });
+  await app.screenshot("projects-managed");
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await app.screenshot("projects-narrow-dark");
+});
+test("project empty/loading/failed-save states keep unsaved input and do not claim persistence", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-projects--loading&viewMode=story",
+  );
+  await expect(
+    screen.getByText("Loading projects…", { exact: true }),
+  ).toBeVisible();
+  await expect(screen.getByLabel("Selected project")).toBeDisabled();
+  await expect(
+    screen.getByRole("button", "Save project", { exact: true }),
+  ).toHaveCount(0);
+  await app.open("/iframe.html?id=observatory-projects--empty&viewMode=story");
+  await expect(
+    screen.getByText(
+      "No projects enrolled. Add your first project to start capture.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await app.open(
+    "/iframe.html?id=observatory-projects--save-error&viewMode=story",
+  );
+  await screen.getByLabel("Project name").fill("Unsaved project");
+  await screen
+    .getByLabel("Repository URLs")
+    .fill("https://github.com/fixture/unsaved");
+  await screen.getByRole("button", "Save project", { exact: true }).tap();
+  await expect(screen.getByRole("alert")).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () =>
+        document.querySelector<HTMLInputElement>('[aria-label="Project name"]')
+          ?.value ?? null,
+    ),
+  ).toBe("Unsaved project");
+  await expect(
+    screen.getByRole("link", "Unsaved project", { exact: true }),
+  ).toHaveCount(0);
+});

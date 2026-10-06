@@ -11,4 +11,6 @@ Read accepted decisions relevant to a change before implementing it. Decisions a
 | [0005](0005-authentication-proof-hierarchy.md) | Emulate for local/CI; disposable Staging users; explicit manual and installed-host acceptance | accepted | Auth testing |
 | [0006](0006-composable-engineering-skills.md) | Independently callable engineering skills composed by astack | accepted | Plugin skills and delivery |
 
+| [0007](0007-agent-observatory.md) | Private agent feedback with portable capture and external work references | accepted | Agent Observatory v1 |
+
 Owner confirmation: this chat on 4 October 2026 establishes the core profile and delegates selection of supported platform patterns. The implementation choices below apply that instruction. Existing products preserve their own accepted stack and policy. Future records use the next number and `proposed`, `accepted`, `rejected`, `deprecated` or `superseded` status. The owner reviews decisions through the PR; agents do not weaken their own judging policy.

@@ -1,0 +1,21 @@
+# Research, 2026-10-05
+
+This repository distributes skills, a static site and foundation examples. Its README assigns durable work records, priorities and dispatch to an external COS. The owner confirms none exists today (StoryLoop archived). Add companion runtime packages; do not reuse example work-item CRUD as an Astack work store.
+
+Otis is this macOS machine: Tailscale Self.HostName=Otis, DNS=otis.tail12a0a0.ts.net, IPv4=100.92.93.101. macOS hostname is MacBookPro. Docker CLI uses OrbStack, initially stopped. Existing Tailscale routes (including archived StoryLoop) must be preserved.
+
+Installed Codex CLI: 0.160.0. Generated protocol JSON schemas and read-only initialize/thread/list/thread/read probes succeeded. Actual desktop turns expose startedAt/completedAt/durationMs, ordered items, shell commandActions/output/exitCode/durationMs and MCP arguments/result/error/durationMs. Source reads as vscode; retain originator rather than assuming this means the IDE. A separate reader cannot know another app-server's live runtime status: no completion timestamp is not proof of failure or abandonment.
+
+## Supported mechanisms
+
+- [App-server](https://learn.chatgpt.com/docs/app-server): paginated thread/list, thread/read without subscribing/resuming, and experimental paginated thread/turns/list and thread/items/list. Explicitly request all sourceKinds; the default omits exec/appServer/subagents. Enumerate archived separately. Persisted items lack individual wall-clock timestamps. No global side-channel subscription to every client's live calls is established.
+- [Hooks](https://learn.chatgpt.com/docs/hooks): SessionStart, UserPromptSubmit, Pre/PostToolUse, Stop, Interrupt and subagent events; async command handlers. Hosted tools and specialized paths have coverage gaps. Definitions require exact-hash native trust review; do not bypass it. SessionEnd is synchronous even when async=true, so exclude it from the non-blocking collector integration. Transcript format is explicitly unstable; do not build v1 around it.
+- [OTel](https://learn.chatgpt.com/docs/config-file/config-advanced#observability-and-telemetry): supported opt-in structured export includes API, prompt and tool events. Prompt capture defaults off. Direct remote export would bypass the required machine-side redaction/offline boundary; do not configure that. OTel alone does not establish skill versions or complete desktop coverage.
+- [CLI JSONL](https://learn.chatgpt.com/docs/non-interactive-mode): codex exec --json exposes turn/item events and token usage, but does not cover ordinarily launched desktop runs. Therefore a wrapper is optional future launch integration, not the automatic capture path.
+- [T3 Code's Codex configuration](https://github.com/pingdotgg/t3code/blob/main/docs/user/providers-codex.md): uses Codex homes; separate homes must be configured in agentlog. Shared/shadow configurations can share session state. No direct T3 integration is needed for persisted Codex turns.
+- [Self-hosted Convex](https://docs.convex.dev/self-hosting), [official compose](https://github.com/get-convex/convex-backend/blob/main/self-hosted/docker/docker-compose.yml): ports 3210/3211, durable data volume, admin key for deployment only. Pin the image digest and bind only loopback.
+- [Custom Convex JWT](https://docs.convex.dev/auth/advanced/custom-jwt): verify issuer, audience and signing algorithm; data-URI JWKS avoids backend-container DNS to the tailnet. [Tailscale Serve](https://tailscale.com/docs/features/tailscale-serve) supplies identity headers at the loopback HTTP proxy. Require an owner allowlist, keep direct ingress loopback-only, and deny absent identity.
+
+## Limits to preserve in the product
+
+No observed token counts means unknown, not zero. Test classification is a command heuristic. User prompts are not automatically interventions. Interrupted history without completion may be an active turn elsewhere. A current file hash cannot establish its historical version: label observation-time hashes, and only claim use-time identity from a contemporaneous hook snapshot. Skill availability is not use. Explicit read actions/skill inputs establish evidence; late/ignored-skill claims require an expected skill declaration and evidence. Generic AI analysis and agent comparisons are outside v1.
