@@ -47,6 +47,7 @@ for (const [story, checkStatus, outcome] of [
               0,
               section.getBoundingClientRect().top + window.scrollY - 90,
             );
+          return null;
         });
         await app.screenshot("evaluation-work-timeline-light");
       }
