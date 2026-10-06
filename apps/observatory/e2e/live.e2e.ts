@@ -1,5 +1,84 @@
 import { test } from "@e2e-dev/web";
 import { expect, secrets } from "e2e";
+test("the annotated run has compact metadata, readable naming, real provider assets and no missing-time placeholders", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open();
+  await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect(screen.getByRole("heading", "Agent runs")).toBeVisible();
+  const runId =
+    "bbb1fd30-527f-4326-b685-fb9c2e021092:codex:01a110d1-fea9-7771-a899-60c3c961a438:01a111c1-1455-7c21-b604-04e1ad9d2d78";
+  await app.open(
+    `/#run/${encodeURIComponent(runId)}?project=a20a2fb3-646f-40fe-9b12-c64f759afaea`,
+  );
+  await expect(screen.getByRole("heading", "Activity trace")).toBeVisible();
+  await expect
+    .poll(() =>
+      browser.evaluate(
+        () => document.querySelector(".run-heading")?.textContent ?? "",
+      ),
+    )
+    .not.toBe("Codex activity in astack");
+  const heading = await browser.evaluate(
+    () => document.querySelector(".run-heading")?.textContent ?? null,
+  );
+  expect(heading).not.toContain("Codex turn");
+  expect(heading).not.toContain("t3-524669e0");
+  await expect(
+    screen.getByRole("link", "Repository github.com/applification/astack"),
+  ).toHaveText("astack.git");
+  await expect
+    .poll(() =>
+      browser.evaluate(() =>
+        [
+          ...document.querySelectorAll<HTMLImageElement>(
+            ".provider-logo, .repository-logo",
+          ),
+        ].every((image) => image.complete && image.naturalWidth > 0),
+      ),
+    )
+    .toBe(true);
+  await expect(
+    screen.getByText("01a110d1…a438", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("01a111c1…2d78", { exact: true }),
+  ).toBeVisible();
+  await screen.getByText("Full identifiers", { exact: true }).tap();
+  await expect(
+    screen.getByText("01a110d1-fea9-7771-a899-60c3c961a438", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Time unavailable", { exact: true }),
+  ).toHaveCount(0);
+  expect(
+    await browser.evaluate(
+      () => document.querySelectorAll("time.event-time").length,
+    ),
+  ).toBeGreaterThan(0);
+  await expect(
+    screen.getByText(/Some recorded items have no event timestamp/),
+  ).toBeVisible();
+  if (typeof heading !== "string") throw new Error("Missing run heading");
+  await screen.getByRole("link", "Back to runs", { exact: true }).tap();
+  await expect(
+    screen.getByRole("link", heading, { exact: true }),
+  ).toBeVisible();
+  await screen.getByRole("link", "Skills & workflows", { exact: true }).tap();
+  const rate = screen
+    .getByRole("button", /problem rate: \d+ of \d+ runs/)
+    .first();
+  await rate.hover();
+  await expect(screen.getByRole("tooltip")).toBeVisible();
+  await expect(screen.getByRole("tooltip")).toContainText(
+    "Counts use the selected project scope",
+  );
+  await rate.press("Escape");
+  await expect(screen.getByRole("tooltip")).toHaveCount(0);
+});
 test("the reported T3 run exposes uploaded progress and conversation details", async ({
   app,
   screen,
@@ -29,6 +108,12 @@ test("live project filter menus work across Runs, Work and Problems and find his
   await screen.getByRole("button", "Open Observatory").tap();
   await expect(screen.getByRole("heading", "Agent runs")).toBeVisible();
   await screen.getByLabel("Selected project").selectOption({ label: "Astack" });
+  await screen.getByRole("button", "Filters", { exact: true }).tap();
+  await expect
+    .poll(() =>
+      screen.getByLabel("Branch", { exact: true }).getByRole("option").count(),
+    )
+    .toBeGreaterThan(1);
   await expect(
     screen.getByText("Loading filter choices…", { exact: true }),
   ).toHaveCount(0, { timeout: 30_000 });
@@ -47,8 +132,13 @@ test("live project filter menus work across Runs, Work and Problems and find his
     screen.getByLabel("Branch", { exact: true }).getByRole("option"),
   ).toHaveCount(branches);
   await screen.getByRole("button", "Clear filters", { exact: true }).tap();
+  await screen.getByRole("button", "Filters", { exact: true }).tap();
   for (const page of ["Runs", "Work", "Problems"]) {
     await screen.getByRole("link", page, { exact: true }).tap();
+    await expect(
+      screen.getByRole("button", "Filters", { exact: true }),
+    ).toHaveAttribute("aria-expanded", "false");
+    await screen.getByRole("button", "Filters", { exact: true }).tap();
     expect(
       await browser.evaluate(
         () => document.querySelectorAll(".filters select").length,
@@ -102,6 +192,7 @@ test("private deployment gates access and supports live run/trace/work/skills na
     new URLSearchParams(location.hash.split("?")[1]).get("project"),
   );
   expect(typeof selectedProject).toBe("string");
+  await screen.getByRole("button", "Filters", { exact: true }).tap();
   await screen.getByLabel("Agent").selectOption({ value: "codex" });
   // Running turns can arrive before their queued events. Use a settled turn
   // for the separate content-visibility assertions below.
@@ -112,7 +203,10 @@ test("private deployment gates access and supports live run/trace/work/skills na
     screen.getByRole("columnheader", "Agent / machine"),
   ).toBeVisible();
   await screen
-    .getByRole("link", /Codex turn/)
+    .getByRole("region", "Agent runs table")
+    .getByRole("row")
+    .nth(1)
+    .getByRole("link")
     .first()
     .tap();
   await expect(screen.getByRole("heading", "Activity trace")).toBeVisible();

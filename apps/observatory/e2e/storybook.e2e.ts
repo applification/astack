@@ -1,5 +1,158 @@
 import { test } from "@e2e-dev/web";
 import { expect } from "e2e";
+test("compact metadata preserves full identifiers and reports clipboard success and failure", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-run-metadata--compact&viewMode=story",
+  );
+  await expect(
+    screen.getByRole(
+      "heading",
+      "Review authentication session handling and expired-session recovery",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("link", "Repository github.com/fixture/astack"),
+  ).toHaveAttribute("href", "https://github.com/fixture/astack");
+  await expect(
+    screen.getByText("0f3a8c21…83bb", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("0f3a8c21-6e4b-4a90-b913-07a135f683bb", { exact: true }),
+  ).not.toBeVisible();
+  await app.screenshot("run-metadata-light-desktop");
+  await screen.getByText("Full identifiers", { exact: true }).tap();
+  await expect(
+    screen.getByText("0f3a8c21-6e4b-4a90-b913-07a135f683bb", { exact: true }),
+  ).toBeVisible();
+  await browser.evaluate(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (text: string) =>
+          sessionStorage.setItem("fixture-copy", text),
+      },
+    });
+    return true;
+  });
+  await screen.getByRole("button", "Copy session ID", { exact: true }).tap();
+  expect(
+    await browser.evaluate(() => sessionStorage.getItem("fixture-copy")),
+  ).toBe("0f3a8c21-6e4b-4a90-b913-07a135f683bb");
+  await expect(screen.getByRole("status")).toHaveText("Copied");
+  await browser.evaluate(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async () => {
+          throw new Error("fixture-denied");
+        },
+      },
+    });
+    return true;
+  });
+  await screen.getByRole("button", "Copy attempt ID", { exact: true }).tap();
+  await expect(
+    screen.getByText("Copy unavailable; select the full value.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  expect(
+    await browser.evaluate(() => {
+      const heading = document.querySelector(".run-heading");
+      return heading ? parseFloat(getComputedStyle(heading).fontSize) : 0;
+    }),
+  ).toBe(32);
+  await app.screenshot("run-metadata-light-narrow");
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  await app.screenshot("run-metadata-dark-narrow");
+  await app.open(
+    "/iframe.html?id=observatory-run-metadata--native-fallback&viewMode=story",
+  );
+  await expect(
+    screen.getByRole("heading", "Codex activity in astack", { exact: true }),
+  ).toBeVisible();
+});
+
+test("provider marks load and problem-rate help works by hover, focus and tap beyond table clipping", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-run-metadata--providers-and-rates&viewMode=story",
+  );
+  await expect
+    .poll(() =>
+      browser.evaluate(() =>
+        [
+          ...document.querySelectorAll<HTMLImageElement>(".provider-logo"),
+        ].every((image) => image.complete && image.naturalWidth > 0),
+      ),
+    )
+    .toBe(true);
+  await expect(screen.getByText("Claude", { exact: true })).toBeVisible();
+  await expect(
+    screen.getByText("other-provider", { exact: true }),
+  ).toBeVisible();
+  const rate = screen.getByRole("button", "19% problem rate: 3 of 16 runs", {
+    exact: true,
+  });
+  await rate.hover();
+  await expect(screen.getByRole("tooltip")).toContainText(
+    "3 of 16 runs had a problem",
+  );
+  await expect(screen.getByRole("tooltip")).toContainText(
+    "informational findings are excluded",
+  );
+  await rate.press("Escape");
+  await expect(screen.getByRole("tooltip")).toHaveCount(0);
+  await rate.press("Tab");
+  await browser.keyboard.press("Shift+Tab");
+  await expect(screen.getByRole("tooltip")).toBeAttached();
+  await rate.press("Enter");
+  await browser.mouse.move(0, 0);
+  await expect(screen.getByRole("tooltip")).toBeVisible();
+  await rate.press("Escape");
+  await browser.setViewport({ width: 390, height: 844 });
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  await rate.tap();
+  await expect(screen.getByRole("tooltip")).toContainText(
+    "same version/hash and provenance group",
+  );
+  await browser.mouse.move(0, 0);
+  await expect
+    .poll(() =>
+      browser.evaluate(() => {
+        const card = document.querySelector(".help-card");
+        if (!card) return false;
+        const rect = card.getBoundingClientRect();
+        return (
+          rect.width > 250 &&
+          rect.height > 100 &&
+          rect.left >= 0 &&
+          rect.right <= innerWidth &&
+          rect.top >= 0 &&
+          rect.bottom <= innerHeight &&
+          !card.closest(".table-scroll")
+        );
+      }),
+    )
+    .toBe(true);
+  await app.screenshot("problem-rate-help-dark-narrow");
+  await screen.getByRole("link", "Runs", { exact: true }).tap();
+  await expect(screen.getByRole("tooltip")).toHaveCount(0);
+});
 test("reactive naming subscriptions render pending fallbacks and survive fresh run objects", async ({
   app,
   screen,
@@ -33,7 +186,7 @@ test("Work and activities use readable cached names with source fallbacks and ex
     }),
   ).toBeVisible();
   await expect(
-    screen.getByRole("link", "astack · Codex turn fixture-2", { exact: true }),
+    screen.getByRole("link", "Codex activity in astack", { exact: true }),
   ).toBeVisible();
   await expect(
     screen.getByRole("link", "Name Work and agent activity", { exact: false }),
@@ -128,6 +281,10 @@ test("categorical menus keep choices available after selection and clear categor
 }) => {
   await app.open("/iframe.html?id=observatory-filters--choices&viewMode=story");
   await screen.getByLabel("Color theme").selectOption({ value: "light" });
+  await expect(
+    screen.getByRole("button", "Filters", { exact: true }),
+  ).toHaveAttribute("aria-expanded", "false");
+  await screen.getByRole("button", "Filters", { exact: true }).tap();
   expect(
     await browser.evaluate(
       () => document.querySelectorAll(".filters select").length,
@@ -187,12 +344,14 @@ test("filter loading, empty and unavailable URL selections remain usable", async
   screen,
 }) => {
   await app.open("/iframe.html?id=observatory-filters--loading&viewMode=story");
+  await screen.getByRole("button", "Filters", { exact: true }).tap();
   await expect(screen.getByLabel("Branch", { exact: true })).toBeDisabled();
   await expect(screen.getByLabel("Status", { exact: true })).toBeEnabled();
   await expect(
     screen.getByText("Loading filter choices…", { exact: true }),
   ).toBeVisible();
   await app.open("/iframe.html?id=observatory-filters--empty&viewMode=story");
+  await screen.getByRole("button", "Filters", { exact: true }).tap();
   await expect(screen.getByLabel("Branch", { exact: true })).toBeEnabled();
   await expect(
     screen.getByLabel("Branch", { exact: true }).getByRole("option"),
@@ -200,6 +359,10 @@ test("filter loading, empty and unavailable URL selections remain usable", async
   await app.open(
     "/iframe.html?id=observatory-filters--unavailable-selection&viewMode=story",
   );
+  await expect(screen.getByRole("list", "Active filters")).toContainText(
+    "removed-branch",
+  );
+  await screen.getByRole("button", "Filters", { exact: true }).tap();
   await expect(screen.getByLabel("Branch", { exact: true })).toHaveValue(
     "removed-branch",
   );
@@ -227,7 +390,18 @@ test("trace expands failure evidence, preserves unknown times and filters failur
       exact: true,
     }),
   ).toBeVisible();
-  await expect(screen.getByText("Time unavailable")).toHaveCount(3);
+  await expect(screen.getByText("Time unavailable")).toHaveCount(0);
+  expect(
+    await browser.evaluate(
+      () => document.querySelectorAll(".event-time").length,
+    ),
+  ).toBe(2);
+  await expect(
+    screen.getByText("Some recorded items have no event timestamp", {
+      exact: false,
+    }),
+  ).toBeVisible();
+  await expect(screen.getByText("Hook", { exact: true })).toBeVisible();
   await screen.getByLabel("Failures and interventions only").check();
   await expect(
     screen.getByText("Test/check result", { exact: true }),

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { AgentRun } from "./domain";
+import { providerName, repositoryPresentation } from "./presentation";
 
 export const namingModel = "gpt-6-luna";
 export const namingBatchSize = 4;
@@ -47,8 +48,18 @@ export const activityNameKey = (projectId: string, runId: string) =>
   JSON.stringify(["activity", projectId, runId]);
 export const workNameKey = (projectId: string, workId: string) =>
   JSON.stringify(["work", projectId, workId]);
-export const activityHeading = (run: AgentRun, names?: RunNames) =>
-  names?.activity ?? run.title;
+export function activityHeading(run: AgentRun, names?: RunNames) {
+  if (names?.activity) return names.activity;
+  if (!/ · [^·]+ turn \S+$/.test(run.title)) return run.title;
+  const repository = repositoryPresentation(run.repo ?? run.cwd).label.replace(
+    /\.git$/,
+    "",
+  );
+  const workspace = /^(?:t3-|[a-f0-9]{8,}$)/i.test(repository)
+    ? "workspace"
+    : repository;
+  return `${providerName(run.agent)} activity in ${workspace}`;
+}
 export const workHeading = (
   runs: readonly AgentRun[],
   names: readonly RunNames[] = [],

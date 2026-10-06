@@ -21,6 +21,12 @@ import {
   type RunFilter,
 } from "@astack/agent-observability/filters";
 import { RunFilters } from "./filters";
+import {
+  ProviderLabel,
+  RepositoryLink,
+  RunMetadata,
+  ProblemRate,
+} from "./run-metadata";
 import { Activity, ArrowLeft, ExternalLink, ShieldCheck } from "lucide-react";
 import { Trace } from "./trace";
 import { Brand, ThemeControl } from "./theme";
@@ -177,7 +183,9 @@ export function RunTable({
                       names.find((name) => name.runId === run.id),
                     )}
                   </a>
-                  <span className="secondary">{run.repo ?? run.cwd}</span>
+                  <span className="secondary">
+                    <RepositoryLink value={run.repo ?? run.cwd} />
+                  </span>
                   <span className="secondary">
                     {!run.startTimeKnown && "Session date · "}
                     {date(run.startedAt)}
@@ -193,7 +201,7 @@ export function RunTable({
                   )}
                 </td>
                 <td>
-                  {run.agent}
+                  <ProviderLabel agent={run.agent} />
                   <span className="secondary">
                     {run.agentVersion ?? "Version unknown"} · {run.machineName}
                   </span>
@@ -513,10 +521,10 @@ function RunDetail({ id, projectId }: { id: string; projectId?: string }) {
       <a href={backLink}>
         <ArrowLeft size={14} aria-hidden="true" /> Back to runs
       </a>
-      <h1>{activityHeading(run, names?.[0])}</h1>
+      <h1 className="run-heading">{activityHeading(run, names?.[0])}</h1>
       <p className="subtitle">
-        {run.agent} {run.agentVersion} · {run.machineName} ·{" "}
-        {!run.startTimeKnown && "Session date · "}
+        <ProviderLabel agent={run.agent} /> {run.agentVersion} ·{" "}
+        {run.machineName} · {!run.startTimeKnown && "Session date · "}
         {date(run.startedAt)} · <Status run={run} />
       </p>
       {run.work && (
@@ -560,40 +568,7 @@ function RunDetail({ id, projectId }: { id: string; projectId?: string }) {
           )}
         </div>
       ))}
-      <dl className="metadata">
-        <div>
-          <dt>Repository / working directory</dt>
-          <dd>{run.repo ?? run.cwd}</dd>
-        </div>
-        <div>
-          <dt>Branch / commit</dt>
-          <dd>
-            {run.branch ?? "Unknown"} · {run.commit?.slice(0, 12) ?? "Unknown"}
-          </dd>
-        </div>
-        <div>
-          <dt>Session / attempt</dt>
-          <dd>
-            {run.sessionId}
-            <br />
-            {run.attemptId}
-          </dd>
-        </div>
-        <div>
-          <dt>Model from thread metadata</dt>
-          <dd>{run.model ?? "Unknown"}</dd>
-        </div>
-        <div>
-          <dt>Duration / events</dt>
-          <dd>
-            {duration(run)} · {run.eventCount} events
-          </dd>
-        </div>
-        <div>
-          <dt>Work outcome</dt>
-          <dd>{run.outcome}</dd>
-        </div>
-      </dl>
+      <RunMetadata run={run} duration={duration(run)} />
       <h2>Skills, instructions & workflows</h2>
       <div className="tag-list">
         {run.skills.length ? (
@@ -671,8 +646,8 @@ function Capabilities({ projectId }: { projectId?: string }) {
               <th>Skill / workflow / instruction</th>
               <th>Hash / provenance</th>
               <th>Runs</th>
-              <th>Problematic</th>
-              <th>Rate</th>
+              <th>Runs with problems</th>
+              <th>Problem rate</th>
             </tr>
           </thead>
           <tbody>
@@ -694,7 +669,12 @@ function Capabilities({ projectId }: { projectId?: string }) {
                   <td className={row.problematic ? "negative" : "positive"}>
                     {row.problematic}
                   </td>
-                  <td>{Math.round((100 * row.problematic) / row.runs)}%</td>
+                  <td>
+                    <ProblemRate
+                      runs={row.runs}
+                      problematic={row.problematic}
+                    />
+                  </td>
                 </tr>
               ))}
           </tbody>
