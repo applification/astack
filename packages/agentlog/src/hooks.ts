@@ -16,6 +16,7 @@ import { LocalStore } from "./store";
 import { loadConfig } from "./config";
 import { cachedProjects } from "./projects";
 import { resolveProject } from "@astack/agent-observability/projects";
+import { localRepository } from "./git";
 
 const hookSchema = z.object({
   session_id: z.string(),
@@ -45,13 +46,16 @@ export async function captureHook(directory: string, raw: unknown) {
     token,
   ]);
   try {
+    const projects = cachedProjects(store);
+    if (!projects.some((p) => p.enabled)) return;
     const prior = store
       .runsForSession(hook.session_id)
       .find((r) => r.cwd === hook.cwd);
-    const project = resolveProject(cachedProjects(store), {
+    const repo = prior?.repo ?? (await localRepository(hook.cwd));
+    const project = resolveProject(projects, {
       machineId: config.machineId,
       cwd: hook.cwd,
-      ...(prior?.repo ? { repo: prior.repo } : {}),
+      ...(repo ? { repo } : {}),
     });
     if (!project) return;
     const workId = process.env.ASTACK_WORK_ID;

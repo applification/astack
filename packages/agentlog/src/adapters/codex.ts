@@ -18,6 +18,7 @@ import { redact, redactText } from "@astack/agent-observability/redaction";
 import { CodexReader } from "./rpc";
 import type { CollectorConfig } from "../config";
 import type { LocalStore } from "../store";
+import { localRepository } from "../git";
 import {
   resolveProject,
   type Project,
@@ -607,6 +608,9 @@ export class CodexAdapter {
     this.reader = reader ?? new CodexReader(config.codexBinary, home);
   }
   async *collect(): AsyncIterable<AgentSnapshot> {
+    if (!this.projects.some((p) => p.enabled)) return;
+    // Cache only within this poll; subsequent polls see origin/folder changes.
+    const repositories = new Map<string, string | null>();
     if (!this.initialized) {
       await this.reader.initialize();
       this.initialized = true;
@@ -635,11 +639,22 @@ export class CodexAdapter {
             break;
           }
           newest = Math.max(newest, thread.updatedAt);
+          let resolvedThread = thread;
+          if (!thread.gitInfo?.originUrl?.trim()) {
+            if (!repositories.has(thread.cwd))
+              repositories.set(thread.cwd, await localRepository(thread.cwd));
+            const repo = repositories.get(thread.cwd);
+            if (repo)
+              resolvedThread = {
+                ...thread,
+                gitInfo: { ...thread.gitInfo, originUrl: repo },
+              };
+          }
           const project = resolveProject(this.projects, {
             machineId: this.config.machineId,
             cwd: thread.cwd,
-            ...(thread.gitInfo?.originUrl
-              ? { repo: thread.gitInfo.originUrl }
+            ...(resolvedThread.gitInfo?.originUrl
+              ? { repo: resolvedThread.gitInfo.originUrl }
               : {}),
           });
           if (!project) continue;
@@ -664,8 +679,8 @@ export class CodexAdapter {
               const parsed = context
                 ? launchContextSchema.parse(JSON.parse(context))
                 : {};
-              yield await normalizeTurn({
-                thread,
+              const snapshot = await normalizeTurn({
+                thread: resolvedThread,
                 turn,
                 machine: this.config,
                 signatureKey: this.signatureKey,
@@ -674,6 +689,11 @@ export class CodexAdapter {
                 ...parsed,
                 projectId: project.projectId,
               });
+              if (resolvedThread !== thread)
+                snapshot.run.coverage.push(
+                  "Repository resolved from local Git at capture time; native origin unavailable.",
+                );
+              yield snapshot;
             }
             turnCursor = turns.nextCursor;
           } while (turnCursor);

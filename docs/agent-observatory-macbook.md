@@ -2,7 +2,7 @@
 
 Otis is ready; **nothing has been installed on the MacBook**. Run these steps there when convenient. The collector runs independently after installation and needs no web app or Convex server on the MacBook.
 
-1. Connect Tailscale and install Bun plus Codex CLI. Use Codex 0.160.0 or a compatible newer app-server; `codex --version` identifies the CLI the collector will read. Clone/update this Astack branch (or main after merge), then enter the repository.
+1. Connect Tailscale and install Git, Bun and Codex CLI. Use Codex 0.160.0 or a compatible newer app-server; `codex --version` identifies the CLI the collector will read. Clone/update this Astack branch (or main after merge), then enter the repository.
 
 2. Build and install locally for the MacBook’s CPU:
 
@@ -25,7 +25,7 @@ Otis is ready; **nothing has been installed on the MacBook**. Run these steps th
 
    The command retains existing machine credentials and updates the private Convex configuration. Do not paste keys into chats, commit them, or reuse Otis’s ingestion key on another machine.
 
-5. Open [Projects](https://otis.tail12a0a0.ts.net:8450/#projects). Astack's existing repository enrollment covers MacBook clones and worktrees when their Codex thread metadata includes that Git origin. Enroll other repositories you want to observe. For a non-Git project or missing origin metadata, edit its project and add its absolute MacBook folder using **Dave Hudson's MacBook** in the Computer selector. Register the machine first so it appears even before its first captured run.
+5. Open [Projects](https://otis.tail12a0a0.ts.net:8450/#projects). Astack's existing repository enrollment covers MacBook clones and future worktrees. If Codex omits the origin, the collector resolves it from the local checkout's Git configuration, including shared worktree configuration. Enroll other repositories you want to observe. For a non-Git project or unavailable repository identity, edit its project and add its absolute MacBook folder using **Dave Hudson's MacBook** in the Computer selector. Register the machine first so it appears even before its first captured run. Individual worktrees do not need folder entries.
 
 6. On the MacBook, check capture and forwarding:
 

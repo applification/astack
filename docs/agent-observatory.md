@@ -50,11 +50,13 @@ The status command reports queued records, project-policy health, source health 
 
 ## Enroll and select projects
 
-Open [Projects](https://otis.tail12a0a0.ts.net:8450/#projects), enter a name and one or more repository URLs, and save. SSH and HTTPS URLs for the same repository share an identity, so clones and worktrees on either computer match automatically when Codex records their Git origin. A repository can belong to one project. For non-Git projects, or sessions without a recorded origin, add an absolute project folder on its registered computer. Folder matching includes subfolders and respects path boundaries. Conflicting project matches are excluded rather than guessed.
+Open [Projects](https://otis.tail12a0a0.ts.net:8450/#projects), enter a name and one or more repository URLs, and save. SSH and HTTPS URLs for the same repository share an identity, so clones and worktrees on either computer match automatically. Codex's recorded origin takes precedence. When it is absent, the collector reads local Git configuration, following linked worktrees to their shared repository. New worktrees need no individual folder registration. A repository can belong to one project. For non-Git projects or unavailable repository identity, add an absolute project folder on its registered computer. Folder matching includes subfolders and respects path boundaries. Conflicting project matches are excluded rather than guessed.
 
 The **Project** selector scopes Runs, Work, Skills, Problems and their drill-downs. **All enrolled projects** combines registered history. Work references with the same ID in different projects remain separate. Project names are editable; **Pause capture** stops future uploads for that project while preserving its existing history. Astack is enrolled on Otis with its repository and known checkout folders. Additional projects require owner enrollment.
 
 The collector fetches the owner's policy before reading full turns, and ingestion independently checks membership again. An offline collector uses its last accepted policy; a new machine without a policy captures no turns. Pausing takes effect at the backend immediately, and at an offline collector when it reconnects. Machine credentials can read only repository definitions and folders for their own computer, not telemetry or other computers' folders. The Health page describes computer-wide operations, while project reports remain scoped.
+
+Local Git lookup requires Git and an available checkout. It reads repository/worktree configuration with a one-second deadline and an 8 KiB output limit; inherited Git overrides, global/system settings and configuration includes are ignored. Credentials are removed before the recovered identity leaves the lookup. Runs label this as a capture-time local observation; no historical origin, branch or commit is invented. A removed checkout with no recorded origin still cannot be identified through this fallback. Explicit folder matches remain available when Git lookup fails.
 
 Saving a project schedules a bounded pass over retained backend history, and its next collector refresh replays available matching source history. Only confident repository/folder matches are assigned. Existing unmatched or ambiguous history stays stored outside reports and is excluded from forwarding; no source files or previously retained records are deleted. Project registration is bounded to 100 projects and 16 KiB of configuration per project.
 
@@ -113,7 +115,7 @@ Automatic persisted capture needs no hooks. For near-use skill hashes, intervent
 agentlog hooks --executable "$HOME/.local/share/astack/observatory/bin/agentlog" --install
 ```
 
-Hooks write only local metadata, emit inert `{}` and fail open. Async observation times are not exact tool-start timestamps. Hooks are prepared but were not installed or trusted on Otis.
+Hooks write only local metadata, emit inert `{}` and fail open. An early hook can match an enrolled worktree through local Git before its first native snapshot; without an enabled policy or reliable project match it stores nothing. Async observation times are not exact tool-start timestamps. Hooks are prepared but were not installed or trusted on Otis.
 
 ## Development and operations
 
