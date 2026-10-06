@@ -18,7 +18,7 @@ flowchart LR
 
 ## Evaluations
 
-The [evaluation workflow](observatory-evaluations.md) joins original intent, acceptance cases, skill criteria and verification reports across captured turns. Owner assessments remain separate from capture and retain their evidence. It is verified on a disposable local backend; rollout to Otis is separate.
+The [evaluation workflow](observatory-evaluations.md) joins original intent, acceptance cases, skill criteria and verification reports across captured turns. Owner assessments remain separate from capture and retain their evidence. It is deployed on Otis: open [Evaluations](https://otis.tail12a0a0.ts.net:8450/#evaluations) and select **Observatory evaluations — first implementation** to review the actual captured request, three turns and retained proof. Its owner assessment starts pending.
 
 ## Use on Otis
 

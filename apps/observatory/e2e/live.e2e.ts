@@ -1,5 +1,83 @@
 import { test } from "@e2e-dev/web";
 import { expect, secrets } from "e2e";
+test("deployed evaluation links the captured request, retained proof and owner review form", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open();
+  await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect(screen.getByRole("heading", "Agent runs")).toBeVisible();
+  await screen.getByLabel("Selected project").selectOption({ label: "Astack" });
+  await screen.getByRole("link", "Evaluations", { exact: true }).tap();
+  await expect(
+    screen.getByRole("heading", "Evaluations", { exact: true }),
+  ).toBeVisible();
+  await screen
+    .getByRole("link", "Observatory evaluations — first implementation", {
+      exact: true,
+    })
+    .tap();
+  await expect(
+    screen.getByRole(
+      "heading",
+      "Observatory evaluations — first implementation",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Reported verification: Pass", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("3 captured turns", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("heading", "Skill application & output criteria"),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("heading", "Add an owner assessment"),
+  ).toBeVisible();
+  await expect(
+    screen.getByLabel("Reason for Intent", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByLabel("Reason for Outcome", { exact: true }),
+  ).toBeVisible();
+  await screen
+    .getByRole("link", "Original request in trace", { exact: true })
+    .tap();
+  await expect(screen.getByRole("heading", "Activity trace")).toBeVisible();
+  expect(
+    await browser.evaluate(() => {
+      const id = new URLSearchParams(location.hash.split("?")[1]).get("event");
+      const event = document.getElementById(id ?? "");
+      return {
+        open: event instanceof HTMLDetailsElement && event.open,
+        matchesRequest:
+          event
+            ?.querySelector(".event-content pre")
+            ?.textContent?.includes("astack observatory") ?? false,
+      };
+    }),
+  ).toEqual({ open: true, matchesRequest: true });
+  await screen
+    .getByRole("link", "Observatory evaluations — first implementation", {
+      exact: true,
+    })
+    .tap();
+  await screen
+    .getByText("Verification context & artifact references", { exact: true })
+    .tap();
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () =>
+        document.documentElement.scrollWidth <=
+        document.documentElement.clientWidth,
+    ),
+  ).toBe(true);
+});
 test("owner access survives reload and browser restart, and Claude rows show the captured CLI version", async ({
   app,
   screen,

@@ -2,6 +2,10 @@
 
 Feature sources: `24e178fa8790e5482f5fd28d9e46805b06e2b31b`. Observed on 2026-10-06 in the isolated `t3/observatory-evals-viability` worktree on macOS, Bun 1.4.0, e2e 0.15.1 and Chromium. The backend was an anonymous, disposable local Convex deployment on loopback ports 3210/3211; Vite used port 7410. No production telemetry or Otis credentials were used. Owned dev processes were stopped after verification.
 
+The owner later requested deployment to Otis. [Deployment proof](otis-deployment.json) supersedes the initial rollout/runtime gaps below. Revision `37a3c0c` is deployed; the backend was pushed before the UI and signed collector. Recovery files and a private database export were preserved. The signed compiled CLI checks/imports a review manifest successfully; owner/scope/evidence reads and anonymous assessment denial pass. Served HTML/JavaScript match the build. All six deployed browser journeys pass, including the evaluation review form, exact original-request trace expansion and narrow layout. The eligible queue was empty at the final observation, and project/source/forwarding health was good. T3 collaborative preview also inspected the live page successfully.
+
+One review item references the actual three captured planning/implementation turns and their original request. Its supplied report is assembled from the retained local observations, with that provenance explicit. Evidence bytes live independently of the worktree in the private runtime review directory. No synthetic runs or owner judgments were added. Only sanitized deployment facts are retained here; live raw reports and credentials remain private.
+
 ## Observed results
 
 - `observatory:check`: strict types; 85 tests passed, zero failed (domain, collector and native Convex integration).
@@ -35,4 +39,4 @@ Confirmed findings fixed:
 
 Reports are supplied observations, not authenticated certificates. Artifact bytes are retained by verification and referenced by Observatory. Assessment history is immutable, with the latest 20 shown. Every declared case is material; missing proof stays inconclusive and a retry pass stays flagged flaky. A revised manifest/proof needs a new UUID.
 
-Upgrade the backend before using evaluation records and retain the upgraded collector for queue replay. No merge or Otis deployment was performed. T3 collaborative preview automation remained unavailable after bounded corrected retries; this does not replace the successful repository-runner browser evidence. Authenticated captures were disallowed by runner secret policy; retained captures are synthetic.
+Upgrade the backend before using evaluation records and retain the upgraded collector for queue replay. The first implementation pass performed no deployment; the subsequent owner-authorized Otis rollout is recorded above. No merge was performed. The initial local T3 preview gap and compiled runtime smoke gap are superseded by the observed Otis preview and signed CLI checks. Authenticated captures were disallowed by runner secret policy; retained captures remain synthetic.

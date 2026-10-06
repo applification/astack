@@ -43,6 +43,10 @@ Use the actual generated backend/site URLs if they differ. The script rejects ho
 
 ## Rollout and limits
 
-Upgrade the backend before enabling evaluation imports. The schema-v1 envelope additionally accepts `evaluation` records; older backends reject them and older collector binaries cannot read those queue records. Retain the upgraded collector for replay. Existing run/event records retain their shape and outcomes. This work does not deploy to Otis.
+Upgrade the backend before enabling evaluation imports. The schema-v1 envelope additionally accepts `evaluation` records; older backends reject them and older collector binaries cannot read those queue records. Retain the upgraded collector for replay. Existing run/event records retain their shape and outcomes.
+
+At the owner's request, revision `37a3c0c` was deployed to Otis on 2026-10-06, with backend functions first and then the production UI/signed collector. Recovery copies and a private database export were retained. Signed CLI check/import, live evaluation auth/scope/snapshot checks and six authenticated browser journeys pass; served HTML/JavaScript match the build and source/forwarding health is good. See [deployment proof](../.astack/observatory-evals/evidence/otis-deployment.json).
+
+Open [Evaluations on Otis](https://otis.tail12a0a0.ts.net:8450/#evaluations) and select **Observatory evaluations — first implementation**. This review item uses the three actual captured planning/implementation turns, the original prompt and the retained first-delivery proof. Its report is explicitly assembled from earlier local observations and preserves their source identities; it does not claim a new agent trial or independent certificate. Evidence bytes are also retained in the private runtime's `reviews/observatory-evals-first-implementation` directory. Deployment added no owner judgment: use the assessment form to review intent, the declared implementation/verification skill criteria and outcome.
 
 The first workflow uses explicit manifests and human assessments, with bounded metadata/trace snapshots. Artifact hosting, automatic task-start/verification handoffs, semantic model judges, controlled agent execution and skill-version comparisons follow later. Synthetic assessments cannot prove real agent skill application or causal improvements.

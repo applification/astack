@@ -1,0 +1,58 @@
+{
+  "deploymentRevision": "37a3c0c16d5782820db2077a5da891e42d939461",
+  "authorizedBy": "Owner asked to deploy to Otis for review.",
+  "environment": "Otis / macOS arm64 / existing private self-hosted Convex",
+  "evaluation": {
+    "at": "2026-10-06T20:29:40.053Z",
+    "deploymentRevision": "37a3c0c16d5782820db2077a5da891e42d939461",
+    "evaluationImported": true,
+    "capturedTurns": 3,
+    "cases": 5,
+    "originalRequestSnapshotMatches": true,
+    "scopedListPresent": true,
+    "runLinkPresent": true,
+    "wrongProjectHidden": true,
+    "anonymousReadDenied": true,
+    "anonymousAssessmentDenied": true,
+    "assessmentsAddedByDeployment": 0,
+    "ownerReviewPending": true
+  },
+  "browser": {
+    "id": "01a112e8-0572-7867-a3d1-07c283e0201e",
+    "status": "passed",
+    "startedAt": "2026-10-06T20:29:18.422Z",
+    "finishedAt": "2026-10-06T20:29:27.226Z",
+    "summary": {
+      "discovered": 6,
+      "selected": 6,
+      "executed": 6,
+      "passed": 6,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 0
+    }
+  },
+  "assets": {
+    "at": "2026-10-06T20:30:29.503Z",
+    "htmlMatchesBuild": true,
+    "javascriptMatchesBuild": true,
+    "asset": "/assets/index-DrhEonRc.js",
+    "javascriptSha256": "a0fa1e75e157d51eecc9410cbdda390eac368455e8287c1b0443cab83a2510e6"
+  },
+  "collector": {
+    "signedCliCheck": "pass",
+    "signedCliImport": "pass",
+    "pendingAtObservation": 0,
+    "projectPolicy": "ok",
+    "forwarding": "ok",
+    "nativeSourcesHealthy": true,
+    "t3SourcesHealthy": true
+  },
+  "recovery": {
+    "previousUiAndCollectorPreserved": true,
+    "databaseSnapshotExported": true,
+    "credentialsPublished": false
+  },
+  "retainedPrivatePixels": false,
+  "ownerAssessmentWritten": false
+}
