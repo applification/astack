@@ -1,8 +1,9 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   useConvexConnectionState,
   usePaginatedQuery,
   useQuery,
+  useQueries,
 } from "convex/react";
 import { api } from "@astack/observatory-backend/api";
 import {
@@ -25,6 +26,37 @@ import { Trace } from "./trace";
 import { Brand, ThemeControl } from "./theme";
 import { ProjectSelector, Projects } from "./projects";
 import type { Project } from "@astack/agent-observability/projects";
+import {
+  activityHeading,
+  workHeading,
+  runNamesSchema,
+  type RunNames,
+} from "@astack/agent-observability/naming";
+
+export function useRunNames(runs: readonly AgentRun[]) {
+  // Each bounded subscription tracks the corresponding loaded page.
+  const serializedIds = JSON.stringify(runs.map((run) => run.id));
+  // useQueries requires a stable request object across its internal rerenders.
+  const queries = useMemo(() => {
+    const ids = runSchema.shape.id.array().parse(JSON.parse(serializedIds));
+    return Object.fromEntries(
+      Array.from({ length: Math.ceil(ids.length / 50) }, (_, index) => [
+        String(index),
+        {
+          query: api.naming.labels,
+          args: {
+            runIds: ids.slice(index * 50, (index + 1) * 50),
+          },
+        },
+      ]),
+    );
+  }, [serializedIds]);
+  const results = useQueries(queries);
+  return Object.values(results).flatMap((value) => {
+    const parsed = runNamesSchema.array().safeParse(value);
+    return parsed.success ? parsed.data : [];
+  });
+}
 
 const duration = (run: AgentRun) => {
   if (!run.startTimeKnown) return "Unknown";
@@ -102,9 +134,11 @@ function Status({ run }: { run: AgentRun }) {
 export function RunTable({
   runs,
   projects = [],
+  names = [],
 }: {
   runs: readonly AgentRun[];
   projects?: readonly Project[];
+  names?: readonly RunNames[];
 }) {
   return (
     <>
@@ -138,7 +172,10 @@ export function RunTable({
                     className="row-title"
                     href={runLink(run.id, run.projectId)}
                   >
-                    {run.title}
+                    {activityHeading(
+                      run,
+                      names.find((name) => name.runId === run.id),
+                    )}
                   </a>
                   <span className="secondary">{run.repo ?? run.cwd}</span>
                   <span className="secondary">
@@ -151,7 +188,7 @@ export function RunTable({
                       className="secondary"
                       href={listLink("work", run.work.id, run.projectId)}
                     >
-                      Work {run.work.id}
+                      Work · {workHeading([run], names)}
                     </a>
                   )}
                 </td>
@@ -190,6 +227,95 @@ export function RunTable({
         </table>
       </div>
     </>
+  );
+}
+
+export function WorkTable({
+  runs,
+  projects = [],
+  names = [],
+}: {
+  runs: readonly AgentRun[];
+  projects?: readonly Project[];
+  names?: readonly RunNames[];
+}) {
+  const workGroups = new Map<string, AgentRun[]>();
+  for (const run of runs)
+    if (run.work) {
+      const key = JSON.stringify([run.projectId, run.work.id]);
+      workGroups.set(key, [...(workGroups.get(key) ?? []), run]);
+    }
+  return (
+    <div className="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>External work reference</th>
+            <th>Runs loaded</th>
+            <th>Duration</th>
+            <th>Problems</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[...workGroups].map(([id, group]) => (
+            <tr key={id}>
+              <td>
+                <a
+                  href={listLink(
+                    "work",
+                    group[0]?.work?.id ?? id,
+                    group[0]?.projectId,
+                  )}
+                >
+                  {workHeading(group, names)}
+                  <span className="secondary">
+                    {[
+                      group[0]?.work?.id,
+                      projects.find((p) => p.projectId === group[0]?.projectId)
+                        ?.name,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </span>
+                </a>
+                {group[0]?.work?.url && (
+                  <a
+                    className="secondary"
+                    href={group[0].work.url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open originating work
+                  </a>
+                )}
+              </td>
+              <td>{group.length}</td>
+              <td>
+                {Math.round(
+                  group.reduce(
+                    (total, run) =>
+                      total +
+                      (run.startTimeKnown
+                        ? (run.completedAt ?? run.lastObservedAt) -
+                          run.startedAt
+                        : 0),
+                    0,
+                  ) / 60_000,
+                )}
+                m observed
+              </td>
+              <td>
+                {
+                  group.filter((r) =>
+                    r.findings.some((f) => f.severity !== "info"),
+                  ).length
+                }
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -233,6 +359,7 @@ function Runs({
     { initialNumItems: 50 },
   );
   const runs = query.results.map((value) => runSchema.parse(JSON.parse(value)));
+  const names = useRunNames(runs);
   useEffect(() => {
     // An indexed candidate page can be empty after applying combined filters.
     // Keep looking until there is a match or the project history is exhausted.
@@ -326,79 +453,12 @@ function Runs({
               </p>
             </div>
           )}
-          <div className="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>External work reference</th>
-                  <th>Runs loaded</th>
-                  <th>Duration</th>
-                  <th>Problems</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[...workGroups].map(([id, group]) => (
-                  <tr key={id}>
-                    <td>
-                      <a
-                        href={listLink(
-                          "work",
-                          group[0]?.work?.id ?? id,
-                          group[0]?.projectId,
-                        )}
-                      >
-                        {group[0]?.work?.label ?? group[0]?.work?.id ?? id}
-                        <span className="secondary">
-                          {
-                            projects.find(
-                              (p) => p.projectId === group[0]?.projectId,
-                            )?.name
-                          }
-                        </span>
-                      </a>
-                      {group[0]?.work?.url && (
-                        <a
-                          className="secondary"
-                          href={group[0].work.url}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Open originating work
-                        </a>
-                      )}
-                    </td>
-                    <td>{group.length}</td>
-                    <td>
-                      {Math.round(
-                        group.reduce(
-                          (total, run) =>
-                            total +
-                            (run.startTimeKnown
-                              ? (run.completedAt ?? run.lastObservedAt) -
-                                run.startedAt
-                              : 0),
-                          0,
-                        ) / 60_000,
-                      )}
-                      m observed
-                    </td>
-                    <td>
-                      {
-                        group.filter((r) =>
-                          r.findings.some((f) => f.severity !== "info"),
-                        ).length
-                      }
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <WorkTable runs={runs} projects={projects} names={names} />
           <h2>Captured activity</h2>
-          <RunTable runs={runs} projects={projects} />
+          <RunTable runs={runs} projects={projects} names={names} />
         </>
       ) : runs.length ? (
-        <RunTable runs={runs} projects={projects} />
+        <RunTable runs={runs} projects={projects} names={names} />
       ) : (
         <div className="empty">
           <h2>No matching runs in this page</h2>
@@ -418,6 +478,7 @@ function RunDetail({ id, projectId }: { id: string; projectId?: string }) {
   const scope = projectId ? { projectId } : {};
   const backLink = `#runs${projectId ? `?${new URLSearchParams({ project: projectId })}` : ""}`;
   const raw = useQuery(api.observatory.run, { runId: id, ...scope });
+  const names = useQuery(api.naming.labels, { runIds: [id] });
   const trace = usePaginatedQuery(
     api.observatory.trace,
     { runId: id, ...scope },
@@ -452,7 +513,7 @@ function RunDetail({ id, projectId }: { id: string; projectId?: string }) {
       <a href={backLink}>
         <ArrowLeft size={14} aria-hidden="true" /> Back to runs
       </a>
-      <h1>{run.title}</h1>
+      <h1>{activityHeading(run, names?.[0])}</h1>
       <p className="subtitle">
         {run.agent} {run.agentVersion} · {run.machineName} ·{" "}
         {!run.startTimeKnown && "Session date · "}
@@ -462,7 +523,7 @@ function RunDetail({ id, projectId }: { id: string; projectId?: string }) {
         <p className="notice">
           Work{" "}
           <a href={listLink("work", run.work.id, run.projectId)}>
-            {run.work.label ?? run.work.id}
+            {workHeading([run], names)}
           </a>
           {run.work.url && (
             <>

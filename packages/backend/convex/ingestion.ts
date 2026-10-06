@@ -11,6 +11,7 @@ import type { Doc } from "./_generated/dataModel";
 import { projectList } from "./projectData";
 import { resolveProject } from "@astack/agent-observability/projects";
 import { paginationOptsValidator } from "convex/server";
+import { queuePrompt, queueStoredPrompt, storeWorkLabel } from "./naming";
 
 function capabilities(run: AgentRun) {
   return new Map(run.skills.map((skill) => [capabilityKey(skill), skill]));
@@ -60,6 +61,12 @@ export async function storeRun(
   };
   if (previous) await ctx.db.patch(previous._id, row);
   else await ctx.db.insert("runs", row);
+  await storeWorkLabel(ctx, run);
+  if (
+    run.work &&
+    (before?.work?.id !== run.work.id || before.projectId !== run.projectId)
+  )
+    await queueStoredPrompt(ctx, run);
   const oldFacets = await ctx.db
     .query("facets")
     .withIndex("by_runId", (q) => q.eq("runId", run.id))
@@ -189,6 +196,7 @@ export const ingest = internalMutation({
         };
         if (previous) await ctx.db.patch(previous._id, row);
         else await ctx.db.insert("events", row);
+        await queuePrompt(ctx, run, event);
       }
     }
     return null;

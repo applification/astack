@@ -8,7 +8,8 @@
     "./analysis": "./src/analysis.ts",
     "./filters": "./src/filters.ts",
     "./redaction": "./src/redaction.ts",
-    "./projects": "./src/projects.ts"
+    "./projects": "./src/projects.ts",
+    "./naming": "./src/naming.ts"
   },
   "dependencies": {
     "zod": "4.6.5"

@@ -2,6 +2,34 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  names: defineTable({
+    key: v.string(),
+    kind: v.union(v.literal("activity"), v.literal("work")),
+    projectId: v.string(),
+    targetId: v.string(),
+    sources: v.array(v.object({ runId: v.string(), eventId: v.string() })),
+    state: v.union(
+      v.literal("pending"),
+      v.literal("ready"),
+      v.literal("skipped"),
+    ),
+    availableAt: v.number(),
+    attempts: v.number(),
+    claim: v.optional(v.string()),
+    snapshot: v.optional(
+      v.array(
+        v.object({
+          runId: v.string(),
+          eventId: v.string(),
+          revision: v.number(),
+        }),
+      ),
+    ),
+    title: v.optional(v.string()),
+    model: v.optional(v.string()),
+  })
+    .index("by_key", ["key"])
+    .index("by_state_and_availableAt", ["state", "availableAt"]),
   projects: defineTable({
     projectId: v.string(),
     name: v.string(),

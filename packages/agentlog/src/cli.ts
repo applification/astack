@@ -15,6 +15,7 @@ import { environmentSecrets } from "@astack/agent-observability/redaction";
 import { linkSession, refreshRun } from "./context";
 import { runIdentity } from "./adapters/codex";
 import { approvedRun } from "./projects";
+import { configureNaming, namingConfigSchema, nameActivities } from "./naming";
 
 const program = new Command()
   .name("agentlog")
@@ -22,6 +23,81 @@ const program = new Command()
   .version("0.1.0")
   .option("--state <directory>", "Private state directory", defaultStateDir());
 const state = () => resolve(z.string().parse(program.opts().state));
+program
+  .command("names-configure")
+  .description(
+    "Configure the independent owner-authenticated Codex naming worker",
+  )
+  .requiredOption("--backend-url <url>")
+  .requiredOption("--auth-url <url>", "Private Observatory /auth/session URL")
+  .requiredOption(
+    "--viewer-token-file <path>",
+    "Owner viewer credential file, separate from machine ingestion",
+  )
+  .option("--codex-home <path>", "Codex home signed in with ChatGPT")
+  .option("--model <model>", "Subscription model", "gpt-6-luna")
+  .action(async (options: unknown) => {
+    const args = z
+      .object({
+        backendUrl: z.string(),
+        authUrl: z.string(),
+        viewerTokenFile: z.string(),
+        codexHome: z.string().optional(),
+        model: z.string(),
+      })
+      .parse(options);
+    const config = await loadConfig(state());
+    const home = args.codexHome ?? config.homes[0]?.path;
+    if (!home) throw new Error("No signed-in Codex home configured");
+    await configureNaming(
+      state(),
+      namingConfigSchema.parse({
+        ...args,
+        viewerTokenFile: resolve(args.viewerTokenFile),
+        codexHome: resolve(home),
+        codexBinary: config.codexBinary,
+      }),
+    );
+    process.stdout.write(
+      "Naming configured. Run agentlog names --backfill, or install its separate names-service.\n",
+    );
+  });
+program
+  .command("names")
+  .description(
+    "Generate cached Work and activity names independently of capture",
+  )
+  .option(
+    "--once",
+    "Process at most one backfill page and one ready naming batch",
+  )
+  .option("--backfill", "Resume queuing historical eligible requests")
+  .action(async (options: unknown) => {
+    const args = z
+      .object({
+        once: z.boolean().optional(),
+        backfill: z.boolean().optional(),
+      })
+      .parse(options);
+    const controller = new AbortController();
+    process.once("SIGINT", () => controller.abort());
+    process.once("SIGTERM", () => controller.abort());
+    const result = await nameActivities(state(), {
+      ...args,
+      signal: controller.signal,
+    });
+    process.stdout.write(JSON.stringify(result) + "\n");
+  });
+program
+  .command("names-service")
+  .requiredOption("--executable <path>")
+  .action(async (options: unknown) => {
+    const args = z.object({ executable: z.string() }).parse(options);
+    await installService(state(), resolve(args.executable), "names");
+    process.stdout.write(
+      "Naming registered with launchd independently of the collector.\n",
+    );
+  });
 program
   .command("content")
   .description(

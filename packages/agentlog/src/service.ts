@@ -3,24 +3,30 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { loadConfig } from "./config";
+import { loadNamingConfig } from "./naming";
 
-export async function installService(directory: string, executable: string) {
+export async function installService(
+  directory: string,
+  executable: string,
+  worker: "collect" | "names" = "collect",
+) {
   if (process.platform !== "darwin")
     throw new Error("Use the documented systemd service on Linux");
-  await loadConfig(directory);
+  if (worker === "names") await loadNamingConfig(directory);
+  else await loadConfig(directory);
   const escape = (value: string) =>
     value
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;");
-  const label = "net.applification.astack-agentlog";
+  const label = `net.applification.astack-agentlog${worker === "names" ? "-names" : ""}`;
   const domain = `gui/${process.getuid?.()}`;
   const file = join(homedir(), `Library/LaunchAgents/${label}.plist`);
   await mkdir(dirname(file), { recursive: true });
   await writeFile(
     file,
-    `<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>Label</key><string>${label}</string><key>ProgramArguments</key><array><string>${escape(executable)}</string><string>--state</string><string>${escape(directory)}</string><string>collect</string></array><key>RunAtLoad</key><true/><key>KeepAlive</key><true/><key>ThrottleInterval</key><integer>30</integer><key>StandardErrorPath</key><string>${escape(join(directory, "service.err.log"))}</string><key>StandardOutPath</key><string>${escape(join(directory, "service.out.log"))}</string></dict></plist>`,
+    `<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>Label</key><string>${label}</string><key>ProgramArguments</key><array><string>${escape(executable)}</string><string>--state</string><string>${escape(directory)}</string><string>${worker}</string>${worker === "names" ? "<string>--backfill</string>" : ""}</array><key>RunAtLoad</key><true/><key>KeepAlive</key><true/><key>ThrottleInterval</key><integer>30</integer><key>StandardErrorPath</key><string>${escape(join(directory, `${worker === "names" ? "names" : "service"}.err.log`))}</string><key>StandardOutPath</key><string>${escape(join(directory, `${worker === "names" ? "names" : "service"}.out.log`))}</string></dict></plist>`,
     { mode: 0o600 },
   );
   try {

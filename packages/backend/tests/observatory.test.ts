@@ -12,6 +12,7 @@ import {
   filterOptionsSchema,
   mergeFilterOptions,
 } from "@astack/agent-observability/filters";
+import { workNameKey } from "@astack/agent-observability/naming";
 
 // Explicit module loaders work in Bun without a Vite-only import.meta.glob.
 const modules = {
@@ -21,6 +22,7 @@ const modules = {
   "../convex/auth.ts": () => import("../convex/auth"),
   "../convex/projects.ts": () => import("../convex/projects"),
   "../convex/http.ts": () => import("../convex/http"),
+  "../convex/naming.ts": () => import("../convex/naming"),
 };
 const machineId = "00000000-0000-4000-8000-000000000001";
 const projectId = "00000000-0000-4000-8000-000000000100";
@@ -88,6 +90,399 @@ beforeEach(() => {
     { machineId, tokenHash: hash(credential) },
     { machineId: secondId, tokenHash: hash("second-ingestion-key") },
   ]);
+});
+
+function prompt(
+  value: ReturnType<typeof run>,
+  text = "Add readable Work headings",
+  revision = 1,
+) {
+  const event = eventSchema.parse({
+    id: `${value.id}:prompt`,
+    runId: value.id,
+    sequence: 1,
+    kind: "user_prompt",
+    timestamp: 1000,
+    observedAt: 1000,
+    timing: "agent",
+    title: "User request",
+    data: { content: text },
+  });
+  return { revision, record: JSON.stringify({ kind: "event", value: event }) };
+}
+async function makeNamesDue(t: Awaited<ReturnType<typeof setup>>) {
+  await t.run(async (ctx) => {
+    for (const row of await ctx.db.query("names").take(100))
+      if (row.state === "pending")
+        await ctx.db.patch(row._id, { availableAt: 0 });
+  });
+}
+test("naming batches related conversations once, keeps source telemetry intact and preserves explicit labels across pages", async () => {
+  const t = await setup();
+  const owner = t.withIdentity({ subject: process.env.OBSERVATORY_OWNER_ID });
+  const first = { ...run(), contentCapture: true, work: { id: "PR-142" } };
+  const second = {
+    ...run(machineId, "second"),
+    sessionId: "different-conversation",
+    contentCapture: true,
+    work: { id: "PR-142" },
+  };
+  for (const value of [first, second])
+    await t.mutation(internal.ingestion.ingest, {
+      machineId,
+      records: [
+        entry(value),
+        prompt(
+          value,
+          value === first
+            ? "Add readable Work headings"
+            : "Also name each captured activity",
+        ),
+      ],
+    });
+  expect(await owner.mutation(api.naming.claim, {})).toEqual([]); // Gather related requests before inference.
+  await makeNamesDue(t);
+  const claims = await owner.mutation(api.naming.claim, {});
+  expect(claims).toHaveLength(3);
+  expect(claims.find((c) => c.kind === "work")?.requests).toEqual([
+    "Add readable Work headings",
+    "Also name each captured activity",
+  ]);
+  expect(await owner.mutation(api.naming.claim, {})).toEqual([]); // Another worker cannot duplicate an active claim.
+  expect(
+    await owner.mutation(api.naming.complete, {
+      model: "gpt-6-luna",
+      names: claims.map((c) => ({
+        key: c.key,
+        claim: c.claim,
+        title:
+          c.kind === "work"
+            ? "Name Work and activities"
+            : "Name captured activity",
+      })),
+    }),
+  ).toBe(3);
+  const raw = await owner.query(api.observatory.run, { runId: first.id });
+  expect(raw && JSON.parse(raw).title).toBe(first.title);
+  expect(raw && JSON.parse(raw).outcome).toBe("unknown");
+  for (const value of [first, second])
+    await t.mutation(internal.ingestion.ingest, {
+      machineId,
+      records: [
+        entry(value, 2),
+        prompt(value, "Updated text in the same request", 2),
+      ],
+    });
+  await makeNamesDue(t);
+  expect(await owner.mutation(api.naming.claim, {})).toEqual([]);
+  expect(
+    (await owner.query(api.naming.labels, { runIds: [first.id] }))[0],
+  ).toEqual({
+    runId: first.id,
+    activity: "Name captured activity",
+    work: "Name Work and activities",
+  });
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [
+      entry(
+        { ...second, work: { id: "PR-142", label: "Owner’s chosen heading" } },
+        3,
+      ),
+    ],
+  });
+  // The named source can be outside the currently loaded page.
+  expect(
+    (await owner.query(api.naming.labels, { runIds: [first.id] }))[0]?.work,
+  ).toBe("Owner’s chosen heading");
+});
+test("naming is owner-only and excludes metadata-only, withheld and paused-project inputs", async () => {
+  const t = await setup();
+  const owner = t.withIdentity({ subject: process.env.OBSERVATORY_OWNER_ID });
+  const value = { ...run(), contentCapture: true, work: { id: "PR-142" } };
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [entry(value), prompt(value)],
+  });
+  for (const actor of [
+    t,
+    t.withIdentity({ subject: machineId }),
+    t.withIdentity({ subject: "other-owner" }),
+  ]) {
+    await expect(actor.mutation(api.naming.claim, {})).rejects.toThrow(
+      "Unauthorized",
+    );
+    await expect(
+      actor.mutation(api.naming.complete, { model: "gpt-6-luna", names: [] }),
+    ).rejects.toThrow("Unauthorized");
+    await expect(
+      actor.mutation(api.naming.fail, { claims: [] }),
+    ).rejects.toThrow("Unauthorized");
+    await expect(
+      actor.mutation(api.naming.backfill, {
+        paginationOpts: { numItems: 3, cursor: null },
+      }),
+    ).rejects.toThrow("Unauthorized");
+    await expect(
+      actor.query(api.naming.labels, { runIds: [value.id] }),
+    ).rejects.toThrow("Unauthorized");
+  }
+  for (const [attempt, capture, text] of [
+    ["metadata", false, "Hidden prompt"],
+    ["withheld", true, "[WITHHELD]"],
+  ] as const) {
+    const excluded = { ...run(machineId, attempt), contentCapture: capture };
+    await t.mutation(internal.ingestion.ingest, {
+      machineId,
+      records: [entry(excluded), prompt(excluded, text)],
+    });
+  }
+  expect(
+    await t.run(async (ctx) => (await ctx.db.query("names").take(20)).length),
+  ).toBe(2);
+  await t.run(async (ctx) => {
+    const project = await ctx.db.query("projects").first();
+    if (project) await ctx.db.patch(project._id, { enabled: false });
+  });
+  await makeNamesDue(t);
+  expect(await owner.mutation(api.naming.claim, {})).toEqual([]);
+  await expect(
+    owner.query(api.naming.labels, { runIds: Array(51).fill(value.id) }),
+  ).rejects.toThrow("Invalid names page");
+});
+test("naming retries safely and rechecks source revision, membership and project policy at completion", async () => {
+  const t = await setup();
+  const owner = t.withIdentity({ subject: process.env.OBSERVATORY_OWNER_ID });
+  const value = { ...run(), contentCapture: true, work: { id: "PR-142" } };
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [entry(value), prompt(value)],
+  });
+  await makeNamesDue(t);
+  const initial = await owner.mutation(api.naming.claim, {});
+  await owner.mutation(api.naming.fail, {
+    claims: initial.map(({ key, claim }) => ({ key, claim })),
+  });
+  expect(await owner.mutation(api.naming.claim, {})).toEqual([]);
+  await makeNamesDue(t);
+  const fresh = await owner.mutation(api.naming.claim, {});
+  expect(fresh[0]?.claim).not.toBe(initial[0]?.claim);
+  expect(
+    await owner.mutation(api.naming.complete, {
+      model: "gpt-6-luna",
+      names: initial.map((c) => ({
+        key: c.key,
+        claim: c.claim,
+        title: "Stale name",
+      })),
+    }),
+  ).toBe(0);
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [prompt(value, "Revised redacted request", 2)],
+  });
+  expect(
+    await owner.mutation(api.naming.complete, {
+      model: "gpt-6-luna",
+      names: fresh.map((c) => ({
+        key: c.key,
+        claim: c.claim,
+        title: "Old request name",
+      })),
+    }),
+  ).toBe(0);
+  await makeNamesDue(t);
+  const changed = await owner.mutation(api.naming.claim, {});
+  expect(
+    changed.every((c) => c.requests[0] === "Revised redacted request"),
+  ).toBe(true);
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [entry({ ...value, work: { id: "PR-other" } }, 2)],
+  });
+  expect(
+    await owner.mutation(api.naming.complete, {
+      model: "gpt-6-luna",
+      names: changed.map((c) => ({
+        key: c.key,
+        claim: c.claim,
+        title: "New request name",
+      })),
+    }),
+  ).toBe(1); // Activity survives; old Work membership does not.
+  await makeNamesDue(t);
+  const moved = await owner.mutation(api.naming.claim, {});
+  expect(moved[0]?.key).toBe(workNameKey(projectId, "PR-other"));
+  await t.run(async (ctx) => {
+    const project = await ctx.db.query("projects").first();
+    if (project) await ctx.db.patch(project._id, { enabled: false });
+  });
+  expect(
+    await owner.mutation(api.naming.complete, {
+      model: "gpt-6-luna",
+      names: moved.map((c) => ({
+        key: c.key,
+        claim: c.claim,
+        title: "Disabled project name",
+      })),
+    }),
+  ).toBe(0);
+});
+test("bounded naming backfill is replay-safe and identical Work IDs remain project-scoped", async () => {
+  const t = await setup();
+  const owner = t.withIdentity({ subject: process.env.OBSERVATORY_OWNER_ID });
+  const otherId = "00000000-0000-4000-8000-000000000101";
+  await t.run(async (ctx) => {
+    await ctx.db.insert("projects", {
+      projectId: otherId,
+      name: "Other",
+      enabled: true,
+      repositories: [],
+      folders: [{ machineId, path: "/other" }],
+    });
+  });
+  const values = [
+    { ...run(), contentCapture: true, work: { id: "PR-142" } },
+    {
+      ...run(machineId, "other-project"),
+      projectId: otherId,
+      cwd: "/other",
+      contentCapture: true,
+      work: { id: "PR-142" },
+    },
+  ];
+  for (const value of values)
+    await t.mutation(internal.ingestion.ingest, {
+      machineId,
+      records: [entry(value), prompt(value)],
+    });
+  await t.run(async (ctx) => {
+    for (const row of await ctx.db.query("names").take(20))
+      await ctx.db.delete(row._id);
+  });
+  await expect(
+    owner.mutation(api.naming.backfill, {
+      paginationOpts: { numItems: 4, cursor: null },
+    }),
+  ).rejects.toThrow("Invalid backfill page");
+  const page = await owner.mutation(api.naming.backfill, {
+    paginationOpts: { numItems: 1, cursor: null },
+  });
+  expect(page.count).toBe(1);
+  await owner.mutation(api.naming.backfill, {
+    paginationOpts: { numItems: 3, cursor: page.continueCursor },
+  });
+  await owner.mutation(api.naming.backfill, {
+    paginationOpts: { numItems: 3, cursor: null },
+  });
+  expect(
+    await t.run(async (ctx) => (await ctx.db.query("names").take(20)).length),
+  ).toBe(4);
+  await makeNamesDue(t);
+  const claims = await owner.mutation(api.naming.claim, {});
+  await owner.mutation(api.naming.complete, {
+    model: "gpt-6-luna",
+    names: claims.map((c) => ({
+      key: c.key,
+      claim: c.claim,
+      title: c.key.includes(otherId)
+        ? "Other project objective"
+        : "First project objective",
+    })),
+  });
+  const names = await owner.query(api.naming.labels, {
+    runIds: values.map((v) => v.id),
+  });
+  expect(names.map((n) => n.work)).toEqual([
+    "First project objective",
+    "Other project objective",
+  ]);
+});
+
+test("naming recovers expired claims and bounds Work source requests without naming native context", async () => {
+  const t = await setup();
+  const owner = t.withIdentity({ subject: process.env.OBSERVATORY_OWNER_ID });
+  for (let i = 0; i < 6; i++) {
+    const value = {
+      ...run(machineId, `bounded-${i}`),
+      contentCapture: true,
+      work: { id: "PR-bounded" },
+    };
+    await t.mutation(internal.ingestion.ingest, {
+      machineId,
+      records: [
+        entry(value),
+        prompt(value, `Request ${i} ` + "x".repeat(2000)),
+      ],
+    });
+  }
+  const context = { ...run(machineId, "context-only"), contentCapture: true };
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [
+      entry(context),
+      prompt(
+        context,
+        "<environment_context>Private machine paths</environment_context>",
+      ),
+    ],
+  });
+  await makeNamesDue(t);
+  const old = await owner.mutation(api.naming.claim, {});
+  const work = old.find((c) => c.kind === "work");
+  expect(work?.requests).toHaveLength(4);
+  expect(work?.requests.every((r) => r.length === 1200)).toBe(true);
+  await makeNamesDue(t); // Simulate expiration after a worker disappears.
+  const renewed = await owner.mutation(api.naming.claim, {});
+  expect(renewed.find((c) => c.key === old[0]?.key)?.claim).not.toBe(
+    old[0]?.claim,
+  );
+  expect(
+    await owner.mutation(api.naming.complete, {
+      model: "gpt-6-luna",
+      names: old.map((c) => ({
+        key: c.key,
+        claim: c.claim,
+        title: "Expired result",
+      })),
+    }),
+  ).toBe(0);
+  expect(
+    await t.run(async (ctx) =>
+      (await ctx.db.query("names").take(20)).some(
+        (n) => n.targetId === context.id,
+      ),
+    ),
+  ).toBe(false);
+});
+test("naming rejects a result when an enabled project's matching capture folder is removed", async () => {
+  const t = await setup();
+  const owner = t.withIdentity({ subject: process.env.OBSERVATORY_OWNER_ID });
+  const value = { ...run(), contentCapture: true };
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [entry(value), prompt(value)],
+  });
+  await makeNamesDue(t);
+  const claims = await owner.mutation(api.naming.claim, {});
+  expect(claims).toHaveLength(1);
+  await t.run(async (ctx) => {
+    const project = await ctx.db.query("projects").first();
+    if (project)
+      await ctx.db.patch(project._id, {
+        folders: [{ machineId, path: "/different-folder" }],
+      });
+  });
+  expect(
+    await owner.mutation(api.naming.complete, {
+      model: "gpt-6-luna",
+      names: claims.map((c) => ({
+        key: c.key,
+        claim: c.claim,
+        title: "Ineligible source",
+      })),
+    }),
+  ).toBe(0);
 });
 test("every data query denies anonymous users and the wrong signed subject", async () => {
   const t = await setup();
