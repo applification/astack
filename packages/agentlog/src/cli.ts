@@ -16,6 +16,7 @@ import { linkSession, refreshRun } from "./context";
 import { runIdentity } from "./adapters/codex";
 import { approvedRun } from "./projects";
 import { configureNaming, namingConfigSchema, nameActivities } from "./naming";
+import { configureT3 } from "./t3-config";
 
 const program = new Command()
   .name("agentlog")
@@ -23,6 +24,40 @@ const program = new Command()
   .version("0.1.0")
   .option("--state <directory>", "Private state directory", defaultStateDir());
 const state = () => resolve(z.string().parse(program.opts().state));
+program
+  .command("t3-configure")
+  .description("Add provider-neutral T3 capture alongside native Codex")
+  .requiredOption("--url <url>", "Private T3 server origin")
+  .requiredOption("--label <name>")
+  .option(
+    "--pairing-file <path>",
+    "Owner-issued T3 pairing grant; exchanged for read-only access",
+  )
+  .option("--token-file <path>", "Existing T3 bearer access token")
+  .action(async (options: unknown) => {
+    const args = z
+      .object({
+        url: z.string(),
+        label: z.string(),
+        pairingFile: z.string().optional(),
+        tokenFile: z.string().optional(),
+      })
+      .refine(
+        (args) => Boolean(args.pairingFile) !== Boolean(args.tokenFile),
+        "Choose exactly one credential file",
+      )
+      .parse(options);
+    const source = await configureT3(state(), {
+      url: args.url,
+      label: args.label,
+      credential: args.pairingFile
+        ? { kind: "pairing", path: args.pairingFile }
+        : { kind: "access", path: z.string().parse(args.tokenFile) },
+    });
+    process.stdout.write(
+      `T3 ${source.label} configured. Native Codex homes are preserved. Restart the collector and check agentlog status.\n`,
+    );
+  });
 program
   .command("names-configure")
   .description(

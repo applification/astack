@@ -9,11 +9,19 @@ import {
 import { detectProblems } from "@astack/agent-observability/analysis";
 import { environmentSecrets } from "@astack/agent-observability/redaction";
 import { CodexAdapter } from "./adapters/codex";
+import { T3Adapter } from "./adapters/t3";
+import { readT3Credential } from "./adapters/t3-rpc";
 import { LocalStore } from "./store";
 import { drainQueue } from "./delivery";
 import { loadConfig, type CollectorConfig } from "./config";
 import { syncProjects, cachedProjects } from "./projects";
 import { resolveProject } from "@astack/agent-observability/projects";
+import type { Project } from "@astack/agent-observability/projects";
+
+type CaptureAdapter = AgentAdapter & {
+  setProjects(projects: readonly Project[]): void;
+  readonly deferredTurns?: number;
+};
 
 async function readSecretFile(path: string) {
   const info = await lstat(path);
@@ -30,6 +38,17 @@ async function readSecretFile(path: string) {
 }
 
 export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
+  const owner = store.getRecord(`run:${snapshot.run.id}`);
+  // A native Codex turn can be visible through both APIs. Its first source owns
+  // its event set, so a later overlap never duplicates events or rewrites history.
+  if (
+    owner?.kind === "run" &&
+    owner.value.agent === "codex" &&
+    owner.value.source !== snapshot.run.source &&
+    (owner.value.source.startsWith("t3:") ||
+      snapshot.run.source.startsWith("t3:"))
+  )
+    return;
   for (const event of snapshot.events) {
     const previous = store.getRecord(`event:${event.id}`);
     if (event.skill && previous?.kind === "event" && previous.value.skill)
@@ -108,23 +127,37 @@ export async function collect(
     ...environmentSecrets(process.env),
     token,
     ...(await Promise.all(config.secretFiles.map(readSecretFile))),
+    ...(
+      await Promise.all(
+        config.t3Sources.map(async (source) => {
+          try {
+            return [await readT3Credential(source.tokenFile)];
+          } catch {
+            return [];
+          } // Unavailable T3 credentials must not stop native capture.
+        }),
+      )
+    ).flat(),
   ];
   const store = new LocalStore(directory, secrets);
   const signatureKey =
     store.getMeta("signatureKey") ?? randomBytes(32).toString("hex");
   store.setMeta("signatureKey", signatureKey);
-  const adapters: { home: string; adapter: CodexAdapter }[] = config.homes.map(
-    (home) => ({
-      home: home.path,
-      adapter: new CodexAdapter(
-        config,
-        home.path,
-        store,
-        signatureKey,
-        secrets,
-      ),
-    }),
-  );
+  const sources: { key: string; create: () => CaptureAdapter }[] = [
+    ...config.homes.map((home) => ({
+      key: home.path,
+      create: () =>
+        new CodexAdapter(config, home.path, store, signatureKey, secrets),
+    })),
+    ...config.t3Sources.map((source) => ({
+      key: `t3:${source.environmentId}`,
+      create: () => new T3Adapter(config, source, store, signatureKey, secrets),
+    })),
+  ];
+  const adapters = sources.map((source) => ({
+    ...source,
+    adapter: source.create(),
+  }));
   const deliveryController = new AbortController();
   const signal = AbortSignal.any([
     deliveryController.signal,
@@ -148,8 +181,17 @@ export async function collect(
           for await (const snapshot of entry.adapter.collect())
             persistSnapshot(store, snapshot);
           store.setMeta(
-            `health:${entry.home}`,
-            JSON.stringify({ status: "ok", at: Date.now() }),
+            `health:${entry.key}`,
+            JSON.stringify({
+              status: entry.adapter.deferredTurns ? "partial" : "ok",
+              at: Date.now(),
+              ...(entry.adapter.deferredTurns
+                ? {
+                    diagnostic: "t3_codex_identity_pending",
+                    deferredTurns: entry.adapter.deferredTurns,
+                  }
+                : {}),
+            }),
           );
         } catch (error) {
           const diagnostic =
@@ -158,11 +200,11 @@ export async function collect(
                   .map((issue) => ({ code: issue.code, path: issue.path }))
                   .slice(0, 10)
               : error instanceof Error &&
-                  /^codex_[a-z0-9_-]+$/.test(error.message)
+                  /^(?:codex|t3)_[a-z0-9_-]+$/.test(error.message)
                 ? error.message
                 : "capture_unavailable";
           store.setMeta(
-            `health:${entry.home}`,
+            `health:${entry.key}`,
             JSON.stringify({
               status: "capture_error",
               at: Date.now(),
@@ -170,13 +212,7 @@ export async function collect(
             }),
           );
           await entry.adapter.close();
-          entry.adapter = new CodexAdapter(
-            config,
-            entry.home,
-            store,
-            signatureKey,
-            secrets,
-          );
+          entry.adapter = entry.create();
         }
       }
       for (const run of store.runsForSession()) {
@@ -229,6 +265,13 @@ export function health(directory: string, config: CollectorConfig) {
         health: store.getMeta(`health:${home.path}`)
           ? JSON.parse(store.getMeta(`health:${home.path}`) ?? "{}")
           : null,
+      })),
+      t3: config.t3Sources.map((source) => ({
+        label: source.label,
+        environmentId: source.environmentId,
+        health: JSON.parse(
+          store.getMeta(`health:t3:${source.environmentId}`) ?? "null",
+        ),
       })),
     };
   } finally {

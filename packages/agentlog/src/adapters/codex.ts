@@ -214,7 +214,7 @@ export async function capability(
   const kind =
     basename(full) === "SKILL.md"
       ? "skill"
-      : basename(full) === "AGENTS.md"
+      : ["AGENTS.md", "CLAUDE.md"].includes(basename(full))
         ? "instruction"
         : null;
   if (!kind) return null;

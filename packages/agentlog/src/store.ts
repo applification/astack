@@ -237,6 +237,12 @@ export class LocalStore {
   }
   resetCaptureCheckpoints() {
     this.db.exec("DELETE FROM meta WHERE key GLOB 'codex:*:updated'");
+    this.db.exec("DELETE FROM meta WHERE key GLOB 't3:*:updated'");
+  }
+  resetT3CaptureCheckpoints(environmentId: string) {
+    this.db
+      .query("DELETE FROM meta WHERE key GLOB ?")
+      .run(`t3:${environmentId}:*:updated`);
   }
 }
 
