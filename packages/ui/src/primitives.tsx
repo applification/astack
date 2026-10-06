@@ -13,6 +13,8 @@ const buttonVariants = cva(
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary-hover",
         outline: "border border-border bg-card text-foreground hover:bg-muted",
+        badge:
+          "max-w-full rounded-lg border border-border bg-card px-3 text-left text-foreground hover:bg-muted aria-expanded:border-link aria-expanded:bg-muted",
         ghost: "text-link hover:bg-muted",
       },
     },

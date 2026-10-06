@@ -30,6 +30,35 @@ test("deployed astack workflow connects the actual route, phases and evidence wi
   await expect(
     screen.getByRole("heading", "How the work unfolded"),
   ).not.toBeVisible();
+  await expect(
+    screen.getByRole("button", "View PR across this flow"),
+  ).toBeVisible();
+  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
+  await expect(
+    screen.getByRole("list", "Recorded skill sequence"),
+  ).toBeVisible();
+  await screen
+    .getByRole("button", "View Testing in Verify", { exact: true })
+    .tap();
+  const skillEvidence = screen.getByRole("region", "Testing skill evidence", {
+    exact: true,
+  });
+  await expect(skillEvidence).toContainText("Recorded name: testing.");
+  await skillEvidence
+    .getByRole("link", "Declaration in trace", { exact: true })
+    .tap();
+  await expect(
+    screen.getByRole("heading", "Workflow annotation", { exact: true }),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () =>
+        document
+          .querySelector(".trace-event[open] .event-content pre")
+          ?.textContent?.includes('"testing"') ?? false,
+    ),
+  ).toBe(true);
+  await browser.back();
   await screen
     .getByText("Captured conversation · 2 turns", { exact: true })
     .tap();
@@ -54,6 +83,10 @@ test("deployed astack workflow connects the actual route, phases and evidence wi
   ).toBe(true);
   await browser.back();
   await browser.setViewport({ width: 390, height: 844 });
+  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
+  await expect(
+    screen.getByRole("list", "Recorded skill sequence"),
+  ).toBeVisible();
   expect(
     await browser.evaluate(
       () =>

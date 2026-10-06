@@ -1,11 +1,15 @@
-import { Badge } from "@astack/ui";
+import { useId, useRef, useState } from "react";
+import { Badge, Button } from "@astack/ui";
 import type { EvaluationDetail } from "@astack/agent-observability/evaluation-view";
 import { routeDefinitions } from "@astack/agent-observability/workflow";
 import {
   workflowFlows,
+  type WorkflowFlow,
+  type WorkflowNode,
   type WorkflowRecord,
 } from "@astack/agent-observability/workflow-view";
 import { runLink } from "./evaluation-evidence";
+import { SkillBadge, SkillIcon, skillLabel } from "./skill-badge";
 
 const phaseLabel = (phase: string) =>
   phase.replace(/[-_]/g, " ").replace(/^./, (letter) => letter.toUpperCase());
@@ -73,6 +77,291 @@ function RecordEvidence({
         </p>
       ) : null}
     </section>
+  );
+}
+
+function declaredSkills(node: Extract<WorkflowNode, { kind: "phase" }>) {
+  return [
+    ...new Set(
+      node.records.flatMap((record) =>
+        record.annotation.action === "phase" ? record.annotation.skills : [],
+      ),
+    ),
+  ];
+}
+
+type SkillSelection =
+  | { kind: "flow"; skill: string }
+  | { kind: "phase"; skill: string; eventId: string };
+
+function WorkflowPath({
+  flow,
+  projectId,
+}: {
+  flow: WorkflowFlow;
+  projectId: string;
+}) {
+  const [mode, setMode] = useState<"phases" | "sequence">("phases");
+  const [selection, setSelection] = useState<SkillSelection | null>(null);
+  const trigger = useRef<HTMLButtonElement | null>(null);
+  const evidenceId = useId();
+  const phases = flow.nodes.flatMap((node) =>
+    node.kind === "phase" ? [node] : [],
+  );
+  const skills = [...new Set(phases.flatMap(declaredSkills))];
+  const selectedRecords = selection
+    ? phases
+        .filter(
+          (node) =>
+            selection.kind === "flow" ||
+            node.records[0]?.eventId === selection.eventId,
+        )
+        .flatMap((node) => node.records)
+        .filter(
+          (record) =>
+            record.annotation.action === "phase" &&
+            record.annotation.skills.includes(selection.skill),
+        )
+    : [];
+  const skillEvidence = selection && selectedRecords.length > 0 && (
+    <section
+      id={evidenceId}
+      aria-label={skillLabel(selection.skill) + " skill evidence"}
+      className="workflow-skill-evidence"
+    >
+      <div className="workflow-phase-heading">
+        <h4 className="skill-evidence-title">
+          <SkillIcon name={selection.skill} />
+          {skillLabel(selection.skill)}
+        </h4>
+        <Button
+          variant="ghost"
+          onClick={() => {
+            setSelection(null);
+            if (trigger.current?.isConnected) trigger.current.focus();
+          }}
+          aria-label="Close skill evidence"
+        >
+          Close
+        </Button>
+      </div>
+      <p className="secondary">
+        Recorded name: {selection.skill}. Agent declarations; supporting links
+        describe the phase and do not prove a skill invocation.
+      </p>
+      {selectedRecords.map((record) => (
+        <div key={record.eventId}>
+          {record.annotation.action === "phase" && (
+            <p className="secondary">
+              {phaseLabel(record.annotation.phase)} ·{" "}
+              {statusLabel[record.annotation.status]}
+            </p>
+          )}
+          <RecordEvidence record={record} projectId={projectId} />
+        </div>
+      ))}
+    </section>
+  );
+
+  return (
+    <>
+      {skills.length > 0 && (
+        <div className="workflow-skill-overview">
+          <p className="secondary">Skills in this flow</p>
+          <div className="skill-badges" aria-label="Flow skills">
+            {skills.map((skill) => {
+              const active =
+                selection?.kind === "flow" && selection.skill === skill;
+              return (
+                <SkillBadge
+                  key={skill}
+                  name={skill}
+                  aria-label={"View " + skillLabel(skill) + " across this flow"}
+                  aria-expanded={active}
+                  aria-controls={active ? evidenceId : undefined}
+                  onClick={(event) => {
+                    trigger.current = event.currentTarget;
+                    setSelection(active ? null : { kind: "flow", skill });
+                  }}
+                />
+              );
+            })}
+          </div>
+          {selection?.kind === "flow" && skillEvidence}
+        </div>
+      )}
+      {flow.nodes.length > 0 ? (
+        <>
+          <div
+            role="group"
+            aria-label="Flow view"
+            className="workflow-view-toggle"
+          >
+            <Button
+              variant="ghost"
+              aria-pressed={mode === "phases"}
+              onClick={() => setMode("phases")}
+            >
+              Work phases
+            </Button>
+            <Button
+              variant="ghost"
+              aria-pressed={mode === "sequence"}
+              onClick={() => setMode("sequence")}
+            >
+              Skill sequence
+            </Button>
+          </div>
+          {mode === "sequence" && (
+            <p className="secondary">
+              Recorded phase order. Skills declared together share a group;
+              their order within it is unknown. Repeated phases remain visible.
+            </p>
+          )}
+          <ol
+            className={
+              mode === "sequence" ? "astack-flow skill-sequence" : "astack-flow"
+            }
+            aria-label={
+              mode === "sequence"
+                ? "Recorded skill sequence"
+                : "Recorded work phases"
+            }
+          >
+            {flow.nodes.map((node, index) => {
+              if (node.kind === "route") {
+                const annotation = node.record.annotation;
+                return annotation.action === "change" ? (
+                  <li key={node.record.eventId} data-step={index + 1}>
+                    <h4>
+                      Changed route → {routeDefinitions[annotation.route].label}
+                    </h4>
+                    <p>{annotation.reason}</p>
+                    <p className="secondary">
+                      Revised plan:{" "}
+                      {annotation.plannedPhases.map(phaseLabel).join(" → ")}
+                    </p>
+                    <details>
+                      <summary>View route change</summary>
+                      <RecordEvidence
+                        record={node.record}
+                        projectId={projectId}
+                      />
+                    </details>
+                  </li>
+                ) : null;
+              }
+              const first = node.records[0];
+              const last = node.records.at(-1);
+              const summary =
+                last?.annotation.action === "phase"
+                  ? last.annotation.summary
+                  : null;
+              const nodeSkills = declaredSkills(node);
+              return (
+                <li key={first?.eventId} data-step={index + 1}>
+                  <div className="workflow-phase-heading">
+                    <h4>{phaseLabel(node.phase)}</h4>
+                    <span
+                      className={
+                        node.status === "failed"
+                          ? "text-destructive"
+                          : "text-muted-foreground"
+                      }
+                    >
+                      <Badge>{statusLabel[node.status]}</Badge>
+                    </span>
+                    {mode === "sequence" && first && (
+                      <time
+                        dateTime={new Date(first.recordedAt).toISOString()}
+                        className="workflow-sequence-time"
+                      >
+                        {new Date(first.recordedAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </time>
+                    )}
+                  </div>
+                  {mode === "phases" && summary && <p>{summary}</p>}
+                  <div
+                    className="skill-badges"
+                    aria-label={phaseLabel(node.phase) + " declared skills"}
+                  >
+                    {nodeSkills.map((skill) => {
+                      const active =
+                        selection?.kind === "phase" &&
+                        selection.eventId === first?.eventId &&
+                        selection.skill === skill;
+                      return (
+                        <SkillBadge
+                          key={skill}
+                          name={skill}
+                          aria-label={
+                            "View " +
+                            skillLabel(skill) +
+                            " in " +
+                            phaseLabel(node.phase)
+                          }
+                          aria-expanded={active}
+                          aria-controls={active ? evidenceId : undefined}
+                          onClick={(event) => {
+                            if (!first) return;
+                            trigger.current = event.currentTarget;
+                            setSelection(
+                              active
+                                ? null
+                                : {
+                                    kind: "phase",
+                                    skill,
+                                    eventId: first.eventId,
+                                  },
+                            );
+                          }}
+                        />
+                      );
+                    })}
+                    {mode === "sequence" && nodeSkills.length === 0 && (
+                      <span className="secondary">
+                        No skills declared for this phase.
+                      </span>
+                    )}
+                  </div>
+                  {selection?.kind === "phase" &&
+                    selection.eventId === first?.eventId &&
+                    skillEvidence}
+                  <details>
+                    <summary>View phase evidence</summary>
+                    <div className="evaluation-step-evidence">
+                      {node.route && (
+                        <p className="secondary">
+                          Route at this phase:{" "}
+                          {routeDefinitions[node.route].label}
+                        </p>
+                      )}
+                      {node.records.map((record) => (
+                        <RecordEvidence
+                          key={record.eventId}
+                          record={record}
+                          projectId={projectId}
+                        />
+                      ))}
+                      <p className="secondary">
+                        Declarations and skill reads do not establish
+                        application. Inspect the linked actions, outputs and
+                        verification results.
+                      </p>
+                    </div>
+                  </details>
+                </li>
+              );
+            })}
+          </ol>
+        </>
+      ) : (
+        <p className="subtitle">No phase transitions recorded yet.</p>
+      )}
+    </>
   );
 }
 
@@ -150,98 +439,10 @@ export function WorkflowEvidence({
                       : "Route not recorded"}
                   </h3>
                 )}
-                {!flow.nodes.length && (
-                  <p className="subtitle">No phase transitions recorded yet.</p>
-                )}
-                <ol className="astack-flow">
-                  {flow.nodes.map((node) => {
-                    if (node.kind === "route") {
-                      const annotation = node.record.annotation;
-                      return annotation.action === "change" ? (
-                        <li key={node.record.eventId}>
-                          <h4>
-                            Changed route →{" "}
-                            {routeDefinitions[annotation.route].label}
-                          </h4>
-                          <p>{annotation.reason}</p>
-                          <p className="secondary">
-                            Revised plan:{" "}
-                            {annotation.plannedPhases
-                              .map(phaseLabel)
-                              .join(" → ")}
-                          </p>
-                          <details>
-                            <summary>View route change</summary>
-                            <RecordEvidence
-                              record={node.record}
-                              projectId={detail.evaluation.projectId}
-                            />
-                          </details>
-                        </li>
-                      ) : null;
-                    }
-                    const first = node.records[0];
-                    const last = node.records.at(-1);
-                    const summary =
-                      last?.annotation.action === "phase"
-                        ? last.annotation.summary
-                        : null;
-                    const skills = [
-                      ...new Set(
-                        node.records.flatMap((record) =>
-                          record.annotation.action === "phase"
-                            ? record.annotation.skills
-                            : [],
-                        ),
-                      ),
-                    ];
-                    return (
-                      <li key={first?.eventId}>
-                        <div className="workflow-phase-heading">
-                          <h4>{phaseLabel(node.phase)}</h4>
-                          <span
-                            className={
-                              node.status === "failed"
-                                ? "text-destructive"
-                                : "text-muted-foreground"
-                            }
-                          >
-                            <Badge>{statusLabel[node.status]}</Badge>
-                          </span>
-                        </div>
-                        {summary && <p>{summary}</p>}
-                        {skills.length > 0 && (
-                          <p className="secondary">
-                            Declared skills: {skills.join(" · ")}
-                          </p>
-                        )}
-                        <details>
-                          <summary>View phase evidence</summary>
-                          <div className="evaluation-step-evidence">
-                            {node.route && (
-                              <p className="secondary">
-                                Route at this phase:{" "}
-                                {routeDefinitions[node.route].label}
-                              </p>
-                            )}
-                            {node.records.map((record) => (
-                              <RecordEvidence
-                                key={record.eventId}
-                                record={record}
-                                projectId={detail.evaluation.projectId}
-                              />
-                            ))}
-                            <p className="secondary">
-                              Declarations and skill reads do not establish
-                              application. Inspect the linked actions, outputs
-                              and verification results.
-                            </p>
-                          </div>
-                        </details>
-                      </li>
-                    );
-                  })}
-                </ol>
+                <WorkflowPath
+                  flow={flow}
+                  projectId={detail.evaluation.projectId}
+                />
               </>
             )}
           </section>

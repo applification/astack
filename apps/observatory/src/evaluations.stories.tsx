@@ -158,6 +158,35 @@ export const MissingFlowEvidence: Story = {
     },
   },
 };
+export const SkillCaptureGaps: Story = {
+  args: {
+    detail: {
+      ...detail("pass"),
+      workflow: {
+        ...workflowViewFixture("feature"),
+        records: workflowViewFixture("feature").records.map((record) => ({
+          ...record,
+          annotation:
+            record.annotation.action === "phase"
+              ? {
+                  ...record.annotation,
+                  skills:
+                    record.annotation.phase === "verify"
+                      ? []
+                      : record.annotation.phase === "implement"
+                        ? [
+                            "applification:react",
+                            "$applification:typescript-best-practices",
+                            "owner:repository-specific-acceptance-check",
+                          ]
+                        : record.annotation.skills,
+                }
+              : record.annotation,
+        })),
+      },
+    },
+  },
+};
 export const Empty: Story = { render: () => <EvaluationTable rows={[]} /> };
 export const Listing: Story = {
   render: () => (

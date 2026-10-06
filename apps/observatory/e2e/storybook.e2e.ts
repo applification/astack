@@ -1,5 +1,265 @@
 import { test } from "@e2e-dev/web";
 import { expect } from "e2e";
+test("skill sequence keeps grouped declarations and repeated attempts, with focused evidence and keyboard return", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--bug-fix-flow&viewMode=story",
+  );
+  await expect(
+    screen.getByRole("button", "View Verify across this flow"),
+  ).toBeVisible();
+  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
+  await expect(screen.getByRole("button", "Skill sequence")).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(
+    screen.getByText("their order within it is unknown", { exact: false }),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(() =>
+      [
+        ...document.querySelectorAll(
+          '[aria-label="Recorded skill sequence"] > li',
+        ),
+      ].map((item) => ({
+        phase: item.querySelector("h4")?.textContent ?? null,
+        skills: [...item.querySelectorAll(".skill-badges button")].map(
+          (button) => button.textContent,
+        ),
+      })),
+    ),
+  ).toEqual([
+    { phase: "Reproduce", skills: ["Bug fix", "App control"] },
+    { phase: "Repair", skills: ["React", "TypeScript"] },
+    { phase: "Verify", skills: ["Verify", "Testing"] },
+    { phase: "Repair", skills: ["React"] },
+    { phase: "Verify", skills: ["Verify", "Testing"] },
+  ]);
+  await screen
+    .getByRole("button", "View Testing in Verify", { exact: true })
+    .first()
+    .tap();
+  const evidence = screen.getByRole("region", "Testing skill evidence", {
+    exact: true,
+  });
+  await expect(
+    evidence.getByRole(
+      "link",
+      "First verification: fresh read still returns old value",
+    ),
+  ).toBeVisible();
+  await expect(
+    evidence.getByRole(
+      "link",
+      "After repair: reopen and fresh store read retain the edit",
+    ),
+  ).not.toBeVisible();
+  const trace = await evidence
+    .getByRole("link", "Declaration in trace")
+    .getAttribute("href");
+  expect(trace).toContain("event=");
+  await screen.getByRole("button", "Work phases", { exact: true }).tap();
+  await expect(evidence).toBeVisible();
+  await screen.getByRole("button", "Close skill evidence").tap();
+  expect(
+    await browser.evaluate(
+      () => document.activeElement?.getAttribute("aria-label") ?? null,
+    ),
+  ).toBe("View Testing in Verify");
+  await screen.getByRole("button", "View Verify across this flow").tap();
+  const history = screen.getByRole("region", "Verify skill evidence", {
+    exact: true,
+  });
+  await expect(
+    history.getByRole(
+      "link",
+      "First verification: fresh read still returns old value",
+    ),
+  ).toBeVisible();
+  await expect(
+    history.getByRole(
+      "link",
+      "After repair: reopen and fresh store read retain the edit",
+    ),
+  ).toBeVisible();
+  await screen.getByRole("button", "Close skill evidence").tap();
+  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
+  await browser.evaluate(() => {
+    const section = document.querySelector('[aria-label="Astack workflow"]');
+    if (section)
+      window.scrollTo(
+        0,
+        section.getBoundingClientRect().top +
+          window.scrollY -
+          (document.querySelector("header")?.getBoundingClientRect().height ??
+            80) -
+          16,
+      );
+    return null;
+  });
+  await app.screenshot("skill-sequence-retries-light");
+  await browser.setViewport({ width: 390, height: 844 });
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  await expect
+    .poll(() =>
+      browser.evaluate(() => ({
+        theme: document.documentElement.dataset.theme ?? null,
+        badgeColor: getComputedStyle(
+          document.querySelector(
+            'button[aria-label="View Verify across this flow"]',
+          ) ?? document.body,
+        ).color,
+        toggleColor: getComputedStyle(
+          document.querySelector(
+            '[aria-label="Flow view"] button[aria-pressed="true"]',
+          ) ?? document.body,
+        ).color,
+      })),
+    )
+    .toEqual({
+      theme: "dark",
+      badgeColor: "rgb(248, 250, 252)",
+      toggleColor: "rgb(248, 250, 252)",
+    });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await browser.evaluate(() => {
+    const section = document.querySelector('[aria-label="Astack workflow"]');
+    if (section)
+      window.scrollTo(
+        0,
+        section.getBoundingClientRect().top +
+          window.scrollY -
+          (document.querySelector("header")?.getBoundingClientRect().height ??
+            80) -
+          16,
+      );
+    return null;
+  });
+  await app.screenshot("skill-sequence-retries-narrow-dark");
+});
+test("skill badges preserve recorded names, no-declaration phases and the PR icon without assigning grades", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--skill-capture-gaps&viewMode=story",
+  );
+  await expect(
+    screen.getByRole("button", "View React in Implement"),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("button", "View TypeScript in Implement"),
+  ).toBeVisible();
+  await screen.getByRole("button", "View React in Implement").tap();
+  await expect(
+    screen.getByRole("region", "React skill evidence"),
+  ).toContainText("Recorded name: applification:react.");
+  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
+  await expect(
+    screen.getByText("No skills declared for this phase.", { exact: true }),
+  ).toBeVisible();
+  await expect(screen.getByText("Omitted", { exact: true })).toBeVisible();
+  await expect(
+    screen.getByText("Started · no finish recorded", { exact: true }),
+  ).toBeVisible();
+  await screen.getByRole("button", "View PR in Review").tap();
+  await expect(screen.getByRole("region", "PR skill evidence")).toContainText(
+    "Preparing the PR with retained verification evidence.",
+  );
+  expect(
+    await browser.evaluate(() => {
+      const image = document.querySelector(
+        'button[aria-label="View PR in Review"] img',
+      );
+      return (
+        image instanceof HTMLImageElement &&
+        image.complete &&
+        image.naturalWidth > 0 &&
+        image.getAttribute("src") === "/providers/github.svg"
+      );
+    }),
+  ).toBe(true);
+  await screen
+    .getByRole(
+      "button",
+      "View owner:repository-specific-acceptance-check in Implement",
+    )
+    .tap();
+  await expect(
+    screen.getByRole(
+      "region",
+      "owner:repository-specific-acceptance-check skill evidence",
+    ),
+  ).toContainText("Recorded name: owner:repository-specific-acceptance-check.");
+  await browser.setViewport({ width: 360, height: 800 });
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  await expect
+    .poll(() =>
+      browser.evaluate(() => ({
+        theme: document.documentElement.dataset.theme ?? null,
+        badgeColor: getComputedStyle(
+          document.querySelector('button[aria-label="View PR in Review"]') ??
+            document.body,
+        ).color,
+      })),
+    )
+    .toEqual({ theme: "dark", badgeColor: "rgb(248, 250, 252)" });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await expect(
+    screen.getByText("Your review pending", { exact: true }),
+  ).toBeVisible();
+  await screen.getByRole("button", "Close skill evidence").tap();
+  await browser.evaluate(() => {
+    const section = document.querySelector('[aria-label="Astack workflow"]');
+    if (section)
+      window.scrollTo(
+        0,
+        section.getBoundingClientRect().top +
+          window.scrollY -
+          (document.querySelector("header")?.getBoundingClientRect().height ??
+            80) -
+          16,
+      );
+    return null;
+  });
+  await app.screenshot("skill-sequence-custom-skills-narrow-dark");
+});
+test("skill sequence retains route changes and missing supporting evidence", async ({
+  app,
+  screen,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--changed-flow&viewMode=story",
+  );
+  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
+  await expect(
+    screen.getByRole("heading", "Changed route → Bug fix"),
+  ).toBeVisible();
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--missing-flow-evidence&viewMode=story",
+  );
+  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
+  await screen
+    .getByRole("button", "View Testing in Verify", { exact: true })
+    .first()
+    .tap();
+  await expect(
+    screen.getByRole("region", "Testing skill evidence"),
+  ).toContainText("Referenced trace event has not been captured.");
+});
 test("astack bug-fix flow preserves verification retries and links declared skills to captured evidence", async ({
   app,
   screen,
@@ -202,7 +462,11 @@ for (const [story, checkStatus, outcome] of [
           if (section)
             window.scrollTo(
               0,
-              section.getBoundingClientRect().top + window.scrollY - 90,
+              section.getBoundingClientRect().top +
+                window.scrollY -
+                (document.querySelector("header")?.getBoundingClientRect()
+                  .height ?? 80) -
+                16,
             );
           return null;
         });
