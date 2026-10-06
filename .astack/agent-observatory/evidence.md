@@ -1,5 +1,25 @@
 # Agent Observatory evidence
 
+## Readable content update, 2026-10-06
+
+Implemented and deployed revision `2eeebee` on Otis. This supersedes the initial metadata-only privacy decision below. New collectors default to redacted content; explicit existing metadata-only settings remain respected. Otis enables readable capture and includes its separate viewer credential in private known-secret matching. Trace titles remain metadata, with readable previews and expanded Message/Command/Output/Arguments/Result/Error sections controlled by Show content.
+
+- Strict types, all 22 domain/collector/native-backend tests, UI lint and public site/plugin checks passed. New cases exercise readable/metadata-only replay with stable identities and first observation times, known secrets and nested/embedded JSON credentials, omitted reasoning, and the CLI capture setting. The production UI and signed portable collector built and deployed successfully.
+- Five synthetic Storybook browser tests passed, including content visible by default, content removed from the DOM when hidden, status metadata retained, preference persistence after reload, restoration, and narrow dark rendering. The first attempt hit an ambiguous locator because it matched both a visible preview and the same text in a collapsed detail; narrowing to visible text resolved the test setup issue. Existing timing/filter/empty/theme/navigation checks remain green.
+- One authenticated deployed UI journey passed. It observed real readable previews, their removal when Show content was disabled, restored content, run/work/skill navigation, and localStorage containing only theme and visibility preferences. Keys/JWTs and conversation content are not stored there.
+- Native private-service proof passed all missing/wrong-identity and machine-credential denial cases and read a persisted trace with redacted content. A fresh owner query for the user's open run confirmed 18 events, including 4 readable message fields, 5 commands and 5 outputs. The first runs page contained 20 runs marked for content capture at that observation.
+- All 1,322 locally retained runs were re-read with content enabled. The history refresh is queued with existing IDs; pending uploads decreased from 86,065 to 84,091 while capture and forwarding reported `ok`. Complete historical delivery is not claimed. The open run and recent runs were prioritised and verified in the native backend.
+- One replay attempt reported `capture_unavailable` and the collector recovered on its next attempt. Simultaneous normal and operator-priority forwarding caused a native optimistic-concurrency retry failure on the shared machine row; sequencing the uploads resolved it, with queued revisions retained. The normal supervised collector is running again.
+- Applied the Convex reviewer checklist as self-review to the retained data/auth boundaries: the existing authenticated, paginated query and ingestion paths accept the already-supported event JSON shape. No schema or function change was required. Permitted/denied native calls and revision replay passed.
+
+Pen is skipped for this addition because it reuses existing trace controls/layout; Storybook and the running deployment cover its states. The original feature's separate Pen comparison gap still keeps the overall PR draft. Remote Observatory, site and plugin CI passed for `2eeebee`; the broader foundation reference check is reported by the PR checks.
+
+![Synthetic readable trace](evidence/trace-content-readable.png)
+
+![Synthetic trace with content hidden](evidence/trace-content-hidden.png)
+
+## Initial feature and appearance proof, 2026-10-05
+
 Environment: Otis/macOS arm64, Bun 1.4.0, Node 24.21, Codex CLI 0.160.0, Convex SDK 1.46.0. Date: 2026-10-05. Initial collector/backend/native-service proof applies to `a201b49`, with current main incorporated at `6264517`. Appearance, bundled fonts, four component browser tests and the deployed UI journey apply to `43fad6c`; the deployed UI source matches that commit. Strict types, 19 domain/collector/backend tests, UI lint and existing site/plugin checks passed after the theme changes. This revision annotation changes documentation only. Raw private reports remain ignored under `.proof/agent-observatory` and `.e2e-live`.
 
 | Acceptance | Observed result |
