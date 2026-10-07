@@ -213,12 +213,32 @@ export async function capturePullRequest(
       continue;
     }
     try {
-      const bytes = await request([
+      const response = await request([
         "api",
         `repos/${reference.repository}/contents/${path}?ref=${mediaRevision}`,
-        "-H",
-        "Accept: application/vnd.github.raw+json",
       ]);
+      const file = z
+        .object({
+          type: z.literal("file"),
+          path: z.string(),
+          size: z
+            .number()
+            .int()
+            .nonnegative()
+            .max(1024 * 1024),
+          encoding: z.literal("base64"),
+          content: z.string().max(2 * 1024 * 1024),
+        })
+        .parse(JSON.parse(response.toString("utf8")));
+      const encoded = file.content.replace(/\s/g, "");
+      if (
+        file.path !== decodeURIComponent(path) ||
+        !/^[A-Za-z0-9+/]*={0,2}$/.test(encoded)
+      )
+        throw new Error("GitHub image identity or encoding mismatch");
+      const bytes = Buffer.from(encoded, "base64");
+      if (bytes.length !== file.size)
+        throw new Error("GitHub image size mismatch");
       const image =
         bytes
           .subarray(0, 8)

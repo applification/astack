@@ -54,7 +54,16 @@ test("GitHub capture authenticates bounded requests and degrades private/mutable
           isPrivate: privateRepo,
         }),
       );
-    return Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 0]);
+    const bytes = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 0]);
+    return Buffer.from(
+      JSON.stringify({
+        type: "file",
+        path: fixture.media[0]?.kind === "image" ? fixture.media[0].path : "",
+        size: bytes.length,
+        encoding: "base64",
+        content: bytes.toString("base64"),
+      }),
+    );
   };
   const result = await capturePullRequest(
     "https://github.com/Applification/Astack/pull/26",
