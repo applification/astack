@@ -3,6 +3,7 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "@astack/observatory-backend/api";
 import { Badge, Button, Input } from "@astack/ui";
+import { MessageSquareText } from "lucide-react";
 import {
   assessmentInputSchema,
   evaluateProof,
@@ -30,6 +31,7 @@ import {
 } from "./evaluation-evidence";
 import { OutcomeFeedbackForm } from "./outcome-feedback";
 import { WorkflowEvidence } from "./workflow-evidence";
+import { PromptJourney } from "./prompt-journey";
 
 export const evaluationLink = (id: string, projectId: string) =>
   "#evaluation/" +
@@ -495,41 +497,53 @@ export function EvaluationView({
     <div className="evaluation-page">
       <p className="eyebrow">Evaluation</p>
       <h1 className="run-heading">{evaluation.title}</h1>
-      <section className="evaluation-intent">
-        <h2>Original intent</h2>
-        <p className="whitespace-pre-wrap">{evaluation.intent.request}</p>
-        {detail.source ? (
-          <a
-            href={runLink(
-              detail.source.event.runId,
-              evaluation.projectId,
-              detail.source.event.id,
-            )}
-          >
-            Original request in trace
-          </a>
-        ) : (
-          <p className="secondary">
-            Declared request; no captured prompt reference supplied.
-          </p>
-        )}
-        {evaluation.intent.clarifications.length > 0 && (
-          <details className="metadata-details">
-            <summary>
-              Agreed scope · {evaluation.intent.clarifications.length}{" "}
-              {evaluation.intent.clarifications.length === 1
-                ? "clarification"
-                : "clarifications"}
-            </summary>
-            <ul>
-              {evaluation.intent.clarifications.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </details>
-        )}
-      </section>
-      <WorkflowEvidence detail={detail} />
+      <PromptJourney>
+        <section className="evaluation-intent" aria-label="Original intent">
+          <h2>Original intent</h2>
+          <div className="evaluation-prompt" data-prompt-card="">
+            <div className="evaluation-prompt-heading">
+              <MessageSquareText size={16} aria-hidden="true" />
+              <span>{detail.source ? "User prompt" : "Declared request"}</span>
+            </div>
+            <blockquote className="evaluation-prompt-text">
+              {evaluation.intent.request}
+            </blockquote>
+            <footer className="evaluation-prompt-context">
+              {detail.source ? (
+                <a
+                  href={runLink(
+                    detail.source.event.runId,
+                    evaluation.projectId,
+                    detail.source.event.id,
+                  )}
+                >
+                  Original request in trace
+                </a>
+              ) : (
+                <p className="secondary">
+                  Declared request; no captured prompt reference supplied.
+                </p>
+              )}
+              {evaluation.intent.clarifications.length > 0 && (
+                <details className="metadata-details">
+                  <summary>
+                    Agreed scope · {evaluation.intent.clarifications.length}{" "}
+                    {evaluation.intent.clarifications.length === 1
+                      ? "clarification"
+                      : "clarifications"}
+                  </summary>
+                  <ul>
+                    {evaluation.intent.clarifications.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+            </footer>
+          </div>
+        </section>
+        <WorkflowEvidence detail={detail} />
+      </PromptJourney>
       <section className="evaluation-result" aria-label="Result summary">
         <h2>Result</h2>
         {resultStep?.response ? (

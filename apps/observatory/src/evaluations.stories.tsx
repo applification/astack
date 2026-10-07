@@ -305,6 +305,47 @@ export const RevisionSummaries: Story = {
     },
   },
 };
+const promptOriginRequest =
+  "Add a route map that shows how a request moves through the agent’s work.\n\nKeep the main journey in the centre. Show delegated work on separate branches, then join the results back into the main line.\n\nKeep the skill evidence easy to open, with enough context to understand each step.";
+const promptOrigin = detail("inconclusive");
+export const PromptOrigin: Story = {
+  args: {
+    detail: {
+      ...promptOrigin,
+      evaluation: {
+        ...promptOrigin.evaluation,
+        title: "Visualise the journey from a user prompt",
+        intent: {
+          ...promptOrigin.evaluation.intent,
+          request: promptOriginRequest,
+          clarifications: [
+            "Keep the map expanded and scrollable.",
+            "Only rejoin a child when the parent explicitly uses its result.",
+          ],
+        },
+      },
+      source: {
+        revision: 1,
+        event: {
+          ...evaluationPrompt(),
+          data: { content: promptOriginRequest },
+        },
+      },
+      workflow: {
+        ...revisionJourney,
+        records: [
+          ...workflowViewFixture("feature").records.map((record) => ({
+            ...record,
+            sessionId: evaluationRun().sessionId,
+          })),
+          ...revisionJourney.records.filter(
+            (record) => record.annotation.action === "join",
+          ),
+        ],
+      },
+    },
+  },
+};
 function laneCountDetail(count: number): EvaluationDetail {
   const workflow = journeyFixture(false).workflow;
   const additional: EvaluationDetail["workflow"]["branches"] = Array.from(

@@ -765,6 +765,69 @@
 @utility workflow-section {
   margin-block: 1.5rem;
 }
+@utility prompt-journey {
+  position: relative;
+  & > section {
+    position: relative;
+    z-index: 1;
+  }
+}
+@utility prompt-journey-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  & path {
+    fill: none;
+    stroke: var(--color-muted-foreground);
+    stroke-width: 2;
+    stroke-linecap: round;
+    opacity: 0.45;
+  }
+}
+@utility evaluation-prompt {
+  width: min(100%, 760px);
+  margin-inline: auto;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.65rem;
+  background: var(--color-card);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 3%);
+  @media (max-width: 600px) {
+    padding: 1rem;
+  }
+}
+@utility evaluation-prompt-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-muted-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  & svg {
+    flex-shrink: 0;
+  }
+}
+@utility evaluation-prompt-text {
+  margin: 1rem 0;
+  padding-left: 1rem;
+  border-left: 2px solid var(--color-link);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+@utility evaluation-prompt-context {
+  font-size: 0.8rem;
+  & .metadata-details {
+    margin-top: 0.65rem;
+  }
+  & .secondary {
+    margin: 0;
+  }
+}
 @utility workflow-phase-heading {
   display: flex;
   flex-wrap: wrap;

@@ -1,5 +1,130 @@
 import { test } from "@e2e-dev/web";
 import { expect } from "e2e";
+test("the original prompt leads into the map and stays connected through scope, pan and resize", async ({
+  app,
+  browser,
+  screen,
+}) => {
+  await browser.setViewport({ width: 1600, height: 1000 });
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--prompt-origin&viewMode=story",
+  );
+  const intent = screen.getByRole("region", "Original intent", { exact: true });
+  await expect(intent.getByText("User prompt", { exact: true })).toBeVisible();
+  await expect(
+    intent.getByRole("link", "Original request in trace"),
+  ).toBeVisible();
+  expect(
+    await intent
+      .getByRole("link", "Original request in trace")
+      .getAttribute("href"),
+  ).toContain("event=");
+  expect(
+    await browser.evaluate(() => ({
+      text:
+        document.querySelector(".evaluation-prompt-text")?.textContent ?? null,
+      quoted:
+        document.querySelector(".evaluation-prompt-text")?.tagName ===
+        "BLOCKQUOTE",
+      editable:
+        document.querySelector(
+          "[data-prompt-card] input, [data-prompt-card] textarea, [data-prompt-card] [contenteditable=true]",
+        ) !== null,
+    })),
+  ).toEqual({
+    text: "Add a route map that shows how a request moves through the agent’s work.\n\nKeep the main journey in the centre. Show delegated work on separate branches, then join the results back into the main line.\n\nKeep the skill evidence easy to open, with enough context to understand each step.",
+    quoted: true,
+    editable: false,
+  });
+  const connection = () =>
+    browser.evaluate(() => {
+      const path = document.querySelector("[data-prompt-connection]");
+      const prompt = document.querySelector("[data-prompt-card]");
+      const root = document.querySelector("[data-map-root]");
+      if (!(path instanceof SVGPathElement) || !prompt || !root) return null;
+      const svg = path.ownerSVGElement;
+      if (!svg) return null;
+      const origin = svg.getBoundingClientRect();
+      const card = prompt.getBoundingClientRect();
+      const target = root.getBoundingClientRect();
+      const start = path.getPointAtLength(0);
+      const end = path.getPointAtLength(path.getTotalLength());
+      return {
+        startsAtPrompt:
+          Math.abs(origin.left + start.x - card.left - card.width / 2) < 0.5 &&
+          Math.abs(origin.top + start.y - card.bottom) < 0.5,
+        endsAtAgent:
+          Math.abs(origin.left + end.x - target.left - target.width / 2) <
+            0.5 && Math.abs(origin.top + end.y - target.top) < 0.5,
+        cardFits: card.left >= 0 && card.right <= innerWidth,
+        pageFits: document.documentElement.scrollWidth <= innerWidth,
+      };
+    });
+  const connected = {
+    startsAtPrompt: true,
+    endsAtAgent: true,
+    cardFits: true,
+    pageFits: true,
+  };
+  await expect.poll(connection).toEqual(connected);
+  await intent
+    .getByText("Agreed scope · 2 clarifications", { exact: true })
+    .tap();
+  await expect(
+    intent.getByText("Keep the map expanded and scrollable.", { exact: true }),
+  ).toBeVisible();
+  await expect.poll(connection).toEqual(connected);
+  await browser.evaluate(() => {
+    const viewport = document.querySelector(".workflow-map-scroll");
+    if (viewport) viewport.scrollLeft += 50;
+    return true;
+  });
+  await expect.poll(connection).toEqual(connected);
+  await browser.setViewport({ width: 390, height: 844 });
+  await expect.poll(connection).toEqual(connected);
+  await browser.evaluate(() => {
+    const viewport = document.querySelector(".workflow-map-scroll");
+    if (viewport) viewport.scrollLeft = 0;
+    return true;
+  });
+  await expect
+    .poll(() =>
+      browser.evaluate(
+        () => document.querySelectorAll("[data-prompt-connection]").length,
+      ),
+    )
+    .toBe(0);
+  await browser.evaluate(() => {
+    const viewport = document.querySelector(".workflow-map-scroll");
+    if (viewport)
+      viewport.scrollLeft = (viewport.scrollWidth - viewport.clientWidth) / 2;
+    return true;
+  });
+  await expect.poll(connection).toEqual(connected);
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--new-feature-flow&viewMode=story",
+  );
+  await expect(
+    screen.getByText("Declared request", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("link", "Original request in trace"),
+  ).toHaveCount(0);
+  await expect.poll(connection).toEqual(connected);
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--awaiting-review&viewMode=story",
+  );
+  await expect(
+    screen.getByRole("heading", "Original intent", { exact: true }),
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      browser.evaluate(
+        () => document.querySelectorAll("[data-prompt-connection]").length,
+      ),
+    )
+    .toBe(0);
+});
 test("one connected map keeps repeated attempts and scoped skill evidence with keyboard return", async ({
   app,
   screen,
