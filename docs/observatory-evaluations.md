@@ -4,6 +4,16 @@ Evaluations connect the request, acceptance cases, declared skill criteria, capt
 
 ## Evaluate captured work
 
+### Automatic agent handoff and UI backup
+
+Astack's owning delivery routes now use `agentlog evaluation begin` to preserve task acceptance/skill criteria and `agentlog evaluation finish` to queue a review at delivery. See [automatic task evaluations](../skills/astack/references/observatory.md#automatic-task-evaluations) for host identities and commands. The task survives collector restart and waits for its explicitly selected final turn to be captured before creating the immutable evaluation. No user-authored manifest is needed. Final-turn completion only makes capture available; it does not establish proof or outcome success.
+
+In a captured run's detail page, **Generate evaluation** creates a backup review immediately. It copies that turn's exact original request as its criterion and preserves the prompt/capture revisions. It opens an existing agent-generated evaluation when one already includes that turn, or reopens its existing backup instead of duplicating it. The record explicitly labels the absence of task-specific criteria and structured proof; missing proof stays inconclusive. Owner assessment remains separate.
+
+The optional `generation` field distinguishes agent-recorded criteria (with their actual recording time) from UI criteria copied from capture. Existing imported manifests remain valid. Task scope is a bounded start/end range within one captured conversation for the agent path, or the selected turn for the button. Different projects/computers, unreadable capture and disabled enrollment are rejected. Limits or missing request content are reported rather than silently truncated.
+
+Activation requires backend-first rollout, the updated collector/CLI, the UI, and refreshed installed Astack instructions. Repository skill edits do not update a host's plugin cache automatically. The JSON import workflow below remains available for explicit reports.
+
 Preserve the original request and acceptance cases at task start, with actual authorized clarifications. Build a versioned JSON manifest following the [authoritative schema](../packages/agent-observability/src/evaluations.ts). Its UUID, enrolled project, captured run IDs, creation time, title, intent, criteria version, cases, skill criteria and proof are explicit. One evaluation can reference several turns from the same project/computer. An optional `intent.source` contains `runId` and `eventId`; it must identify a captured user prompt whose redacted content exactly matches the request. Without it the request is visibly labelled declared.
 
 Drive the relevant user path with the project's existing control CLI/runner. Produce a proof report from actual assertions and observations: full Git revision, dirty state, source digest, target, actor, fixture, command and case attempts. Each attempt records status, observation, any required independent observation and retained artifact paths/SHA-256 digests. Preserve failures and artifact bytes through cleanup. Observatory saves references, not artifact bytes, and does not independently authenticate supplied reports.
@@ -51,11 +61,14 @@ Start an anonymous local Convex deployment from `packages/backend` using `CONVEX
 
 ```sh
 bun packages/backend/scripts/verify-evaluations-local.ts
+bun packages/backend/scripts/verify-evaluation-generation-local.ts
 VITE_CONVEX_URL=http://127.0.0.1:3210 VITE_CONVEX_SITE_URL=http://127.0.0.1:3211 bun run --cwd apps/observatory dev --port 7410 --strictPort
 E2E_TELEMETRY_DISABLED=1 bun x e2e run --config e2e.evaluations-local.config.ts
 ```
 
 Use the actual generated backend/site URLs if they differ. The script rejects hosted/non-anonymous targets before replacing local auth with disposable keys. It generates all three reports, seeds explicitly synthetic turns, imports through SQLite/HTTP, authenticates the owner and confirms persisted assessments with fresh reads and anonymous denial. Results stay ignored in `.proof/observatory-evals/local`. The URL-only browser config leaves operator-owned processes running; stop those owned commands afterward. Production builds still require HTTPS; loopback HTTP is development-only. Retained screenshots use synthetic stories because authenticated e2e secret policy can prohibit captures.
+
+The generation script uses that bootstrap to exercise the real begin/finish CLI, capture lag, exactly-once SQLite queueing, HTTP forwarding, a fresh owner read and anonymous denial. It retains ignored results in `.proof/observatory-generation/local` and seeds a new captured turn for the browser's create/reload/retry journey. Run both scripts before the local browser suite.
 
 ## Rollout and limits
 
@@ -73,7 +86,7 @@ The follow-up at `bb4061e` simplifies the detail page with a work timeline, expa
 
 Open [Evaluations on Otis](https://otis.tail12a0a0.ts.net:8450/#evaluations) and select **Observatory evaluations — first implementation**. This review item uses the three actual captured planning/implementation turns, the original prompt and the retained first-delivery proof. Its report is explicitly assembled from earlier local observations and preserves their source identities; it does not claim a new agent trial or independent certificate. Evidence bytes are also retained in the private runtime's `reviews/observatory-evals-first-implementation` directory. Deployment added no owner judgment: use the outcome review for your view of the result, or expand the detailed review to assess intent, the declared implementation/verification skill criteria and outcome.
 
-The first workflow uses explicit manifests and human assessments, with bounded metadata/trace snapshots. Artifact hosting, automatic task-start/verification handoffs, semantic model judges, controlled agent execution and skill-version comparisons follow later. Synthetic assessments cannot prove real agent skill application or causal improvements.
+The first workflow used explicit manifests and human assessments, with bounded metadata/trace snapshots. The automatic agent handoff and UI backup above extend creation; artifact hosting, semantic model judges, controlled agent execution and skill-version comparisons remain outside this slice. Synthetic assessments cannot prove real agent skill application or causal improvements.
 
 Revision `ff26d80` adds structured astack route/phase recording and was deployed to Otis with the backend upgraded first. [Flow proof](../.astack/observatory-flows/behavior-contract.md) retains verification, recovery and served-asset observations. Open **Observatory — astack route and workflow tracking** in Evaluations for the two actual intent/implementation turns and the flow explicitly declared during this change. Its original timestamps distinguish late recording from task-start selection. The reported contract checks and captured actions support owner review; deployment creates no owner judgment. Historical evaluations keep their recorded skill activity and show missing structured flow explicitly.
 

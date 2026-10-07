@@ -50,3 +50,5 @@ Use [portable handoffs](references/handoffs.md) and [examples](references/handof
 ## Agent feedback when Observatory is installed
 
 Use [Observatory context](references/observatory.md) for stable work/session correlation and explicit workflow/outcome annotations. Automatic capture is independent of this method; telemetry must never block delivery. Keep external work ownership and capture provenance intact when using observed behavior to improve the harness.
+
+For substantive tasks with readable capture, use the [automatic evaluation handoff](references/observatory.md#automatic-task-evaluations): record criteria at task start, preserve its task ID across follow-ups, and queue the evaluation at delivery. The user does not need to request or author the review record.

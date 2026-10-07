@@ -16,15 +16,23 @@ import {
   redact,
 } from "@astack/agent-observability/redaction";
 import { linkSession, refreshRun } from "./context";
-import { runIdentity } from "./adapters/codex";
+import { runIdentity, turnSchema } from "./adapters/codex";
+import { CodexReader } from "./adapters/rpc";
 import { approvedRun } from "./projects";
 import { configureNaming, namingConfigSchema, nameActivities } from "./naming";
 import { configureT3 } from "./t3-config";
 import { importEvaluation } from "./evaluations";
 import {
+  beginEvaluationTask,
+  finishEvaluationTask,
+  evaluationTask,
+  publishEvaluationTasks,
+} from "./evaluation-tasks";
+import {
   evaluationManifestSchema,
   evaluationSchema,
   evaluateProof,
+  proofReportSchema,
 } from "@astack/agent-observability/evaluations";
 import { savedEditProof, proofVariantSchema } from "./evaluation-proof";
 import { recordWorkflow } from "./workflow";
@@ -76,6 +84,170 @@ delivery
 const evaluations = program
   .command("evaluation")
   .description("Check or queue immutable intent and verification snapshots");
+const taskRunOptions = z.object({
+  run: z.string().optional(),
+  session: z.string().optional(),
+  turn: z.string().optional(),
+});
+async function taskRunId(options: unknown, starting = false) {
+  const args = taskRunOptions.parse(options);
+  const config = await loadConfig(state());
+  if (args.run && (args.session || args.turn))
+    throw new Error("Use --run or --session with --turn.");
+  const session =
+    args.session ?? process.env.CODEX_THREAD_ID ?? process.env.CODEX_SESSION_ID;
+  let turn = args.turn;
+  if (!args.run && session && !turn) {
+    const home =
+      config.homes.find((home) => home.path === process.env.CODEX_HOME) ??
+      config.homes[0];
+    if (!home) throw new Error("No configured Codex home.");
+    const reader = new CodexReader(config.codexBinary, home.path);
+    try {
+      await reader.initialize();
+      const page = z.object({ data: z.array(turnSchema) }).parse(
+        await reader.request("thread/turns/list", {
+          threadId: session,
+          limit: 1,
+          sortDirection: "desc",
+          itemsView: "full",
+        }),
+      );
+      const latest = page.data[0];
+      if (
+        !latest ||
+        (starting &&
+          latest.status !== "inProgress" &&
+          !(latest.status === "interrupted" && latest.completedAt == null))
+      )
+        throw new Error(
+          "Active native turn unavailable; supply the original captured --run explicitly.",
+        );
+      turn = latest.id;
+    } finally {
+      await reader.close();
+    }
+  }
+  const id =
+    args.run ??
+    (session && turn ? runIdentity(config.machineId, session, turn) : null);
+  if (!id || !id.startsWith(config.machineId + ":"))
+    throw new Error(
+      "Supply this computer's captured --run, or trusted Codex --session and --turn IDs.",
+    );
+  return id;
+}
+const repeated = (value: string, previous: string[]) => [...previous, value];
+evaluations
+  .command("begin")
+  .description("Record task criteria now; capture may arrive later")
+  .option("--run <id>", "Original captured turn ID")
+  .option("--session <id>", "Trusted native Codex session ID")
+  .option("--turn <id>", "Trusted native Codex original turn ID")
+  .option("--task <uuid>", "Fresh identity for revised scope")
+  .requiredOption("--title <text>")
+  .requiredOption(
+    "--case <expected>",
+    "Acceptance case; repeat for each material case",
+    repeated,
+    [],
+  )
+  .option(
+    "--skill <name=expected>",
+    "Skill criterion; repeat as needed",
+    repeated,
+    [],
+  )
+  .action(async (options: unknown) => {
+    const args = z
+      .object({
+        task: z.string().uuid().optional(),
+        title: z.string(),
+        case: z.array(z.string()).min(1).max(20),
+        skill: z.array(z.string()).max(10),
+      })
+      .parse(options);
+    const firstRunId = await taskRunId(options, true);
+    await deliveryStore(async (store) => {
+      const task = beginEvaluationTask(store, {
+        id: args.task,
+        firstRunId,
+        title: args.title,
+        cases: args.case.map((expected, index) => ({
+          id: `C${index + 1}`,
+          expected,
+          requiresIndependentObservation: false,
+        })),
+        skillCriteria: args.skill.map((value, index) => {
+          const split = value.indexOf("=");
+          if (split < 1) throw new Error("Skill criteria use name=expected.");
+          return {
+            id: `S${index + 1}`,
+            skill: value.slice(0, split),
+            expected: value.slice(split + 1),
+          };
+        }),
+      });
+      return { taskId: task.id, state: task.state };
+    });
+  });
+evaluations
+  .command("finish")
+  .description(
+    "Queue delivery; the collector waits for the final turn before publishing",
+  )
+  .requiredOption("--task <uuid>")
+  .option("--run <id>", "Final captured task turn ID")
+  .option("--session <id>", "Trusted native Codex session ID")
+  .option("--turn <id>", "Trusted native Codex final turn ID")
+  .option(
+    "--proof <file>",
+    "Actual structured proof report; omit when unavailable",
+  )
+  .action(async (options: unknown) => {
+    const args = z
+      .object({ task: z.string().uuid(), proof: z.string().optional() })
+      .parse(options);
+    const lastRunId = await taskRunId(options);
+    const proof = args.proof
+      ? proofReportSchema.parse(
+          JSON.parse(await readFile(resolve(args.proof), "utf8")),
+        )
+      : null;
+    await deliveryStore(async (store) => {
+      finishEvaluationTask(store, args.task, lastRunId, proof);
+      publishEvaluationTasks(store);
+      const task = evaluationTask(store, args.task);
+      return {
+        taskId: args.task,
+        state: task?.state,
+        ...(task?.state === "queued"
+          ? { evaluationId: task.evaluationId }
+          : task?.state === "failed"
+            ? { error: task.error }
+            : {}),
+      };
+    });
+  });
+evaluations
+  .command("status")
+  .requiredOption("--task <uuid>")
+  .action(async (options: unknown) => {
+    const args = z.object({ task: z.string().uuid() }).parse(options);
+    await deliveryStore(async (store) => {
+      const task = evaluationTask(store, args.task);
+      if (!task) throw new Error("Evaluation task not found.");
+      return {
+        taskId: task.id,
+        state: task.state,
+        ...(task.state === "queued"
+          ? { evaluationId: task.evaluationId }
+          : task.state === "failed"
+            ? { error: task.error }
+            : {}),
+      };
+    });
+  });
 evaluations
   .command("demo-proof")
   .description(

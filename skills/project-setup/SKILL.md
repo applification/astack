@@ -7,6 +7,8 @@ metadata:
 
 # Set up the project
 
+When owning substantive work with agentlog readable capture, use the [automatic evaluation handoff](../astack/references/observatory.md#automatic-task-evaluations) at task start and delivery. Reuse its task ID across follow-ups and keep telemetry failures from blocking the work.
+
 For integration and upgrades, apply [sequence verifiable units](../principle-sequence-verifiable-units/SKILL.md) and [prove it works](../principle-prove-it-works/SKILL.md) to the resulting runtime loop.
 
 Use this directly for initial setup, project integration or an upgrade to astack's engineering method, or when astack delivery needs a foundation. The outcome is an agent that can start the intended product, identify its instance, exercise real behavior, inspect the result, run meaningful checks and retain evidence through cleanup.

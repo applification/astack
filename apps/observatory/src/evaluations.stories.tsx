@@ -106,6 +106,34 @@ export const MissingProof: Story = {
 export const MissingContent: Story = {
   args: { detail: { ...detail("pass"), timeline: [] } },
 };
+export const GeneratedFromCapture: Story = {
+  args: {
+    detail: {
+      ...detail("inconclusive"),
+      evaluation: {
+        ...evaluationFixture("inconclusive"),
+        proof: null,
+        cases: [
+          {
+            id: "C1",
+            expected: "Fix edits disappearing after saving and reopening.",
+            requiresIndependentObservation: false,
+          },
+        ],
+        skillCriteria: [],
+        generation: {
+          method: "ui",
+          version: "capture-v1",
+          sources: ["reproduce", "repair"].map((turn) => ({
+            runId: evaluationRun(turn).id,
+            revision: 1,
+          })),
+          requestRevision: 1,
+        },
+      },
+    },
+  },
+};
 export const BugFixFlow: Story = {
   args: { detail: { ...detail("pass"), workflow: workflowViewFixture() } },
 };

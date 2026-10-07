@@ -37,6 +37,7 @@ import { getProject } from "./projectData";
 import { resolveProject } from "@astack/agent-observability/projects";
 import { evaluationWorkflow } from "./evaluationWorkflow";
 import { evaluationDelivery } from "./evaluationDelivery";
+import { generateEvaluation } from "@astack/agent-observability/evaluation-generation";
 
 const snapshotSchema = evaluationDetailSchema.pick({
   runs: true,
@@ -230,6 +231,9 @@ export async function storeEvaluation(
     createdAt: value.createdAt,
     data,
     snapshot: boundedJson(snapshotSchema.parse({ runs, source })),
+    ...(value.generation?.method === "ui" && value.intent.source
+      ? { generationKey: "ui:" + value.intent.source.runId }
+      : {}),
   });
   for (const runId of value.runIds)
     await ctx.db.insert("evaluationRuns", {
@@ -238,6 +242,116 @@ export async function storeEvaluation(
       createdAt: value.createdAt,
     });
 }
+export const generate = mutation({
+  args: { runId: v.string(), projectId: v.optional(v.string()) },
+  returns: v.object({ evaluationId: v.string(), projectId: v.string() }),
+  handler: async (ctx, args) => {
+    await requireOwner(ctx);
+    const row = await ctx.db
+      .query("runs")
+      .withIndex("by_runId", (q) => q.eq("runId", args.runId))
+      .unique();
+    const project = row?.projectId
+      ? await getProject(ctx, row.projectId)
+      : null;
+    if (
+      !row?.enrolled ||
+      !project?.enabled ||
+      (args.projectId && args.projectId !== row.projectId)
+    )
+      throw new Error("Run is unavailable in this enabled project.");
+    const run = runSchema.parse(JSON.parse(row.data));
+    if (
+      !run.contentCapture ||
+      resolveProject([project], run)?.projectId !== row.projectId
+    )
+      throw new Error(
+        "Evaluation generation requires readable project capture.",
+      );
+    const linked = await ctx.db
+      .query("evaluationRuns")
+      .withIndex("by_runId_and_createdAt", (q) => q.eq("runId", run.id))
+      .order("desc")
+      .take(20);
+    for (const link of linked) {
+      const existing = await stored(ctx, link.evaluationId);
+      if (
+        existing?.projectId === project.projectId &&
+        evaluationSchema.parse(JSON.parse(existing.data)).generation?.method ===
+          "agent"
+      )
+        return {
+          evaluationId: existing.evaluationId,
+          projectId: project.projectId,
+        };
+    }
+    const previous = await ctx.db
+      .query("evaluations")
+      .withIndex("by_generationKey", (q) =>
+        q.eq("generationKey", "ui:" + run.id),
+      )
+      .unique();
+    if (previous)
+      return {
+        evaluationId: previous.evaluationId,
+        projectId: project.projectId,
+      };
+    const prompts = await ctx.db
+      .query("events")
+      .withIndex("by_runId_and_kind_and_sequence", (q) =>
+        q.eq("runId", run.id).eq("kind", "user_prompt"),
+      )
+      .order("asc")
+      .take(12);
+    // Legacy captures may predate the indexed kind projection.
+    const candidates = prompts.length
+      ? prompts
+      : await ctx.db
+          .query("events")
+          .withIndex("by_runId_and_sequence", (q) => q.eq("runId", run.id))
+          .order("asc")
+          .take(201);
+    if (!prompts.length && candidates.length > 200)
+      throw new Error("Legacy request lookup exceeds the capture budget.");
+    const requests = candidates
+      .map((item) => ({
+        event: eventSchema.parse(JSON.parse(item.data)),
+        revision: item.revision,
+      }))
+      .filter(({ event }) => event.kind === "user_prompt");
+    if (requests.length > 11)
+      throw new Error("This turn exceeds the evaluation clarification limit.");
+    const source = requests[0];
+    if (!source) throw new Error("This turn has no captured original request.");
+    const name = await ctx.db
+      .query("names")
+      .withIndex("by_key", (q) =>
+        q.eq("key", activityNameKey(project.projectId, run.id)),
+      )
+      .unique();
+    const evaluation = generateEvaluation({
+      id: crypto.randomUUID(),
+      createdAt: Date.now(),
+      title: activityHeading(
+        run,
+        name ? { runId: run.id, activity: name.title } : undefined,
+      ),
+      runs: [{ run, revision: row.revision }],
+      source,
+      clarifications: requests
+        .slice(1)
+        .map(({ event }) => event.data.content)
+        .filter(
+          (value): value is string =>
+            typeof value === "string" && !!value.trim(),
+        ),
+      criteria: { method: "ui" },
+      proof: null,
+    });
+    await storeEvaluation(ctx, evaluation, run.machineId);
+    return { evaluationId: evaluation.id, projectId: project.projectId };
+  },
+});
 export const list = query({
   args: {
     projectId: v.optional(v.string()),

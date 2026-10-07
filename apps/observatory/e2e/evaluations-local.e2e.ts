@@ -18,6 +18,91 @@ const result = z
       readFileSync(".proof/observatory-evals/local/results.json", "utf8"),
     ),
   );
+const generation = z
+  .object({
+    agentEvaluationId: z.string(),
+    agentRunId: z.string(),
+    buttonRunId: z.string(),
+  })
+  .parse(
+    JSON.parse(
+      readFileSync(".proof/observatory-generation/local/results.json", "utf8"),
+    ),
+  );
+test("generation button creates a persisted review from captured work and reopens the agent handoff", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/#run/" +
+      encodeURIComponent(generation.buttonRunId) +
+      "?project=" +
+      fixtureProject,
+  );
+  await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect(
+    screen.getByRole("button", "Generate evaluation", { exact: true }),
+  ).toBeVisible();
+  await screen
+    .getByRole("button", "Generate evaluation", { exact: true })
+    .tap();
+  await expect(
+    screen.getByText("Generated from captured work.", { exact: false }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Checks incomplete", { exact: true }),
+  ).toBeVisible();
+  const createdUrl = await browser.evaluate(() => location.hash);
+  await browser.reload();
+  await expect(
+    screen
+      .getByText(
+        "Explore recipes and movies and record reproducible UX issues.",
+        { exact: true },
+      )
+      .first(),
+  ).toBeVisible();
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await app.open(
+    "/#run/" +
+      encodeURIComponent(generation.buttonRunId) +
+      "?project=" +
+      fixtureProject,
+  );
+  await screen
+    .getByRole("button", "Generate evaluation", { exact: true })
+    .tap();
+  await expect(
+    screen.getByText("Generated from captured work.", { exact: false }),
+  ).toBeVisible();
+  expect(await browser.evaluate(() => location.hash)).toBe(createdUrl);
+  await app.open(
+    "/#run/" +
+      encodeURIComponent(generation.agentRunId) +
+      "?project=" +
+      fixtureProject,
+  );
+  await screen
+    .getByRole("button", "Generate evaluation", { exact: true })
+    .tap();
+  await expect(
+    screen.getByText("Created by the agent delivery handoff.", {
+      exact: false,
+    }),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(() =>
+      decodeURIComponent(location.hash.split("?")[0]?.slice(12) ?? ""),
+    ),
+  ).toBe(generation.agentEvaluationId);
+});
 for (const item of result.results) {
   test(
     "local persisted " +

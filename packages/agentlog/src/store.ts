@@ -35,6 +35,8 @@ export class LocalStore {
       CREATE INDEX IF NOT EXISTS by_pending ON records(delivered,revision);
       CREATE INDEX IF NOT EXISTS by_run ON records(run_id,kind);
       CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY,value TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS evaluation_tasks(id TEXT PRIMARY KEY,state TEXT NOT NULL,data TEXT NOT NULL);
+      CREATE INDEX IF NOT EXISTS evaluation_tasks_by_state ON evaluation_tasks(state);
       INSERT OR IGNORE INTO meta VALUES('revision','0');`);
   }
   put(record: TelemetryRecord) {
@@ -168,6 +170,16 @@ export class LocalStore {
       )
       .get(key);
     return row ? recordSchema.parse(JSON.parse(row.payload)) : null;
+  }
+  saveEvaluationTask(id: string, state: string, value: unknown) {
+    this.db
+      .query(
+        "INSERT INTO evaluation_tasks(id,state,data) VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET state=excluded.state,data=excluded.data",
+      )
+      .run(id, state, JSON.stringify(redact(value, this.secrets)));
+  }
+  redactMetadata(value: unknown) {
+    return redact(value, this.secrets);
   }
   batch(machineId: string, priority: "recent" | "oldest" = "recent") {
     // Assessments reference several turns. Upload their parents and original
