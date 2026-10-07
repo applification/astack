@@ -6,6 +6,7 @@ import { Badge, Button, Input } from "@astack/ui";
 import { MessageSquareText } from "lucide-react";
 import {
   assessmentInputSchema,
+  acceptanceLabel,
   evaluateProof,
   validateAssessment,
   verdictSchema,
@@ -15,6 +16,7 @@ import {
 } from "@astack/agent-observability/evaluations";
 import {
   evaluationDetailSchema,
+  evaluationRequest,
   evaluationSummarySchema,
   type EvaluationDetail,
   type EvaluationSummary,
@@ -175,7 +177,7 @@ function JudgmentEditor({
             >
               {evaluation.cases.map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.id} · {item.expected}
+                  {item.id} · {acceptanceLabel(item)}
                 </option>
               ))}
             </select>
@@ -507,7 +509,7 @@ export function EvaluationView({
               <span>{detail.source ? "User prompt" : "Declared request"}</span>
             </div>
             <blockquote className="evaluation-prompt-text">
-              {evaluation.intent.request}
+              {evaluationRequest(detail)}
             </blockquote>
             <footer className="evaluation-prompt-context">
               {detail.source ? (

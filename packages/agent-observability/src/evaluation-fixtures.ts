@@ -1,6 +1,7 @@
 import { eventSchema, runSchema } from "./domain";
 import {
   assessmentInputSchema,
+  declaredIntentSchema,
   evaluationSchema,
   type ProofReport,
   type AssessmentInput,
@@ -10,6 +11,10 @@ export const fixtureMachine = "00000000-0000-4000-8000-000000000001";
 export const fixtureProject = "00000000-0000-4000-8000-000000000100";
 export const fixtureRequest =
   "Fix edits disappearing after saving and reopening.";
+export const fixtureLongRequest =
+  "Maintain the scheduled health backlog, retain evidence and verify the saved result.\n"
+    .repeat(100)
+    .slice(0, 5633);
 export function evaluationRun(turn = "repair") {
   return runSchema.parse({
     id: fixtureMachine + ":codex:saved-edit:" + turn,
@@ -57,7 +62,7 @@ export function evaluationFixture(
   proof?: ProofReport,
 ) {
   const prompt = evaluationPrompt();
-  return evaluationSchema.parse({
+  const evaluation = evaluationSchema.parse({
     schemaVersion: 1,
     id: fixtureMachine + ":evaluation:fixture-" + status,
     machineId: fixtureMachine,
@@ -133,6 +138,10 @@ export function evaluationFixture(
       ],
     },
   });
+  return {
+    ...evaluation,
+    intent: declaredIntentSchema.parse(evaluation.intent),
+  };
 }
 export function fixtureAssessment(
   status: "pass" | "fail" | "inconclusive" = "pass",

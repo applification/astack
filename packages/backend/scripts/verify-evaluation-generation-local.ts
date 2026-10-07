@@ -12,6 +12,7 @@ import {
   evaluationPrompt,
   fixtureMachine,
   fixtureProject,
+  fixtureLongRequest,
 } from "@astack/agent-observability/evaluation-fixtures";
 import { evaluationDetailSchema } from "@astack/agent-observability/evaluation-view";
 import { evaluateProof } from "@astack/agent-observability/evaluations";
@@ -120,12 +121,19 @@ const buttonRun = {
   sessionId: "button:" + nonce,
   title: "Explore recipes and movies",
 };
+const missingPromptRun = {
+  ...buttonRun,
+  id: fixtureMachine + ":codex:missing-request:" + nonce,
+  sessionId: "missing-request:" + nonce,
+  title: "Captured request unavailable",
+};
 try {
   store.setMeta("projectPolicy", JSON.stringify([project]));
   store.put({ kind: "run", value: first });
   store.put({ kind: "event", value: prompt });
   store.put({ kind: "run", value: last });
   store.put({ kind: "run", value: buttonRun });
+  store.put({ kind: "run", value: missingPromptRun });
   store.put({
     kind: "event",
     value: {
@@ -133,8 +141,7 @@ try {
       id: buttonRun.id + ":prompt",
       runId: buttonRun.id,
       data: {
-        content:
-          "Explore recipes and movies and record reproducible UX issues.",
+        content: fixtureLongRequest,
       },
     },
   });
@@ -202,6 +209,8 @@ await writeFile(
       agentEvaluationId,
       agentRunId: last.id,
       buttonRunId: buttonRun.id,
+      missingPromptRunId: missingPromptRun.id,
+      buttonRequestCharacters: fixtureLongRequest.length,
       anonymousDenied,
       automaticProof: "pass",
       buttonExistingAgent: true,

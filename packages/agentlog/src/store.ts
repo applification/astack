@@ -40,7 +40,14 @@ export class LocalStore {
       INSERT OR IGNORE INTO meta VALUES('revision','0');`);
   }
   put(record: TelemetryRecord) {
-    const safe = recordSchema.parse(redact(record, this.secrets));
+    const safe = recordSchema.parse(
+      redact(
+        record,
+        this.secrets,
+        0,
+        record.kind === "evaluation" ? null : 8000,
+      ),
+    );
     if (Buffer.byteLength(JSON.stringify(safe)) > 128 * 1024) {
       if (safe.kind === "event" && safe.value.delivery)
         throw new Error("Delivery evidence exceeds the 128 KiB record budget");
@@ -99,6 +106,14 @@ export class LocalStore {
           "Evaluation is immutable; use a new ID for revised intent or proof",
         );
       if (safe.kind === "evaluation" && safe.value.intent.source) {
+        if ("kind" in safe.value.intent)
+          for (const runId of safe.value.runIds) {
+            const parent = this.getRecord("run:" + runId);
+            if (parent?.kind !== "run" || !parent.value.contentCapture)
+              throw new Error(
+                "Captured intent requires readable project capture",
+              );
+          }
         const source = this.getRecord(
           "event:" + safe.value.intent.source.eventId,
         );
@@ -106,7 +121,17 @@ export class LocalStore {
           source?.kind !== "event" ||
           source.value.runId !== safe.value.intent.source.runId ||
           source.value.kind !== "user_prompt" ||
-          source.value.data.content !== safe.value.intent.request
+          ("request" in safe.value.intent
+            ? source.value.data.content !== safe.value.intent.request
+            : typeof source.value.data.content !== "string" ||
+              !source.value.data.content.trim() ||
+              source.value.data.content === "[WITHHELD]" ||
+              this.db
+                .query<{ revision: number }, [string]>(
+                  "SELECT revision FROM records WHERE key=?",
+                )
+                .get("event:" + safe.value.intent.source.eventId)?.revision !==
+                safe.value.intent.source.revision)
         )
           throw new Error(
             "Original request does not match an already captured prompt",

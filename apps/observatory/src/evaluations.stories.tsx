@@ -15,11 +15,13 @@ import {
   evaluationRun,
   evaluationPrompt,
   fixtureAssessment,
+  fixtureLongRequest,
 } from "@astack/agent-observability/evaluation-fixtures";
 import { EvaluationView, EvaluationTable } from "./evaluations";
 import { ObservatoryLayout } from "./app";
 import { workflowViewFixture } from "@astack/agent-observability/workflow-fixtures";
 import { journeyFixture } from "@astack/agent-observability/journey-fixtures";
+import { generateEvaluation } from "@astack/agent-observability/evaluation-generation";
 
 function detail(status: "pass" | "fail" | "inconclusive", assessed = false) {
   const evaluation = evaluationFixture(status);
@@ -105,6 +107,30 @@ export const MissingProof: Story = {
 };
 export const MissingContent: Story = {
   args: { detail: { ...detail("pass"), timeline: [] } },
+};
+export const LongCapturedRequest: Story = {
+  args: {
+    detail: (() => {
+      const prompt = {
+        ...evaluationPrompt(),
+        data: { content: fixtureLongRequest },
+      };
+      return evaluationDetailSchema.parse({
+        ...detail("inconclusive"),
+        evaluation: generateEvaluation({
+          id: "00000000-0000-4000-8000-000000000002",
+          createdAt: 2000,
+          title: "Review a long scheduled request",
+          runs: [{ run: evaluationRun("reproduce"), revision: 1 }],
+          source: { event: prompt, revision: 1 },
+          clarifications: [],
+          criteria: { method: "ui" },
+          proof: null,
+        }),
+        source: { event: prompt, revision: 1 },
+      });
+    })(),
+  },
 };
 export const GeneratedFromCapture: Story = {
   args: {

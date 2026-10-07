@@ -1,0 +1,34 @@
+bun test v1.4.0 (34cbb9a40)
+
+packages/backend/tests/evaluations.test.ts:
+ZodError: [
+  {
+    "origin": "string",
+    "code": "too_big",
+    "maximum": 4096,
+    "inclusive": true,
+    "path": [
+      "intent",
+      "request"
+    ],
+    "message": "Too big: expected string to have <=4096 characters"
+  },
+  {
+    "origin": "string",
+    "code": "too_big",
+    "maximum": 4096,
+    "inclusive": true,
+    "path": [
+      "cases",
+      0,
+      "expected"
+    ],
+    "message": "Too big: expected string to have <=4096 characters"
+  }
+]
+(fail) generation preserves a long captured request once and keeps verification inconclusive [44.86ms]
+
+ 0 pass
+ 16 filtered out
+ 1 fail
+Ran 1 test across 1 file. [136.00ms]

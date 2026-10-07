@@ -1,9 +1,11 @@
 import { beforeEach, expect, test } from "bun:test";
 import { convexTest } from "convex-test";
+import { ConvexError } from "convex/values";
 import schema from "../convex/schema";
 import { api, internal } from "../convex/_generated/api";
 import {
   evaluationDetailSchema,
+  evaluationRequest,
   evaluationSummarySchema,
 } from "@astack/agent-observability/evaluation-view";
 import { activityNameKey } from "@astack/agent-observability/naming";
@@ -87,6 +89,186 @@ async function setup(
   return { t, evaluation, owner: t.withIdentity({ subject: ownerId }) };
 }
 
+test.each([5633, 16000])(
+  "generation preserves a %i-character captured request once",
+  async (length) => {
+    const { t, owner } = await setup();
+    const request = "Maintain the scheduled health backlog.\n"
+      .repeat(500)
+      .slice(0, length);
+    const prompt = { ...evaluationPrompt(), data: { content: request } };
+    await t.mutation(internal.ingestion.ingest, {
+      machineId: fixtureMachine,
+      records: entries([{ kind: "event", value: prompt }], 2),
+    });
+    const saved = await owner.mutation(api.evaluations.generate, {
+      runId: prompt.runId,
+      projectId: fixtureProject,
+    });
+    const detail = evaluationDetailSchema.parse(
+      JSON.parse(
+        (await owner.query(api.evaluations.detail, {
+          evaluationId: saved.evaluationId,
+        })) ?? "null",
+      ),
+    );
+    expect(detail.source?.event.data.content).toBe(request);
+    expect(detail.source?.revision).toBe(2);
+    expect(JSON.stringify(detail.evaluation)).not.toContain(request);
+    expect(detail.evaluation.intent).toEqual({
+      kind: "captured",
+      source: { runId: prompt.runId, eventId: prompt.id, revision: 2 },
+      clarifications: [],
+    });
+    expect(detail.evaluation.cases[0]?.expected).toEqual({
+      kind: "original_request",
+    });
+    expect(detail.evaluation.proof).toBeNull();
+  },
+);
+
+test("generation reports a byte budget error and rolls back oversized clarification records", async () => {
+  const { t, owner } = await setup();
+  const prompt = evaluationPrompt();
+  for (let index = 1; index <= 3; index++)
+    await t.mutation(internal.ingestion.ingest, {
+      machineId: fixtureMachine,
+      records: entries([
+        {
+          kind: "event",
+          value: {
+            ...prompt,
+            id: prompt.id + ":clarification:" + index,
+            sequence: index,
+            data: { content: "Scope clarification. ".repeat(2500) },
+          },
+        },
+      ]),
+    });
+  try {
+    await owner.mutation(api.evaluations.generate, { runId: prompt.runId });
+    throw new Error("Oversized generation succeeded");
+  } catch (error) {
+    expect(error).toBeInstanceOf(ConvexError);
+    if (!(error instanceof ConvexError)) throw error;
+    expect(error.data).toBe(
+      "Evaluation record exceeds its 128 KiB byte budget.",
+    );
+  }
+  expect(
+    await t.run(async (ctx) =>
+      ctx.db
+        .query("evaluations")
+        .withIndex("by_generationKey", (q) =>
+          q.eq("generationKey", "ui:" + prompt.runId),
+        )
+        .unique(),
+    ),
+  ).toBeNull();
+});
+
+test("generation bounds preserved snapshots by UTF-8 bytes without saving a partial review", async () => {
+  const { t, owner } = await setup();
+  const prompt = evaluationPrompt();
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries(
+      [
+        {
+          kind: "event",
+          value: {
+            ...prompt,
+            data: { content: "€".repeat(175000) },
+          },
+        },
+      ],
+      2,
+    ),
+  });
+  try {
+    await owner.mutation(api.evaluations.generate, { runId: prompt.runId });
+    throw new Error("Oversized snapshot generation succeeded");
+  } catch (error) {
+    if (!(error instanceof ConvexError)) throw error;
+    expect(error.data).toBe(
+      "Evaluation snapshot exceeds its 512 KiB byte budget.",
+    );
+  }
+  expect(
+    await t.run(async (ctx) =>
+      ctx.db
+        .query("evaluations")
+        .withIndex("by_generationKey", (q) =>
+          q.eq("generationKey", "ui:" + prompt.runId),
+        )
+        .unique(),
+    ),
+  ).toBeNull();
+});
+
+test("captured intent imports reject a stale original request revision", async () => {
+  const { t, evaluation } = await setup();
+  const source = evaluationPrompt();
+  await expect(
+    t.mutation(internal.ingestion.ingest, {
+      machineId: fixtureMachine,
+      records: entries([
+        {
+          kind: "evaluation",
+          value: {
+            ...evaluation,
+            id: evaluation.id + "-stale-request",
+            intent: {
+              kind: "captured",
+              source: {
+                runId: source.runId,
+                eventId: source.id,
+                revision: 99,
+              },
+              clarifications: [],
+            },
+          },
+        },
+      ]),
+    }),
+  ).rejects.toThrow("does not match");
+});
+
+test("captured intent imports require every selected turn to remain readable", async () => {
+  const { t, evaluation } = await setup();
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries(
+      [{ kind: "run", value: { ...evaluationRun(), contentCapture: false } }],
+      2,
+    ),
+  });
+  const source = evaluationPrompt();
+  await expect(
+    t.mutation(internal.ingestion.ingest, {
+      machineId: fixtureMachine,
+      records: entries([
+        {
+          kind: "evaluation",
+          value: {
+            ...evaluation,
+            id: evaluation.id + "-unreadable-request",
+            intent: {
+              kind: "captured",
+              source: {
+                runId: source.runId,
+                eventId: source.id,
+                revision: 1,
+              },
+              clarifications: [],
+            },
+          },
+        },
+      ]),
+    }),
+  ).rejects.toThrow("requires readable project capture");
+});
+
 test("owner generates a persisted review from the exact captured request, with idempotent concurrent retries", async () => {
   const { t, owner } = await setup();
   const runId = evaluationRun("reproduce").id;
@@ -105,18 +287,19 @@ test("owner generates a persisted review from the exact captured request, with i
     evaluationId: first.evaluationId,
   });
   const detail = evaluationDetailSchema.parse(JSON.parse(raw ?? "null"));
-  expect(detail.evaluation.intent.request).toBe(
+  expect(evaluationRequest(detail)).toBe(
     "Fix edits disappearing after saving and reopening.",
   );
   expect(detail.evaluation.intent.source).toEqual({
     runId,
     eventId: evaluationPrompt().id,
+    revision: 1,
   });
   expect(detail.evaluation.runIds).toEqual([runId]);
   expect(detail.evaluation.cases).toEqual([
     {
       id: "C1",
-      expected: "Fix edits disappearing after saving and reopening.",
+      expected: { kind: "original_request" },
       requiresIndependentObservation: false,
     },
   ]);
@@ -154,7 +337,7 @@ test("owner generates a persisted review from the exact captured request, with i
       })) ?? "null",
     ),
   );
-  expect(saved.evaluation.intent.request).toBe(
+  expect(evaluationRequest(saved)).toBe(
     "Fix edits disappearing after saving and reopening.",
   );
 });
@@ -399,7 +582,7 @@ test("evaluation snapshots preserve original intent and captured turns without c
   const detail = evaluationDetailSchema.parse(JSON.parse(raw ?? "null"));
   expect(detail.runs).toHaveLength(2);
   expect(detail.source?.event.data.content).toBe(evaluation.intent.request);
-  expect(detail.evaluation.intent.request).toBe(evaluation.intent.request);
+  expect(evaluationRequest(detail)).toBe(evaluation.intent.request);
   expect(detail.runs.every(({ run }) => run.outcome === "unknown")).toBe(true);
   expect(detail.assessments).toEqual([]);
   await t.mutation(internal.ingestion.ingest, {

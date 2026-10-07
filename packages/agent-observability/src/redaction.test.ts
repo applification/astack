@@ -1,5 +1,15 @@
 import { expect, test } from "bun:test";
 import { redact, redactText } from "./redaction";
+test("byte-bounded evaluation redaction preserves long text and replacement growth", () => {
+  const content = "Captured instruction.\n".repeat(500) + "abcdef ending";
+  expect(redact({ content }, ["abcdef"], 0, null)).toEqual({
+    content: "Captured instruction.\n".repeat(500) + "[REDACTED] ending",
+  });
+  expect(redactText("abcdef ending", ["abcdef"], null)).toBe(
+    "[REDACTED] ending",
+  );
+  expect(redact({ content })).toEqual({ content: content.slice(0, 8000) });
+});
 test("redacts nested credentials, environment assignments, known secrets, URLs and bearer tokens", () => {
   const safe = redact(
     {

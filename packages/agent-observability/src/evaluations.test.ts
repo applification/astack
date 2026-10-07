@@ -4,7 +4,55 @@ import {
   evaluationSchema,
   validateAssessment,
 } from "./evaluations";
-import { evaluationFixture, fixtureAssessment } from "./evaluation-fixtures";
+import {
+  evaluationFixture,
+  evaluationRun,
+  evaluationPrompt,
+  fixtureAssessment,
+} from "./evaluation-fixtures";
+import { generateEvaluation } from "./evaluation-generation";
+import { evaluationDetailSchema, evaluationRequest } from "./evaluation-view";
+
+test("captured intent resolves only its matching preserved source revision", () => {
+  const source = { event: evaluationPrompt(), revision: 7 };
+  const evaluation = generateEvaluation({
+    id: "fixture-captured-request",
+    createdAt: 2000,
+    title: "Review captured work",
+    runs: [{ run: evaluationRun("reproduce"), revision: 1 }],
+    source,
+    clarifications: [],
+    criteria: { method: "ui" },
+    proof: null,
+  });
+  const detail = evaluationDetailSchema.parse({
+    evaluation,
+    source,
+    runs: [],
+    assessments: [],
+    moreAssessments: false,
+  });
+  expect(evaluationRequest(detail)).toBe(
+    "Fix edits disappearing after saving and reopening.",
+  );
+  for (const mismatched of [
+    null,
+    { ...source, revision: 8 },
+    { ...source, event: { ...source.event, id: "different-request" } },
+  ])
+    expect(() =>
+      evaluationDetailSchema.parse({ ...detail, source: mismatched }),
+    ).toThrow("preserved original request revision");
+  expect(() =>
+    evaluationSchema.parse({
+      ...evaluation,
+      generation: {
+        ...evaluation.generation,
+        requestRevision: 8,
+      },
+    }),
+  ).toThrow("captured original request revision");
+});
 
 test("completed turns never substitute for proof or owner assessment", () => {
   const value = evaluationFixture();
