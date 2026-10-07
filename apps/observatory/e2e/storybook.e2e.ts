@@ -1560,6 +1560,9 @@ test("child lanes stay expanded, connect to declared joins and retain separate r
     if (map instanceof HTMLElement) map.focus();
     return true;
   });
+  const beforeKeyboardScroll = await browser.evaluate(
+    () => document.querySelector(".workflow-map-scroll")?.scrollLeft ?? 0,
+  );
   await browser.keyboard.press("ArrowRight");
   await expect
     .poll(() =>
@@ -1567,11 +1570,127 @@ test("child lanes stay expanded, connect to declared joins and retain separate r
         () => document.querySelector(".workflow-map-scroll")?.scrollLeft ?? 0,
       ),
     )
-    .toBeGreaterThan(0);
+    .toBeGreaterThan(beforeKeyboardScroll);
   await expect(
     screen.getByRole("link", "React skill read in child trace").last(),
   ).toHaveAttribute("href", /child-ui%3Aretry.*event=/);
   await app.screenshot("connected-child-journeys-narrow-dark");
+});
+
+test("main rail stays centered with zero through four outward child lanes", async ({
+  app,
+  browser,
+  screen,
+}) => {
+  await browser.setViewport({ width: 1600, height: 1000 });
+  for (const [story, count] of [
+    ["bug-fix-flow", 0],
+    ["single-journey", 1],
+    ["parallel-journeys", 2],
+    ["three-journeys", 3],
+    ["four-journeys", 4],
+  ] satisfies [string, number][]) {
+    await app.open(
+      `/iframe.html?id=observatory-evaluations--${story}&viewMode=story`,
+    );
+    await expect
+      .poll(() =>
+        browser.evaluate(() => {
+          const map = document.querySelector(".workflow-map");
+          const viewport = map?.parentElement;
+          const main = map?.querySelector("[data-map-main]");
+          const root = map?.querySelector("[data-map-root]");
+          if (!map || !viewport || !main || !root) return null;
+          const center = (element: Element) => {
+            const rect = element.getBoundingClientRect();
+            return rect.left + rect.width / 2;
+          };
+          const x = center(main);
+          const branches = [...map.querySelectorAll("[data-map-branch]")];
+          return {
+            count: branches.length,
+            rootAligned: Math.abs(center(root) - x) < 1,
+            mainCentered: Math.abs(center(map) - x) < 1,
+            viewportCentered: Math.abs(center(viewport) - x) < 1,
+            distinctLanes:
+              new Set([
+                x,
+                ...branches.map((branch) => {
+                  const stop = branch.querySelector("[data-map-child-stop]");
+                  return stop ? center(stop) : null;
+                }),
+              ]).size ===
+              branches.length + 1,
+            outwardLabels: branches.every((branch, index) => {
+              const stop = branch.querySelector("[data-map-child-stop]");
+              const label = branch.querySelector("h4");
+              if (!stop || !label) return false;
+              const side = branch.getAttribute("data-side");
+              const a = stop.getBoundingClientRect(),
+                b = label.getBoundingClientRect();
+              return index % 2 === 0
+                ? side === "left" && center(stop) < x && b.right < a.left - 12
+                : side === "right" && center(stop) > x && b.left > a.right + 12;
+            }),
+            pageFits: document.documentElement.scrollWidth <= innerWidth,
+          };
+        }),
+      )
+      .toEqual({
+        count,
+        rootAligned: true,
+        mainCentered: true,
+        viewportCentered: true,
+        distinctLanes: true,
+        outwardLabels: true,
+        pageFits: true,
+      });
+  }
+  await browser.evaluate(() => {
+    const map = document.querySelector(".workflow-map-scroll");
+    if (map) map.scrollLeft = 0;
+    return true;
+  });
+  await screen
+    .getByRole("button", "View React in Verify", { exact: true })
+    .last()
+    .tap();
+  await expect
+    .poll(() =>
+      browser.evaluate(
+        () =>
+          document.querySelector(".workflow-map-scroll")?.scrollLeft ?? null,
+      ),
+    )
+    .toBe(0);
+  await screen
+    .getByRole("region", "React skill evidence", { exact: true })
+    .getByRole("button", "Close skill evidence")
+    .tap();
+  await browser.evaluate(() => {
+    const map = document.querySelector(".workflow-map-scroll");
+    if (map)
+      window.scrollTo(0, map.getBoundingClientRect().top + scrollY - 100);
+    return true;
+  });
+  await app.screenshot("centered-four-child-lanes-light");
+  await browser.setViewport({ width: 390, height: 844 });
+  await expect
+    .poll(() =>
+      browser.evaluate(() => {
+        const viewport = document.querySelector(".workflow-map-scroll");
+        const main = viewport?.querySelector("[data-map-main]");
+        if (!viewport || !main) return false;
+        const a = viewport.getBoundingClientRect(),
+          b = main.getBoundingClientRect();
+        return (
+          Math.abs(b.left + b.width / 2 - a.left - a.width / 2) < 1 &&
+          document.documentElement.scrollWidth <= innerWidth
+        );
+      }),
+    )
+    .toBe(true);
+  await app.screenshot("centered-four-child-lanes-narrow");
 });
 
 test("completed and unavailable children never create an implicit parent join", async ({

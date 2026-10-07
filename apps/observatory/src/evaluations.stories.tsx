@@ -276,6 +276,51 @@ export const ParallelJourneys: Story = {
     detail: { ...detail("inconclusive"), workflow: journeyFixture().workflow },
   },
 };
+function laneCountDetail(count: number): EvaluationDetail {
+  const workflow = journeyFixture(false).workflow;
+  const additional: EvaluationDetail["workflow"]["branches"] = Array.from(
+    { length: Math.max(0, count - workflow.branches.length) },
+    (_, index) => ({
+      parentRunId: evaluationRun().id,
+      delegation: {
+        id: "delegate-additional-" + index,
+        source: "t3",
+        child: {
+          kind: "t3",
+          environmentId: "fixture-host",
+          threadId: "additional-child-" + index,
+        },
+        title: index === 0 ? "Documentation checks" : "Security review",
+        status: "running",
+        startedAt: 1075,
+        completedAt: null,
+      },
+      state: "unavailable",
+      reason:
+        "This child conversation has no readable capture in this fixture.",
+      runs: [],
+      records: [],
+      reads: [],
+      truncated: false,
+    }),
+  );
+  return {
+    ...detail("inconclusive"),
+    workflow: {
+      ...workflow,
+      branches: [...workflow.branches, ...additional].slice(0, count),
+    },
+  };
+}
+export const SingleJourney: Story = {
+  args: { detail: laneCountDetail(1) },
+};
+export const ThreeJourneys: Story = {
+  args: { detail: laneCountDetail(3) },
+};
+export const FourJourneys: Story = {
+  args: { detail: laneCountDetail(4) },
+};
 export const ReturnedWithoutJoin: Story = {
   args: {
     detail: {

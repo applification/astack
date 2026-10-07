@@ -439,8 +439,14 @@ function WorkflowPath({
   }));
   if (branches.length) stations.splice(insertionIndex, 0, { kind: "fork" });
   const forkRow = insertionIndex + 3;
-  const columnsStyle: CSSProperties & { "--map-columns": string } = {
-    "--map-columns": `320px${" 280px".repeat(branches.length)}`,
+  const branchRadius = Math.ceil(branches.length / 2);
+  const mainColumn = branchRadius + 1;
+  const columnsStyle: CSSProperties & {
+    "--map-lane-count": number;
+    "--map-main-column": number;
+  } = {
+    "--map-lane-count": branchRadius * 2 + 1,
+    "--map-main-column": mainColumn,
   };
   return (
     <ConnectedWorkflowMap
@@ -521,6 +527,8 @@ function WorkflowPath({
           );
         })}
         {branches.map((branch, index) => {
+          const side = index % 2 === 0 ? "left" : "right";
+          const distance = Math.floor(index / 2) + 1;
           const join = branchJoin(branch, flow.nodes);
           const joinIndex = stations.findIndex(
             (station) => station.kind === "node" && station.node === join,
@@ -529,7 +537,8 @@ function WorkflowPath({
             "--map-column": number;
             "--map-row": string;
           } = {
-            "--map-column": index + 2,
+            "--map-column":
+              mainColumn + (side === "left" ? -distance : distance),
             "--map-row": `${forkRow} / ${joinIndex < 0 ? stations.length + 3 : joinIndex + 3}`,
           };
           return (
@@ -538,6 +547,7 @@ function WorkflowPath({
               aria-label={branch.delegation.title || "Delegated agent"}
               className="journey-child"
               data-map-branch=""
+              data-side={side}
               data-color={index % 5}
               data-join-target={
                 join?.kind === "join" ? join.record.eventId : undefined
