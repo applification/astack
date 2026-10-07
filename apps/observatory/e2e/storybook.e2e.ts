@@ -1683,9 +1683,38 @@ test("main rail stays centered with zero through four outward child lanes", asyn
         if (!viewport || !main) return false;
         const a = viewport.getBoundingClientRect(),
           b = main.getBoundingClientRect();
+        const map = viewport.querySelector(".workflow-map");
+        if (!map) return false;
+        const rect = map.getBoundingClientRect();
+        const anchors = [...map.querySelectorAll("[data-map-key]")];
+        const paths = [...map.querySelectorAll("path[data-connection]")];
+        const linesAligned =
+          paths.length > 0 &&
+          paths.every((path) => {
+            if (!(path instanceof SVGPathElement)) return false;
+            const start = path.getPointAtLength(0),
+              end = path.getPointAtLength(path.getTotalLength());
+            return ["from", "to"].every((key, index) => {
+              const anchor = anchors.find(
+                (item) =>
+                  item.getAttribute("data-map-key") ===
+                  path.getAttribute("data-" + key),
+              );
+              if (!anchor) return false;
+              const bounds = anchor.getBoundingClientRect();
+              const point = index === 0 ? start : end;
+              return (
+                Math.abs(point.x - bounds.left + rect.left - bounds.width / 2) <
+                  0.5 &&
+                Math.abs(point.y - bounds.top + rect.top - bounds.height / 2) <
+                  0.5
+              );
+            });
+          });
         return (
           Math.abs(b.left + b.width / 2 - a.left - a.width / 2) < 1 &&
-          document.documentElement.scrollWidth <= innerWidth
+          document.documentElement.scrollWidth <= innerWidth &&
+          linesAligned
         );
       }),
     )
