@@ -1,0 +1,78 @@
+{
+  "at": "2026-10-07T06:51:53.748886+00:00",
+  "runtimeRevision": "4e7b870975c569688594ebdbb39edd0a7446eb1f",
+  "authorizedBy": "Owner asked to deploy the current branch to Otis for review.",
+  "target": "https://otis.tail12a0a0.ts.net:8450",
+  "backendFirst": true,
+  "legacyRunsReprojected": 1376,
+  "servedAssetsMatchBuild": true,
+  "assets": [
+    {
+      "asset": "/assets/index-BRxw-aEv.js",
+      "sha256": "7f61eaf22a9566fc55217f2af2d8296b8f81e0d471dae8a92f06d79ba7ef2f85"
+    },
+    {
+      "asset": "/assets/index-DAo7IyTC.css",
+      "sha256": "1b6b4aaa3136eda0db4150cea5b4955b660d8b057ebb25ba9c489ef3702b856a"
+    }
+  ],
+  "collectorSigned": true,
+  "collector": {
+    "pending": 0,
+    "projectPolicy": "ok",
+    "forwarding": "ok",
+    "nativeSourcesHealthy": true,
+    "t3SourcesHealthy": true
+  },
+  "journey": {
+    "linkedFeatureTurns": 3,
+    "directChildren": 2,
+    "childStates": [
+      "available",
+      "available"
+    ],
+    "childTaskStatuses": [
+      "completed",
+      "completed"
+    ],
+    "childSkills": [
+      [
+        "react",
+        "typescript-best-practices"
+      ],
+      [
+        "testing",
+        "typescript-best-practices"
+      ]
+    ],
+    "joinReferenceStates": [
+      "available",
+      "available"
+    ],
+    "truncated": false,
+    "workflowRecordedAfterDelivery": true,
+    "ownerAssessmentWritten": false,
+    "privateReviewSnapshotRetained": true
+  },
+  "liveBrowser": {
+    "runId": "01a1151c-3839-7ce9-9c45-0d5fe75be8cd",
+    "passed": 7,
+    "failed": 0,
+    "retries": 0
+  },
+  "manualBrowser": {
+    "independentChildExpansion": true,
+    "childSkillOpensOwningTraceEvent": true,
+    "explicitJoinVisible": true,
+    "desktopNoOverflow": true,
+    "narrowNoOverflow": true,
+    "deliveredFeatureResultVisible": true
+  },
+  "recovery": {
+    "previousUiAndCollectorRetained": true,
+    "collectorSqliteBackedUp": true,
+    "privateDatabaseExportRetained": true,
+    "localDevelopmentEnvironmentRestored": true
+  },
+  "privatePixelsPublished": false
+}
