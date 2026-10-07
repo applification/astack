@@ -1577,6 +1577,104 @@ test("child lanes stay expanded, connect to declared joins and retain separate r
   await app.screenshot("connected-child-journeys-narrow-dark");
 });
 
+test("map descriptions compact revisions without losing the full value", async ({
+  app,
+  browser,
+  screen,
+}) => {
+  const revision = "0123456789abcdef0123456789abcdef01234567";
+  await browser.setViewport({ width: 1600, height: 1100 });
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--revision-summaries&viewMode=story",
+  );
+  await expect
+    .poll(() =>
+      browser.evaluate(() => ({
+        maps: document.querySelectorAll(".workflow-map").length,
+        branches: document.querySelectorAll("[data-map-branch]").length,
+        forks: document.querySelectorAll('path[data-connection="fork"]').length,
+        joins: document.querySelectorAll('path[data-connection="join"]').length,
+      })),
+    )
+    .toEqual({ maps: 1, branches: 2, forks: 2, joins: 2 });
+  await expect(
+    screen.getByRole("heading", "New feature", { exact: true }),
+  ).toBeVisible();
+  await expect(screen.getByText("01234567", { exact: true })).toHaveAttribute(
+    "title",
+    revision,
+  );
+  expect(
+    await browser.evaluate(() => {
+      const description = document
+        .querySelector(".map-main-cell .map-revision")
+        ?.closest("p");
+      const main = document.querySelector("[data-map-main]");
+      const child = document.querySelector("[data-map-child-stop]");
+      if (!description || !main || !child) return null;
+      return {
+        smaller:
+          parseFloat(getComputedStyle(description).fontSize) <
+          parseFloat(getComputedStyle(document.body).fontSize),
+        fullHashInSentence: /\b[a-f0-9]{40}\b/i.test(
+          description.textContent ?? "",
+        ),
+        distinctBranch:
+          getComputedStyle(main).borderColor !==
+          getComputedStyle(child).borderColor,
+      };
+    }),
+  ).toEqual({ smaller: true, fullHashInSentence: false, distinctBranch: true });
+  await browser.evaluate(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (value: string) =>
+          sessionStorage.setItem("fixture-revision-copy", value),
+      },
+    });
+    return true;
+  });
+  await screen.getByRole("button", "Copy revision", { exact: true }).tap();
+  expect(
+    await browser.evaluate(() =>
+      sessionStorage.getItem("fixture-revision-copy"),
+    ),
+  ).toBe(revision);
+  await expect(screen.getByText("Copied", { exact: true })).toBeVisible();
+  await browser.evaluate(() => {
+    const map = document.querySelector(".workflow-map-scroll");
+    if (map)
+      window.scrollTo(0, map.getBoundingClientRect().top + scrollY - 100);
+    return true;
+  });
+  await app.screenshot("compact-revisions-light");
+  await browser.evaluate(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async () => {
+          throw new Error("fixture-denied");
+        },
+      },
+    });
+    return true;
+  });
+  await screen.getByRole("button", "Copy revision", { exact: true }).tap();
+  await expect(screen.getByText(revision, { exact: true })).toBeVisible();
+  await expect(
+    screen.getByText("Copy unavailable; select the full value.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+});
+
 test("main rail stays centered with zero through four outward child lanes", async ({
   app,
   browser,

@@ -276,6 +276,35 @@ export const ParallelJourneys: Story = {
     detail: { ...detail("inconclusive"), workflow: journeyFixture().workflow },
   },
 };
+const revisionJourney = journeyFixture().workflow;
+export const RevisionSummaries: Story = {
+  args: {
+    detail: {
+      ...detail("inconclusive"),
+      workflow: {
+        ...revisionJourney,
+        records: [
+          ...workflowViewFixture("feature").records.map((record) => ({
+            ...record,
+            sessionId: evaluationRun().sessionId,
+            annotation:
+              record.annotation.action === "phase" &&
+              record.annotation.phase === "implement"
+                ? {
+                    ...record.annotation,
+                    summary:
+                      "Implemented route journeys, direct child capture, separate attempts and explicit joins in runtime source 0123456789abcdef0123456789abcdef01234567.",
+                  }
+                : record.annotation,
+          })),
+          ...revisionJourney.records.filter(
+            (record) => record.annotation.action === "join",
+          ),
+        ],
+      },
+    },
+  },
+};
 function laneCountDetail(count: number): EvaluationDetail {
   const workflow = journeyFixture(false).workflow;
   const additional: EvaluationDetail["workflow"]["branches"] = Array.from(

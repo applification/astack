@@ -11,7 +11,7 @@ type Connection = {
 };
 
 export const childLineColors = [
-  "#5b9d9b",
+  "#6776c9",
   "#b78b3e",
   "#8875a6",
   "#d7775f",
@@ -83,7 +83,7 @@ export function ConnectedWorkflowMap({
       element.querySelectorAll("[data-map-branch]").forEach((branch, index) => {
         const stops = [...branch.querySelectorAll("[data-map-child-stop]")];
         const color =
-          childLineColors[index % childLineColors.length] ?? "#5b9d9b";
+          childLineColors[index % childLineColors.length] ?? "#6776c9";
         if (fork && stops[0]) connect(fork, stops[0], "fork", color);
         stops.forEach((stop, i) => {
           const previous = stops[i - 1];

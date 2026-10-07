@@ -57,7 +57,15 @@ export function RepositoryLink({ value }: { value: string }) {
   );
 }
 
-export function CopyValue({ value, label }: { value: string; label: string }) {
+export function CopyValue({
+  value,
+  label,
+  showValueOnFailure = false,
+}: {
+  value: string;
+  label: string;
+  showValueOnFailure?: boolean;
+}) {
   const [feedback, setFeedback] = useState<"idle" | "copied" | "failed">(
     "idle",
   );
@@ -90,6 +98,7 @@ export function CopyValue({ value, label }: { value: string; label: string }) {
             : "Copy unavailable; select the full value."}
         </span>
       )}
+      {feedback === "failed" && showValueOnFailure && <code>{value}</code>}
     </span>
   );
 }

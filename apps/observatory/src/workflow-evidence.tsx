@@ -11,6 +11,7 @@ import {
 } from "@astack/agent-observability/workflow-view";
 import { ConnectedWorkflowMap } from "./connected-workflow-map";
 import { runLink } from "./evaluation-evidence";
+import { CopyValue } from "./run-metadata";
 import { SkillBadge, SkillIcon, skillLabel } from "./skill-badge";
 
 const phaseLabel = (phase: string) =>
@@ -21,6 +22,26 @@ const statusLabel = {
   failed: "Failed · agent reported",
   omitted: "Omitted",
 };
+
+function MapDescription({ text }: { text: string }) {
+  const parts = text.split(/(\b(?:[a-f0-9]{64}|[a-f0-9]{40})\b)/gi);
+  return (
+    <p className="map-description">
+      {parts.map((part, index) =>
+        index % 2 === 1 ? (
+          <span className="map-revision" key={index}>
+            <code title={part} aria-label={"Revision " + part}>
+              {part.slice(0, 8)}
+            </code>
+            <CopyValue value={part} label="revision" showValueOnFailure />
+          </span>
+        ) : (
+          part
+        ),
+      )}
+    </p>
+  );
+}
 
 function RecordEvidence({
   record,
@@ -43,11 +64,13 @@ function RecordEvidence({
         {" · "}
         {new Date(record.recordedAt).toLocaleString()}
       </p>
-      <p>
-        {annotation.action === "phase" || annotation.action === "join"
-          ? annotation.summary
-          : annotation.reason}
-      </p>
+      <MapDescription
+        text={
+          annotation.action === "phase" || annotation.action === "join"
+            ? annotation.summary
+            : annotation.reason
+        }
+      />
       <a href={runLink(record.runId, projectId, record.eventId)}>
         Declaration in trace
       </a>
@@ -154,7 +177,9 @@ function PhaseStop({
       >
         {statusLabel[node.status]}
       </p>
-      {last?.annotation.action === "phase" && <p>{last.annotation.summary}</p>}
+      {last?.annotation.action === "phase" && (
+        <MapDescription text={last.annotation.summary} />
+      )}
       <div
         className="skill-badges"
         aria-label={phaseLabel(node.phase) + " declared skills"}
@@ -239,7 +264,7 @@ function WorkflowNodeStop({
       <article className="map-station" data-map-station="">
         <MapStop lane={lane} id={node.record.eventId} />
         <h4>Changed route → {routeDefinitions[annotation.route].label}</h4>
-        <p>{annotation.reason}</p>
+        <MapDescription text={annotation.reason} />
         <a
           className="map-evidence-link"
           href={runLink(node.record.runId, projectId, node.record.eventId)}
@@ -303,7 +328,11 @@ function ChildJourney({
           Task {branch.delegation.status} · {branch.runs.length}{" "}
           {branch.runs.length === 1 ? "turn" : "turns"}
         </p>
-        {branch.reason && <p role="status">{branch.reason}</p>}
+        {branch.reason && (
+          <p className="map-description" role="status">
+            {branch.reason}
+          </p>
+        )}
       </header>
       {flows.map((flow) => (
         <ol
@@ -466,11 +495,13 @@ function WorkflowPath({
               ? routeDefinitions[selected.route].label
               : "Route not recorded"}
           </h3>
-          <p>
-            {selected?.action === "select"
-              ? selected.reason
-              : "The recorded activity follows."}
-          </p>
+          <MapDescription
+            text={
+              selected?.action === "select"
+                ? selected.reason
+                : "The recorded activity follows."
+            }
+          />
           {flow.selection && (
             <a
               className="map-evidence-link"
