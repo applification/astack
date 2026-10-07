@@ -3,6 +3,7 @@ import { runSchema } from "@astack/agent-observability";
 import { ObservatoryLayout } from "./app";
 import { RunMetadata, ProviderLabel, ProblemRate } from "./run-metadata";
 import { activityHeading } from "@astack/agent-observability/naming";
+import { fixtureAutomation } from "@astack/agent-observability/automation-fixtures";
 
 const run = runSchema.parse({
   id: "fixture:metadata",
@@ -48,6 +49,9 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Compact: Story = {};
+export const Scheduled: Story = {
+  args: { run: { ...run, automation: fixtureAutomation } },
+};
 export const NativeFallback: Story = {
   args: { run: { ...run, title: "t3-12345678 · Codex turn 01a111c1" } },
 };

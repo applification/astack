@@ -1,5 +1,125 @@
 import { test } from "@e2e-dev/web";
 import { expect } from "e2e";
+test("scheduled task rows group history by machine and project with explicit schedule snapshots", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-scheduled-tasks--captured&viewMode=story",
+  );
+  const table = screen.getByRole("region", "Scheduled tasks table", {
+    exact: true,
+  });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await app.screenshot("scheduled-tasks-desktop");
+  await expect(table.getByRole("row")).toHaveCount(5);
+  const desktop = table
+    .getByRole("row")
+    .filter({ hasText: "daily-health" })
+    .filter({ hasText: "Fixture desktop" });
+  await expect(desktop.getByRole("cell", "2", { exact: true })).toBeVisible();
+  await expect(desktop).toContainText("Daily · 09:00");
+  await expect(desktop).toContainText("Next run (last observed)");
+  const href = await desktop
+    .getByRole("link", "View task history")
+    .getAttribute("href");
+  const params = new URLSearchParams(href?.split("?")[1]);
+  expect(params.get("project")).toBe("00000000-0000-4000-8000-000000000100");
+  expect(JSON.parse(params.get("automation") ?? "null")).toEqual([
+    "00000000-0000-4000-8000-000000000001",
+    "codex",
+    ["task", "daily-health"],
+  ]);
+  await expect(
+    table.getByRole("row").filter({ hasText: "Weekly summary" }),
+  ).toContainText("Paused");
+  await expect(
+    table.getByRole("row").filter({ hasText: "Unidentified scheduled task" }),
+  ).toContainText("Schedule unavailable");
+  await browser.setViewport({ width: 390, height: 844 });
+  await expect(table).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await table.focus();
+  await expect(table).toBeFocused();
+  await app.screenshot("scheduled-tasks-narrow");
+  await app.open(
+    "/iframe.html?id=observatory-scheduled-tasks--separate-projects&viewMode=story",
+  );
+  await expect(
+    screen.getByRole("region", "Scheduled tasks table").getByRole("row"),
+  ).toHaveCount(3);
+  await app.open(
+    "/iframe.html?id=observatory-scheduled-tasks--empty&viewMode=story",
+  );
+  await expect(
+    screen.getByRole("heading", "No captured scheduled tasks"),
+  ).toBeVisible();
+});
+
+test("scheduled run badges and detail metadata identify automation activity without labelling interactive rows", async ({
+  app,
+  screen,
+}) => {
+  await app.open("/iframe.html?id=observatory-runs--scheduled&viewMode=story");
+  const table = screen.getByRole("region", "Agent runs table", { exact: true });
+  await expect(table.getByRole("link", /^Scheduled task:/)).toHaveCount(5);
+  await expect(
+    table
+      .getByRole("row")
+      .filter({ hasText: "Interactive review" })
+      .getByRole("link", /^Scheduled task:/),
+  ).toHaveCount(0);
+  const badge = table.getByRole("link", "Scheduled task: Weekly summary");
+  await expect(badge).toHaveAttribute("title", "Weekly summary");
+  expect(await badge.getAttribute("href")).toContain("automation=");
+  await app.open(
+    "/iframe.html?id=observatory-run-metadata--scheduled&viewMode=story",
+  );
+  await expect(
+    screen.getByText("Daily health scan", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Scheduled task", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Daily · 09:00", { exact: true }),
+  ).toBeVisible();
+});
+
+test("scheduled run filters expose the task name and reset through clear filters", async ({
+  app,
+  screen,
+}) => {
+  await app.open("/iframe.html?id=observatory-filters--choices&viewMode=story");
+  await screen.getByRole("button", "Filters", { exact: true }).tap();
+  await screen
+    .getByLabel("Run type", { exact: true })
+    .selectOption({ label: "Scheduled tasks" });
+  await screen
+    .getByLabel("Scheduled task", { exact: true })
+    .selectOption({ label: "Daily health scan · Fixture desktop" });
+  await expect(screen.getByRole("list", "Active filters")).toContainText(
+    "Run type: Scheduled tasks",
+  );
+  await expect(screen.getByRole("list", "Active filters")).toContainText(
+    "Scheduled task: Daily health scan · Fixture desktop",
+  );
+  await screen.getByRole("button", "Clear filters", { exact: true }).tap();
+  await expect(screen.getByLabel("Run type", { exact: true })).toHaveValue("");
+  await expect(
+    screen.getByLabel("Scheduled task", { exact: true }),
+  ).toHaveValue("");
+});
+
 test("the original prompt leads into the map and stays connected through scope, pan and resize", async ({
   app,
   browser,
@@ -1200,7 +1320,7 @@ test("categorical menus keep choices available after selection and clear categor
     await browser.evaluate(
       () => document.querySelectorAll(".filters select").length,
     ),
-  ).toBe(10);
+  ).toBe(12);
   expect(
     await browser.evaluate(
       () => document.querySelectorAll('.filters input[type="text"]').length,

@@ -4,6 +4,7 @@ import { ObservatoryLayout, RunTable, WorkTable, useRunNames } from "./app";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { useState } from "react";
 import { Button } from "@astack/ui";
+import { automationFixtureRuns } from "@astack/agent-observability/automation-fixtures";
 
 const runs = ["completed", "failed", "running"].map((status, index) =>
   runSchema.parse({
@@ -83,6 +84,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Mixed: Story = {};
+export const Scheduled: Story = { args: { runs: automationFixtureRuns() } };
 export const ClaudeCliVersions: Story = {
   args: {
     runs: runs.map((run, index) => ({

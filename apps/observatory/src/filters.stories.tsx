@@ -34,6 +34,11 @@ const options: readonly FilterOption[] = [
   },
   { dimension: "skill", value: "convex-expert", label: "convex-expert" },
   {
+    dimension: "automation",
+    value: "fixture-task-key",
+    label: "Daily health scan · Fixture desktop",
+  },
+  {
     dimension: "tool",
     value: "mcp__convex__query",
     label: "mcp__convex__query",
