@@ -1,0 +1,240 @@
+{
+  "observedAt": "2026-10-07T16:20:10.379Z",
+  "revision": {
+    "base": "5d842d76e34e36dfd7e06875546ab742f8de7b6b",
+    "dirty": true,
+    "sourceDigest": "7bf99fe8114e70a4e723c0a9b165610173fc2df86a225e22f782b944588a6292",
+    "sources": [
+      {
+        "path": ".astack/project.md",
+        "sha256": "0bc1c143e7d660b033aca1eb8c360755cff989e1f2c5c4d2c89bb178b825472d"
+      },
+      {
+        "path": "apps/observatory/e2e/evaluations-local.e2e.ts",
+        "sha256": "3584ec3a44fc2c81e8d8038d2ea460b7940f0d43efaedfd7c75faa1f500a50ed"
+      },
+      {
+        "path": "apps/observatory/e2e/storybook.e2e.ts",
+        "sha256": "267a3b24bd48d1cae9173497cfa139c5a668a2bd22c4ece9265bab961e9e2c24"
+      },
+      {
+        "path": "apps/observatory/src/app.tsx",
+        "sha256": "452201a451ac0bc6c8d4507bbac8abceaf535cc85d4b5ddb9992b1aa3b24c0c9"
+      },
+      {
+        "path": "apps/observatory/src/evaluations.stories.tsx",
+        "sha256": "8510a3868316f0c6b782eda937fa1705c5f7e285a23af08acf0a2db2bbc27746"
+      },
+      {
+        "path": "apps/observatory/src/evaluations.tsx",
+        "sha256": "77d6781bbf82f765308ce18715e6d3a3dbec3e22403d36ddf9cb4e28300d4187"
+      },
+      {
+        "path": "apps/observatory/src/generate-evaluation.stories.tsx",
+        "sha256": "968a74c1d1d12d40eb36187de04e92719225628d9e2be27bdf05c6684c49d722"
+      },
+      {
+        "path": "apps/observatory/src/generate-evaluation.tsx",
+        "sha256": "68246d562177240529b2309ea79041f9c264470a476c106f3e7086fd22a53fec"
+      },
+      {
+        "path": "docs/observatory-evaluations.md",
+        "sha256": "85c04670304028af38ae7c5de2f41140fee15f43802e662d5ad4c323ad21a12c"
+      },
+      {
+        "path": "packages/agent-observability/package.json",
+        "sha256": "9cbb76de520916c9ce3664eb4961e6b176c912c1169e9375dea08a728eae65c6"
+      },
+      {
+        "path": "packages/agent-observability/src/evaluation-generation.ts",
+        "sha256": "56645c1d7e332b034a95170138e947ffd03f55244635fec94b7e6b61a112e4f4"
+      },
+      {
+        "path": "packages/agent-observability/src/evaluations.ts",
+        "sha256": "f44e4c31218c04bb1c11f4d266c879fd1646d7d6d6a5b025ce3461154b53a9ea"
+      },
+      {
+        "path": "packages/agentlog/src/cli.ts",
+        "sha256": "da43edb7182d50760bc8cfbb0552f697964d33a2e0f80b8339199c7c1ec66c8e"
+      },
+      {
+        "path": "packages/agentlog/src/collector.ts",
+        "sha256": "c933c02fc46e863d5fdc0d8aaf2839dfbedd11495a5a7fe16eec2a932e77a2d1"
+      },
+      {
+        "path": "packages/agentlog/src/evaluation-tasks.test.ts",
+        "sha256": "c129713ffa82485e211a92598d4876893c7bb4158c7fd7e2aed65c526c14f185"
+      },
+      {
+        "path": "packages/agentlog/src/evaluation-tasks.ts",
+        "sha256": "ea3717f93bccb020d79ae7112ed4c96af7eece6a7325d39e2dfdae2fcafcb23d"
+      },
+      {
+        "path": "packages/agentlog/src/store.ts",
+        "sha256": "0582472f33cd33db8e941f1626c0421e9509173b2b9005767b581c48e6d97fbb"
+      },
+      {
+        "path": "packages/backend/convex/evaluations.ts",
+        "sha256": "f9da3daff535fe4517887897fb09d575a7603f8811f677175fea8c7c8a701f4e"
+      },
+      {
+        "path": "packages/backend/convex/schema.ts",
+        "sha256": "14daf5c149b35f7d39f5e3db2d16544d8dcfcaa06a9cece9096cf820330d4103"
+      },
+      {
+        "path": "packages/backend/scripts/verify-evaluation-generation-local.ts",
+        "sha256": "e05d4717597730db0dfc94125e234b2d2f285f48d75b87b06437cfebcbeaf35d"
+      },
+      {
+        "path": "packages/backend/tests/evaluations.test.ts",
+        "sha256": "61033663b983175418bb9d00986684c6e6074e12d8a3758d2174096840df7ed1"
+      },
+      {
+        "path": "skills/app-control/SKILL.md",
+        "sha256": "70af3f5e11a4a9f215064504c4b561cdc74589c4a3154aa234bd1afad514b17a"
+      },
+      {
+        "path": "skills/astack/SKILL.md",
+        "sha256": "33b60aad424ff75245abee346d8b2487e67101f7811b33ae3dc7cf31ed0f442a"
+      },
+      {
+        "path": "skills/astack/references/observatory.md",
+        "sha256": "18af881742d4a3983bbbfda5ee1211dcd2769c5ce3766ff9371a16fba21aa9a4"
+      },
+      {
+        "path": "skills/bug-fix/SKILL.md",
+        "sha256": "8f18aaf6047b07cc55e208662edf6032f4684dcc7135b47eb7cc9d905ce44e5c"
+      },
+      {
+        "path": "skills/cloud-transition/SKILL.md",
+        "sha256": "9fd85580bc4a5027cc0e0b45f112e207fcf0eb96ba08ee001a76dbab011247bb"
+      },
+      {
+        "path": "skills/implement/SKILL.md",
+        "sha256": "67f3803142a1761698508c1205ee5bdeaa3e2359b3a47a68a9905389d6f0c569"
+      },
+      {
+        "path": "skills/investigate/SKILL.md",
+        "sha256": "1b4ac2e602063cc2200ebe846d57edcbe8a43abbb6db284e34ec7ee337ac224b"
+      },
+      {
+        "path": "skills/performance/SKILL.md",
+        "sha256": "e74d8f385d730ee7f2049e3553de4696d2cf273843670dacebab4575e5101ce3"
+      },
+      {
+        "path": "skills/pr/SKILL.md",
+        "sha256": "d67570c44c1e9e82bb62f722edd97a7be246de85756d284dd46a18a1b2f6d031"
+      },
+      {
+        "path": "skills/project-setup/SKILL.md",
+        "sha256": "5e6110fb3223b08bfc53e97a3e94076d508ec21f5b0264869e541ac0c143233f"
+      },
+      {
+        "path": "skills/refactor/SKILL.md",
+        "sha256": "91face802431355ed4b6ad270973a677a93a9c2639ed3a108095805041a520cd"
+      },
+      {
+        "path": "skills/verify/SKILL.md",
+        "sha256": "91aa5aec268a3dd1e453f218846b6fd7da1fdd593cdb46c45d24326675e28cd8"
+      }
+    ]
+  },
+  "environment": {
+    "platform": "macOS arm64",
+    "runtime": "Bun 1.4.0",
+    "backend": "owned anonymous local Convex on 127.0.0.1:3410/3411",
+    "ui": "local Observatory development server on port 7410",
+    "fixture": "synthetic saved-edit and recipe/movie exploration captures"
+  },
+  "checks": [
+    {
+      "command": "bun run check",
+      "result": "pass",
+      "observations": "Site routes, 112 examples, guide links, plugin schemas, assets and skill identities pass."
+    },
+    {
+      "command": "bun run observatory:check",
+      "result": "pass",
+      "tests": 111,
+      "assertions": 671,
+      "failures": 0
+    },
+    {
+      "command": "bun run observatory:lint",
+      "result": "pass"
+    },
+    {
+      "command": "bun run observatory:build",
+      "result": "pass"
+    },
+    {
+      "command": "bun run observatory:build:storybook",
+      "result": "pass"
+    },
+    {
+      "command": "bun run observatory:test:e2e",
+      "result": "pass",
+      "tests": 42,
+      "failures": 0
+    },
+    {
+      "command": "bun packages/backend/scripts/verify-evaluations-local.ts",
+      "result": "pass",
+      "observations": "Three actual saved-edit service variants; persisted owner assessments and denied anonymous reads."
+    },
+    {
+      "command": "bun packages/backend/scripts/verify-evaluation-generation-local.ts",
+      "result": "pass",
+      "observations": "Actual begin/finish CLI, capture lag, exactly-once queue, HTTP forwarding, supplied actual proof, fresh owner detail, anonymous denial and agent fallback."
+    },
+    {
+      "command": "E2E_TELEMETRY_DISABLED=1 bun x --no-install e2e run --config e2e.evaluations-local.config.ts",
+      "result": "pass",
+      "tests": 4,
+      "failures": 0,
+      "observations": "Owner login, create/reload/retry, narrow view and existing agent evaluation."
+    },
+    {
+      "command": "native implicit begin in disposable state with configured native reader",
+      "result": "pass",
+      "observations": "Trusted host session resolves the current unfinished turn; no production telemetry written."
+    },
+    {
+      "command": "compiled and ad-hoc signed CLI, then evaluation status on the local task",
+      "result": "pass",
+      "observations": "Signed compiled executable reads the durable queued local task. Signing follows the existing macOS installer."
+    },
+    {
+      "command": "git diff --check",
+      "result": "pass"
+    }
+  ],
+  "review": {
+    "skill": "convex:convex-reviewer",
+    "method": "self-review",
+    "blockingFindings": [],
+    "observations": "Owner check before DB reads, current capture policy, explicit validators, bounded indexes, transactional persistence and retry idempotency."
+  },
+  "limits": [
+    "Otis was not deployed.",
+    "Installed plugin caches were not refreshed.",
+    "Automatic creation depends on the owning Astack agent running begin/finish.",
+    "No historical evaluations were backfilled.",
+    "The UI backup supplies the original request as its criterion; structured proof and task-specific criteria remain absent.",
+    "Generation does not grade owner judgment."
+  ],
+  "media": [
+    {
+      "path": "run-generation.png",
+      "sha256": "be9c7fb820e72144ff7c860646749fbba8f1cd8a04f92358d1a1e3ad1df3b011"
+    },
+    {
+      "path": "capture-generated-review.png",
+      "sha256": "fac2c531a12bb502b5b84fba06b9d749fcdfbe54cbc27717c6c841071fd9b921"
+    },
+    {
+      "path": "agent-generated-review.png",
+      "sha256": "d56b236f1d9e841255ef54666a4ebadd7272955a60ecd0c83fbed7e9f69561ae"
+    }
+  ]
+}

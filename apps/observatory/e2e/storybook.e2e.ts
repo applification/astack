@@ -1,5 +1,40 @@
 import { test } from "@e2e-dev/web";
 import { expect } from "e2e";
+test("generation button shows capture requirements, locks pending work and retains a retry after failure", async ({
+  app,
+  screen,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-generate-evaluation--unavailable&viewMode=story",
+  );
+  await expect(
+    screen.getByRole("button", "Generate evaluation", { exact: true }),
+  ).toBeDisabled();
+  await expect(
+    screen.getByText("Readable capture is required to generate an evaluation."),
+  ).toBeVisible();
+  await app.open(
+    "/iframe.html?id=observatory-generate-evaluation--pending&viewMode=story",
+  );
+  await screen
+    .getByRole("button", "Generate evaluation", { exact: true })
+    .tap();
+  await expect(
+    screen.getByRole("button", "Generating evaluation…", { exact: true }),
+  ).toBeDisabled();
+  await app.open(
+    "/iframe.html?id=observatory-generate-evaluation--failure&viewMode=story",
+  );
+  await screen
+    .getByRole("button", "Generate evaluation", { exact: true })
+    .tap();
+  await expect(screen.getByRole("alert")).toContainText(
+    "Could not generate an evaluation.",
+  );
+  await expect(
+    screen.getByRole("button", "Generate evaluation", { exact: true }),
+  ).toBeEnabled();
+});
 test("the original prompt leads into the map and stays connected through scope, pan and resize", async ({
   app,
   browser,

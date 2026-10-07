@@ -7,6 +7,8 @@ metadata:
 
 # Bug fix
 
+When owning substantive work with agentlog readable capture, use the [automatic evaluation handoff](../astack/references/observatory.md#automatic-task-evaluations) at task start and delivery. Reuse its task ID across follow-ups and keep telemetry failures from blocking the work.
+
 Apply [fix root causes](../principle-fix-root-causes/SKILL.md) for the reproduction and supported repair.
 
 For a demonstrated recurring failure, apply [encode lessons in structure](../principle-encode-lessons-in-structure/SKILL.md) to prevent recurrence at its owning boundary within scope.

@@ -31,4 +31,22 @@ Child conversations stay separate even when they use the same flow or phase name
 
 Readable capture must be enabled. Recording validates project scope and references, redacts before local queueing, and never changes outcome grades. Missing identities, collector versions, capture gaps or forwarding failures leave telemetry unknown; do not repeatedly troubleshoot them or let them delay the engineering task. The backend and collector must be upgraded together before structured annotations are used.
 
+## Automatic task evaluations
+
+When owning a substantive task in a project with agentlog readable capture, automatically record its acceptance criteria at the start and queue its evaluation at delivery. This is part of the task handoff, without asking the user to write a manifest or opt in again. Preserve one returned task ID across follow-ups; contributors reuse the owner's task instead of creating duplicate evaluations.
+
+```sh
+agentlog evaluation begin --title "Preserve saved edits" --case "The saved edit survives reopening." --skill "bug-fix=Reproduce the failure and repair its cause."
+agentlog evaluation finish --task RETURNED_TASK_ID --proof ACTUAL_PROOF_REPORT
+agentlog evaluation status --task RETURNED_TASK_ID
+```
+
+In a native Codex host, the CLI uses the trusted `CODEX_THREAD_ID`/`CODEX_SESSION_ID` and resolves the active turn through the native reader. An explicit `--session SESSION_ID --turn TURN_ID` overrides that lookup. Other hosts use the actual canonical `--run CAPTURED_RUN_ID`. Never invent these identities or select an unrelated historical turn. Begin requires an active native turn when resolving implicitly; use an explicit original run for a deliberate late declaration. The stored recording timestamp makes lateness visible.
+
+Each repeated `--case` becomes C1, C2, etc.; repeated `--skill name=expected` becomes S1, S2, etc. Preserve criteria agreed from the request. A material change of scope starts a fresh `--task UUID`; do not rewrite the prior criteria after seeing results. Supply a structured proof report only when it exists, using matching case IDs. Otherwise omit `--proof`: the review still appears with incomplete checks. Never fabricate revision, source digest, observations or artifact hashes to satisfy the schema.
+
+Call finish when handing the task's result back, including failed or incomplete delivery. It may return `pending` while the final message has not yet been captured. The collector resolves the explicit start/end turn boundaries, links the original prompt and follow-ups, and publishes once after capture catches up. Do not poll for publication or let capture delay the final result. Identical begin/finish retries are idempotent; status reports a persisted generation failure. Report an unavailable/unsupported CLI as an evidence gap and continue the engineering work.
+
+Observatory's run-detail **Generate evaluation** button is the backup for captured work. It uses that selected turn's exact request as its review criterion and labels the absence of task-specific acceptance/skill criteria and structured proof. Generation does not assign owner judgment. Upgrade the backend and collector, and refresh the installed Astack skill package, to activate this handoff; deploying only the UI does not update host instructions.
+
 Use Observatory evidence to improve skills and instructions. Compare matching hash/provenance groups, inspect supporting traces, and keep descriptive correlations separate from causal claims. Do not assume a current file hash was the version used historically. Readable capture redacts secrets before buffering; the trace's Show content toggle only hides details on screen. Machine capture can separately use metadata-only mode. Capture gaps stay visible.

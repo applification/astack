@@ -7,6 +7,8 @@ metadata:
 
 # Verify the outcome
 
+When owning a substantive verification task with agentlog readable capture, use the [automatic evaluation handoff](../astack/references/observatory.md#automatic-task-evaluations) at task start and delivery. During an enclosing delivery task, reuse its existing task ID and return actual proof to its owner instead of creating another evaluation. Telemetry failures must not block verification.
+
 Read [prove it works](../principle-prove-it-works/SKILL.md) before claiming the named outcome.
 
 Read `.astack/project.md` when present for the project's runtime, control and verification commands; use the requested scope without requiring the astack coordinator or a setup pass.

@@ -86,6 +86,115 @@ async function setup(
   });
   return { t, evaluation, owner: t.withIdentity({ subject: ownerId }) };
 }
+
+test("owner generates a persisted review from the exact captured request, with idempotent concurrent retries", async () => {
+  const { t, owner } = await setup();
+  const runId = evaluationRun("reproduce").id;
+  const [first, retry] = await Promise.all([
+    owner.mutation(api.evaluations.generate, {
+      runId,
+      projectId: fixtureProject,
+    }),
+    owner.mutation(api.evaluations.generate, {
+      runId,
+      projectId: fixtureProject,
+    }),
+  ]);
+  expect(retry).toEqual(first);
+  const raw = await owner.query(api.evaluations.detail, {
+    evaluationId: first.evaluationId,
+  });
+  const detail = evaluationDetailSchema.parse(JSON.parse(raw ?? "null"));
+  expect(detail.evaluation.intent.request).toBe(
+    "Fix edits disappearing after saving and reopening.",
+  );
+  expect(detail.evaluation.intent.source).toEqual({
+    runId,
+    eventId: evaluationPrompt().id,
+  });
+  expect(detail.evaluation.runIds).toEqual([runId]);
+  expect(detail.evaluation.cases).toEqual([
+    {
+      id: "C1",
+      expected: "Fix edits disappearing after saving and reopening.",
+      requiresIndependentObservation: false,
+    },
+  ]);
+  expect(detail.evaluation.proof).toBe(null);
+  expect(detail.evaluation.generation).toEqual({
+    method: "ui",
+    version: "capture-v1",
+    sources: [{ runId, revision: 1 }],
+    requestRevision: 1,
+  });
+  expect(detail.assessments).toEqual([]);
+  expect(detail.feedback).toEqual([]);
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries(
+      [
+        {
+          kind: "event",
+          value: {
+            ...evaluationPrompt(),
+            data: { content: "Later revised prompt" },
+          },
+        },
+      ],
+      20,
+    ),
+  });
+  expect(await owner.mutation(api.evaluations.generate, { runId })).toEqual(
+    first,
+  );
+  const saved = evaluationDetailSchema.parse(
+    JSON.parse(
+      (await owner.query(api.evaluations.detail, {
+        evaluationId: first.evaluationId,
+      })) ?? "null",
+    ),
+  );
+  expect(saved.evaluation.intent.request).toBe(
+    "Fix edits disappearing after saving and reopening.",
+  );
+});
+
+test("generation enforces owner identity, project scope, readable capture and current enrollment", async () => {
+  const { t, owner } = await setup();
+  const runId = evaluationRun("reproduce").id;
+  await expect(t.mutation(api.evaluations.generate, { runId })).rejects.toThrow(
+    "Unauthorized",
+  );
+  await expect(
+    owner.mutation(api.evaluations.generate, { runId, projectId: "foreign" }),
+  ).rejects.toThrow("unavailable");
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries(
+      [
+        {
+          kind: "run",
+          value: { ...evaluationRun("reproduce"), contentCapture: false },
+        },
+      ],
+      20,
+    ),
+  });
+  await expect(
+    owner.mutation(api.evaluations.generate, { runId }),
+  ).rejects.toThrow("readable");
+  await t.run(async (ctx) => {
+    const project = await ctx.db
+      .query("projects")
+      .withIndex("by_projectId", (q) => q.eq("projectId", fixtureProject))
+      .unique();
+    if (!project) throw new Error("Missing fixture project");
+    await ctx.db.patch(project._id, { enabled: false });
+  });
+  await expect(
+    owner.mutation(api.evaluations.generate, { runId }),
+  ).rejects.toThrow("unavailable");
+});
 test("workflow detail resolves multi-turn evidence, hides foreign references and respects readable capture", async () => {
   const { t, evaluation, owner } = await setup();
   const { annotations, support } = workflowFixture("changed");

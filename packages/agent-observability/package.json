@@ -12,6 +12,7 @@
     "./naming": "./src/naming.ts",
     "./presentation": "./src/presentation.ts",
     "./evaluations": "./src/evaluations.ts",
+    "./evaluation-generation": "./src/evaluation-generation.ts",
     "./evaluation-view": "./src/evaluation-view.ts",
     "./evaluation-fixtures": "./src/evaluation-fixtures.ts",
     "./workflow": "./src/workflow.ts",

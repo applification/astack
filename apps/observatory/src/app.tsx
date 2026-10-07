@@ -34,6 +34,7 @@ import { Brand, ThemeControl } from "./theme";
 import { ProjectSelector, Projects } from "./projects";
 import type { Project } from "@astack/agent-observability/projects";
 import { Evaluations, EvaluationPage, evaluationLink } from "./evaluations";
+import { GenerateEvaluation } from "./generate-evaluation";
 import {
   activityHeading,
   workHeading,
@@ -575,6 +576,14 @@ function RunDetail({ id, projectId }: { id: string; projectId?: string }) {
         </div>
       ))}
       <RunMetadata run={run} duration={duration(run)} />
+      {run.projectId && (
+        <GenerateEvaluation
+          key={run.id}
+          runId={run.id}
+          projectId={run.projectId}
+          available={run.contentCapture}
+        />
+      )}
       {!!evaluations?.length && (
         <div className="notice">
           <h2>Evaluations of this work</h2>

@@ -53,6 +53,28 @@ export const proofReportSchema = z
       ),
   })
   .strict();
+const generationBase = {
+  version: z.literal("capture-v1"),
+  sources: z
+    .array(
+      z
+        .object({ runId: id, revision: z.number().int().nonnegative() })
+        .strict(),
+    )
+    .min(1)
+    .max(20),
+  requestRevision: z.number().int().nonnegative(),
+};
+export const evaluationGenerationSchema = z.discriminatedUnion("method", [
+  z
+    .object({
+      ...generationBase,
+      method: z.literal("agent"),
+      criteriaRecordedAt: z.number().finite().nonnegative(),
+    })
+    .strict(),
+  z.object({ ...generationBase, method: z.literal("ui") }).strict(),
+]);
 export const evaluationManifestSchema = z
   .object({
     schemaVersion: z.literal(1),
@@ -93,11 +115,27 @@ export const evaluationManifestSchema = z
         "Duplicate skill criterion",
       ),
     proof: proofReportSchema.nullable(),
+    generation: evaluationGenerationSchema.optional(),
   })
   .strict();
 export const evaluationSchema = evaluationManifestSchema
   .extend({ id, machineId: z.string().uuid() })
   .superRefine((value, ctx) => {
+    if (
+      value.generation &&
+      (!value.intent.source ||
+        value.generation.sources.length !== value.runIds.length ||
+        !unique(value.generation.sources, (source) => source.runId) ||
+        value.generation.sources.some(
+          (source) => !value.runIds.includes(source.runId),
+        ))
+    )
+      ctx.addIssue({
+        code: "custom",
+        message:
+          "Generation provenance must reference the original request and every selected turn exactly once.",
+        path: ["generation"],
+      });
     for (const proof of value.proof?.cases ?? [])
       if (!value.cases.some((item) => item.id === proof.caseId))
         ctx.addIssue({

@@ -29,8 +29,10 @@ export default defineSchema({
     createdAt: v.number(),
     data: v.string(),
     snapshot: v.string(),
+    generationKey: v.optional(v.string()),
   })
     .index("by_evaluationId", ["evaluationId"])
+    .index("by_generationKey", ["generationKey"])
     .index("by_projectId_and_createdAt", ["projectId", "createdAt"])
     .index("by_createdAt", ["createdAt"]),
   evaluationRuns: defineTable({

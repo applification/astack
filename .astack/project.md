@@ -1,6 +1,6 @@
 # Companion runtime: Agent Observatory
 
-The [evaluation workflow](../docs/observatory-evaluations.md) documents manifest import, proof-report contracts, the saved-edit CLI fixture and anonymous local integration checks. Use `bun packages/backend/scripts/verify-evaluations-local.ts` with an owned anonymous backend; `e2e.evaluations-local.config.ts` exercises the real adapter on port 7410. These commands do not deploy to Otis.
+The [evaluation workflow](../docs/observatory-evaluations.md) documents the automatic agent begin/finish handoff, the run-detail generation button, manifest import and proof-report contracts. With an owned anonymous backend, run `bun packages/backend/scripts/verify-evaluations-local.ts` then `bun packages/backend/scripts/verify-evaluation-generation-local.ts`; `e2e.evaluations-local.config.ts` exercises the real adapter on port 7410. These commands do not deploy to Otis.
 
 For substantive engineering work with Observatory capture available, state the selected astack route and its reason, then use the [route/phase recording instructions](../skills/astack/references/observatory.md#record-the-route-and-path). Preserve one flow across follow-up turns and attach actual skill/action/verification references. Recording is optional, requires trusted captured identities and must never block delivery. Route and phase declarations do not grade the outcome.
 

@@ -485,6 +485,17 @@ export function EvaluationView({
   const verification = evaluateProof(evaluation);
   return (
     <div className="evaluation-page">
+      {evaluation.generation && (
+        <p className="notice">
+          {evaluation.generation.method === "agent"
+            ? "Created by the agent delivery handoff. Criteria recorded " +
+              new Date(
+                evaluation.generation.criteriaRecordedAt,
+              ).toLocaleString() +
+              "."
+            : "Generated from captured work. The original request is the review criterion; task-specific acceptance and skill criteria were not recorded."}
+        </p>
+      )}
       <p className="eyebrow">Evaluation</p>
       <h1 className="run-heading">{evaluation.title}</h1>
       <PromptJourney>

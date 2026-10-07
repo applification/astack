@@ -16,6 +16,7 @@ import { LocalStore } from "./store";
 import { drainQueue } from "./delivery";
 import { loadConfig, type CollectorConfig } from "./config";
 import { syncProjects, cachedProjects } from "./projects";
+import { publishEvaluationTasks } from "./evaluation-tasks";
 import { resolveProject } from "@astack/agent-observability/projects";
 import {
   mergeDelegations,
@@ -247,6 +248,7 @@ export async function collect(
         if (JSON.stringify(findings) !== JSON.stringify(run.findings))
           store.put({ kind: "run", value: { ...run, findings } });
       }
+      publishEvaluationTasks(store);
       if (options.once) {
         await drainQueue(store, config, token, { signal, once: true });
         return { pending: store.pending() };
