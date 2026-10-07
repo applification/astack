@@ -1,0 +1,131 @@
+{
+  "at": "2026-10-07T07:53:58.489125+00:00",
+  "runtimeRevision": "83b76c979c7e1ed54dc6616e1e92d6ddf10cd4a6",
+  "target": "https://otis.tail12a0a0.ts.net:8450",
+  "uiOnly": true,
+  "backendAndCollectorRevision": "4e7b870975c569688594ebdbb39edd0a7446eb1f",
+  "authorizedBy": "Owner requested central main and outward child lanes, distinct first child colour, smaller descriptions and compact revision values for Otis review.",
+  "servedAssetsMatchBuild": true,
+  "checks": {
+    "lint": "passed",
+    "strictTypes": "passed",
+    "unitTests": 102,
+    "assertions": 605,
+    "storybookBuild": "passed",
+    "productionBuild": "passed"
+  },
+  "storybook": {
+    "runId": "01a11559-8962-70eb-aef7-dcc14f8e5b32",
+    "passed": 38,
+    "failed": 0,
+    "retries": 0,
+    "testedWorkingTreeBase": "dd131a1acd120e6edb8a9edfd9d761d0f2fddfae",
+    "testedWorkingTreeDirty": true,
+    "sourceCommittedAs": "83b76c979c7e1ed54dc6616e1e92d6ddf10cd4a6",
+    "childCountsChecked": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "outwardLabels": true,
+    "distinctLanes": true,
+    "mainCentered": true,
+    "rootAligned": true,
+    "manualPanSurvivesEvidenceExpansion": true,
+    "narrowResizeCentersMain": true,
+    "keyboardPanFromCenteredPosition": true,
+    "resizedPathsMeetStops": true,
+    "compactRevisionCopyAndFailureRecovery": true
+  },
+  "liveBrowser": {
+    "runId": "01a1155b-03fc-7442-8fd2-ea8f6febb717",
+    "passed": 7,
+    "failed": 0,
+    "retries": 0
+  },
+  "manualBrowser": {
+    "desktop": {
+      "ready": true,
+      "oneMap": true,
+      "mainCentered": true,
+      "rootAligned": true,
+      "leftChildren": 1,
+      "rightChildren": 1,
+      "noDisclosures": true,
+      "forks": 2,
+      "joins": 2,
+      "pathsMeetStops": true,
+      "pageFits": true,
+      "scrollable": false
+    },
+    "narrow": {
+      "ready": true,
+      "oneMap": true,
+      "mainCentered": true,
+      "rootAligned": true,
+      "leftChildren": 1,
+      "rightChildren": 1,
+      "noDisclosures": true,
+      "forks": 2,
+      "joins": 2,
+      "pathsMeetStops": true,
+      "pageFits": true,
+      "scrollable": true
+    },
+    "typography": {
+      "descriptionsSmaller": true,
+      "compactRevisionCount": 1,
+      "shortRevisions": true,
+      "fullIdsAbsentFromDescriptions": true,
+      "distinctLeftColour": true,
+      "firstChildStrokeMatchesStop": true
+    }
+  },
+  "realJourney": {
+    "linkedParentTurns": 3,
+    "directChildren": 2,
+    "childCaptureAvailable": true,
+    "joinReferenceStates": [
+      "available",
+      "available"
+    ],
+    "ownerAssessmentWritten": false
+  },
+  "recovery": {
+    "previousUiRetained": true,
+    "existingBindMountPreserved": true,
+    "oldImmutableAssetsRetained": true
+  },
+  "privatePixelsPublished": false,
+  "assets": [
+    {
+      "asset": "/assets/index-DtHuRjSh.js",
+      "sha256": "a53ec3a1d819291ad3e8fc8db6cb651f700044b694f0890e970b5478e50a5b16"
+    },
+    {
+      "asset": "/assets/index-CjPWdPDD.css",
+      "sha256": "ad2967aea82501a32386d6f20147e4a7357b7704b4ba59840b1d2d5145ada593"
+    }
+  ],
+  "selectedSyntheticMedia": [
+    {
+      "path": "centered-map-light.png",
+      "sha256": "b136d7e8401f8fee7de72dcf473d836d40740f05d68c46f5c234a3581c4ac6ef",
+      "synthetic": true
+    },
+    {
+      "path": "centered-map-narrow.png",
+      "sha256": "80deb84f69dfc64db040de9bc3f67798ffc91c8758ab9ee5ff1daf8f7eec1672",
+      "synthetic": true
+    }
+  ],
+  "geometryCorrection": {
+    "failedRunId": "01a1154e-1da7-7c9d-a8b3-415723f41bc1",
+    "failedCases": 1,
+    "cause": "Auto-centering changed the coordinate origin during line measurements.",
+    "fixedRevision": "dd131a1acd120e6edb8a9edfd9d761d0f2fddfae",
+    "regressionPassesInFinalRun": true
+  }
+}
