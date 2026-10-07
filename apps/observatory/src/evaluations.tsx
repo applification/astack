@@ -234,7 +234,8 @@ export function AssessmentForm({
     (record) => record.annotation.action === "phase",
   );
   const routeOptions = (workflow?.records ?? []).flatMap((record) =>
-    record.annotation.action === "select" || record.annotation.action === "change"
+    record.annotation.action === "select" ||
+    record.annotation.action === "change"
       ? [
           {
             runId: record.runId,
@@ -528,7 +529,7 @@ export function EvaluationView({
           </details>
         )}
       </section>
-      <WorkflowEvidence detail={detail} view="selection" />
+      <WorkflowEvidence detail={detail} />
       <section className="evaluation-result" aria-label="Result summary">
         <h2>Result</h2>
         {resultStep?.response ? (
@@ -575,7 +576,6 @@ export function EvaluationView({
       </section>
       {detail.workflow.records.length > 0 ? (
         <>
-          <WorkflowEvidence detail={detail} view="path" />
           <details className="evaluation-disclosure">
             <summary>
               Captured conversation · {evaluation.runIds.length} turns

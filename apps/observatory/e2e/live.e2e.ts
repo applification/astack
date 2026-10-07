@@ -22,7 +22,7 @@ test("deployed astack workflow connects the actual route, phases and evidence wi
     ),
   ).toBeVisible();
   await expect(
-    screen.getByText("astack → New feature", { exact: true }),
+    screen.getByRole("heading", "New feature", { exact: true }),
   ).toBeVisible();
   await expect(
     screen.getByRole("heading", "Path taken", { exact: true }),
@@ -30,13 +30,8 @@ test("deployed astack workflow connects the actual route, phases and evidence wi
   await expect(
     screen.getByRole("heading", "How the work unfolded"),
   ).not.toBeVisible();
-  await expect(
-    screen.getByRole("button", "View PR across this flow"),
-  ).toBeVisible();
-  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
-  await expect(
-    screen.getByRole("list", "Recorded skill sequence"),
-  ).toBeVisible();
+  await expect(screen.getByRole("button", "View PR in Review")).toBeVisible();
+  await expect(screen.getByRole("region", "Workflow map")).toBeVisible();
   await screen
     .getByRole("button", "View Testing in Verify", { exact: true })
     .tap();
@@ -67,10 +62,8 @@ test("deployed astack workflow connects the actual route, phases and evidence wi
   await expect(
     screen.getByRole("heading", "How the work unfolded"),
   ).toBeVisible();
-  await screen.getByText("Route selection evidence", { exact: true }).tap();
   await screen
-    .getByRole("link", "Declaration in trace", { exact: true })
-    .first()
+    .getByRole("link", "Route selection in trace", { exact: true })
     .tap();
   await expect(
     screen.getByRole("heading", "Workflow annotation", { exact: true }),
@@ -85,10 +78,7 @@ test("deployed astack workflow connects the actual route, phases and evidence wi
   ).toBe(true);
   await browser.back();
   await browser.setViewport({ width: 390, height: 844 });
-  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
-  await expect(
-    screen.getByRole("list", "Recorded skill sequence"),
-  ).toBeVisible();
+  await expect(screen.getByRole("region", "Workflow map")).toBeVisible();
   expect(
     await browser.evaluate(
       () =>

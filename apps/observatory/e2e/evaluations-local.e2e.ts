@@ -46,7 +46,7 @@ for (const item of result.results) {
       ).toBeVisible();
       await expect(screen.getByRole("heading", "Path taken")).toBeVisible();
       await expect(
-        screen.getByText("astack → Bug fix", { exact: true }),
+        screen.getByRole("heading", "Bug fix", { exact: true }),
       ).toBeVisible();
       await screen
         .getByText("Captured conversation · 2 turns", { exact: true })
@@ -124,11 +124,7 @@ for (const item of result.results) {
           screen.getByText("Route choice: Inconclusive", { exact: true }),
         ).toBeVisible();
         await screen
-          .getByText("Route selection evidence", { exact: true })
-          .tap();
-        await screen
-          .getByRole("link", "Declaration in trace", { exact: true })
-          .first()
+          .getByRole("link", "Route selection in trace", { exact: true })
           .tap();
         await expect(
           screen.getByRole("heading", "Workflow annotation", { exact: true }),

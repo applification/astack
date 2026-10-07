@@ -1,6 +1,6 @@
 import { test } from "@e2e-dev/web";
 import { expect } from "e2e";
-test("skill sequence keeps grouped declarations and repeated attempts, with focused evidence and keyboard return", async ({
+test("one connected map keeps repeated attempts and scoped skill evidence with keyboard return", async ({
   app,
   screen,
   browser,
@@ -9,28 +9,24 @@ test("skill sequence keeps grouped declarations and repeated attempts, with focu
     "/iframe.html?id=observatory-evaluations--bug-fix-flow&viewMode=story",
   );
   await expect(
-    screen.getByRole("button", "View Verify across this flow"),
+    screen.getByRole("heading", "Bug fix", { exact: true }),
   ).toBeVisible();
-  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
-  await expect(screen.getByRole("button", "Skill sequence")).toHaveAttribute(
-    "aria-pressed",
-    "true",
-  );
   await expect(
-    screen.getByText("their order within it is unknown", { exact: false }),
-  ).toBeVisible();
+    screen.getByRole("button", "Skill sequence", { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    screen.getByText("Skills in this flow", { exact: true }),
+  ).toHaveCount(0);
   expect(
     await browser.evaluate(() =>
-      [
-        ...document.querySelectorAll(
-          '[aria-label="Recorded skill sequence"] > li',
-        ),
-      ].map((item) => ({
-        phase: item.querySelector("h4")?.textContent ?? null,
-        skills: [...item.querySelectorAll(".skill-badges button")].map(
-          (button) => button.textContent,
-        ),
-      })),
+      [...document.querySelectorAll(".map-main-cell [data-status]")].map(
+        (item) => ({
+          phase: item.querySelector("h4")?.textContent ?? null,
+          skills: [...item.querySelectorAll(".skill-badges button")].map(
+            (button) => button.textContent,
+          ),
+        }),
+      ),
     ),
   ).toEqual([
     { phase: "Reproduce", skills: ["Bug fix", "App control"] },
@@ -58,92 +54,42 @@ test("skill sequence keeps grouped declarations and repeated attempts, with focu
       "After repair: reopen and fresh store read retain the edit",
     ),
   ).not.toBeVisible();
-  const trace = await evidence
-    .getByRole("link", "Declaration in trace")
-    .getAttribute("href");
-  expect(trace).toContain("event=");
-  await screen.getByRole("button", "Route journey", { exact: true }).tap();
-  await expect(evidence).toBeVisible();
+  expect(
+    await evidence
+      .getByRole("link", "Declaration in trace")
+      .getAttribute("href"),
+  ).toContain("event=");
   await screen.getByRole("button", "Close skill evidence").tap();
   expect(
     await browser.evaluate(
       () => document.activeElement?.getAttribute("aria-label") ?? null,
     ),
   ).toBe("View Testing in Verify");
-  await screen.getByRole("button", "View Verify across this flow").tap();
-  const history = screen.getByRole("region", "Verify skill evidence", {
-    exact: true,
-  });
-  await expect(
-    history.getByRole(
-      "link",
-      "First verification: fresh read still returns old value",
-    ),
-  ).toBeVisible();
-  await expect(
-    history.getByRole(
-      "link",
-      "After repair: reopen and fresh store read retain the edit",
-    ),
-  ).toBeVisible();
-  await screen.getByRole("button", "Close skill evidence").tap();
-  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
+  await expect
+    .poll(() =>
+      browser.evaluate(
+        () => document.querySelectorAll('path[data-connection="root"]').length,
+      ),
+    )
+    .toBe(1);
   await browser.evaluate(() => {
-    const section = document.querySelector('[aria-label="Astack workflow"]');
-    if (section)
-      window.scrollTo(
-        0,
-        section.getBoundingClientRect().top +
-          window.scrollY -
-          (document.querySelector("header")?.getBoundingClientRect().height ??
-            80) -
-          16,
-      );
-    return null;
+    document.querySelector('[aria-label="Workflow map"]')?.scrollIntoView();
+    return true;
   });
-  await app.screenshot("skill-sequence-retries-light");
+  await app.screenshot("connected-route-retries-light");
   await browser.setViewport({ width: 390, height: 844 });
   await screen.getByLabel("Color theme").selectOption({ value: "dark" });
   await expect
     .poll(() =>
-      browser.evaluate(() => ({
-        theme: document.documentElement.dataset.theme ?? null,
-        badgeColor: getComputedStyle(
-          document.querySelector(
-            'button[aria-label="View Verify across this flow"]',
-          ) ?? document.body,
-        ).color,
-        toggleColor: getComputedStyle(
-          document.querySelector(
-            '[aria-label="Flow view"] button[aria-pressed="true"]',
-          ) ?? document.body,
-        ).color,
-      })),
+      browser.evaluate(() => document.documentElement.dataset.theme ?? null),
     )
-    .toEqual({
-      theme: "dark",
-      badgeColor: "rgb(248, 250, 252)",
-      toggleColor: "rgb(248, 250, 252)",
-    });
+    .toBe("dark");
   expect(
     await browser.evaluate(
-      () => document.documentElement.scrollWidth <= window.innerWidth,
+      () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
-  await browser.evaluate(() => {
-    const section = document.querySelector('[aria-label="Astack workflow"]');
-    if (section)
-      window.scrollTo(
-        0,
-        section.getBoundingClientRect().top +
-          window.scrollY -
-          (document.querySelector("header")?.getBoundingClientRect().height ??
-            80) -
-          16,
-      );
-    return null;
-  });
-  await app.screenshot("skill-sequence-retries-narrow-dark");
+  await app.screenshot("connected-route-retries-narrow-dark");
 });
 test("skill badges preserve recorded names, no-declaration phases and the PR icon without assigning grades", async ({
   app,
@@ -163,7 +109,6 @@ test("skill badges preserve recorded names, no-declaration phases and the PR ico
   await expect(
     screen.getByRole("region", "React skill evidence"),
   ).toContainText("Recorded name: applification:react.");
-  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
   await expect(
     screen.getByText("No skills declared for this phase.", { exact: true }),
   ).toBeVisible();
@@ -221,7 +166,18 @@ test("skill badges preserve recorded names, no-declaration phases and the PR ico
   await expect(
     screen.getByText("Your review pending", { exact: true }),
   ).toBeVisible();
-  await screen.getByRole("button", "Close skill evidence").tap();
+  await screen
+    .getByRole("region", "PR skill evidence", { exact: true })
+    .getByRole("button", "Close skill evidence")
+    .tap();
+  await screen
+    .getByRole(
+      "region",
+      "owner:repository-specific-acceptance-check skill evidence",
+      { exact: true },
+    )
+    .getByRole("button", "Close skill evidence")
+    .tap();
   await browser.evaluate(() => {
     const section = document.querySelector('[aria-label="Astack workflow"]');
     if (section)
@@ -235,23 +191,21 @@ test("skill badges preserve recorded names, no-declaration phases and the PR ico
       );
     return null;
   });
-  await app.screenshot("skill-sequence-custom-skills-narrow-dark");
+  await app.screenshot("connected-map-custom-skills-narrow-dark");
 });
-test("skill sequence retains route changes and missing supporting evidence", async ({
+test("connected map retains route changes and missing supporting evidence", async ({
   app,
   screen,
 }) => {
   await app.open(
     "/iframe.html?id=observatory-evaluations--changed-flow&viewMode=story",
   );
-  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
   await expect(
     screen.getByRole("heading", "Changed route → Bug fix"),
   ).toBeVisible();
   await app.open(
     "/iframe.html?id=observatory-evaluations--missing-flow-evidence&viewMode=story",
   );
-  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
   await screen
     .getByRole("button", "View Testing in Verify", { exact: true })
     .first()
@@ -269,7 +223,7 @@ test("astack bug-fix flow preserves verification retries and links declared skil
     "/iframe.html?id=observatory-evaluations--bug-fix-flow&viewMode=story",
   );
   await expect(
-    screen.getByText("astack → Bug fix", { exact: true }),
+    screen.getByRole("heading", "Bug fix", { exact: true }),
   ).toBeVisible();
   await expect(
     screen.getByText(
@@ -279,7 +233,7 @@ test("astack bug-fix flow preserves verification retries and links declared skil
   ).toBeVisible();
   expect(
     await browser.evaluate(() =>
-      [...document.querySelectorAll(".astack-flow > li h4")].map(
+      [...document.querySelectorAll(".map-main-cell h4")].map(
         (item) => item.textContent,
       ),
     ),
@@ -287,7 +241,9 @@ test("astack bug-fix flow preserves verification retries and links declared skil
   await expect(
     screen.getByText("Failed · agent reported", { exact: true }),
   ).toBeVisible();
-  await screen.getByText("View phase evidence", { exact: true }).first().tap();
+  await screen
+    .getByRole("button", "View Bug fix in Reproduce", { exact: true })
+    .tap();
   await expect(
     screen.getByRole("link", "Before fix: reopening loses the saved edit"),
   ).toBeVisible();
@@ -313,7 +269,7 @@ test("astack new-feature flow explains omissions and leaves unfinished phases un
     "/iframe.html?id=observatory-evaluations--new-feature-flow&viewMode=story",
   );
   await expect(
-    screen.getByText("astack → New feature", { exact: true }),
+    screen.getByRole("heading", "New feature", { exact: true }),
   ).toBeVisible();
   await expect(screen.getByText("Omitted", { exact: true })).toBeVisible();
   await expect(
@@ -338,9 +294,8 @@ test("astack route changes, missing selection and unavailable evidence stay expl
     "/iframe.html?id=observatory-evaluations--changed-flow&viewMode=story",
   );
   await expect(
-    screen.getByText("astack → Investigation", { exact: true }),
+    screen.getByRole("heading", "Investigation", { exact: true }),
   ).toBeVisible();
-  await expect(screen.getByText("Now: Bug fix", { exact: true })).toBeVisible();
   await expect(
     screen.getByRole("heading", "Changed route → Bug fix"),
   ).toBeVisible();
@@ -356,13 +311,16 @@ test("astack route changes, missing selection and unavailable evidence stay expl
     "/iframe.html?id=observatory-evaluations--missing-flow-selection&viewMode=story",
   );
   await expect(
-    screen.getByText("astack → Route not recorded", { exact: true }),
+    screen.getByRole("heading", "Route not recorded", { exact: true }),
   ).toBeVisible();
   await expect(screen.getByRole("status")).toContainText("display limit");
   await app.open(
     "/iframe.html?id=observatory-evaluations--missing-flow-evidence&viewMode=story",
   );
-  await screen.getByText("View phase evidence", { exact: true }).first().tap();
+  await screen
+    .getByRole("button", "View Testing in Verify", { exact: true })
+    .first()
+    .tap();
   await expect(
     screen.getByText("Referenced trace event has not been captured.", {
       exact: true,
@@ -1494,7 +1452,7 @@ test("project empty/loading/failed-save states keep unsaved input and do not cla
   ).toHaveCount(0);
 });
 
-test("parallel child journeys expand independently, retain failed retries and link evidence to the owning child", async ({
+test("child lanes stay expanded, connect to declared joins and retain separate retry evidence", async ({
   app,
   screen,
   browser,
@@ -1502,43 +1460,24 @@ test("parallel child journeys expand independently, retain failed retries and li
   await app.open(
     "/iframe.html?id=observatory-evaluations--parallel-journeys&viewMode=story",
   );
-  await expect(screen.getByText("UI checks", { exact: true })).toBeVisible();
+  await expect(
+    screen.getByRole("heading", "UI checks", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("heading", "Data review", { exact: true }),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () => document.querySelectorAll(".workflow-map details").length,
+    ),
+  ).toBe(0);
   expect(
     await browser.evaluate(() =>
-      [...document.querySelectorAll(".journey-child")].map((child) =>
-        child.hasAttribute("open"),
+      [...document.querySelectorAll(".journey-child [data-status]")].map(
+        (node) => node.getAttribute("data-status"),
       ),
     ),
-  ).toEqual([false, false]);
-  await browser.evaluate(() => {
-    document.querySelector<HTMLElement>(".journey-child > summary")?.focus();
-    return true;
-  });
-  await browser.keyboard.press("Enter");
-  expect(
-    await browser.evaluate(() =>
-      [...document.querySelectorAll(".journey-child")].map((child) =>
-        child.hasAttribute("open"),
-      ),
-    ),
-  ).toEqual([true, false]);
-  await screen.getByText("Data review", { exact: true }).tap();
-  expect(
-    await browser.evaluate(() =>
-      [...document.querySelectorAll(".journey-child")].map((child) =>
-        child.hasAttribute("open"),
-      ),
-    ),
-  ).toEqual([true, true]);
-  expect(
-    await browser.evaluate(() =>
-      [
-        ...document.querySelectorAll(
-          ".journey-child:first-child .astack-flow > li[data-status]",
-        ),
-      ].map((phase) => phase.getAttribute("data-status")),
-    ),
-  ).toEqual(["failed", "completed"]);
+  ).toEqual(["failed", "completed", "completed"]);
   await screen
     .getByRole("button", "View React in Verify", { exact: true })
     .last()
@@ -1564,38 +1503,75 @@ test("parallel child journeys expand independently, retain failed retries and li
       () => document.activeElement?.getAttribute("aria-label") ?? null,
     ),
   ).toBe("View React in Verify");
-  await screen.getByText("UI checks", { exact: true }).tap();
+  await expect
+    .poll(() =>
+      browser.evaluate(() => {
+        const content = document.querySelector(".workflow-map");
+        if (!content) return false;
+        const rect = content.getBoundingClientRect();
+        const anchors = [...content.querySelectorAll("[data-map-key]")];
+        const paths = [...content.querySelectorAll("path[data-connection]")];
+        return (
+          paths.length > 0 &&
+          paths.every((path) => {
+            if (!(path instanceof SVGPathElement)) return false;
+            const start = path.getPointAtLength(0),
+              end = path.getPointAtLength(path.getTotalLength());
+            return ["from", "to"].every((key, i) => {
+              const anchor = anchors.find(
+                (a) =>
+                  a.getAttribute("data-map-key") ===
+                  path.getAttribute("data-" + key),
+              );
+              if (!anchor) return false;
+              const b = anchor.getBoundingClientRect(),
+                p = i === 0 ? start : end;
+              return (
+                Math.abs(p.x - (b.left - rect.left + b.width / 2)) < 0.5 &&
+                Math.abs(p.y - (b.top - rect.top + b.height / 2)) < 0.5
+              );
+            });
+          })
+        );
+      }),
+    )
+    .toBe(true);
   expect(
-    await browser.evaluate(() =>
-      [...document.querySelectorAll(".journey-child")].map((child) =>
-        child.hasAttribute("open"),
-      ),
-    ),
-  ).toEqual([false, true]);
-  await expect(
-    screen.getByRole("heading", "Join back to main", { exact: true }),
-  ).toBeVisible();
-  await app.screenshot("parallel-journeys-light");
+    await browser.evaluate(() => ({
+      forks: document.querySelectorAll('path[data-connection="fork"]').length,
+      joins: document.querySelectorAll('path[data-connection="join"]').length,
+      roots: document.querySelectorAll('path[data-connection="root"]').length,
+    })),
+  ).toEqual({ forks: 2, joins: 2, roots: 1 });
+  await browser.evaluate(() => {
+    document.querySelector(".workflow-map")?.scrollIntoView();
+    return true;
+  });
+  await app.screenshot("connected-child-journeys-light");
   await browser.setViewport({ width: 390, height: 844 });
   await screen.getByLabel("Color theme").selectOption({ value: "dark" });
   expect(
     await browser.evaluate(
-      () => document.documentElement.dataset.theme ?? null,
-    ),
-  ).toBe("dark");
-  await screen.getByText("UI checks", { exact: true }).tap();
-  expect(
-    await browser.evaluate(
-      () => document.documentElement.scrollWidth > window.innerWidth,
+      () => document.documentElement.scrollWidth > innerWidth,
     ),
   ).toBe(false);
   await browser.evaluate(() => {
-    document
-      .querySelector('[aria-label="Delegated journeys"]')
-      ?.scrollIntoView();
+    const map = document.querySelector(".workflow-map-scroll");
+    if (map instanceof HTMLElement) map.focus();
     return true;
   });
-  await app.screenshot("parallel-journeys-narrow-dark");
+  await browser.keyboard.press("ArrowRight");
+  await expect
+    .poll(() =>
+      browser.evaluate(
+        () => document.querySelector(".workflow-map-scroll")?.scrollLeft ?? 0,
+      ),
+    )
+    .toBeGreaterThan(0);
+  await expect(
+    screen.getByRole("link", "React skill read in child trace").last(),
+  ).toHaveAttribute("href", /child-ui%3Aretry.*event=/);
+  await app.screenshot("connected-child-journeys-narrow-dark");
 });
 
 test("completed and unavailable children never create an implicit parent join", async ({
@@ -1606,10 +1582,9 @@ test("completed and unavailable children never create an implicit parent join", 
   await app.open(
     "/iframe.html?id=observatory-evaluations--returned-without-join&viewMode=story",
   );
-  await screen.getByText("UI checks", { exact: true }).tap();
   await expect(
     screen
-      .getByText("No captured parent join referencing this result.", {
+      .getByText("No parent join recorded", {
         exact: true,
       })
       .first(),
@@ -1620,7 +1595,6 @@ test("completed and unavailable children never create an implicit parent join", 
   await app.open(
     "/iframe.html?id=observatory-evaluations--unavailable-child-journey&viewMode=story",
   );
-  await screen.getByText("Uncaptured child", { exact: true }).tap();
   await expect(
     screen.getByText("The host did not expose a child conversation identity.", {
       exact: true,
