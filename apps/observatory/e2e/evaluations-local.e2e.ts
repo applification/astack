@@ -2,7 +2,10 @@ import { test } from "@e2e-dev/web";
 import { expect, secrets } from "e2e";
 import { readFileSync } from "node:fs";
 import { z } from "zod";
-import { fixtureProject } from "@astack/agent-observability/evaluation-fixtures";
+import {
+  fixtureProject,
+  fixtureLongRequest,
+} from "@astack/agent-observability/evaluation-fixtures";
 
 const result = z
   .object({
@@ -23,6 +26,7 @@ const generation = z
     agentEvaluationId: z.string(),
     agentRunId: z.string(),
     buttonRunId: z.string(),
+    missingPromptRunId: z.string(),
   })
   .parse(
     JSON.parse(
@@ -55,15 +59,25 @@ test("generation button creates a persisted review from captured work and reopen
     screen.getByText("Checks incomplete", { exact: true }),
   ).toBeVisible();
   const createdUrl = await browser.evaluate(() => location.hash);
+  expect(
+    await browser.evaluate(
+      () =>
+        document.querySelector(".evaluation-prompt-text")?.textContent ?? null,
+    ),
+  ).toBe(fixtureLongRequest);
   await browser.reload();
   await expect(
-    screen
-      .getByText(
-        "Explore recipes and movies and record reproducible UX issues.",
-        { exact: true },
-      )
-      .first(),
+    screen.getByRole("heading", "Explore recipes and movies", {
+      exact: true,
+      level: 1,
+    }),
   ).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () =>
+        document.querySelector(".evaluation-prompt-text")?.textContent ?? null,
+    ),
+  ).toBe(fixtureLongRequest);
   await browser.setViewport({ width: 390, height: 844 });
   expect(
     await browser.evaluate(
@@ -102,6 +116,28 @@ test("generation button creates a persisted review from captured work and reopen
       decodeURIComponent(location.hash.split("?")[0]?.slice(12) ?? ""),
     ),
   ).toBe(generation.agentEvaluationId);
+});
+test("generation reports missing request capture and retains the retry button", async ({
+  app,
+  screen,
+}) => {
+  await app.open(
+    "/#run/" +
+      encodeURIComponent(generation.missingPromptRunId) +
+      "?project=" +
+      fixtureProject,
+  );
+  await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
+  await screen.getByRole("button", "Open Observatory").tap();
+  await screen
+    .getByRole("button", "Generate evaluation", { exact: true })
+    .tap();
+  await expect(screen.getByRole("alert")).toHaveText(
+    "This turn has no captured original request.",
+  );
+  await expect(
+    screen.getByRole("button", "Generate evaluation", { exact: true }),
+  ).toBeEnabled();
 });
 for (const item of result.results) {
   test(

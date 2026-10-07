@@ -1,0 +1,26 @@
+{
+  "baseRevision": "4940ee274a7bbc2366f53294889a1548b5388701",
+  "algorithm": "sha256",
+  "files": {
+    "apps/observatory/e2e/evaluations-local.e2e.ts": "035780ed5e67ce7a4c1b06a565f110e66970639cbc0e32fc8545fbf4698e73b3",
+    "apps/observatory/e2e/storybook.e2e.ts": "aef4b7d12f34a8029ec0cf3a7000147a1f35f8774cfaa3d935a32496b0702471",
+    "apps/observatory/src/evaluation-evidence.tsx": "0de532ab65aa4ca870305d7151d14260a9b8339ee118a1d5cb2fc6f5020d7bf5",
+    "apps/observatory/src/evaluations.stories.tsx": "cb200fae9fe3b6b1c5a622192f2f2eed7b0e2f6f811440e70dcf201271e241ef",
+    "apps/observatory/src/evaluations.tsx": "cafeb26a42b22b5a165db5b95113607673683b72712e1fd9a29cb90c180555d6",
+    "apps/observatory/src/generate-evaluation.stories.tsx": "62d403ef335a33f5c1be04d71fb30d72057027681cdbb01c18b02f56080044ce",
+    "apps/observatory/src/generate-evaluation.tsx": "b8d6146fbbf0c05a9f514b3f96aa199298c9cae464fef10ef9644b499c7392ef",
+    "packages/agent-observability/src/evaluation-fixtures.ts": "fa850b5c7841ba0483d9c6fa2a0d3726b23ffa38a67b092d858a2f73d0514bdf",
+    "packages/agent-observability/src/evaluation-generation.ts": "b290d8a1ff4974147c8cf9b411600b72df1743e016bf8b88eb9ceef9b70cb979",
+    "packages/agent-observability/src/evaluation-view.ts": "ca6d9e403590416db60cc62272329d36977b0af17f80e88acb0e6c370161d0a3",
+    "packages/agent-observability/src/evaluations.test.ts": "b22a76a6571adc99622f9812730a2a0726b2c57ae2a2c91b89e0ee02dad3a857",
+    "packages/agent-observability/src/evaluations.ts": "f6d2c2326772c0dedffd194e008988a902344059c8ef748c6d8ade3524f0e3d7",
+    "packages/agent-observability/src/redaction.test.ts": "b1332b3c09453c02c1e3f42b462a86791bd2bb71297bd731895140ee6a316d84",
+    "packages/agent-observability/src/redaction.ts": "657343ad987c51d1b3561809f04dd2ead615b8dd901328caa3828044254a0fa0",
+    "packages/agentlog/src/evaluation-tasks.test.ts": "c33975efebd3d75914c37da8f0a4cdc17a6ff0737d5826a6831ef57c8e462d91",
+    "packages/agentlog/src/evaluations.test.ts": "476fe4ddd4704a55a2239594ace8bb9c0068220e04dfc1967b06c034344f6387",
+    "packages/agentlog/src/store.ts": "faec9a6fddebc8e488df52d82bac683ca71725de3a50e2035beeec5327495f64",
+    "packages/backend/convex/evaluations.ts": "8279aeac66c47af890d03c7d4c362d661ffb15f2479962345d42db61a765dc84",
+    "packages/backend/scripts/verify-evaluation-generation-local.ts": "67b65fdc769d0e4570c5cc784f2e5f90373d7a61b33620db0dc3a6d0d60d6266",
+    "packages/backend/tests/evaluations.test.ts": "cd7d0ec0ec39bca64726ed01f65d093ce3173984d1231f6a3693a26e292bcd1a"
+  }
+}

@@ -14,8 +14,44 @@ export const artifactSchema = z
 const acceptanceSchema = z
   .object({
     id,
-    expected: text,
+    expected: z.union([
+      text,
+      z.object({ kind: z.literal("original_request") }).strict(),
+    ]),
     requiresIndependentObservation: z.boolean(),
+  })
+  .strict();
+export function acceptanceLabel(criterion: z.infer<typeof acceptanceSchema>) {
+  return typeof criterion.expected === "string"
+    ? criterion.expected
+    : "Fulfil the original request shown above.";
+}
+export const declaredIntentSchema = z
+  .object({
+    request: z
+      .string()
+      .min(1)
+      .max(4096)
+      .refine((value) => value.trim().length > 0, "Empty request"),
+    source: traceReferenceSchema.optional(),
+    clarifications: z.array(text).max(10),
+  })
+  .strict();
+const capturedIntentSchema = z
+  .object({
+    kind: z.literal("captured"),
+    source: traceReferenceSchema.extend({
+      revision: z.number().int().nonnegative(),
+    }),
+    // Captured text is bounded by the serialized record/snapshot budgets.
+    clarifications: z
+      .array(
+        z
+          .string()
+          .min(1)
+          .refine((value) => value.trim().length > 0, "Empty clarification"),
+      )
+      .max(10),
   })
   .strict();
 export const verdictSchema = z.enum(["pass", "fail", "inconclusive"]);
@@ -87,17 +123,7 @@ export const evaluationManifestSchema = z
       .max(20)
       .refine((ids) => unique(ids, String), "Duplicate run"),
     title: text,
-    intent: z
-      .object({
-        request: z
-          .string()
-          .min(1)
-          .max(4096)
-          .refine((value) => value.trim().length > 0, "Empty request"),
-        source: traceReferenceSchema.optional(),
-        clarifications: z.array(text).max(10),
-      })
-      .strict(),
+    intent: z.union([declaredIntentSchema, capturedIntentSchema]),
     criteriaVersion: text,
     cases: z
       .array(acceptanceSchema)
@@ -121,6 +147,17 @@ export const evaluationManifestSchema = z
 export const evaluationSchema = evaluationManifestSchema
   .extend({ id, machineId: z.string().uuid() })
   .superRefine((value, ctx) => {
+    if (
+      "kind" in value.intent &&
+      value.generation &&
+      value.intent.source.revision !== value.generation.requestRevision
+    )
+      ctx.addIssue({
+        code: "custom",
+        path: ["generation", "requestRevision"],
+        message:
+          "Generation must preserve the captured original request revision.",
+      });
     if (
       value.generation &&
       (!value.intent.source ||

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useMutation } from "convex/react";
+import { ConvexError } from "convex/values";
 import { api } from "@astack/observatory-backend/api";
 import { Button } from "@astack/ui";
 import { evaluationLink } from "./evaluations";
@@ -24,11 +25,13 @@ export function GenerateEvaluationButton({
     try {
       await generate();
       setState({ kind: "ready" });
-    } catch {
+    } catch (error) {
       setState({
         kind: "failed",
         message:
-          "Could not generate an evaluation. Check capture availability and try again.",
+          error instanceof ConvexError && typeof error.data === "string"
+            ? error.data
+            : "Could not generate an evaluation. Please try again.",
       });
     } finally {
       inFlight.current = false;

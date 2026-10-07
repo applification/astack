@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { v, ConvexError } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
 import { z } from "zod";
 import { eventSchema, runSchema } from "@astack/agent-observability";
@@ -39,14 +39,20 @@ import { evaluationWorkflow } from "./evaluationWorkflow";
 import { evaluationDelivery } from "./evaluationDelivery";
 import { generateEvaluation } from "@astack/agent-observability/evaluation-generation";
 
-const snapshotSchema = evaluationDetailSchema.pick({
-  runs: true,
-  source: true,
+const snapshotSchema = z.object({
+  runs: evaluationDetailSchema.shape.runs,
+  source: evaluationDetailSchema.shape.source,
 });
-const boundedJson = (value: unknown, maximumBytes = 512 * 1024) => {
+const boundedJson = (
+  value: unknown,
+  maximumBytes = 512 * 1024,
+  label = "Evaluation snapshot",
+) => {
   const data = JSON.stringify(value);
   if (new TextEncoder().encode(data).byteLength > maximumBytes)
-    throw new Error("Evaluation snapshot exceeds its byte budget");
+    throw new ConvexError(
+      `${label} exceeds its ${maximumBytes / 1024} KiB byte budget.`,
+    );
   return data;
 };
 // Read only the bounded beginning/end of a turn. Full traces stay on their own route.
@@ -169,8 +175,9 @@ async function traceSnapshot(
     .unique();
   if (!row || row.runId !== runId)
     throw new Error("Trace evidence not captured");
+  const event = eventSchema.parse(JSON.parse(row.data));
   return eventSnapshotSchema.parse({
-    event: redact(eventSchema.parse(JSON.parse(row.data))),
+    event: redact(event, [], 0, event.kind === "user_prompt" ? null : 8000),
     revision: row.revision,
   });
 }
@@ -179,7 +186,8 @@ export async function storeEvaluation(
   input: Evaluation,
   machineId: string,
 ) {
-  const value = evaluationSchema.parse(redact(input));
+  // Evaluation record/snapshot byte budgets own size; redaction must not shorten captured intent.
+  const value = evaluationSchema.parse(redact(input, [], 0, null));
   if (
     value.machineId !== machineId ||
     !value.id.startsWith(machineId + ":evaluation:")
@@ -202,10 +210,12 @@ export async function storeEvaluation(
     const run = runSchema.parse(JSON.parse(row.data));
     if (resolveProject([project], run)?.projectId !== value.projectId)
       throw new Error("Evaluation run outside current project capture policy");
+    if ("kind" in value.intent && !run.contentCapture)
+      throw new Error("Captured intent requires readable project capture");
     runs.push({ run: runSchema.parse(redact(run)), revision: row.revision });
   }
   const previous = await stored(ctx, value.id);
-  const data = boundedJson(value, 128 * 1024);
+  const data = boundedJson(value, 128 * 1024, "Evaluation record");
   if (previous) {
     if (previous.data !== data)
       throw new Error("Evaluation is immutable; use a new ID");
@@ -221,7 +231,12 @@ export async function storeEvaluation(
   if (
     source &&
     (source.event.kind !== "user_prompt" ||
-      source.event.data.content !== value.intent.request)
+      ("kind" in value.intent
+        ? source.revision !== value.intent.source.revision ||
+          typeof source.event.data.content !== "string" ||
+          !source.event.data.content.trim() ||
+          source.event.data.content === "[WITHHELD]"
+        : source.event.data.content !== value.intent.request))
   )
     throw new Error("Original request does not match captured prompt");
   await ctx.db.insert("evaluations", {
@@ -259,13 +274,13 @@ export const generate = mutation({
       !project?.enabled ||
       (args.projectId && args.projectId !== row.projectId)
     )
-      throw new Error("Run is unavailable in this enabled project.");
+      throw new ConvexError("Run is unavailable in this enabled project.");
     const run = runSchema.parse(JSON.parse(row.data));
     if (
       !run.contentCapture ||
       resolveProject([project], run)?.projectId !== row.projectId
     )
-      throw new Error(
+      throw new ConvexError(
         "Evaluation generation requires readable project capture.",
       );
     const linked = await ctx.db
@@ -312,7 +327,9 @@ export const generate = mutation({
           .order("asc")
           .take(201);
     if (!prompts.length && candidates.length > 200)
-      throw new Error("Legacy request lookup exceeds the capture budget.");
+      throw new ConvexError(
+        "Legacy request lookup exceeds the capture budget.",
+      );
     const requests = candidates
       .map((item) => ({
         event: eventSchema.parse(JSON.parse(item.data)),
@@ -320,9 +337,21 @@ export const generate = mutation({
       }))
       .filter(({ event }) => event.kind === "user_prompt");
     if (requests.length > 11)
-      throw new Error("This turn exceeds the evaluation clarification limit.");
+      throw new ConvexError(
+        "This turn exceeds the evaluation clarification limit.",
+      );
     const source = requests[0];
-    if (!source) throw new Error("This turn has no captured original request.");
+    if (!source)
+      throw new ConvexError("This turn has no captured original request.");
+    const request = source.event.data.content;
+    if (
+      typeof request !== "string" ||
+      !request.trim() ||
+      request === "[WITHHELD]"
+    )
+      throw new ConvexError(
+        "A readable captured original request is required.",
+      );
     const name = await ctx.db
       .query("names")
       .withIndex("by_key", (q) =>

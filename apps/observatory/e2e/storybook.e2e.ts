@@ -36,6 +36,65 @@ test("generation button shows capture requirements, locks pending work and retai
   ).toBeEnabled();
 });
 
+test("generation displays an application budget error with a retry", async ({
+  app,
+  screen,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-generate-evaluation--storage-budget&viewMode=story",
+  );
+  await screen
+    .getByRole("button", "Generate evaluation", { exact: true })
+    .tap();
+  await expect(screen.getByRole("alert")).toHaveText(
+    "Evaluation record exceeds its 128 KiB byte budget.",
+  );
+  await expect(
+    screen.getByRole("button", "Generate evaluation", { exact: true }),
+  ).toBeEnabled();
+});
+
+test("a long captured request renders fully once with a reference criterion", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--long-captured-request&viewMode=story",
+  );
+  await expect(
+    screen.getByRole("heading", "Review a long scheduled request", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () =>
+        document.querySelector(".evaluation-prompt-text")?.textContent
+          ?.length ?? null,
+    ),
+  ).toBe(5633);
+  await screen
+    .getByText("0 of 1 checks passed · what was checked?", { exact: true })
+    .tap();
+  await screen
+    .getByText("Fulfil the original request shown above.", { exact: true })
+    .first()
+    .tap();
+  await expect(
+    screen.getByText("Fulfil the original request shown above.", {
+      exact: true,
+    }),
+  ).toHaveCount(2);
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await app.screenshot("long-captured-request-narrow");
+});
+
 test("scheduled task rows group history by machine and project with explicit schedule snapshots", async ({
   app,
   screen,

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { ConvexError } from "convex/values";
 import { GenerateEvaluationButton } from "./generate-evaluation";
 import { ObservatoryLayout } from "./app";
 
@@ -26,6 +27,15 @@ export const Failure: Story = {
   args: {
     generate: async () => {
       throw new Error("Fixture capture unavailable");
+    },
+  },
+};
+export const StorageBudget: Story = {
+  args: {
+    generate: async () => {
+      throw new ConvexError(
+        "Evaluation record exceeds its 128 KiB byte budget.",
+      );
     },
   },
 };

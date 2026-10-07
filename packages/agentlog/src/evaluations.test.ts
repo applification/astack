@@ -132,9 +132,11 @@ test("multi-turn evaluations wait for acknowledged parent turns and the original
       value: { ...evaluation, intent: { ...evaluation.intent, request } },
     });
     const saved = store.getRecord("evaluation:" + evaluation.id);
-    expect(saved?.kind === "evaluation" && saved.value.intent.request).toBe(
-      request,
-    );
+    expect(
+      saved?.kind === "evaluation" &&
+        "request" in saved.value.intent &&
+        saved.value.intent.request,
+    ).toBe(request);
     for (const priority of ["recent", "oldest"] as const) {
       const before = store.batch(fixtureMachine, priority);
       expect(

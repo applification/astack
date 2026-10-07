@@ -1,6 +1,7 @@
 import { Badge } from "@astack/ui";
 import {
   evaluateProof,
+  acceptanceLabel,
   type Evaluation,
 } from "@astack/agent-observability/evaluations";
 import type { EvaluationDetail } from "@astack/agent-observability/evaluation-view";
@@ -66,7 +67,7 @@ export function VerificationEvidence({
             id={"case-" + item.id}
           >
             <summary>
-              <span>{textPreview(item.expected, 110)}</span>
+              <span>{textPreview(acceptanceLabel(item), 110)}</span>
               <span
                 className={
                   result?.verdict === "fail"
@@ -82,7 +83,7 @@ export function VerificationEvidence({
             </summary>
             <dl className="evaluation-observation">
               <dt>Expected</dt>
-              <dd>{item.expected}</dd>
+              <dd>{acceptanceLabel(item)}</dd>
               <dt>Observed</dt>
               <dd
                 className={result?.verdict === "fail" ? "negative" : undefined}

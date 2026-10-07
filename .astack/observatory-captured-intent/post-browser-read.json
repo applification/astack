@@ -1,0 +1,12 @@
+{
+  "backend": "http://127.0.0.1:3210",
+  "observedAt": "2026-10-07T17:40:59.779Z",
+  "persistedRequestCharacters": 5633,
+  "requestMatchesCapture": true,
+  "intentKind": "captured",
+  "requestCopiedIntoMetadata": false,
+  "criterionKind": "original_request",
+  "evaluationCountAfterBrowserAndRetry": 1,
+  "missingRequestEvaluationCount": 0,
+  "proof": null
+}

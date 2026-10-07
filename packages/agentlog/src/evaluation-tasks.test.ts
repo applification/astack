@@ -73,12 +73,16 @@ test("agent handoff survives capture lag and restart, preserving criteria and pu
     );
     if (saved?.kind !== "evaluation")
       throw new Error("Evaluation was not persisted.");
-    expect(saved.value.intent.request).toBe(
-      "Fix edits disappearing after saving and reopening.",
-    );
-    expect(saved.value.intent.source).toEqual({
-      runId: first.id,
-      eventId: evaluationPrompt().id,
+    if (!saved.value.generation)
+      throw new Error("Generation provenance missing.");
+    expect(saved.value.intent).toEqual({
+      kind: "captured",
+      source: {
+        runId: first.id,
+        eventId: evaluationPrompt().id,
+        revision: saved.value.generation.requestRevision,
+      },
+      clarifications: [],
     });
     expect(saved.value.runIds).toEqual([first.id, last.id]);
     expect(saved.value.cases[0]?.expected).toBe(
@@ -97,6 +101,34 @@ test("agent handoff survives capture lag and restart, preserving criteria and pu
         )
         .get()?.count,
     ).toBe(1);
+    if (!("kind" in saved.value.intent))
+      throw new Error("Captured intent missing.");
+    const capturedIntent = saved.value.intent;
+    const generation = saved.value.generation;
+    expect(() =>
+      store.put({
+        kind: "evaluation",
+        value: {
+          ...saved.value,
+          id: saved.value.id + "-stale-request",
+          intent: {
+            ...capturedIntent,
+            source: { ...capturedIntent.source, revision: 99 },
+          },
+          generation: { ...generation, requestRevision: 99 },
+        },
+      }),
+    ).toThrow("already captured prompt");
+    store.put({ kind: "run", value: { ...last, contentCapture: false } });
+    expect(() =>
+      store.put({
+        kind: "evaluation",
+        value: {
+          ...saved.value,
+          id: saved.value.id + "-unreadable",
+        },
+      }),
+    ).toThrow("requires readable project capture");
   } finally {
     store.close();
     await rm(directory, { recursive: true, force: true });

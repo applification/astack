@@ -74,8 +74,12 @@ export function generateEvaluation({
     title,
     runIds: runs.map(({ run }) => run.id),
     intent: {
-      request,
-      source: { runId: source.event.runId, eventId: source.event.id },
+      kind: "captured",
+      source: {
+        runId: source.event.runId,
+        eventId: source.event.id,
+        revision: source.revision,
+      },
       clarifications,
     },
     criteriaVersion: "capture-v1",
@@ -85,7 +89,7 @@ export function generateEvaluation({
         : [
             {
               id: "C1",
-              expected: request,
+              expected: { kind: "original_request" },
               requiresIndependentObservation: false,
             },
           ],
