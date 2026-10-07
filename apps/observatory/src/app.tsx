@@ -22,6 +22,11 @@ import {
 } from "@astack/agent-observability/filters";
 import { RunFilters } from "./filters";
 import {
+  RunStatus as Status,
+  ScheduledBadge,
+  ScheduledTasksTable,
+} from "./scheduled-tasks";
+import {
   ProviderLabel,
   RepositoryLink,
   RunMetadata,
@@ -121,25 +126,6 @@ function LoadMore({
     </div>
   );
 }
-function Status({ run }: { run: AgentRun }) {
-  return (
-    <span
-      className={
-        run.status === "failed"
-          ? "negative"
-          : run.status === "completed"
-            ? "positive"
-            : "neutral"
-      }
-    >
-      {run.status === "completed"
-        ? "Turn completed"
-        : run.status === "running"
-          ? "No completion observed"
-          : run.status}
-    </span>
-  );
-}
 export function RunTable({
   runs,
   projects = [],
@@ -186,6 +172,11 @@ export function RunTable({
                       names.find((name) => name.runId === run.id),
                     )}
                   </a>
+                  {run.automation && (
+                    <span className="secondary">
+                      <ScheduledBadge run={run} />
+                    </span>
+                  )}
                   <span className="secondary">
                     <RepositoryLink value={run.repo ?? run.cwd} />
                   </span>
@@ -333,7 +324,7 @@ export function WorkTable({
 function Runs({
   route,
   problems = false,
-  workView = false,
+  view = "runs",
   projectId,
   projects,
   options,
@@ -341,7 +332,7 @@ function Runs({
 }: {
   route: string;
   problems?: boolean;
-  workView?: boolean;
+  view?: "runs" | "work" | "scheduled";
   projectId?: string;
   projects: readonly Project[];
   options: readonly FilterOption[] | undefined;
@@ -362,7 +353,12 @@ function Runs({
       ...(projectId ? { projectId } : {}),
       filters: [
         ...(problems ? [{ dimension: "problem", value: "yes" }] : []),
-        ...filters,
+        ...(view === "scheduled"
+          ? [{ dimension: "scheduled", value: "yes" }]
+          : []),
+        ...filters.filter(
+          (filter) => view !== "scheduled" || filter.dimension !== "scheduled",
+        ),
       ],
       ...(after ? { after: new Date(`${after}T00:00:00`).getTime() } : {}),
       ...(before ? { before: new Date(`${before}T23:59:59`).getTime() } : {}),
@@ -385,11 +381,14 @@ function Runs({
     ),
   );
   const machines = new Set(runs.map((run) => run.machineId));
-  const title = workView
-    ? "Work & agent activity"
-    : problems
-      ? "Problems & patterns"
-      : "Agent runs";
+  const title =
+    view === "scheduled"
+      ? "Scheduled tasks"
+      : view === "work"
+        ? "Work & agent activity"
+        : problems
+          ? "Problems & patterns"
+          : "Agent runs";
   const workGroups = new Map<string, AgentRun[]>();
   for (const run of runs)
     if (run.work) {
@@ -403,11 +402,13 @@ function Runs({
       <p className="eyebrow">Private agent feedback</p>
       <h1>{title}</h1>
       <p className="subtitle">
-        {workView
-          ? "Follow external work references through every captured attempt."
-          : problems
-            ? "Deterministic signals with trace evidence."
-            : "Follow the evidence. Improve the harness."}
+        {view === "scheduled"
+          ? "Browse recurring tasks and their captured activity."
+          : view === "work"
+            ? "Follow external work references through every captured attempt."
+            : problems
+              ? "Deterministic signals with trace evidence."
+              : "Follow the evidence. Improve the harness."}
       </p>
       <div className="metrics">
         <div>
@@ -452,7 +453,9 @@ function Runs({
         <p role="status" className="empty">
           Loading runs…
         </p>
-      ) : workView ? (
+      ) : view === "scheduled" ? (
+        <ScheduledTasksTable runs={runs} projects={projects} />
+      ) : view === "work" ? (
         <>
           {!workGroups.size && (
             <div className="notice">
@@ -533,6 +536,12 @@ function RunDetail({ id, projectId }: { id: string; projectId?: string }) {
         {run.agentVersion ?? "Version unknown"} · {run.machineName} ·{" "}
         {!run.startTimeKnown && "Session date · "}
         {date(run.startedAt)} · <Status run={run} />
+        {run.automation && (
+          <>
+            {" "}
+            · <ScheduledBadge run={run} />
+          </>
+        )}
       </p>
       {run.work && (
         <p className="notice">
@@ -836,7 +845,13 @@ export function App() {
         options={options}
         optionsLoading={catalog.status !== "Exhausted"}
         problems={section === "problems"}
-        workView={section === "work"}
+        view={
+          section === "work"
+            ? "work"
+            : section === "scheduled"
+              ? "scheduled"
+              : "runs"
+        }
       />
     );
   return (
@@ -886,6 +901,7 @@ export function ObservatoryLayout({
             <nav className="navigation" aria-label="Observatory">
               {[
                 ["runs", "Runs"],
+                ["scheduled", "Scheduled tasks"],
                 ["work", "Work"],
                 ["evaluations", "Evaluations"],
                 ["skills", "Skills & workflows"],

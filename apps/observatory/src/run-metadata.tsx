@@ -1,6 +1,8 @@
 import { Copy, Folder, GitFork, Info } from "lucide-react";
 import { HelpCard } from "@astack/ui";
 import { useCopyToast } from "./copy-toast";
+import { ScheduledBadge, ScheduleSnapshot } from "./scheduled-tasks";
+import { automationName } from "@astack/agent-observability/automations";
 import type { AgentRun } from "@astack/agent-observability";
 import {
   providerName,
@@ -113,6 +115,18 @@ export function RunMetadata({
 }) {
   return (
     <dl className="metadata">
+      {run.automation && (
+        <div>
+          <dt>Scheduled task</dt>
+          <dd>
+            <strong>{automationName(run.automation)}</strong>
+            <span className="secondary">
+              <ScheduledBadge run={run} />
+            </span>
+            <ScheduleSnapshot automation={run.automation} />
+          </dd>
+        </div>
+      )}
       <div>
         <dt>Repository / working directory</dt>
         <dd>

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { filterSchema, runSchema, type AgentRun } from "./domain";
+import { automationKey, automationName } from "./automations";
 
 export const filterOptionSchema = z.object({
   dimension: filterSchema.shape.dimension.exclude([
@@ -28,6 +29,7 @@ const outcomeLabels = {
 } satisfies Record<AgentRun["outcome"], string>;
 
 export const fixedFilterOptions: readonly FilterOption[] = [
+  { dimension: "scheduled", value: "yes", label: "Scheduled tasks" },
   ...runSchema.shape.status.options.map<FilterOption>((value) => ({
     dimension: "status",
     value,
@@ -56,6 +58,14 @@ export function runFilterOptions(run: AgentRun): FilterOption[] {
   add("branch", run.branch);
   add("status", run.status, statusLabels[run.status]);
   add("outcome", run.outcome, outcomeLabels[run.outcome]);
+  if (run.automation) {
+    add("scheduled", "yes", "Scheduled tasks");
+    add(
+      "automation",
+      automationKey(run) ?? undefined,
+      `${automationName(run.automation)} · ${run.machineName}`,
+    );
+  }
   add(
     "work",
     run.work?.id,

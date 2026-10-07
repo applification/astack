@@ -7,6 +7,8 @@
     ".": "./src/domain.ts",
     "./analysis": "./src/analysis.ts",
     "./filters": "./src/filters.ts",
+    "./automations": "./src/automations.ts",
+    "./automation-fixtures": "./src/automation-fixtures.ts",
     "./redaction": "./src/redaction.ts",
     "./projects": "./src/projects.ts",
     "./naming": "./src/naming.ts",

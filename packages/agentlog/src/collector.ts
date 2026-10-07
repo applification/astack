@@ -23,6 +23,7 @@ import {
   mergeSessionReferences,
 } from "@astack/agent-observability/delegation";
 import type { Project } from "@astack/agent-observability/projects";
+import { mergeAutomation } from "@astack/agent-observability/automations";
 
 type CaptureAdapter = AgentAdapter & {
   setProjects(projects: readonly Project[]): void;
@@ -56,10 +57,15 @@ export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
   ) {
     // Either host can add verified identities and task facts; the first source
     // continues to own all trace events and assessed outcomes.
+    const automation = mergeAutomation(
+      owner.value.automation,
+      snapshot.run.automation,
+    );
     store.put({
       kind: "run",
       value: runSchema.parse({
         ...owner.value,
+        ...(automation ? { automation } : {}),
         sessionReferences: mergeSessionReferences(
           owner.value.sessionReferences,
           snapshot.run.sessionReferences,
@@ -98,6 +104,11 @@ export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
   const previous = store.getRecord(`run:${snapshot.run.id}`);
   const run = snapshot.run;
   if (previous?.kind === "run") {
+    const automation = mergeAutomation(
+      previous.value.automation,
+      run.automation,
+    );
+    if (automation) run.automation = automation;
     run.sessionReferences = mergeSessionReferences(
       previous.value.sessionReferences,
       run.sessionReferences,
