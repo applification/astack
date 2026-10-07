@@ -73,3 +73,16 @@ Seven authenticated live browser checks pass in run `01a1155b-03fc-7442-8fd2-ea8
 
 - [Centered main rail with distinct branch colours and compact revision](centered-map-light.png): synthetic `revision-summaries` Storybook observation through the T3 browser, 1600 × 2200 viewport saved at 1280 × 1760.
 - [Centered narrow view of the four-child fixture](centered-map-narrow.png): synthetic e2e Chromium capture, 390 × 844; pan horizontally to reach outer lanes and their full labels.
+
+## Copy toast and fork context
+
+The owner's copied-state screenshot exposed a rendering defect: inline feedback expanded the revision badge and replaced its copy icon. The synthetic story reproduced a width change from 98px to 137.296875px. The new geometry/icon assertion fails against the previous UI in run `01a11569-3604-7c24-a9d4-131b59250aa0` and passes after the fix.
+
+Runtime source `474e198110e58d6b25589d1b6264b705d3c05a33` keeps the copy icon, text and badge dimensions unchanged. A shared toast outside the map announces success and disappears after three seconds. Repeated copying replaces the active notification; failed copying exposes its selectable full revision in a dismissible error toast. The delegated-work label and child count are centered in a compact card above the fork dot; child lines start below that dot. This follows the owner's request and delegated layout judgment.
+
+UI lint, strict types, 102 tests/605 assertions and production/Storybook builds pass. All 38 browser checks pass in run `01a1156a-4dde-7c3a-8e84-5f72874708db`, including unchanged badge dimensions/icon, full-value copying, toast placement and expiry, repeated activation, failure recovery and card placement with zero through four children. The run tested the modified tree based on `fa68fe298e62a9798c38e7ad421b74d1f977a5ab`, subsequently committed as runtime source `474e198110e58d6b25589d1b6264b705d3c05a33`. Test return values were corrected to serializable null fallbacks before the final strict check.
+
+The authorized UI-only Otis rollout serves HTML, JavaScript and CSS matching the production build. All seven live checks pass in run `01a1156d-8405-7636-835c-f3b6511d0e03`. Native clipboard copying succeeds in the actual authenticated review and leaves its badge at 98 × 34px, with the copy icon intact and feedback outside the map. Desktop and 390px inspection confirm the card's placement and all connections meeting their stops. Both actual child captures and explicit join references remain available; no owner assessment was written. Backend/collector remain at the prior deployment, and the previous UI is retained privately for recovery. [Sanitized deployment evidence](copy-toast-deployment.json) retains observations and served hashes.
+
+- [Full route with the fork card and copied toast](copy-toast-light.png): synthetic T3 browser capture, 1600 × 2300 viewport saved at 1280 × 1840.
+- [Narrow dark fork card, stable badge and toast](copy-toast-narrow-dark.png): synthetic T3 browser capture, 390 × 844 viewport saved at 780 × 1688; horizontal map scrolling remains available.
