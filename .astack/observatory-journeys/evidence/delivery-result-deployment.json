@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "a0056c11101348f0f4b45a5cb30a4be42c471271",
+  "backendRevision": "a0056c11101348f0f4b45a5cb30a4be42c471271",
+  "collectorRevision": "a0056c11101348f0f4b45a5cb30a4be42c471271",
+  "collectorSha256": "0102dd74612d4b53e2ec1a59c4e337306c713d1b52a7ccbc56ca64b6e74cc623",
+  "assets": [
+    {
+      "asset": "/assets/index-3HCMnOVh.js",
+      "sha256": "b9d29e6c5cbe8e414981f498fc3c8f5667baa509ec4c32d160506c36adfc9748"
+    },
+    {
+      "asset": "/assets/index-CjtAdgYc.css",
+      "sha256": "f3fe8ab7b4f07b052d6c3bcfaaab6d1dae7a3817fe8611f508c40b01307023da"
+    }
+  ],
+  "htmlMatchesBuild": true,
+  "previousRuntimeRetained": true,
+  "localEnvironmentRestored": true,
+  "verification": {
+    "domainCollectorConvex": {
+      "passed": 107,
+      "assertions": 637
+    },
+    "storybook": {
+      "passed": 41,
+      "runId": "01a115b6-6e99-7fda-80ee-5d0c452b842b"
+    },
+    "convexReviewer": "complete; no unresolved findings"
+  },
+  "actualDelivery": {
+    "pr": 26,
+    "initialCaptureRevision": "a0056c11101348f0f4b45a5cb30a4be42c471271",
+    "initialInlineImages": 0,
+    "linkedParentTurns": 3,
+    "availableChildren": 2,
+    "availableJoinResults": 2,
+    "anonymousDenied": true,
+    "ownerAssessments": 0
+  }
+}
