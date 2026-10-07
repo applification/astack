@@ -15,6 +15,8 @@ import {
   fixtureMachine,
   fixtureProject,
 } from "@astack/agent-observability/evaluation-fixtures";
+import { deliveryFixture } from "@astack/agent-observability/delivery-fixtures";
+import { eventSchema } from "@astack/agent-observability";
 import type { TelemetryRecord } from "@astack/agent-observability";
 import { workflowFixture } from "@astack/agent-observability/workflow-fixtures";
 
@@ -868,4 +870,113 @@ test("delegated lookup rejects stale foreign projections and cycles and bounds l
   expect(bounded.workflow.branches.some((branch) => branch.truncated)).toBe(
     true,
   );
+});
+
+test("PR delivery has owner/readable policy, immutable capture and separate current observations", async () => {
+  const { t, evaluation, owner } = await setup();
+  const run = {
+    ...evaluationRun(),
+    repo: "https://github.com/applification/astack",
+  };
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries([{ kind: "run", value: run }], 500),
+  });
+  const evidence = deliveryFixture();
+  const event = eventSchema.parse({
+    id: run.id + ":delivery",
+    runId: run.id,
+    sequence: 50,
+    kind: "delivery_recorded",
+    timestamp: 2000,
+    observedAt: 2000,
+    timing: "agent",
+    title: "PR evidence",
+    delivery: { ...evidence, current: null },
+    data: {},
+  });
+  const ingest = (value: typeof event, revision: number) =>
+    t.mutation(internal.ingestion.ingest, {
+      machineId: fixtureMachine,
+      records: entries([{ kind: "event", value }], revision),
+    });
+  await ingest(event, 600);
+  const read = async () =>
+    evaluationDetailSchema.parse(
+      JSON.parse(
+        (await owner.query(api.evaluations.detail, {
+          evaluationId: evaluation.id,
+          projectId: fixtureProject,
+        })) ?? "null",
+      ),
+    );
+  const before = await read();
+  expect(before.delivery?.evidence).toEqual(event.delivery);
+  await expect(
+    t.query(api.evaluations.detail, {
+      evaluationId: evaluation.id,
+      projectId: fixtureProject,
+    }),
+  ).rejects.toThrow();
+  await expect(
+    ingest(
+      {
+        ...event,
+        delivery: {
+          ...evidence,
+          snapshot: { ...evidence.snapshot, title: "Rewritten" },
+        },
+      },
+      601,
+    ),
+  ).rejects.toThrow("immutable");
+  await expect(
+    ingest(
+      {
+        ...event,
+        id: run.id + ":foreign",
+        delivery: {
+          ...evidence,
+          snapshot: {
+            ...evidence.snapshot,
+            repository: "another/project",
+            url: "https://github.com/another/project/pull/26",
+            media: [],
+          },
+        },
+      },
+      602,
+    ),
+  ).rejects.toThrow("repository");
+  await ingest({ ...event, delivery: evidence }, 603);
+  const refreshed = await read();
+  expect(refreshed.delivery?.evidence).toEqual(evidence);
+  expect(refreshed.evaluation).toEqual(before.evaluation);
+  expect(refreshed.runs).toEqual(before.runs);
+  expect(refreshed.assessments).toEqual(before.assessments);
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries(
+      [{ kind: "run", value: { ...run, contentCapture: false } }],
+      700,
+    ),
+  });
+  expect((await read()).delivery).toBeNull();
+  await expect(
+    ingest({ ...event, id: run.id + ":withheld" }, 701),
+  ).rejects.toThrow("readable");
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries([{ kind: "run", value: run }], 800),
+  });
+  await owner.mutation(api.projects.save, {
+    project: {
+      projectId: fixtureProject,
+      name: "Fixture",
+      enabled: false,
+      repositories: [],
+      folders: [{ machineId: fixtureMachine, path: "/fixture" }],
+    },
+  });
+  expect((await read()).delivery).toBeNull();
 });

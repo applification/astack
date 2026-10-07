@@ -2,6 +2,7 @@ import { z } from "zod";
 import { evaluationSchema } from "./evaluations";
 import { workflowAnnotationSchema } from "./workflow";
 import { delegationSchema, sessionReferenceSchema } from "./delegation";
+import { deliveryEvidenceSchema } from "./delivery-evidence";
 
 const id = z.string().min(1).max(512);
 const text = z.string().max(4096);
@@ -45,6 +46,7 @@ export const eventKinds = [
   "skill_loaded",
   "instruction_loaded",
   "workflow_step",
+  "delivery_recorded",
   "subagent_start",
   "subagent_result",
   "intervention",
@@ -68,12 +70,19 @@ export const eventSchema = z
     durationMs: time.optional(),
     skill: skillUseSchema.optional(),
     workflow: workflowAnnotationSchema.optional(),
+    delivery: deliveryEvidenceSchema.optional(),
     data: z.record(z.string().max(128), z.json()).default({}),
   })
   .strict()
   .refine((event) => !event.workflow || event.kind === "workflow_step", {
     message: "Workflow annotations require a workflow_step event",
-  });
+  })
+  .refine(
+    (event) => (event.kind === "delivery_recorded") === !!event.delivery,
+    {
+      message: "Delivery evidence requires a delivery_recorded event",
+    },
+  );
 export const findingSchema = z
   .object({
     rule: z.enum([

@@ -18,6 +18,8 @@
     "./workflow-view": "./src/workflow-view.ts",
     "./workflow-fixtures": "./src/workflow-fixtures.ts",
     "./delegation": "./src/delegation.ts",
+    "./delivery-evidence": "./src/delivery-evidence.ts",
+    "./delivery-fixtures": "./src/delivery-fixtures.ts",
     "./journey-fixtures": "./src/journey-fixtures.ts"
   },
   "dependencies": {

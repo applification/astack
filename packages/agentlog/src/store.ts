@@ -40,7 +40,9 @@ export class LocalStore {
   put(record: TelemetryRecord) {
     const safe = recordSchema.parse(redact(record, this.secrets));
     if (Buffer.byteLength(JSON.stringify(safe)) > 128 * 1024) {
-      if (safe.kind === "event")
+      if (safe.kind === "event" && safe.value.delivery)
+        throw new Error("Delivery evidence exceeds the 128 KiB record budget");
+      else if (safe.kind === "event")
         safe.value.data = {
           omitted: "Large event detail omitted at the 128 KiB record budget",
         };
@@ -78,6 +80,15 @@ export class LocalStore {
         const previous = recordSchema.parse(JSON.parse(existing.payload));
         if (previous.kind === "event")
           safe.value.observedAt = previous.value.observedAt;
+        if (
+          previous.kind === "event" &&
+          previous.value.delivery &&
+          JSON.stringify(previous.value.delivery.snapshot) !==
+            JSON.stringify(safe.value.delivery?.snapshot)
+        )
+          throw new Error(
+            "Delivery snapshot is immutable; capture a new revision",
+          );
       }
       const payload = JSON.stringify(safe);
       if (existing?.payload === payload) return false;
@@ -336,7 +347,10 @@ export async function forward(
         : record;
     const run = parent?.kind === "run" ? parent.value : null;
     const project = run ? resolveProject(projects, run) : null;
-    return run && project && run.projectId === project.projectId
+    return run &&
+      project &&
+      run.projectId === project.projectId &&
+      !(record.kind === "event" && record.value.delivery && !run.contentCapture)
       ? []
       : [batch.keys[index]?.key ?? ""];
   });

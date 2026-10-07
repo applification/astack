@@ -14,6 +14,7 @@ import { paginationOptsValidator } from "convex/server";
 import { queuePrompt, queueStoredPrompt, storeWorkLabel } from "./naming";
 import { storeEvaluation } from "./evaluations";
 import { sessionReferenceKey } from "@astack/agent-observability/delegation";
+import { repositoryIdentity } from "@astack/agent-observability/projects";
 
 function capabilities(run: AgentRun) {
   return new Map(run.skills.map((skill) => [capabilityKey(skill), skill]));
@@ -204,11 +205,42 @@ export const ingest = internalMutation({
         const project = run ? resolveProject(projects, run) : null;
         if (!run || !project || run.projectId !== project.projectId)
           throw new Error("Project not enabled for capture");
+        if (
+          event.delivery &&
+          (!run.contentCapture ||
+            !run.repo ||
+            repositoryIdentity(run.repo) !==
+              repositoryIdentity(
+                `https://github.com/${event.delivery.snapshot.repository}`,
+              ))
+        )
+          throw new Error("PR evidence outside readable repository capture");
+        if (
+          event.delivery &&
+          new TextEncoder().encode(JSON.stringify(event)).byteLength >
+            128 * 1024
+        )
+          throw new Error(
+            "Delivery evidence exceeds the 128 KiB record budget",
+          );
         const previous = await ctx.db
           .query("events")
           .withIndex("by_eventId", (q) => q.eq("eventId", event.id))
           .unique();
         if (previous && previous.revision >= entry.revision) continue;
+        if (previous) {
+          const original = recordSchema.parse({
+            kind: "event",
+            value: JSON.parse(previous.data),
+          });
+          if (
+            original.kind === "event" &&
+            original.value.delivery &&
+            JSON.stringify(original.value.delivery.snapshot) !==
+              JSON.stringify(event.delivery?.snapshot)
+          )
+            throw new Error("Delivery snapshot is immutable");
+        }
         const row = {
           eventId: event.id,
           runId: event.runId,

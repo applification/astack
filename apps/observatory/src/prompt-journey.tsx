@@ -1,6 +1,11 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
-type Bridge = { width: number; height: number; path: string };
+type Bridge = {
+  width: number;
+  height: number;
+  prompt: string | null;
+  result: string | null;
+};
 
 export function PromptJourney({ children }: { children: ReactNode }) {
   const content = useRef<HTMLDivElement>(null);
@@ -11,40 +16,46 @@ export function PromptJourney({ children }: { children: ReactNode }) {
     if (!element) return;
     const prompt = element.querySelector("[data-prompt-card]");
     const root = element.querySelector("[data-map-root]");
-    const viewport = root?.closest(".workflow-map-scroll");
+    const last = [...element.querySelectorAll("[data-map-main]")].at(-1);
+    const result = element.querySelector("[data-result-card]");
+    const viewports = [...element.querySelectorAll(".workflow-map-scroll")];
     let frame = 0;
     const measure = () => {
-      if (!prompt || !root || !viewport) {
-        setBridge(null);
-        return;
-      }
       const bounds = element.getBoundingClientRect();
-      const start = prompt.getBoundingClientRect();
-      const end = root.getBoundingClientRect();
-      const visible = viewport.getBoundingClientRect();
-      const rootX = end.left + end.width / 2;
-      if (
-        rootX < visible.left ||
-        rootX > visible.right ||
-        end.top <= start.bottom
-      ) {
-        setBridge(null);
-        return;
-      }
-      const fromX = start.left + start.width / 2 - bounds.left;
-      const fromY = start.bottom - bounds.top;
-      const toX = rootX - bounds.left;
-      const toY = end.top - bounds.top;
-      const middle = (fromY + toY) / 2;
+      const visible = (node: Element) => {
+        const viewport = node.closest(".workflow-map-scroll");
+        if (!viewport) return false;
+        const rect = node.getBoundingClientRect();
+        const clip = viewport.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        return x >= clip.left && x <= clip.right;
+      };
+      const connect = (
+        from: Element | null | undefined,
+        to: Element | null | undefined,
+      ) => {
+        if (!from || !to) return null;
+        const start = from.getBoundingClientRect();
+        const end = to.getBoundingClientRect();
+        if (end.top <= start.bottom) return null;
+        const fromX = start.left + start.width / 2 - bounds.left;
+        const fromY = start.bottom - bounds.top;
+        const toX = end.left + end.width / 2 - bounds.left;
+        const toY = end.top - bounds.top;
+        const middle = (fromY + toY) / 2;
+        return `M ${fromX} ${fromY} C ${fromX} ${middle}, ${toX} ${middle}, ${toX} ${toY}`;
+      };
       const next = {
         width: bounds.width,
-        height: toY,
-        path: `M ${fromX} ${fromY} C ${fromX} ${middle}, ${toX} ${middle}, ${toX} ${toY}`,
+        height: bounds.height,
+        prompt: root && visible(root) ? connect(prompt, root) : null,
+        result: last && visible(last) ? connect(last, result) : null,
       };
       setBridge((previous) =>
         previous?.width === next.width &&
         previous.height === next.height &&
-        previous.path === next.path
+        previous.prompt === next.prompt &&
+        previous.result === next.result
           ? previous
           : next,
       );
@@ -54,18 +65,16 @@ export function PromptJourney({ children }: { children: ReactNode }) {
       frame = requestAnimationFrame(measure);
     };
     const observer = new ResizeObserver(schedule);
-    observer.observe(element);
-    if (prompt) observer.observe(prompt);
-    if (root) observer.observe(root);
-    if (viewport) {
-      observer.observe(viewport);
+    for (const node of [element, prompt, root, result, last, ...viewports])
+      if (node) observer.observe(node);
+    for (const viewport of viewports)
       viewport.addEventListener("scroll", schedule, { passive: true });
-    }
     measure();
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
-      viewport?.removeEventListener("scroll", schedule);
+      for (const viewport of viewports)
+        viewport.removeEventListener("scroll", schedule);
     };
   }, [children]);
 
@@ -78,7 +87,12 @@ export function PromptJourney({ children }: { children: ReactNode }) {
           height={bridge.height}
           aria-hidden="true"
         >
-          <path d={bridge.path} data-prompt-connection="" />
+          {bridge.prompt && (
+            <path d={bridge.prompt} data-prompt-connection="" />
+          )}
+          {bridge.result && (
+            <path d={bridge.result} data-result-connection="" />
+          )}
         </svg>
       )}
       {children}

@@ -2041,3 +2041,157 @@ test("completed and unavailable children never create an implicit parent join", 
     ),
   ).toBe(0);
 });
+
+test("delivery evidence connects to the last main stop and keeps captured checks separate from current PR state", async ({
+  app,
+  browser,
+  screen,
+}) => {
+  await browser.route("https://raw.githubusercontent.com/**", async (route) => {
+    await route.fulfill({
+      headers: { "content-type": "image/svg+xml" },
+      body: '<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420"><rect width="900" height="420" fill="#eef3f7"/><text x="60" y="90" font-size="28" fill="#1e3548">Saved edits survive reopening</text><path d="M70 160v180" stroke="#499674" stroke-width="5"/><circle cx="70" cy="200" r="12" fill="#eef3f7" stroke="#499674" stroke-width="5"/><text x="105" y="208" font-size="22" fill="#1e3548">Save → reopen → verify</text></svg>',
+    });
+  });
+  await browser.setViewport({ width: 1440, height: 1000 });
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--delivered-result&viewMode=story",
+  );
+  const result = screen.getByRole("region", "Result summary", { exact: true });
+  await expect(
+    result.getByText("Delivered result", { exact: true }),
+  ).toBeVisible();
+  await expect(result.getByRole("region", "Captured PR checks")).toContainText(
+    "1 passed · 1 skipped / neutral",
+  );
+  await expect(
+    result.getByRole("region", "Latest PR observation"),
+  ).toContainText("1 pending");
+  await expect(
+    result.getByRole("region", "Latest PR observation"),
+  ).toContainText("PR has changed since this evidence was captured");
+  await expect(
+    result.getByText("Your review pending", { exact: true }),
+  ).toBeVisible();
+  expect(
+    await result
+      .getByRole("link", "Delivery evidence in trace")
+      .getAttribute("href"),
+  ).toContain("event=");
+  await browser.evaluate(() => {
+    document.querySelector("[data-result-card]")?.scrollIntoView();
+    return true;
+  });
+  await expect
+    .poll(() =>
+      browser.evaluate(() => {
+        const img = document.querySelector(".delivery-image img");
+        return (
+          img instanceof HTMLImageElement &&
+          img.complete &&
+          img.naturalWidth > 0
+        );
+      }),
+    )
+    .toBe(true);
+  const geometry = () =>
+    browser.evaluate(() => {
+      const path = document.querySelector("[data-result-connection]");
+      const last = [...document.querySelectorAll("[data-map-main]")].at(-1);
+      const card = document.querySelector("[data-result-card]");
+      if (
+        !(path instanceof SVGPathElement) ||
+        !last ||
+        !card ||
+        !path.ownerSVGElement
+      )
+        return null;
+      const svg = path.ownerSVGElement.getBoundingClientRect();
+      const from = last.getBoundingClientRect(),
+        to = card.getBoundingClientRect();
+      const start = path.getPointAtLength(0),
+        end = path.getPointAtLength(path.getTotalLength());
+      return {
+        startsAtLastStop:
+          Math.abs(svg.left + start.x - from.left - from.width / 2) < 0.5 &&
+          Math.abs(svg.top + start.y - from.bottom) < 0.5,
+        endsAtResult:
+          Math.abs(svg.left + end.x - to.left - to.width / 2) < 0.5 &&
+          Math.abs(svg.top + end.y - to.top) < 0.5,
+        pageFits: document.documentElement.scrollWidth <= innerWidth,
+      };
+    });
+  const connected = {
+    startsAtLastStop: true,
+    endsAtResult: true,
+    pageFits: true,
+  };
+  await expect.poll(geometry).toEqual(connected);
+  await result.getByText("Captured CI details", { exact: true }).tap();
+  await expect(
+    result.getByText("Save and reopen", { exact: true }),
+  ).toBeVisible();
+  await expect.poll(geometry).toEqual(connected);
+  await browser.setViewport({ width: 390, height: 844 });
+  await expect.poll(geometry).toEqual(connected);
+  await browser.evaluate(() => {
+    const viewport = document.querySelector(".workflow-map-scroll");
+    if (viewport) viewport.scrollLeft = 0;
+    return true;
+  });
+  await expect
+    .poll(() =>
+      browser.evaluate(
+        () => document.querySelectorAll("[data-result-connection]").length,
+      ),
+    )
+    .toBe(0);
+  await browser.evaluate(() => {
+    const viewport = document.querySelector(".workflow-map-scroll");
+    if (viewport)
+      viewport.scrollLeft = (viewport.scrollWidth - viewport.clientWidth) / 2;
+    return true;
+  });
+  await expect.poll(geometry).toEqual(connected);
+});
+test("failed private delivery and missing image previews retain honest evidence links", async ({
+  app,
+  browser,
+  screen,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--private-delivery&viewMode=story",
+  );
+  const result = screen.getByRole("region", "Result summary", { exact: true });
+  await expect(result.getByRole("region", "Captured PR checks")).toContainText(
+    "1 failed · 1 pending",
+  );
+  await expect(result.getByRole("link", "Private screenshot ↗")).toBeVisible();
+  expect(await browser.locator(".delivery-image img").count()).toBe(0);
+  await expect(
+    result.getByText("Private image — open with GitHub access", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await browser.route("https://raw.githubusercontent.com/**", async (route) => {
+    await route.abort();
+  });
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--delivered-result&viewMode=story",
+  );
+  await browser.evaluate(() => {
+    document.querySelector("[data-result-card]")?.scrollIntoView();
+    return true;
+  });
+  await expect(
+    result.getByText("Preview unavailable — open the captured image link", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    result.getByRole("link", "Synthetic saved-edit preview ↗"),
+  ).toBeVisible();
+  await expect(
+    result.getByText("Your review pending", { exact: true }),
+  ).toBeVisible();
+});

@@ -86,3 +86,16 @@ Revision `83b76c979c7e1ed54dc6616e1e92d6ddf10cd4a6` centers the main rail under 
 Revision `474e198110e58d6b25589d1b6264b705d3c05a33` keeps the copy icon and badge dimensions unchanged, with success feedback in a brief toast. The delegated-work label and count sit in a compact card centered above the split. It was deployed to Otis on 2026-10-07. All 38 browser checks and seven live checks pass; native copying in the actual review succeeds without changing the badge. [Copy-toast deployment evidence](../.astack/observatory-journeys/evidence/copy-toast-deployment.json) records before/after rendering, card placement, served hashes and synthetic screenshots.
 
 Revision `63225edff47b7c1aa8084b94400be46d5542fc1e` gives the original request a prompt card, preserving its exact text, paragraph breaks, trace link and agreed scope. A neutral line connects it to astack and follows map panning, scope expansion and resizing. The label remains explicit when the request has no captured source. This UI-only revision was deployed to Otis on 2026-10-07; all 39 browser checks and seven live checks pass. [Prompt-origin deployment evidence](../.astack/observatory-journeys/evidence/prompt-origin-deployment.json) retains geometry observations, served hashes and synthetic screenshots.
+
+### PR delivery evidence
+
+The PR skill can record an existing task PR against a readable evaluation parent run:
+
+```sh
+agentlog delivery capture --run <captured-parent-run-id> --pr https://github.com/<owner>/<repo>/pull/<number>
+agentlog delivery refresh --event <returned-event-id>
+```
+
+Capture uses the machine's existing `gh` access and enforces the run's enrolled project, readable-capture and repository policy. It saves a bounded PR summary, up to 50 checks and four image references. Supported public PNG/JPEG/WebP repository assets at full commit SHAs render inline with a full-image link and captured digest; private, mutable, unavailable and unsupported images remain links. Credentials and arbitrary PR HTML are never sent to the browser. Existing records need no migration.
+
+The bottom result card combines that delivery snapshot with reported evaluation verification. Captured checks/media keep their revisions. Refresh updates only the separately timestamped latest PR observation; it never upgrades verification, changes the captured PR snapshot or assigns an owner grade. A new PR head can be captured as a new delivery record. The record must belong to a parent run already included in the evaluation. A PR skill read or a host's linked-PR metadata alone is not a delivery record.

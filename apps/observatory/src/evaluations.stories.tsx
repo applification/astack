@@ -1,3 +1,4 @@
+import { deliveryFixture } from "@astack/agent-observability/delivery-fixtures";
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import {
@@ -425,6 +426,59 @@ export const UnavailableChildJourney: Story = {
             truncated: false,
           },
         ],
+      },
+    },
+  },
+};
+
+export const DeliveredResult: Story = {
+  args: {
+    detail: {
+      ...detail("pass"),
+      workflow: journeyFixture().workflow,
+      delivery: {
+        runId: evaluationRun().id,
+        eventId: evaluationRun().id + ":delivery",
+        evidence: deliveryFixture(),
+      },
+    },
+  },
+};
+export const PrivateDelivery: Story = {
+  args: {
+    detail: {
+      ...detail("pass"),
+      workflow: workflowViewFixture(),
+      delivery: {
+        runId: evaluationRun().id,
+        eventId: evaluationRun().id + ":delivery",
+        evidence: {
+          ...deliveryFixture(),
+          snapshot: {
+            ...deliveryFixture().snapshot,
+            visibility: "private",
+            media: [
+              {
+                kind: "link",
+                label: "Private screenshot",
+                url:
+                  "https://github.com/applification/astack/blob/" +
+                  "a".repeat(40) +
+                  "/.proof/saved-edit.png",
+                reason: "Private image — open with GitHub access",
+              },
+            ],
+            checks: [
+              {
+                name: "Save and reopen",
+                status: "completed",
+                conclusion: "failure",
+                url: null,
+              },
+              { name: "Review", status: "queued", conclusion: null, url: null },
+            ],
+          },
+        },
       },
     },
   },

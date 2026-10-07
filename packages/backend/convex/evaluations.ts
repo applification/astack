@@ -36,6 +36,7 @@ import type { Doc } from "./_generated/dataModel";
 import { getProject } from "./projectData";
 import { resolveProject } from "@astack/agent-observability/projects";
 import { evaluationWorkflow } from "./evaluationWorkflow";
+import { evaluationDelivery } from "./evaluationDelivery";
 
 const snapshotSchema = evaluationDetailSchema.pick({
   runs: true,
@@ -350,6 +351,7 @@ export const detail = query({
         ...snapshot,
         timeline,
         workflow: await evaluationWorkflow(ctx, snapshot.runs, project),
+        delivery: await evaluationDelivery(ctx, snapshot.runs, project),
         feedback: feedback
           .slice(0, 20)
           .map((item) => outcomeFeedbackSchema.parse(JSON.parse(item.data))),

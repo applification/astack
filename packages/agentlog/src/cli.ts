@@ -28,6 +28,7 @@ import {
 } from "@astack/agent-observability/evaluations";
 import { savedEditProof, proofVariantSchema } from "./evaluation-proof";
 import { recordWorkflow } from "./workflow";
+import { recordPrDelivery, refreshPrDelivery } from "./pr-evidence";
 import {
   routeSchema,
   routeDefinitions,
@@ -39,6 +40,39 @@ const program = new Command()
   .version("0.1.0")
   .option("--state <directory>", "Private state directory", defaultStateDir());
 const state = () => resolve(z.string().parse(program.opts().state));
+const delivery = program
+  .command("delivery")
+  .description(
+    "Capture revision-pinned PR evidence using this machine's existing gh access",
+  );
+async function deliveryStore<T>(action: (store: LocalStore) => Promise<T>) {
+  const config = await loadConfig(state());
+  const store = new LocalStore(state(), [
+    ...environmentSecrets(process.env),
+    await readSecretFile(config.tokenFile),
+    ...(await Promise.all(config.secretFiles.map(readSecretFile))),
+  ]);
+  try {
+    process.stdout.write(JSON.stringify(await action(store)) + "\n");
+  } finally {
+    store.close();
+  }
+}
+delivery
+  .command("capture")
+  .requiredOption("--run <id>", "Captured parent run ID")
+  .requiredOption("--pr <url>", "The task's existing GitHub PR URL")
+  .action(async (options: unknown) => {
+    const args = z.object({ run: z.string(), pr: z.string() }).parse(options);
+    await deliveryStore((store) => recordPrDelivery(store, args.run, args.pr));
+  });
+delivery
+  .command("refresh")
+  .requiredOption("--event <id>", "Existing delivery event ID")
+  .action(async (options: unknown) => {
+    const args = z.object({ event: z.string() }).parse(options);
+    await deliveryStore((store) => refreshPrDelivery(store, args.event));
+  });
 const evaluations = program
   .command("evaluation")
   .description("Check or queue immutable intent and verification snapshots");

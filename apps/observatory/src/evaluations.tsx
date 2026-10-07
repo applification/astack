@@ -25,13 +25,13 @@ import {
   feedbackLabels,
   runLink,
   textPreview,
-  VerificationEvidence,
   verdictLabel,
   WorkTimeline,
 } from "./evaluation-evidence";
 import { OutcomeFeedbackForm } from "./outcome-feedback";
 import { WorkflowEvidence } from "./workflow-evidence";
 import { PromptJourney } from "./prompt-journey";
+import { DeliveryResult } from "./delivery-result";
 
 export const evaluationLink = (id: string, projectId: string) =>
   "#evaluation/" +
@@ -483,16 +483,6 @@ export function EvaluationView({
 }) {
   const { evaluation, feedback } = detail;
   const verification = evaluateProof(evaluation);
-  const resultStep = [...detail.runs]
-    .sort((a, b) => b.run.startedAt - a.run.startedAt)
-    .map(({ run }) => detail.timeline.find((step) => step.runId === run.id))
-    .find((step) => step?.response);
-  const checkStatus =
-    verification.verdict === "pass"
-      ? "Checks passed"
-      : verification.verdict === "fail"
-        ? "Checks found a problem"
-        : "Checks incomplete";
   return (
     <div className="evaluation-page">
       <p className="eyebrow">Evaluation</p>
@@ -543,51 +533,8 @@ export function EvaluationView({
           </div>
         </section>
         <WorkflowEvidence detail={detail} />
+        <DeliveryResult detail={detail} />
       </PromptJourney>
-      <section className="evaluation-result" aria-label="Result summary">
-        <h2>Result</h2>
-        {resultStep?.response ? (
-          <>
-            <p>{textPreview(resultStep.response.text, 320)}</p>
-            <a
-              href={runLink(
-                resultStep.runId,
-                evaluation.projectId,
-                resultStep.response.eventId,
-              )}
-            >
-              Read the agent’s response
-            </a>
-          </>
-        ) : (
-          <p>
-            No response excerpt available. The work and verification evidence
-            are linked below.
-          </p>
-        )}
-        <div className="tag-list">
-          <span
-            className={
-              verification.verdict === "fail"
-                ? "text-destructive"
-                : verification.verdict === "pass"
-                  ? "text-success"
-                  : "text-muted-foreground"
-            }
-          >
-            <Badge>{checkStatus}</Badge>
-          </span>
-          <Badge>
-            {feedback[0]
-              ? "Your review: " + feedbackLabels[feedback[0].choice]
-              : "Your review pending"}
-          </Badge>
-          <Badge>{evaluation.runIds.length} captured turns</Badge>
-        </div>
-        <p className="secondary">
-          The agent’s response and reported checks are evidence for your review.
-        </p>
-      </section>
       {detail.workflow.records.length > 0 ? (
         <>
           <details className="evaluation-disclosure">
@@ -600,7 +547,6 @@ export function EvaluationView({
       ) : (
         <WorkTimeline detail={detail} />
       )}
-      <VerificationEvidence evaluation={evaluation} />
       {saveFeedback && (
         <OutcomeFeedbackForm key={evaluation.id} save={saveFeedback} />
       )}

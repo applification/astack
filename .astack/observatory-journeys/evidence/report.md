@@ -97,3 +97,13 @@ Otis serves HTML, JavaScript and CSS matching the production build. All seven li
 
 - [Prompt flowing into astack and the route map](prompt-origin-light.png): synthetic T3 browser capture, 1600 × 2100 viewport saved at 1280 × 1680.
 - [Narrow dark prompt and its connection to astack](prompt-origin-narrow-dark.png): synthetic T3 browser capture, 390 × 844 viewport saved at 780 × 1688.
+
+## Delivered result and explicit PR evidence
+
+The result is now a centered card connected to the last visible main stop, with the delivered summary, task PR, revision-pinned screenshot and verification links. CI at capture and the timestamped latest PR observation remain separate. Owner review is unchanged. The PR skill records the portable delivery handoff through `agentlog delivery capture`; refresh changes only the latest observation.
+
+D1–D4 pass strict types and 107 domain/collector/native Convex regressions (637 assertions), UI lint, site/plugin checks and the built Storybook suite: 41 cases pass in run `01a115b6-6e99-7fda-80ee-5d0c452b842b`. The selected stories are `observatory-evaluations--delivered-result` and `--private-delivery`. Tests exercise immutable capture/restart, same-repository/readable and owner boundaries, pending/failed/skipped CI, private and unavailable images, and connector geometry after image load, expansion, narrow resize and panning. Existing 39 journeys still pass.
+
+The initial new browser checks identified a missing accessible region role and an unsuitable single-line fixture for an offscreen-branch assertion. The regions now expose their labels; the geometry fixture has actual parallel lanes. The final run passes without retries. Local Convex function preparation passes against the workspace's named anonymous loopback deployment. The completed `convex:convex-reviewer` checklist found the direct-ingest byte budget asymmetry, now fixed; no unresolved findings remain. Pen is skipped on the owner's approved rendered concept.
+
+Selected synthetic Storybook captures show [the result card](delivery-result-light.png) and [its narrow layout](delivery-result-narrow.png). The public PR image is an existing immutable synthetic capture; test CI, revisions and task metadata are fixture values. PR delivery does not infer success or assign owner grades. Actual trace pixels stay private. D5 and deployment identities are recorded after the Otis rollout below.
