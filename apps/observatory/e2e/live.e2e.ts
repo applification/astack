@@ -22,7 +22,7 @@ test("deployed astack workflow connects the actual route, phases and evidence wi
     ),
   ).toBeVisible();
   await expect(
-    screen.getByText("astack → New feature", { exact: true }),
+    screen.getByRole("heading", "New feature", { exact: true }),
   ).toBeVisible();
   await expect(
     screen.getByRole("heading", "Path taken", { exact: true }),
@@ -30,13 +30,8 @@ test("deployed astack workflow connects the actual route, phases and evidence wi
   await expect(
     screen.getByRole("heading", "How the work unfolded"),
   ).not.toBeVisible();
-  await expect(
-    screen.getByRole("button", "View PR across this flow"),
-  ).toBeVisible();
-  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
-  await expect(
-    screen.getByRole("list", "Recorded skill sequence"),
-  ).toBeVisible();
+  await expect(screen.getByRole("button", "View PR in Review")).toBeVisible();
+  await expect(screen.getByRole("region", "Workflow map")).toBeVisible();
   await screen
     .getByRole("button", "View Testing in Verify", { exact: true })
     .tap();
@@ -67,10 +62,8 @@ test("deployed astack workflow connects the actual route, phases and evidence wi
   await expect(
     screen.getByRole("heading", "How the work unfolded"),
   ).toBeVisible();
-  await screen.getByText("Route selection evidence", { exact: true }).tap();
   await screen
-    .getByRole("link", "Declaration in trace", { exact: true })
-    .first()
+    .getByRole("link", "Route selection in trace", { exact: true })
     .tap();
   await expect(
     screen.getByRole("heading", "Workflow annotation", { exact: true }),
@@ -85,10 +78,7 @@ test("deployed astack workflow connects the actual route, phases and evidence wi
   ).toBe(true);
   await browser.back();
   await browser.setViewport({ width: 390, height: 844 });
-  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
-  await expect(
-    screen.getByRole("list", "Recorded skill sequence"),
-  ).toBeVisible();
+  await expect(screen.getByRole("region", "Workflow map")).toBeVisible();
   expect(
     await browser.evaluate(
       () =>
@@ -544,4 +534,85 @@ test("private deployment gates access and supports live run/trace/work/skills na
   await expect(screen.getByRole("heading", "Private Observatory")).toHaveCount(
     0,
   );
+});
+
+test("deployed delivery card loads the actual PR screenshot and connects at desktop and narrow widths", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  const evaluationId =
+    "bbb1fd30-527f-4326-b685-fb9c2e021092:evaluation:5b418a24-5832-4a67-a362-d83c346ff7ed";
+  await browser.setViewport({ width: 1440, height: 1000 });
+  await app.open(
+    "/#evaluation/" +
+      encodeURIComponent(evaluationId) +
+      "?project=a20a2fb3-646f-40fe-9b12-c64f759afaea",
+  );
+  await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
+  await screen.getByRole("button", "Open Observatory").tap();
+  const result = screen.getByRole("region", "Result summary", { exact: true });
+  await expect(
+    result.getByText("Delivered result", { exact: true }),
+  ).toBeVisible();
+  expect(
+    await result
+      .getByRole(
+        "link",
+        "#26 · Follow agent route journeys from prompt to delivery evidence",
+      )
+      .getAttribute("href"),
+  ).toBe("https://github.com/applification/astack/pull/26");
+  await browser.evaluate(() => {
+    document.querySelector("[data-result-card]")?.scrollIntoView();
+    return true;
+  });
+  const geometry = () =>
+    browser.evaluate(() => {
+      const image = document.querySelector(".delivery-image img"),
+        path = document.querySelector("[data-result-connection]"),
+        card = document.querySelector("[data-result-card]"),
+        last = [...document.querySelectorAll("[data-map-main]")].at(-1);
+      if (
+        !(image instanceof HTMLImageElement) ||
+        !(path instanceof SVGPathElement) ||
+        !card ||
+        !last ||
+        !path.ownerSVGElement
+      )
+        return null;
+      const svg = path.ownerSVGElement.getBoundingClientRect(),
+        a = last.getBoundingClientRect(),
+        b = card.getBoundingClientRect(),
+        p = path.getPointAtLength(0),
+        q = path.getPointAtLength(path.getTotalLength());
+      return {
+        imageLoaded: image.complete && image.naturalWidth > 0,
+        immutableImage: /\/applification\/astack\/[a-f0-9]{40}\//.test(
+          image.src,
+        ),
+        start:
+          Math.abs(svg.left + p.x - a.left - a.width / 2) < 0.5 &&
+          Math.abs(svg.top + p.y - a.bottom) < 0.5,
+        end:
+          Math.abs(svg.left + q.x - b.left - b.width / 2) < 0.5 &&
+          Math.abs(svg.top + q.y - b.top) < 0.5,
+        pageFits: document.documentElement.scrollWidth <= innerWidth,
+      };
+    });
+  const connected = {
+    imageLoaded: true,
+    immutableImage: true,
+    start: true,
+    end: true,
+    pageFits: true,
+  };
+  await expect.poll(geometry, { timeout: 15000 }).toEqual(connected);
+  await expect(
+    result.getByText("Your review pending", { exact: true }),
+  ).toBeVisible();
+  await result.getByText("Captured CI details", { exact: true }).tap();
+  await expect.poll(geometry).toEqual(connected);
+  await browser.setViewport({ width: 390, height: 844 });
+  await expect.poll(geometry).toEqual(connected);
 });

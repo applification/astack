@@ -113,3 +113,37 @@ test("flow judgments need captured trace references and remain independent of ou
     }),
   ).toThrow("outside");
 });
+
+test("sibling journeys and retries pair by conversation across turns without inventing a join", async () => {
+  const { journeyFixture } = await import("./journey-fixtures");
+  const capture = journeyFixture(false).workflow;
+  const flows = workflowFlows(
+    capture.branches.flatMap((branch) => branch.records).reverse(),
+  );
+  expect(flows).toHaveLength(2);
+  expect(
+    flows.flatMap((flow) =>
+      flow.nodes.flatMap((node) =>
+        node.kind === "phase" ? [node.status] : [],
+      ),
+    ),
+  ).toEqual(["failed", "completed", "completed"]);
+  for (const flow of flows)
+    for (const node of flow.nodes)
+      if (node.kind === "phase") {
+        expect(
+          new Set(node.records.map((record) => record.sessionId)).size,
+        ).toBe(1);
+        expect(node.records).toHaveLength(2);
+      }
+  expect(
+    workflowFlows(capture.records)
+      .flatMap((flow) => flow.nodes)
+      .some((node) => node.kind === "join"),
+  ).toBe(false);
+  expect(
+    workflowFlows(journeyFixture().workflow.records)
+      .flatMap((flow) => flow.nodes)
+      .filter((node) => node.kind === "join"),
+  ).toHaveLength(1);
+});

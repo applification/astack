@@ -251,7 +251,11 @@ export function Trace({
                     <Badge>
                       {event.workflow.action === "phase"
                         ? event.workflow.phase + " · " + event.workflow.status
-                        : event.workflow.route + " · " + event.workflow.action}
+                        : event.workflow.action === "join"
+                          ? "Parent join declared"
+                          : event.workflow.route +
+                            " · " +
+                            event.workflow.action}
                     </Badge>
                   )}
                   <span className="event-kind">

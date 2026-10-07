@@ -735,3 +735,67 @@ test("an approved parent restores early hook events and work bindings cannot rep
   expect(store.pending()).toBe(0);
   store.close();
 });
+
+test("native spawn completion records a delegated identity without claiming a child result or a parent join", async () => {
+  const config = configSchema.parse({
+    schemaVersion: 1,
+    machineId: "00000000-0000-4000-8000-000000000001",
+    machineName: "Fixture",
+    endpoint: "http://127.0.0.1:1/agentlog/ingest",
+    tokenFile: "/fixture/token",
+    homes: [{ path: "/fixture", label: "fixture" }],
+    since: 0,
+  });
+  const snapshot = await normalizeTurn({
+    thread: threadSchema.parse({
+      id: "parent",
+      cwd: "/fixture",
+      source: "cli",
+      cliVersion: "fixture",
+      createdAt: 1,
+      updatedAt: 2,
+    }),
+    turn: turnSchema.parse({
+      id: "turn",
+      status: "completed",
+      startedAt: 1,
+      completedAt: 2,
+      items: [
+        {
+          id: "spawn",
+          type: "collabAgentToolCall",
+          tool: "spawnAgent",
+          status: "completed",
+          receiverThreadIds: ["child"],
+        },
+        {
+          id: "wait",
+          type: "collabAgentToolCall",
+          tool: "wait",
+          status: "completed",
+          receiverThreadIds: ["child"],
+        },
+      ],
+    }),
+    machine: config,
+    signatureKey: "fixture",
+    observedAt: 2000,
+  });
+  expect(snapshot.run.delegations).toMatchObject([
+    {
+      child: { kind: "codex", sessionId: "child" },
+      status: "unknown",
+      startedAt: null,
+      completedAt: null,
+    },
+  ]);
+  expect(
+    snapshot.events.filter((event) => event.kind === "subagent_result"),
+  ).toEqual([]);
+  expect(
+    snapshot.events.filter((event) => event.tool === "spawnAgent"),
+  ).toMatchObject([{ kind: "tool_result", data: { status: "completed" } }]);
+  expect(
+    snapshot.events.some((event) => event.workflow?.action === "join"),
+  ).toBe(false);
+});

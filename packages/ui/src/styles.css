@@ -237,6 +237,9 @@
   min-width: 0;
   max-width: 1320px;
   margin-inline: auto;
+  &:has(.evaluation-page) {
+    max-width: 1540px;
+  }
 }
 @utility eyebrow {
   color: var(--color-muted-foreground);
@@ -430,9 +433,39 @@
   gap: 0.2rem;
   flex-wrap: wrap;
 }
-@utility copy-feedback {
-  color: var(--color-muted-foreground);
-  font-size: 0.7rem;
+@utility copy-toast {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 80;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  max-width: min(24rem, calc(100vw - 2rem));
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-card);
+  color: var(--color-foreground);
+  box-shadow: 0 4px 18px rgb(0 0 0 / 15%);
+  font-size: 0.875rem;
+  & > div {
+    min-width: 0;
+    align-self: center;
+  }
+  & p {
+    margin: 0;
+  }
+  & code {
+    display: block;
+    margin-top: 0.4rem;
+    overflow-wrap: anywhere;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+  & button {
+    flex-shrink: 0;
+  }
 }
 @utility help-trigger {
   display: inline-flex;
@@ -647,8 +680,11 @@
   gap: 1rem;
 }
 @utility evaluation-page {
-  max-width: 900px;
+  max-width: 1440px;
   overflow-wrap: anywhere;
+  & > section:not(.workflow-section) {
+    max-width: 900px;
+  }
   & h3 {
     font-size: 1.05rem;
     font-weight: 600;
@@ -729,51 +765,166 @@
 @utility workflow-section {
   margin-block: 1.5rem;
 }
-@utility workflow-selection {
-  padding: 1rem 1.2rem;
-  border: 1px solid var(--color-border);
-  border-radius: 0.5rem;
-  background: var(--color-card);
-  & p {
-    margin-bottom: 0.5rem;
-  }
-  & summary {
-    font-size: 0.85rem;
-    color: var(--color-link);
+@utility prompt-journey {
+  position: relative;
+  & > section {
+    position: relative;
+    z-index: 1;
   }
 }
-@utility astack-flow {
-  list-style: none;
-  padding: 0;
-  & > li {
-    position: relative;
-    padding: 0 0 1.3rem 1.4rem;
-    margin-left: 0.3rem;
-    border-left: 1px solid var(--color-border);
+@utility prompt-journey-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  & path {
+    fill: none;
+    stroke: var(--color-muted-foreground);
+    stroke-width: 2;
+    stroke-linecap: round;
+    opacity: 0.45;
   }
-  & > li::before {
-    content: "";
-    position: absolute;
-    top: 0.45rem;
-    left: -5px;
-    width: 9px;
-    height: 9px;
-    background: var(--color-link);
-    border-radius: 50%;
+}
+@utility evaluation-prompt {
+  width: min(100%, 760px);
+  margin-inline: auto;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.65rem;
+  background: var(--color-card);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 3%);
+  @media (max-width: 600px) {
+    padding: 1rem;
   }
-  & > li:last-child {
-    border-left-color: transparent;
+}
+@utility evaluation-prompt-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-muted-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  & svg {
+    flex-shrink: 0;
   }
-  & h4 {
+}
+@utility evaluation-prompt-text {
+  margin: 1rem 0;
+  padding-left: 1rem;
+  border-left: 2px solid var(--color-link);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+@utility evaluation-prompt-context {
+  font-size: 0.8rem;
+  & .metadata-details {
+    margin-top: 0.65rem;
+  }
+  & .secondary {
     margin: 0;
   }
+}
+@utility delivery-result {
+  width: min(100%, 760px);
+  margin: 2rem auto 0;
+  padding: 1.25rem 1.5rem;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 0.65rem;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 3%);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+  & .tag-list {
+    margin-block: 1rem;
+  }
+  & .secondary {
+    font-size: 0.78rem;
+  }
+  & .evaluation-checks {
+    margin-block: 1rem;
+  }
+  @media (max-width: 600px) {
+    padding: 1rem;
+  }
+}
+@utility delivery-summary {
+  margin-block: 1rem;
+  line-height: 1.7;
+}
+@utility delivery-pr {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding-block: 0.85rem;
+  border-top: 1px solid var(--color-border);
+  & svg {
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+  & a {
+    font-weight: 600;
+  }
   & p {
-    margin: 0.35rem 0 0.6rem;
+    margin: 0.35rem 0;
   }
-  & summary {
-    font-size: 0.85rem;
-    color: var(--color-link);
+}
+@utility delivery-revision {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  white-space: nowrap;
+}
+@utility delivery-image {
+  margin: 0.65rem 0 1rem;
+  & img {
+    width: 100%;
+    height: auto;
+    max-height: 340px;
+    object-fit: cover;
+    object-position: top;
+    border: 1px solid var(--color-border);
+    border-radius: 0.45rem;
+    background: var(--color-background);
   }
+  & figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 0.45rem;
+    color: var(--color-muted-foreground);
+    font-size: 0.75rem;
+  }
+}
+@utility delivery-media-link {
+  font-size: 0.8rem;
+}
+@utility delivery-verification {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: baseline;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--color-border);
+}
+@utility delivery-current {
+  margin-block: 1rem;
+  padding-block: 0.75rem;
+  border-block: 1px solid var(--color-border);
+  font-size: 0.8rem;
+  & p {
+    margin: 0.35rem 0 0;
+  }
+}
+@utility delivery-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  font-size: 0.8rem;
 }
 @utility workflow-phase-heading {
   display: flex;
@@ -809,27 +960,6 @@
     filter: invert(1);
   }
 }
-@utility workflow-skill-overview {
-  margin-bottom: 1.2rem;
-  & > p {
-    margin-bottom: 0.35rem;
-  }
-}
-@utility workflow-view-toggle {
-  display: flex;
-  gap: 0.5rem;
-  border-bottom: 1px solid var(--color-border);
-  margin-bottom: 1rem;
-  & button {
-    border-radius: 0;
-    border-bottom: 2px solid transparent;
-  }
-  & button[aria-pressed="true"] {
-    border-bottom-color: var(--color-link);
-    color: var(--color-foreground);
-    font-weight: 600;
-  }
-}
 @utility workflow-skill-evidence {
   padding: 0.75rem 1rem;
   margin-block: 0.75rem;
@@ -847,38 +977,6 @@
     width: 1.25rem;
     height: 1.25rem;
     color: var(--color-link);
-  }
-}
-@utility workflow-sequence-time {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--color-muted-foreground);
-  margin-left: auto;
-}
-@utility skill-sequence {
-  & > li {
-    padding: 0 0 1rem 2rem;
-    margin-left: 0.8rem;
-  }
-  & > li::before {
-    content: attr(data-step);
-    width: 1.6rem;
-    height: 1.6rem;
-    left: -0.8rem;
-    top: 0;
-    display: grid;
-    place-items: center;
-    background: var(--color-card);
-    color: var(--color-muted-foreground);
-    border: 1px solid var(--color-border);
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-  }
-  & .skill-badges {
-    padding: 0.6rem;
-    border: 1px solid var(--color-border);
-    border-radius: 0.5rem;
-    background: var(--color-card);
   }
 }
 @utility workflow-record {
@@ -1002,5 +1100,277 @@
   }
   h1:not(.run-heading) {
     font-size: 3rem;
+  }
+}
+
+@utility workflow-map-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  padding: 0.5rem 0 1rem;
+  &:focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 4px;
+  }
+}
+@utility workflow-map {
+  --journey-color: #6f8eb2;
+  position: relative;
+  width: max-content;
+  min-width: 100%;
+  &[data-route="implement"] {
+    --journey-color: #4b916f;
+  }
+  &[data-route="bug-fix"] {
+    --journey-color: #d7775f;
+  }
+  &[data-route="investigate"] {
+    --journey-color: #8875a6;
+  }
+  &[data-route="performance"] {
+    --journey-color: #b78b3e;
+  }
+  &[data-route="pr"] {
+    --journey-color: #5b9d9b;
+  }
+}
+@utility workflow-map-grid {
+  --map-lane-width: clamp(264px, calc((100vw - 12rem) / 4), 320px);
+  --map-fork-header-height: 4.5rem;
+  display: grid;
+  width: max-content;
+  margin-inline: auto;
+  grid-template-columns: repeat(var(--map-lane-count), var(--map-lane-width));
+  column-gap: 2.5rem;
+  padding: 0 1rem 0 var(--map-lane-width);
+  position: relative;
+  align-items: stretch;
+}
+@utility workflow-map-lines {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+  & path {
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+}
+@utility map-root {
+  grid-column: var(--map-main-column);
+  grid-row: 1;
+  padding: 0 0 3rem;
+  & > span {
+    display: inline-flex;
+    margin-left: 8.5px;
+    transform: translateX(-50%);
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.8rem 1.2rem;
+    border-radius: 0.35rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-card);
+    color: var(--color-foreground);
+    font-weight: 700;
+    font-family: var(--font-mono);
+  }
+  & svg {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+}
+@utility map-station {
+  position: relative;
+  padding: 0 0 1.75rem 2.1rem;
+  min-width: 0;
+  & h4,
+  & h5 {
+    margin: 0;
+  }
+  & > p {
+    margin: 0.45rem 0 0.6rem;
+  }
+  & a {
+    overflow-wrap: anywhere;
+  }
+  & .skill-badges {
+    gap: 0.35rem;
+  }
+  & button {
+    white-space: normal;
+  }
+  &[data-status="failed"] > .map-stop {
+    background: var(--color-destructive);
+  }
+  &[data-status="omitted"] > .map-stop {
+    border-style: dashed;
+  }
+}
+@utility map-stop {
+  position: absolute;
+  top: 0.15rem;
+  left: 0;
+  width: 17px;
+  height: 17px;
+  border: 3px solid var(--child-color, var(--journey-color));
+  border-radius: 50%;
+  background: var(--color-background);
+}
+@utility map-route-heading {
+  grid-column: var(--map-main-column);
+  grid-row: 2;
+  padding-bottom: 2rem;
+  & h3 {
+    display: inline-block;
+    margin: -0.45rem 0 0.3rem;
+    padding: 0.55rem 0.8rem;
+    border-radius: 0.3rem;
+    background: var(--journey-color);
+    color: #fff;
+    font-size: 1rem;
+  }
+}
+@utility map-status {
+  font-size: 0.78rem;
+}
+@utility map-description {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+@utility map-revision {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  vertical-align: middle;
+  max-width: 100%;
+  padding-left: 0.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.3rem;
+  background: var(--color-card);
+  font-size: 0.75rem;
+  & code {
+    font-family: var(--font-mono);
+  }
+  & .copy-value {
+    min-width: 0;
+  }
+}
+@utility map-evidence-link {
+  display: block;
+  font-size: 0.78rem;
+  margin-top: 0.45rem;
+}
+@utility map-caption {
+  font-size: 0.8rem;
+}
+@utility journey-child {
+  grid-column: var(--map-column);
+  grid-row: var(--map-row);
+  --child-color: #6776c9;
+  position: relative;
+  padding-top: calc(3.5rem + var(--map-fork-header-height));
+  padding-bottom: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  &[data-side="left"] {
+    transform: translateX(calc(-100% + 17px));
+    text-align: right;
+    & .skill-badges {
+      justify-content: flex-end;
+    }
+    & .map-station {
+      padding-left: 0;
+      padding-right: 2.1rem;
+    }
+    & .map-stop {
+      left: auto;
+      right: 0;
+    }
+    & .child-read-stops > h5 {
+      padding-left: 0;
+      padding-right: 2.1rem;
+    }
+  }
+  &[data-color="1"] {
+    --child-color: #b78b3e;
+  }
+  &[data-color="2"] {
+    --child-color: #8875a6;
+  }
+  &[data-color="3"] {
+    --child-color: #d7775f;
+  }
+  &[data-color="4"] {
+    --child-color: #6f8eb2;
+  }
+}
+@utility child-phase-stops {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+@utility child-read-stops {
+  & > h5 {
+    padding-left: 2.1rem;
+    margin: 0 0 0.75rem;
+  }
+}
+@utility journey-skill-read {
+  padding-bottom: 1.2rem;
+}
+@utility journey-child-end {
+  margin-top: auto;
+  & > .map-station:last-child {
+    padding-bottom: 0;
+  }
+}
+@utility journey-join {
+  & > .map-stop {
+    outline: 2px solid var(--journey-color);
+    outline-offset: 3px;
+  }
+}
+
+@utility map-main-cell {
+  grid-column: var(--map-main-column);
+  grid-row: var(--map-row);
+}
+@utility journey-child-heading {
+  padding-bottom: 1.75rem;
+}
+@utility journey-delegation-station {
+  &.map-station {
+    padding: 0 0 3rem;
+  }
+  & > .map-stop {
+    top: auto;
+    bottom: 1rem;
+  }
+}
+@utility journey-delegation-card {
+  position: relative;
+  left: 8.5px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.125rem;
+  width: max-content;
+  max-width: var(--map-lane-width);
+  min-height: var(--map-fork-header-height);
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.4rem;
+  background: var(--color-card);
+  text-align: center;
+  & h4 {
+    font-size: 0.875rem;
+  }
+  & p {
+    margin: 0;
+    font-size: 0.78rem;
   }
 }

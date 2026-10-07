@@ -1,6 +1,131 @@
 import { test } from "@e2e-dev/web";
 import { expect } from "e2e";
-test("skill sequence keeps grouped declarations and repeated attempts, with focused evidence and keyboard return", async ({
+test("the original prompt leads into the map and stays connected through scope, pan and resize", async ({
+  app,
+  browser,
+  screen,
+}) => {
+  await browser.setViewport({ width: 1600, height: 1000 });
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--prompt-origin&viewMode=story",
+  );
+  const intent = screen.getByRole("region", "Original intent", { exact: true });
+  await expect(intent.getByText("User prompt", { exact: true })).toBeVisible();
+  await expect(
+    intent.getByRole("link", "Original request in trace"),
+  ).toBeVisible();
+  expect(
+    await intent
+      .getByRole("link", "Original request in trace")
+      .getAttribute("href"),
+  ).toContain("event=");
+  expect(
+    await browser.evaluate(() => ({
+      text:
+        document.querySelector(".evaluation-prompt-text")?.textContent ?? null,
+      quoted:
+        document.querySelector(".evaluation-prompt-text")?.tagName ===
+        "BLOCKQUOTE",
+      editable:
+        document.querySelector(
+          "[data-prompt-card] input, [data-prompt-card] textarea, [data-prompt-card] [contenteditable=true]",
+        ) !== null,
+    })),
+  ).toEqual({
+    text: "Add a route map that shows how a request moves through the agent’s work.\n\nKeep the main journey in the centre. Show delegated work on separate branches, then join the results back into the main line.\n\nKeep the skill evidence easy to open, with enough context to understand each step.",
+    quoted: true,
+    editable: false,
+  });
+  const connection = () =>
+    browser.evaluate(() => {
+      const path = document.querySelector("[data-prompt-connection]");
+      const prompt = document.querySelector("[data-prompt-card]");
+      const root = document.querySelector("[data-map-root]");
+      if (!(path instanceof SVGPathElement) || !prompt || !root) return null;
+      const svg = path.ownerSVGElement;
+      if (!svg) return null;
+      const origin = svg.getBoundingClientRect();
+      const card = prompt.getBoundingClientRect();
+      const target = root.getBoundingClientRect();
+      const start = path.getPointAtLength(0);
+      const end = path.getPointAtLength(path.getTotalLength());
+      return {
+        startsAtPrompt:
+          Math.abs(origin.left + start.x - card.left - card.width / 2) < 0.5 &&
+          Math.abs(origin.top + start.y - card.bottom) < 0.5,
+        endsAtAgent:
+          Math.abs(origin.left + end.x - target.left - target.width / 2) <
+            0.5 && Math.abs(origin.top + end.y - target.top) < 0.5,
+        cardFits: card.left >= 0 && card.right <= innerWidth,
+        pageFits: document.documentElement.scrollWidth <= innerWidth,
+      };
+    });
+  const connected = {
+    startsAtPrompt: true,
+    endsAtAgent: true,
+    cardFits: true,
+    pageFits: true,
+  };
+  await expect.poll(connection).toEqual(connected);
+  await intent
+    .getByText("Agreed scope · 2 clarifications", { exact: true })
+    .tap();
+  await expect(
+    intent.getByText("Keep the map expanded and scrollable.", { exact: true }),
+  ).toBeVisible();
+  await expect.poll(connection).toEqual(connected);
+  await browser.evaluate(() => {
+    const viewport = document.querySelector(".workflow-map-scroll");
+    if (viewport) viewport.scrollLeft += 50;
+    return true;
+  });
+  await expect.poll(connection).toEqual(connected);
+  await browser.setViewport({ width: 390, height: 844 });
+  await expect.poll(connection).toEqual(connected);
+  await browser.evaluate(() => {
+    const viewport = document.querySelector(".workflow-map-scroll");
+    if (viewport) viewport.scrollLeft = 0;
+    return true;
+  });
+  await expect
+    .poll(() =>
+      browser.evaluate(
+        () => document.querySelectorAll("[data-prompt-connection]").length,
+      ),
+    )
+    .toBe(0);
+  await browser.evaluate(() => {
+    const viewport = document.querySelector(".workflow-map-scroll");
+    if (viewport)
+      viewport.scrollLeft = (viewport.scrollWidth - viewport.clientWidth) / 2;
+    return true;
+  });
+  await expect.poll(connection).toEqual(connected);
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--new-feature-flow&viewMode=story",
+  );
+  await expect(
+    screen.getByText("Declared request", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("link", "Original request in trace"),
+  ).toHaveCount(0);
+  await expect.poll(connection).toEqual(connected);
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--awaiting-review&viewMode=story",
+  );
+  await expect(
+    screen.getByRole("heading", "Original intent", { exact: true }),
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      browser.evaluate(
+        () => document.querySelectorAll("[data-prompt-connection]").length,
+      ),
+    )
+    .toBe(0);
+});
+test("one connected map keeps repeated attempts and scoped skill evidence with keyboard return", async ({
   app,
   screen,
   browser,
@@ -9,28 +134,24 @@ test("skill sequence keeps grouped declarations and repeated attempts, with focu
     "/iframe.html?id=observatory-evaluations--bug-fix-flow&viewMode=story",
   );
   await expect(
-    screen.getByRole("button", "View Verify across this flow"),
+    screen.getByRole("heading", "Bug fix", { exact: true }),
   ).toBeVisible();
-  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
-  await expect(screen.getByRole("button", "Skill sequence")).toHaveAttribute(
-    "aria-pressed",
-    "true",
-  );
   await expect(
-    screen.getByText("their order within it is unknown", { exact: false }),
-  ).toBeVisible();
+    screen.getByRole("button", "Skill sequence", { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    screen.getByText("Skills in this flow", { exact: true }),
+  ).toHaveCount(0);
   expect(
     await browser.evaluate(() =>
-      [
-        ...document.querySelectorAll(
-          '[aria-label="Recorded skill sequence"] > li',
-        ),
-      ].map((item) => ({
-        phase: item.querySelector("h4")?.textContent ?? null,
-        skills: [...item.querySelectorAll(".skill-badges button")].map(
-          (button) => button.textContent,
-        ),
-      })),
+      [...document.querySelectorAll(".map-main-cell [data-status]")].map(
+        (item) => ({
+          phase: item.querySelector("h4")?.textContent ?? null,
+          skills: [...item.querySelectorAll(".skill-badges button")].map(
+            (button) => button.textContent,
+          ),
+        }),
+      ),
     ),
   ).toEqual([
     { phase: "Reproduce", skills: ["Bug fix", "App control"] },
@@ -58,92 +179,42 @@ test("skill sequence keeps grouped declarations and repeated attempts, with focu
       "After repair: reopen and fresh store read retain the edit",
     ),
   ).not.toBeVisible();
-  const trace = await evidence
-    .getByRole("link", "Declaration in trace")
-    .getAttribute("href");
-  expect(trace).toContain("event=");
-  await screen.getByRole("button", "Work phases", { exact: true }).tap();
-  await expect(evidence).toBeVisible();
+  expect(
+    await evidence
+      .getByRole("link", "Declaration in trace")
+      .getAttribute("href"),
+  ).toContain("event=");
   await screen.getByRole("button", "Close skill evidence").tap();
   expect(
     await browser.evaluate(
       () => document.activeElement?.getAttribute("aria-label") ?? null,
     ),
   ).toBe("View Testing in Verify");
-  await screen.getByRole("button", "View Verify across this flow").tap();
-  const history = screen.getByRole("region", "Verify skill evidence", {
-    exact: true,
-  });
-  await expect(
-    history.getByRole(
-      "link",
-      "First verification: fresh read still returns old value",
-    ),
-  ).toBeVisible();
-  await expect(
-    history.getByRole(
-      "link",
-      "After repair: reopen and fresh store read retain the edit",
-    ),
-  ).toBeVisible();
-  await screen.getByRole("button", "Close skill evidence").tap();
-  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
+  await expect
+    .poll(() =>
+      browser.evaluate(
+        () => document.querySelectorAll('path[data-connection="root"]').length,
+      ),
+    )
+    .toBe(1);
   await browser.evaluate(() => {
-    const section = document.querySelector('[aria-label="Astack workflow"]');
-    if (section)
-      window.scrollTo(
-        0,
-        section.getBoundingClientRect().top +
-          window.scrollY -
-          (document.querySelector("header")?.getBoundingClientRect().height ??
-            80) -
-          16,
-      );
-    return null;
+    document.querySelector('[aria-label="Workflow map"]')?.scrollIntoView();
+    return true;
   });
-  await app.screenshot("skill-sequence-retries-light");
+  await app.screenshot("connected-route-retries-light");
   await browser.setViewport({ width: 390, height: 844 });
   await screen.getByLabel("Color theme").selectOption({ value: "dark" });
   await expect
     .poll(() =>
-      browser.evaluate(() => ({
-        theme: document.documentElement.dataset.theme ?? null,
-        badgeColor: getComputedStyle(
-          document.querySelector(
-            'button[aria-label="View Verify across this flow"]',
-          ) ?? document.body,
-        ).color,
-        toggleColor: getComputedStyle(
-          document.querySelector(
-            '[aria-label="Flow view"] button[aria-pressed="true"]',
-          ) ?? document.body,
-        ).color,
-      })),
+      browser.evaluate(() => document.documentElement.dataset.theme ?? null),
     )
-    .toEqual({
-      theme: "dark",
-      badgeColor: "rgb(248, 250, 252)",
-      toggleColor: "rgb(248, 250, 252)",
-    });
+    .toBe("dark");
   expect(
     await browser.evaluate(
-      () => document.documentElement.scrollWidth <= window.innerWidth,
+      () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
-  await browser.evaluate(() => {
-    const section = document.querySelector('[aria-label="Astack workflow"]');
-    if (section)
-      window.scrollTo(
-        0,
-        section.getBoundingClientRect().top +
-          window.scrollY -
-          (document.querySelector("header")?.getBoundingClientRect().height ??
-            80) -
-          16,
-      );
-    return null;
-  });
-  await app.screenshot("skill-sequence-retries-narrow-dark");
+  await app.screenshot("connected-route-retries-narrow-dark");
 });
 test("skill badges preserve recorded names, no-declaration phases and the PR icon without assigning grades", async ({
   app,
@@ -163,7 +234,6 @@ test("skill badges preserve recorded names, no-declaration phases and the PR ico
   await expect(
     screen.getByRole("region", "React skill evidence"),
   ).toContainText("Recorded name: applification:react.");
-  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
   await expect(
     screen.getByText("No skills declared for this phase.", { exact: true }),
   ).toBeVisible();
@@ -221,7 +291,18 @@ test("skill badges preserve recorded names, no-declaration phases and the PR ico
   await expect(
     screen.getByText("Your review pending", { exact: true }),
   ).toBeVisible();
-  await screen.getByRole("button", "Close skill evidence").tap();
+  await screen
+    .getByRole("region", "PR skill evidence", { exact: true })
+    .getByRole("button", "Close skill evidence")
+    .tap();
+  await screen
+    .getByRole(
+      "region",
+      "owner:repository-specific-acceptance-check skill evidence",
+      { exact: true },
+    )
+    .getByRole("button", "Close skill evidence")
+    .tap();
   await browser.evaluate(() => {
     const section = document.querySelector('[aria-label="Astack workflow"]');
     if (section)
@@ -235,23 +316,21 @@ test("skill badges preserve recorded names, no-declaration phases and the PR ico
       );
     return null;
   });
-  await app.screenshot("skill-sequence-custom-skills-narrow-dark");
+  await app.screenshot("connected-map-custom-skills-narrow-dark");
 });
-test("skill sequence retains route changes and missing supporting evidence", async ({
+test("connected map retains route changes and missing supporting evidence", async ({
   app,
   screen,
 }) => {
   await app.open(
     "/iframe.html?id=observatory-evaluations--changed-flow&viewMode=story",
   );
-  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
   await expect(
     screen.getByRole("heading", "Changed route → Bug fix"),
   ).toBeVisible();
   await app.open(
     "/iframe.html?id=observatory-evaluations--missing-flow-evidence&viewMode=story",
   );
-  await screen.getByRole("button", "Skill sequence", { exact: true }).tap();
   await screen
     .getByRole("button", "View Testing in Verify", { exact: true })
     .first()
@@ -269,7 +348,7 @@ test("astack bug-fix flow preserves verification retries and links declared skil
     "/iframe.html?id=observatory-evaluations--bug-fix-flow&viewMode=story",
   );
   await expect(
-    screen.getByText("astack → Bug fix", { exact: true }),
+    screen.getByRole("heading", "Bug fix", { exact: true }),
   ).toBeVisible();
   await expect(
     screen.getByText(
@@ -279,7 +358,7 @@ test("astack bug-fix flow preserves verification retries and links declared skil
   ).toBeVisible();
   expect(
     await browser.evaluate(() =>
-      [...document.querySelectorAll(".astack-flow > li h4")].map(
+      [...document.querySelectorAll(".map-main-cell h4")].map(
         (item) => item.textContent,
       ),
     ),
@@ -287,7 +366,9 @@ test("astack bug-fix flow preserves verification retries and links declared skil
   await expect(
     screen.getByText("Failed · agent reported", { exact: true }),
   ).toBeVisible();
-  await screen.getByText("View phase evidence", { exact: true }).first().tap();
+  await screen
+    .getByRole("button", "View Bug fix in Reproduce", { exact: true })
+    .tap();
   await expect(
     screen.getByRole("link", "Before fix: reopening loses the saved edit"),
   ).toBeVisible();
@@ -313,7 +394,7 @@ test("astack new-feature flow explains omissions and leaves unfinished phases un
     "/iframe.html?id=observatory-evaluations--new-feature-flow&viewMode=story",
   );
   await expect(
-    screen.getByText("astack → New feature", { exact: true }),
+    screen.getByRole("heading", "New feature", { exact: true }),
   ).toBeVisible();
   await expect(screen.getByText("Omitted", { exact: true })).toBeVisible();
   await expect(
@@ -338,9 +419,8 @@ test("astack route changes, missing selection and unavailable evidence stay expl
     "/iframe.html?id=observatory-evaluations--changed-flow&viewMode=story",
   );
   await expect(
-    screen.getByText("astack → Investigation", { exact: true }),
+    screen.getByRole("heading", "Investigation", { exact: true }),
   ).toBeVisible();
-  await expect(screen.getByText("Now: Bug fix", { exact: true })).toBeVisible();
   await expect(
     screen.getByRole("heading", "Changed route → Bug fix"),
   ).toBeVisible();
@@ -356,13 +436,16 @@ test("astack route changes, missing selection and unavailable evidence stay expl
     "/iframe.html?id=observatory-evaluations--missing-flow-selection&viewMode=story",
   );
   await expect(
-    screen.getByText("astack → Route not recorded", { exact: true }),
+    screen.getByRole("heading", "Route not recorded", { exact: true }),
   ).toBeVisible();
   await expect(screen.getByRole("status")).toContainText("display limit");
   await app.open(
     "/iframe.html?id=observatory-evaluations--missing-flow-evidence&viewMode=story",
   );
-  await screen.getByText("View phase evidence", { exact: true }).first().tap();
+  await screen
+    .getByRole("button", "View Testing in Verify", { exact: true })
+    .first()
+    .tap();
   await expect(
     screen.getByText("Referenced trace event has not been captured.", {
       exact: true,
@@ -1492,4 +1575,623 @@ test("project empty/loading/failed-save states keep unsaved input and do not cla
   await expect(
     screen.getByRole("link", "Unsaved project", { exact: true }),
   ).toHaveCount(0);
+});
+
+test("child lanes stay expanded, connect to declared joins and retain separate retry evidence", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--parallel-journeys&viewMode=story",
+  );
+  await expect(
+    screen.getByRole("heading", "UI checks", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("heading", "Data review", { exact: true }),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () => document.querySelectorAll(".workflow-map details").length,
+    ),
+  ).toBe(0);
+  expect(
+    await browser.evaluate(() =>
+      [...document.querySelectorAll(".journey-child [data-status]")].map(
+        (node) => node.getAttribute("data-status"),
+      ),
+    ),
+  ).toEqual(["failed", "completed", "completed"]);
+  await screen
+    .getByRole("button", "View React in Verify", { exact: true })
+    .last()
+    .tap();
+  const evidence = screen.getByRole("region", "React skill evidence", {
+    exact: true,
+  });
+  await expect(
+    evidence.getByRole("link", "UI verification failed"),
+  ).not.toBeVisible();
+  await expect(
+    evidence.getByRole("link", "Child returned proposed checks"),
+  ).toBeVisible();
+  expect(
+    await evidence
+      .getByRole("link", "Declaration in trace")
+      .first()
+      .getAttribute("href"),
+  ).toContain("child-ui%3Aretry");
+  await screen.getByRole("button", "Close skill evidence").tap();
+  expect(
+    await browser.evaluate(
+      () => document.activeElement?.getAttribute("aria-label") ?? null,
+    ),
+  ).toBe("View React in Verify");
+  await expect
+    .poll(() =>
+      browser.evaluate(() => {
+        const content = document.querySelector(".workflow-map");
+        if (!content) return false;
+        const rect = content.getBoundingClientRect();
+        const anchors = [...content.querySelectorAll("[data-map-key]")];
+        const paths = [...content.querySelectorAll("path[data-connection]")];
+        return (
+          paths.length > 0 &&
+          paths.every((path) => {
+            if (!(path instanceof SVGPathElement)) return false;
+            const start = path.getPointAtLength(0),
+              end = path.getPointAtLength(path.getTotalLength());
+            return ["from", "to"].every((key, i) => {
+              const anchor = anchors.find(
+                (a) =>
+                  a.getAttribute("data-map-key") ===
+                  path.getAttribute("data-" + key),
+              );
+              if (!anchor) return false;
+              const b = anchor.getBoundingClientRect(),
+                p = i === 0 ? start : end;
+              return (
+                Math.abs(p.x - (b.left - rect.left + b.width / 2)) < 0.5 &&
+                Math.abs(p.y - (b.top - rect.top + b.height / 2)) < 0.5
+              );
+            });
+          })
+        );
+      }),
+    )
+    .toBe(true);
+  expect(
+    await browser.evaluate(() => ({
+      forks: document.querySelectorAll('path[data-connection="fork"]').length,
+      joins: document.querySelectorAll('path[data-connection="join"]').length,
+      roots: document.querySelectorAll('path[data-connection="root"]').length,
+    })),
+  ).toEqual({ forks: 2, joins: 2, roots: 1 });
+  await browser.evaluate(() => {
+    document.querySelector(".workflow-map")?.scrollIntoView();
+    return true;
+  });
+  await app.screenshot("connected-child-journeys-light");
+  await browser.setViewport({ width: 390, height: 844 });
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth > innerWidth,
+    ),
+  ).toBe(false);
+  await browser.evaluate(() => {
+    const map = document.querySelector(".workflow-map-scroll");
+    if (map instanceof HTMLElement) map.focus();
+    return true;
+  });
+  const beforeKeyboardScroll = await browser.evaluate(
+    () => document.querySelector(".workflow-map-scroll")?.scrollLeft ?? 0,
+  );
+  await browser.keyboard.press("ArrowRight");
+  await expect
+    .poll(() =>
+      browser.evaluate(
+        () => document.querySelector(".workflow-map-scroll")?.scrollLeft ?? 0,
+      ),
+    )
+    .toBeGreaterThan(beforeKeyboardScroll);
+  await expect(
+    screen.getByRole("link", "React skill read in child trace").last(),
+  ).toHaveAttribute("href", /child-ui%3Aretry.*event=/);
+  await app.screenshot("connected-child-journeys-narrow-dark");
+});
+
+test("map descriptions compact revisions without losing the full value", async ({
+  app,
+  browser,
+  screen,
+}) => {
+  const revision = "0123456789abcdef0123456789abcdef01234567";
+  await browser.setViewport({ width: 1600, height: 1100 });
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--revision-summaries&viewMode=story",
+  );
+  await expect
+    .poll(() =>
+      browser.evaluate(() => ({
+        maps: document.querySelectorAll(".workflow-map").length,
+        branches: document.querySelectorAll("[data-map-branch]").length,
+        forks: document.querySelectorAll('path[data-connection="fork"]').length,
+        joins: document.querySelectorAll('path[data-connection="join"]').length,
+      })),
+    )
+    .toEqual({ maps: 1, branches: 2, forks: 2, joins: 2 });
+  await expect(
+    screen.getByRole("heading", "New feature", { exact: true }),
+  ).toBeVisible();
+  await expect(screen.getByText("01234567", { exact: true })).toHaveAttribute(
+    "title",
+    revision,
+  );
+  expect(
+    await browser.evaluate(() => {
+      const description = document
+        .querySelector(".map-main-cell .map-revision")
+        ?.closest("p");
+      const main = document.querySelector("[data-map-main]");
+      const child = document.querySelector("[data-map-child-stop]");
+      if (!description || !main || !child) return null;
+      return {
+        smaller:
+          parseFloat(getComputedStyle(description).fontSize) <
+          parseFloat(getComputedStyle(document.body).fontSize),
+        fullHashInSentence: /\b[a-f0-9]{40}\b/i.test(
+          description.textContent ?? "",
+        ),
+        distinctBranch:
+          getComputedStyle(main).borderColor !==
+          getComputedStyle(child).borderColor,
+      };
+    }),
+  ).toEqual({ smaller: true, fullHashInSentence: false, distinctBranch: true });
+  const beforeCopy = await browser.evaluate(() => {
+    const badge = document.querySelector(".map-revision");
+    if (!badge) return null;
+    const bounds = badge.getBoundingClientRect();
+    return {
+      width: bounds.width,
+      height: bounds.height,
+      text: badge.textContent,
+      icon: badge.querySelector("button svg")?.innerHTML ?? null,
+    };
+  });
+  expect(beforeCopy).not.toBeNull();
+  await browser.evaluate(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (value: string) =>
+          sessionStorage.setItem("fixture-revision-copy", value),
+      },
+    });
+    return true;
+  });
+  await screen.getByRole("button", "Copy revision", { exact: true }).tap();
+  expect(
+    await browser.evaluate(() =>
+      sessionStorage.getItem("fixture-revision-copy"),
+    ),
+  ).toBe(revision);
+  await expect(screen.getByText("Copied", { exact: true })).toBeVisible();
+  expect(
+    await browser.evaluate(() => {
+      const badge = document.querySelector(".map-revision");
+      if (!badge) return null;
+      const bounds = badge.getBoundingClientRect();
+      return {
+        width: bounds.width,
+        height: bounds.height,
+        text: badge.textContent,
+        icon: badge.querySelector("button svg")?.innerHTML ?? null,
+      };
+    }),
+  ).toEqual(beforeCopy);
+  expect(
+    await browser.evaluate(
+      () =>
+        document.querySelector(".copy-toast")?.parentElement === document.body,
+    ),
+  ).toBe(true);
+  await browser.evaluate(() => {
+    const map = document.querySelector(".workflow-map-scroll");
+    if (map)
+      window.scrollTo(0, map.getBoundingClientRect().top + scrollY - 100);
+    return true;
+  });
+  await app.screenshot("copy-toast-light");
+  await expect(screen.getByRole("status")).toHaveCount(0);
+  await screen.getByRole("button", "Copy revision", { exact: true }).tap();
+  await screen.getByRole("button", "Copy revision", { exact: true }).tap();
+  await expect(screen.getByRole("status")).toHaveCount(1);
+  await browser.evaluate(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async () => {
+          throw new Error("fixture-denied");
+        },
+      },
+    });
+    return true;
+  });
+  await screen.getByRole("button", "Copy revision", { exact: true }).tap();
+  await expect(screen.getByText(revision, { exact: true })).toBeVisible();
+  await expect(
+    screen.getByText("Copy unavailable; select the full value.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await expect(screen.getByRole("alert")).toContainText(revision);
+  expect(
+    await browser.evaluate(
+      () => document.querySelector(".map-revision")?.textContent ?? null,
+    ),
+  ).toBe("01234567");
+  await screen
+    .getByRole("button", "Dismiss copy notification", { exact: true })
+    .tap();
+  await expect(screen.getByRole("alert")).toHaveCount(0);
+});
+
+test("main rail stays centered with zero through four outward child lanes", async ({
+  app,
+  browser,
+  screen,
+}) => {
+  await browser.setViewport({ width: 1600, height: 1000 });
+  for (const [story, count] of [
+    ["bug-fix-flow", 0],
+    ["single-journey", 1],
+    ["parallel-journeys", 2],
+    ["three-journeys", 3],
+    ["four-journeys", 4],
+  ] satisfies [string, number][]) {
+    await app.open(
+      `/iframe.html?id=observatory-evaluations--${story}&viewMode=story`,
+    );
+    await expect
+      .poll(() =>
+        browser.evaluate(() => {
+          const map = document.querySelector(".workflow-map");
+          const viewport = map?.parentElement;
+          const main = map?.querySelector("[data-map-main]");
+          const root = map?.querySelector("[data-map-root]");
+          if (!map || !viewport || !main || !root) return null;
+          const center = (element: Element) => {
+            const rect = element.getBoundingClientRect();
+            return rect.left + rect.width / 2;
+          };
+          const x = center(main);
+          const branches = [...map.querySelectorAll("[data-map-branch]")];
+          const fork = map.querySelector("[data-map-fork]");
+          const card = map.querySelector(".journey-delegation-card");
+          return {
+            count: branches.length,
+            rootAligned: Math.abs(center(root) - x) < 1,
+            mainCentered: Math.abs(center(map) - x) < 1,
+            viewportCentered: Math.abs(center(viewport) - x) < 1,
+            distinctLanes:
+              new Set([
+                x,
+                ...branches.map((branch) => {
+                  const stop = branch.querySelector("[data-map-child-stop]");
+                  return stop ? center(stop) : null;
+                }),
+              ]).size ===
+              branches.length + 1,
+            outwardLabels: branches.every((branch, index) => {
+              const stop = branch.querySelector("[data-map-child-stop]");
+              const label = branch.querySelector("h4");
+              if (!stop || !label) return false;
+              const side = branch.getAttribute("data-side");
+              const a = stop.getBoundingClientRect(),
+                b = label.getBoundingClientRect();
+              return index % 2 === 0
+                ? side === "left" && center(stop) < x && b.right < a.left - 12
+                : side === "right" && center(stop) > x && b.left > a.right + 12;
+            }),
+            forkCardAboveJunction:
+              branches.length === 0
+                ? card === null
+                : !!fork &&
+                  !!card &&
+                  Math.abs(center(card) - x) < 1 &&
+                  card.getBoundingClientRect().bottom <
+                    fork.getBoundingClientRect().top - 12 &&
+                  branches.every((branch) => {
+                    const stop = branch.querySelector("[data-map-child-stop]");
+                    return (
+                      !!stop &&
+                      stop.getBoundingClientRect().top >
+                        fork.getBoundingClientRect().bottom
+                    );
+                  }),
+            pageFits: document.documentElement.scrollWidth <= innerWidth,
+          };
+        }),
+      )
+      .toEqual({
+        count,
+        rootAligned: true,
+        mainCentered: true,
+        viewportCentered: true,
+        distinctLanes: true,
+        outwardLabels: true,
+        forkCardAboveJunction: true,
+        pageFits: true,
+      });
+  }
+  await browser.evaluate(() => {
+    const map = document.querySelector(".workflow-map-scroll");
+    if (map) map.scrollLeft = 0;
+    return true;
+  });
+  await screen
+    .getByRole("button", "View React in Verify", { exact: true })
+    .last()
+    .tap();
+  await expect
+    .poll(() =>
+      browser.evaluate(
+        () =>
+          document.querySelector(".workflow-map-scroll")?.scrollLeft ?? null,
+      ),
+    )
+    .toBe(0);
+  await screen
+    .getByRole("region", "React skill evidence", { exact: true })
+    .getByRole("button", "Close skill evidence")
+    .tap();
+  await browser.evaluate(() => {
+    const map = document.querySelector(".workflow-map-scroll");
+    if (map)
+      window.scrollTo(0, map.getBoundingClientRect().top + scrollY - 100);
+    return true;
+  });
+  await app.screenshot("centered-four-child-lanes-light");
+  await browser.setViewport({ width: 390, height: 844 });
+  await expect
+    .poll(() =>
+      browser.evaluate(() => {
+        const viewport = document.querySelector(".workflow-map-scroll");
+        const main = viewport?.querySelector("[data-map-main]");
+        if (!viewport || !main) return false;
+        const a = viewport.getBoundingClientRect(),
+          b = main.getBoundingClientRect();
+        const map = viewport.querySelector(".workflow-map");
+        if (!map) return false;
+        const rect = map.getBoundingClientRect();
+        const anchors = [...map.querySelectorAll("[data-map-key]")];
+        const paths = [...map.querySelectorAll("path[data-connection]")];
+        const linesAligned =
+          paths.length > 0 &&
+          paths.every((path) => {
+            if (!(path instanceof SVGPathElement)) return false;
+            const start = path.getPointAtLength(0),
+              end = path.getPointAtLength(path.getTotalLength());
+            return ["from", "to"].every((key, index) => {
+              const anchor = anchors.find(
+                (item) =>
+                  item.getAttribute("data-map-key") ===
+                  path.getAttribute("data-" + key),
+              );
+              if (!anchor) return false;
+              const bounds = anchor.getBoundingClientRect();
+              const point = index === 0 ? start : end;
+              return (
+                Math.abs(point.x - bounds.left + rect.left - bounds.width / 2) <
+                  0.5 &&
+                Math.abs(point.y - bounds.top + rect.top - bounds.height / 2) <
+                  0.5
+              );
+            });
+          });
+        return (
+          Math.abs(b.left + b.width / 2 - a.left - a.width / 2) < 1 &&
+          document.documentElement.scrollWidth <= innerWidth &&
+          linesAligned
+        );
+      }),
+    )
+    .toBe(true);
+  await app.screenshot("centered-four-child-lanes-narrow");
+});
+
+test("completed and unavailable children never create an implicit parent join", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--returned-without-join&viewMode=story",
+  );
+  await expect(
+    screen
+      .getByText("No parent join recorded", {
+        exact: true,
+      })
+      .first(),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("heading", "Join back to main", { exact: true }),
+  ).not.toBeVisible();
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--unavailable-child-journey&viewMode=story",
+  );
+  await expect(
+    screen.getByText("The host did not expose a child conversation identity.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () => document.querySelectorAll(".journey-child a").length,
+    ),
+  ).toBe(0);
+});
+
+test("delivery evidence connects to the last main stop and keeps captured checks separate from current PR state", async ({
+  app,
+  browser,
+  screen,
+}) => {
+  await browser.route("https://raw.githubusercontent.com/**", async (route) => {
+    await route.fulfill({
+      headers: { "content-type": "image/svg+xml" },
+      body: '<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420"><rect width="900" height="420" fill="#eef3f7"/><text x="60" y="90" font-size="28" fill="#1e3548">Saved edits survive reopening</text><path d="M70 160v180" stroke="#499674" stroke-width="5"/><circle cx="70" cy="200" r="12" fill="#eef3f7" stroke="#499674" stroke-width="5"/><text x="105" y="208" font-size="22" fill="#1e3548">Save → reopen → verify</text></svg>',
+    });
+  });
+  await browser.setViewport({ width: 1440, height: 1000 });
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--delivered-result&viewMode=story",
+  );
+  const result = screen.getByRole("region", "Result summary", { exact: true });
+  await expect(
+    result.getByText("Delivered result", { exact: true }),
+  ).toBeVisible();
+  await expect(result.getByRole("region", "Captured PR checks")).toContainText(
+    "1 passed · 1 skipped / neutral",
+  );
+  await expect(
+    result.getByRole("region", "Latest PR observation"),
+  ).toContainText("1 pending");
+  await expect(
+    result.getByRole("region", "Latest PR observation"),
+  ).toContainText("PR has changed since this evidence was captured");
+  await expect(
+    result.getByText("Your review pending", { exact: true }),
+  ).toBeVisible();
+  expect(
+    await result
+      .getByRole("link", "Delivery evidence in trace")
+      .getAttribute("href"),
+  ).toContain("event=");
+  await browser.evaluate(() => {
+    document.querySelector("[data-result-card]")?.scrollIntoView();
+    return true;
+  });
+  await expect
+    .poll(() =>
+      browser.evaluate(() => {
+        const img = document.querySelector(".delivery-image img");
+        return (
+          img instanceof HTMLImageElement &&
+          img.complete &&
+          img.naturalWidth > 0
+        );
+      }),
+    )
+    .toBe(true);
+  const geometry = () =>
+    browser.evaluate(() => {
+      const path = document.querySelector("[data-result-connection]");
+      const last = [...document.querySelectorAll("[data-map-main]")].at(-1);
+      const card = document.querySelector("[data-result-card]");
+      if (
+        !(path instanceof SVGPathElement) ||
+        !last ||
+        !card ||
+        !path.ownerSVGElement
+      )
+        return null;
+      const svg = path.ownerSVGElement.getBoundingClientRect();
+      const from = last.getBoundingClientRect(),
+        to = card.getBoundingClientRect();
+      const start = path.getPointAtLength(0),
+        end = path.getPointAtLength(path.getTotalLength());
+      return {
+        startsAtLastStop:
+          Math.abs(svg.left + start.x - from.left - from.width / 2) < 0.5 &&
+          Math.abs(svg.top + start.y - from.bottom) < 0.5,
+        endsAtResult:
+          Math.abs(svg.left + end.x - to.left - to.width / 2) < 0.5 &&
+          Math.abs(svg.top + end.y - to.top) < 0.5,
+        pageFits: document.documentElement.scrollWidth <= innerWidth,
+      };
+    });
+  const connected = {
+    startsAtLastStop: true,
+    endsAtResult: true,
+    pageFits: true,
+  };
+  await expect.poll(geometry).toEqual(connected);
+  await result.getByText("Captured CI details", { exact: true }).tap();
+  await expect(
+    result.getByText("Save and reopen", { exact: true }),
+  ).toBeVisible();
+  await expect.poll(geometry).toEqual(connected);
+  await browser.setViewport({ width: 390, height: 844 });
+  await expect.poll(geometry).toEqual(connected);
+  await browser.evaluate(() => {
+    const viewport = document.querySelector(".workflow-map-scroll");
+    if (viewport) viewport.scrollLeft = 0;
+    return true;
+  });
+  await expect
+    .poll(() =>
+      browser.evaluate(
+        () => document.querySelectorAll("[data-result-connection]").length,
+      ),
+    )
+    .toBe(0);
+  await browser.evaluate(() => {
+    const viewport = document.querySelector(".workflow-map-scroll");
+    if (viewport)
+      viewport.scrollLeft = (viewport.scrollWidth - viewport.clientWidth) / 2;
+    return true;
+  });
+  await expect.poll(geometry).toEqual(connected);
+});
+test("failed private delivery and missing image previews retain honest evidence links", async ({
+  app,
+  browser,
+  screen,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--private-delivery&viewMode=story",
+  );
+  const result = screen.getByRole("region", "Result summary", { exact: true });
+  await expect(result.getByRole("region", "Captured PR checks")).toContainText(
+    "1 failed · 1 pending",
+  );
+  await expect(result.getByRole("link", "Private screenshot ↗")).toBeVisible();
+  expect(await browser.locator(".delivery-image img").count()).toBe(0);
+  await expect(
+    result.getByText("Private image — open with GitHub access", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await browser.route("https://raw.githubusercontent.com/**", async (route) => {
+    await route.abort();
+  });
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--delivered-result&viewMode=story",
+  );
+  await browser.evaluate(() => {
+    document.querySelector("[data-result-card]")?.scrollIntoView();
+    return true;
+  });
+  await expect(
+    result.getByText("Preview unavailable — open the captured image link", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    result.getByRole("link", "Synthetic saved-edit preview ↗"),
+  ).toBeVisible();
+  await expect(
+    result.getByText("Your review pending", { exact: true }),
+  ).toBeVisible();
 });

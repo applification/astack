@@ -17,10 +17,13 @@
 | Assessment            | A judgment against stated criteria, with reasons and supporting observations.                              |
 | Outcome feedback      | The owner's view of whether a result delivered what they wanted, independently of technical grades.        |
 | Verification report   | Reported observations of acceptance cases on a named revision and environment, with retained evidence.     |
-| Astack route          | The engineering approach explicitly selected for the requested outcome, with a recorded reason.           |
-| Workflow flow         | Capture-owned correlation of a route selection, changes and phase transitions across linked turns.        |
+| Astack route          | The engineering approach explicitly selected for the requested outcome, with a recorded reason.            |
+| Workflow flow         | Capture-owned correlation of a route selection, changes and phase transitions across linked turns.         |
 | Workflow phase        | An agent-declared part of its approach, whose progress and skill application need supporting observations. |
-| Flow assessment       | An owner's evidence-backed judgment of route choice and execution, independent of outcome assessment.     |
+| Delegation            | An agent assigning a distinct task to a child agent, separately from forking a conversation.               |
+| Agent branch          | A delegated child's own journey, observations and execution attempts within the parent task.               |
+| Workflow join         | The parent's explicit record of using identified child results in its continuing work.                     |
+| Flow assessment       | An owner's evidence-backed judgment of route choice and execution, independent of outcome assessment.      |
 | Intervention          | An explicit human interruption or intervention; an ordinary prompt is not sufficient evidence.             |
 | Capability use        | Evidence that a skill, instruction or workflow was read, explicitly supplied, or declared for an attempt.  |
 | Observation-time hash | Identity of capability content when it was inspected, without proof of its historical identity.            |

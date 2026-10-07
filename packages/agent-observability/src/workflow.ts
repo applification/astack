@@ -78,10 +78,22 @@ export const workflowAnnotationSchema = z.discriminatedUnion("action", [
       ...common,
       action: z.literal("phase"),
       phase: id,
+      attemptId: id.optional(),
       status: z.enum(["started", "completed", "failed", "omitted"]),
       summary: text,
       skills: z.array(id).max(12),
       evidence: z.array(reference).max(8),
+    })
+    .strict(),
+  z
+    .object({
+      ...common,
+      action: z.literal("join"),
+      summary: text,
+      inputs: z
+        .array(z.object({ branchId: id, result: reference }).strict())
+        .min(1)
+        .max(8),
     })
     .strict(),
 ]);

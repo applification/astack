@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Copy, Check, Folder, GitFork, Info } from "lucide-react";
+import { Copy, Folder, GitFork, Info } from "lucide-react";
 import { HelpCard } from "@astack/ui";
+import { useCopyToast } from "./copy-toast";
 import type { AgentRun } from "@astack/agent-observability";
 import {
   providerName,
@@ -57,10 +57,16 @@ export function RepositoryLink({ value }: { value: string }) {
   );
 }
 
-export function CopyValue({ value, label }: { value: string; label: string }) {
-  const [feedback, setFeedback] = useState<"idle" | "copied" | "failed">(
-    "idle",
-  );
+export function CopyValue({
+  value,
+  label,
+  showValueOnFailure = false,
+}: {
+  value: string;
+  label: string;
+  showValueOnFailure?: boolean;
+}) {
+  const notify = useCopyToast();
   return (
     <span className="copy-value">
       <button
@@ -71,25 +77,17 @@ export function CopyValue({ value, label }: { value: string; label: string }) {
         onClick={async () => {
           try {
             await navigator.clipboard.writeText(value);
-            setFeedback("copied");
+            notify({ kind: "copied" });
           } catch {
-            setFeedback("failed");
+            notify({
+              kind: "failed",
+              fullValue: showValueOnFailure ? value : null,
+            });
           }
         }}
       >
-        {feedback === "copied" ? (
-          <Check size={14} aria-hidden="true" />
-        ) : (
-          <Copy size={14} aria-hidden="true" />
-        )}
+        <Copy size={14} aria-hidden="true" />
       </button>
-      {feedback !== "idle" && (
-        <span role="status" className="copy-feedback">
-          {feedback === "copied"
-            ? "Copied"
-            : "Copy unavailable; select the full value."}
-        </span>
-      )}
     </span>
   );
 }

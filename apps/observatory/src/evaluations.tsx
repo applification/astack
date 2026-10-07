@@ -3,6 +3,7 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "@astack/observatory-backend/api";
 import { Badge, Button, Input } from "@astack/ui";
+import { MessageSquareText } from "lucide-react";
 import {
   assessmentInputSchema,
   evaluateProof,
@@ -24,12 +25,13 @@ import {
   feedbackLabels,
   runLink,
   textPreview,
-  VerificationEvidence,
   verdictLabel,
   WorkTimeline,
 } from "./evaluation-evidence";
 import { OutcomeFeedbackForm } from "./outcome-feedback";
 import { WorkflowEvidence } from "./workflow-evidence";
+import { PromptJourney } from "./prompt-journey";
+import { DeliveryResult } from "./delivery-result";
 
 export const evaluationLink = (id: string, projectId: string) =>
   "#evaluation/" +
@@ -234,7 +236,8 @@ export function AssessmentForm({
     (record) => record.annotation.action === "phase",
   );
   const routeOptions = (workflow?.records ?? []).flatMap((record) =>
-    record.annotation.action !== "phase"
+    record.annotation.action === "select" ||
+    record.annotation.action === "change"
       ? [
           {
             runId: record.runId,
@@ -480,102 +483,60 @@ export function EvaluationView({
 }) {
   const { evaluation, feedback } = detail;
   const verification = evaluateProof(evaluation);
-  const resultStep = [...detail.runs]
-    .sort((a, b) => b.run.startedAt - a.run.startedAt)
-    .map(({ run }) => detail.timeline.find((step) => step.runId === run.id))
-    .find((step) => step?.response);
-  const checkStatus =
-    verification.verdict === "pass"
-      ? "Checks passed"
-      : verification.verdict === "fail"
-        ? "Checks found a problem"
-        : "Checks incomplete";
   return (
     <div className="evaluation-page">
       <p className="eyebrow">Evaluation</p>
       <h1 className="run-heading">{evaluation.title}</h1>
-      <section className="evaluation-intent">
-        <h2>Original intent</h2>
-        <p className="whitespace-pre-wrap">{evaluation.intent.request}</p>
-        {detail.source ? (
-          <a
-            href={runLink(
-              detail.source.event.runId,
-              evaluation.projectId,
-              detail.source.event.id,
-            )}
-          >
-            Original request in trace
-          </a>
-        ) : (
-          <p className="secondary">
-            Declared request; no captured prompt reference supplied.
-          </p>
-        )}
-        {evaluation.intent.clarifications.length > 0 && (
-          <details className="metadata-details">
-            <summary>
-              Agreed scope · {evaluation.intent.clarifications.length}{" "}
-              {evaluation.intent.clarifications.length === 1
-                ? "clarification"
-                : "clarifications"}
-            </summary>
-            <ul>
-              {evaluation.intent.clarifications.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </details>
-        )}
-      </section>
-      <WorkflowEvidence detail={detail} view="selection" />
-      <section className="evaluation-result" aria-label="Result summary">
-        <h2>Result</h2>
-        {resultStep?.response ? (
-          <>
-            <p>{textPreview(resultStep.response.text, 320)}</p>
-            <a
-              href={runLink(
-                resultStep.runId,
-                evaluation.projectId,
-                resultStep.response.eventId,
+      <PromptJourney>
+        <section className="evaluation-intent" aria-label="Original intent">
+          <h2>Original intent</h2>
+          <div className="evaluation-prompt" data-prompt-card="">
+            <div className="evaluation-prompt-heading">
+              <MessageSquareText size={16} aria-hidden="true" />
+              <span>{detail.source ? "User prompt" : "Declared request"}</span>
+            </div>
+            <blockquote className="evaluation-prompt-text">
+              {evaluation.intent.request}
+            </blockquote>
+            <footer className="evaluation-prompt-context">
+              {detail.source ? (
+                <a
+                  href={runLink(
+                    detail.source.event.runId,
+                    evaluation.projectId,
+                    detail.source.event.id,
+                  )}
+                >
+                  Original request in trace
+                </a>
+              ) : (
+                <p className="secondary">
+                  Declared request; no captured prompt reference supplied.
+                </p>
               )}
-            >
-              Read the agent’s response
-            </a>
-          </>
-        ) : (
-          <p>
-            No response excerpt available. The work and verification evidence
-            are linked below.
-          </p>
-        )}
-        <div className="tag-list">
-          <span
-            className={
-              verification.verdict === "fail"
-                ? "text-destructive"
-                : verification.verdict === "pass"
-                  ? "text-success"
-                  : "text-muted-foreground"
-            }
-          >
-            <Badge>{checkStatus}</Badge>
-          </span>
-          <Badge>
-            {feedback[0]
-              ? "Your review: " + feedbackLabels[feedback[0].choice]
-              : "Your review pending"}
-          </Badge>
-          <Badge>{evaluation.runIds.length} captured turns</Badge>
-        </div>
-        <p className="secondary">
-          The agent’s response and reported checks are evidence for your review.
-        </p>
-      </section>
+              {evaluation.intent.clarifications.length > 0 && (
+                <details className="metadata-details">
+                  <summary>
+                    Agreed scope · {evaluation.intent.clarifications.length}{" "}
+                    {evaluation.intent.clarifications.length === 1
+                      ? "clarification"
+                      : "clarifications"}
+                  </summary>
+                  <ul>
+                    {evaluation.intent.clarifications.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+            </footer>
+          </div>
+        </section>
+        <WorkflowEvidence detail={detail} />
+        <DeliveryResult detail={detail} />
+      </PromptJourney>
       {detail.workflow.records.length > 0 ? (
         <>
-          <WorkflowEvidence detail={detail} view="path" />
           <details className="evaluation-disclosure">
             <summary>
               Captured conversation · {evaluation.runIds.length} turns
@@ -586,7 +547,6 @@ export function EvaluationView({
       ) : (
         <WorkTimeline detail={detail} />
       )}
-      <VerificationEvidence evaluation={evaluation} />
       {saveFeedback && (
         <OutcomeFeedbackForm key={evaluation.id} save={saveFeedback} />
       )}

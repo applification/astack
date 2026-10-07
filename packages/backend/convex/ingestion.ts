@@ -13,6 +13,8 @@ import { resolveProject } from "@astack/agent-observability/projects";
 import { paginationOptsValidator } from "convex/server";
 import { queuePrompt, queueStoredPrompt, storeWorkLabel } from "./naming";
 import { storeEvaluation } from "./evaluations";
+import { sessionReferenceKey } from "@astack/agent-observability/delegation";
+import { repositoryIdentity } from "@astack/agent-observability/projects";
 
 function capabilities(run: AgentRun) {
   return new Map(run.skills.map((skill) => [capabilityKey(skill), skill]));
@@ -41,6 +43,24 @@ function facets(run: AgentRun) {
     ...new Map(pairs.map((pair) => [JSON.stringify(pair), pair])).values(),
   ].slice(0, 900);
 }
+async function storeSessions(ctx: MutationCtx, run: AgentRun) {
+  const old = await ctx.db
+    .query("runSessions")
+    .withIndex("by_runId", (q) => q.eq("runId", run.id))
+    .take(21);
+  for (const item of old) await ctx.db.delete(item._id);
+  const keys = new Set(run.sessionReferences.map(sessionReferenceKey));
+  if (run.agent === "codex")
+    keys.add(sessionReferenceKey({ kind: "codex", sessionId: run.sessionId }));
+  for (const key of [...keys].slice(0, 20))
+    await ctx.db.insert("runSessions", {
+      machineId: run.machineId,
+      key,
+      runId: run.id,
+      startedAt: run.startedAt,
+    });
+}
+
 export async function storeRun(
   ctx: MutationCtx,
   run: AgentRun,
@@ -62,6 +82,7 @@ export async function storeRun(
   };
   if (previous) await ctx.db.patch(previous._id, row);
   else await ctx.db.insert("runs", row);
+  await storeSessions(ctx, run);
   await storeWorkLabel(ctx, run);
   if (
     run.work &&
@@ -184,11 +205,42 @@ export const ingest = internalMutation({
         const project = run ? resolveProject(projects, run) : null;
         if (!run || !project || run.projectId !== project.projectId)
           throw new Error("Project not enabled for capture");
+        if (
+          event.delivery &&
+          (!run.contentCapture ||
+            !run.repo ||
+            repositoryIdentity(run.repo) !==
+              repositoryIdentity(
+                `https://github.com/${event.delivery.snapshot.repository}`,
+              ))
+        )
+          throw new Error("PR evidence outside readable repository capture");
+        if (
+          event.delivery &&
+          new TextEncoder().encode(JSON.stringify(event)).byteLength >
+            128 * 1024
+        )
+          throw new Error(
+            "Delivery evidence exceeds the 128 KiB record budget",
+          );
         const previous = await ctx.db
           .query("events")
           .withIndex("by_eventId", (q) => q.eq("eventId", event.id))
           .unique();
         if (previous && previous.revision >= entry.revision) continue;
+        if (previous) {
+          const original = recordSchema.parse({
+            kind: "event",
+            value: JSON.parse(previous.data),
+          });
+          if (
+            original.kind === "event" &&
+            original.value.delivery &&
+            JSON.stringify(original.value.delivery.snapshot) !==
+              JSON.stringify(event.delivery?.snapshot)
+          )
+            throw new Error("Delivery snapshot is immutable");
+        }
         const row = {
           eventId: event.id,
           runId: event.runId,
@@ -220,6 +272,7 @@ export const rebuildFacets = internalMutation({
       throw new Error("Invalid repair page");
     const page = await ctx.db.query("runs").paginate(args.paginationOpts);
     for (const row of page.page) {
+      await storeSessions(ctx, runSchema.parse(JSON.parse(row.data)));
       const old = await ctx.db
         .query("facets")
         .withIndex("by_runId", (q) => q.eq("runId", row.runId))

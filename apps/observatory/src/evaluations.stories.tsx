@@ -1,3 +1,4 @@
+import { deliveryFixture } from "@astack/agent-observability/delivery-fixtures";
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import {
@@ -18,6 +19,7 @@ import {
 import { EvaluationView, EvaluationTable } from "./evaluations";
 import { ObservatoryLayout } from "./app";
 import { workflowViewFixture } from "@astack/agent-observability/workflow-fixtures";
+import { journeyFixture } from "@astack/agent-observability/journey-fixtures";
 
 function detail(status: "pass" | "fail" | "inconclusive", assessed = false) {
   const evaluation = evaluationFixture(status);
@@ -135,6 +137,7 @@ export const MissingFlowSelection: Story = {
       ...detail("pass"),
       workflow: {
         records: workflowViewFixture().records.slice(1, 4),
+        branches: [],
         truncated: true,
       },
     },
@@ -267,4 +270,216 @@ export const FlowReview: Story = {
       initial={{ ...detail("pass"), workflow: workflowViewFixture() }}
     />
   ),
+};
+
+export const ParallelJourneys: Story = {
+  args: {
+    detail: { ...detail("inconclusive"), workflow: journeyFixture().workflow },
+  },
+};
+const revisionJourney = journeyFixture().workflow;
+export const RevisionSummaries: Story = {
+  args: {
+    detail: {
+      ...detail("inconclusive"),
+      workflow: {
+        ...revisionJourney,
+        records: [
+          ...workflowViewFixture("feature").records.map((record) => ({
+            ...record,
+            sessionId: evaluationRun().sessionId,
+            annotation:
+              record.annotation.action === "phase" &&
+              record.annotation.phase === "implement"
+                ? {
+                    ...record.annotation,
+                    summary:
+                      "Implemented route journeys, direct child capture, separate attempts and explicit joins in runtime source 0123456789abcdef0123456789abcdef01234567.",
+                  }
+                : record.annotation,
+          })),
+          ...revisionJourney.records.filter(
+            (record) => record.annotation.action === "join",
+          ),
+        ],
+      },
+    },
+  },
+};
+const promptOriginRequest =
+  "Add a route map that shows how a request moves through the agent’s work.\n\nKeep the main journey in the centre. Show delegated work on separate branches, then join the results back into the main line.\n\nKeep the skill evidence easy to open, with enough context to understand each step.";
+const promptOrigin = detail("inconclusive");
+export const PromptOrigin: Story = {
+  args: {
+    detail: {
+      ...promptOrigin,
+      evaluation: {
+        ...promptOrigin.evaluation,
+        title: "Visualise the journey from a user prompt",
+        intent: {
+          ...promptOrigin.evaluation.intent,
+          request: promptOriginRequest,
+          clarifications: [
+            "Keep the map expanded and scrollable.",
+            "Only rejoin a child when the parent explicitly uses its result.",
+          ],
+        },
+      },
+      source: {
+        revision: 1,
+        event: {
+          ...evaluationPrompt(),
+          data: { content: promptOriginRequest },
+        },
+      },
+      workflow: {
+        ...revisionJourney,
+        records: [
+          ...workflowViewFixture("feature").records.map((record) => ({
+            ...record,
+            sessionId: evaluationRun().sessionId,
+          })),
+          ...revisionJourney.records.filter(
+            (record) => record.annotation.action === "join",
+          ),
+        ],
+      },
+    },
+  },
+};
+function laneCountDetail(count: number): EvaluationDetail {
+  const workflow = journeyFixture(false).workflow;
+  const additional: EvaluationDetail["workflow"]["branches"] = Array.from(
+    { length: Math.max(0, count - workflow.branches.length) },
+    (_, index) => ({
+      parentRunId: evaluationRun().id,
+      delegation: {
+        id: "delegate-additional-" + index,
+        source: "t3",
+        child: {
+          kind: "t3",
+          environmentId: "fixture-host",
+          threadId: "additional-child-" + index,
+        },
+        title: index === 0 ? "Documentation checks" : "Security review",
+        status: "running",
+        startedAt: 1075,
+        completedAt: null,
+      },
+      state: "unavailable",
+      reason:
+        "This child conversation has no readable capture in this fixture.",
+      runs: [],
+      records: [],
+      reads: [],
+      truncated: false,
+    }),
+  );
+  return {
+    ...detail("inconclusive"),
+    workflow: {
+      ...workflow,
+      branches: [...workflow.branches, ...additional].slice(0, count),
+    },
+  };
+}
+export const SingleJourney: Story = {
+  args: { detail: laneCountDetail(1) },
+};
+export const ThreeJourneys: Story = {
+  args: { detail: laneCountDetail(3) },
+};
+export const FourJourneys: Story = {
+  args: { detail: laneCountDetail(4) },
+};
+export const ReturnedWithoutJoin: Story = {
+  args: {
+    detail: {
+      ...detail("inconclusive"),
+      workflow: journeyFixture(false).workflow,
+    },
+  },
+};
+export const UnavailableChildJourney: Story = {
+  args: {
+    detail: {
+      ...detail("inconclusive"),
+      workflow: {
+        ...journeyFixture(false).workflow,
+        branches: [
+          {
+            parentRunId: evaluationRun().id,
+            delegation: {
+              id: "delegate-missing",
+              source: "t3",
+              child: null,
+              title: "Uncaptured child",
+              status: "cancelled",
+              startedAt: null,
+              completedAt: null,
+            },
+            state: "unavailable",
+            reason: "The host did not expose a child conversation identity.",
+            runs: [],
+            records: [],
+            reads: [],
+            truncated: false,
+          },
+        ],
+      },
+    },
+  },
+};
+
+export const DeliveredResult: Story = {
+  args: {
+    detail: {
+      ...detail("pass"),
+      workflow: journeyFixture().workflow,
+      delivery: {
+        runId: evaluationRun().id,
+        eventId: evaluationRun().id + ":delivery",
+        evidence: deliveryFixture(),
+      },
+    },
+  },
+};
+export const PrivateDelivery: Story = {
+  args: {
+    detail: {
+      ...detail("pass"),
+      workflow: workflowViewFixture(),
+      delivery: {
+        runId: evaluationRun().id,
+        eventId: evaluationRun().id + ":delivery",
+        evidence: {
+          ...deliveryFixture(),
+          snapshot: {
+            ...deliveryFixture().snapshot,
+            visibility: "private",
+            media: [
+              {
+                kind: "link",
+                label: "Private screenshot",
+                url:
+                  "https://github.com/applification/astack/blob/" +
+                  "a".repeat(40) +
+                  "/.proof/saved-edit.png",
+                reason: "Private image — open with GitHub access",
+              },
+            ],
+            checks: [
+              {
+                name: "Save and reopen",
+                status: "completed",
+                conclusion: "failure",
+                url: null,
+              },
+              { name: "Review", status: "queued", conclusion: null, url: null },
+            ],
+          },
+        },
+      },
+    },
+  },
 };

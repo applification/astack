@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { eventSchema, runSchema } from "./domain";
 import { workflowCaptureSchema } from "./workflow-view";
+import { deliveryEvidenceSchema } from "./delivery-evidence";
 import {
   assessmentSchema,
   evaluationSchema,
@@ -36,7 +37,19 @@ export const evaluationDetailSchema = z.object({
   timeline: z.array(evaluationStepSchema).max(20).default([]),
   feedback: z.array(outcomeFeedbackSchema).max(20).default([]),
   moreFeedback: z.boolean().default(false),
-  workflow: workflowCaptureSchema.default({ records: [], truncated: false }),
+  workflow: workflowCaptureSchema.default({
+    records: [],
+    branches: [],
+    truncated: false,
+  }),
+  delivery: z
+    .object({
+      runId: z.string(),
+      eventId: z.string(),
+      evidence: deliveryEvidenceSchema,
+    })
+    .nullable()
+    .default(null),
 });
 export const evaluationSummarySchema = z.object({
   id: z.string(),

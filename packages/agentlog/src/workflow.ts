@@ -6,6 +6,7 @@ import {
 import { approvedRun } from "./projects";
 import { refreshRun } from "./context";
 import type { LocalStore } from "./store";
+import { sessionReferenceKey } from "@astack/agent-observability/delegation";
 
 export function recordWorkflow({
   store,
@@ -43,9 +44,11 @@ export function recordWorkflow({
   const refs =
     annotation.action === "phase"
       ? annotation.evidence
-      : annotation.action === "select" && annotation.request
-        ? [annotation.request]
-        : [];
+      : annotation.action === "join"
+        ? annotation.inputs.map((input) => input.result)
+        : annotation.action === "select" && annotation.request
+          ? [annotation.request]
+          : [];
   for (const ref of refs) {
     const event = store.getRecord("event:" + ref.eventId);
     if (
@@ -58,6 +61,32 @@ export function recordWorkflow({
       throw new Error(
         "Workflow evidence outside captured project or unavailable",
       );
+  }
+  if (annotation.action === "join") {
+    const tasks = store
+      .runsForSession(run.sessionId)
+      .flatMap((turn) => turn.delegations);
+    for (const input of annotation.inputs) {
+      const task = tasks.find((task) => task.id === input.branchId);
+      const child = approvedRun(store, input.result.runId);
+      const childReference = task?.child;
+      if (
+        !childReference ||
+        !child ||
+        (!child.sessionReferences.some(
+          (ref) =>
+            sessionReferenceKey(ref) === sessionReferenceKey(childReference),
+        ) &&
+          !(
+            child.agent === "codex" &&
+            childReference.kind === "codex" &&
+            child.sessionId === childReference.sessionId
+          ))
+      )
+        throw new Error(
+          "Join result must belong to the recorded delegated branch",
+        );
+    }
   }
   const now = Date.now();
   const id =
@@ -73,8 +102,10 @@ export function recordWorkflow({
     observedAt: now,
     timing: "agent",
     title:
-      annotation.action === "phase" ? annotation.summary : annotation.reason,
-    ...(annotation.action !== "phase"
+      annotation.action === "phase" || annotation.action === "join"
+        ? annotation.summary
+        : annotation.reason,
+    ...(annotation.action === "select" || annotation.action === "change"
       ? {
           skill: {
             name: annotation.route,

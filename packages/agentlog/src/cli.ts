@@ -28,6 +28,7 @@ import {
 } from "@astack/agent-observability/evaluations";
 import { savedEditProof, proofVariantSchema } from "./evaluation-proof";
 import { recordWorkflow } from "./workflow";
+import { recordPrDelivery, refreshPrDelivery } from "./pr-evidence";
 import {
   routeSchema,
   routeDefinitions,
@@ -39,6 +40,39 @@ const program = new Command()
   .version("0.1.0")
   .option("--state <directory>", "Private state directory", defaultStateDir());
 const state = () => resolve(z.string().parse(program.opts().state));
+const delivery = program
+  .command("delivery")
+  .description(
+    "Capture revision-pinned PR evidence using this machine's existing gh access",
+  );
+async function deliveryStore<T>(action: (store: LocalStore) => Promise<T>) {
+  const config = await loadConfig(state());
+  const store = new LocalStore(state(), [
+    ...environmentSecrets(process.env),
+    await readSecretFile(config.tokenFile),
+    ...(await Promise.all(config.secretFiles.map(readSecretFile))),
+  ]);
+  try {
+    process.stdout.write(JSON.stringify(await action(store)) + "\n");
+  } finally {
+    store.close();
+  }
+}
+delivery
+  .command("capture")
+  .requiredOption("--run <id>", "Captured parent run ID")
+  .requiredOption("--pr <url>", "The task's existing GitHub PR URL")
+  .action(async (options: unknown) => {
+    const args = z.object({ run: z.string(), pr: z.string() }).parse(options);
+    await deliveryStore((store) => recordPrDelivery(store, args.run, args.pr));
+  });
+delivery
+  .command("refresh")
+  .requiredOption("--event <id>", "Existing delivery event ID")
+  .action(async (options: unknown) => {
+    const args = z.object({ event: z.string() }).parse(options);
+    await deliveryStore((store) => refreshPrDelivery(store, args.event));
+  });
 const evaluations = program
   .command("evaluation")
   .description("Check or queue immutable intent and verification snapshots");
@@ -488,7 +522,12 @@ program
   .option("--turn <id>", "Captured turn ID (required when recording)")
   .option("--name <name>", "Selected astack route; legacy workflow name")
   .option("--step <step>", "Phase name; legacy step title")
-  .option("--action <action>", "select, change, phase, or context")
+  .option("--action <action>", "select, change, phase, join, or context")
+  .option("--attempt <id>", "Optional phase attempt identity")
+  .option(
+    "--branches <ids...>",
+    "Delegated branch IDs matched in order to --evidence for a join",
+  )
   .option(
     "--flow <id>",
     "Existing flow ID; defaults to the session's last selected flow",
@@ -519,7 +558,11 @@ program
         turn: z.string().optional(),
         name: z.string().optional(),
         step: z.string().optional(),
-        action: z.enum(["select", "change", "phase", "context"]).optional(),
+        action: z
+          .enum(["select", "change", "phase", "join", "context"])
+          .optional(),
+        attempt: z.string().optional(),
+        branches: z.array(z.string()).optional(),
         flow: z.string().optional(),
         reason: z.string().optional(),
         plan: z.array(z.string()).optional(),
@@ -549,6 +592,7 @@ program
               runId: run.id,
               turnId: run.attemptId,
               status: run.status,
+              delegations: run.delegations,
               prompts: store
                 .events(run.id)
                 .filter((event) => event.kind === "user_prompt")
@@ -588,6 +632,7 @@ program
                 ...common,
                 action: args.action,
                 phase: z.string().parse(args.step),
+                ...(args.attempt ? { attemptId: args.attempt } : {}),
                 status: z
                   .enum(["started", "completed", "failed", "omitted"])
                   .parse(args.status),
@@ -595,18 +640,41 @@ program
                 skills: args.skills ?? [],
                 evidence: (args.evidence ?? []).map(reference),
               }
-            : {
-                ...common,
-                action: args.action,
-                route: routeSchema.parse(args.name),
-                reason: z.string().parse(args.reason),
-                plannedPhases:
-                  args.plan ??
-                  routeDefinitions[routeSchema.parse(args.name)].phases,
-                ...(args.action === "select" && args.requestEvent
-                  ? { request: reference(args.requestEvent) }
-                  : {}),
-              };
+            : args.action === "join"
+              ? {
+                  ...common,
+                  action: args.action,
+                  summary: z.string().parse(args.summary),
+                  inputs: z
+                    .array(z.string())
+                    .min(1)
+                    .max(8)
+                    .parse(args.branches)
+                    .map((branchId, index) => {
+                      if (args.branches?.length !== args.evidence?.length)
+                        throw new Error(
+                          "Join branches and evidence must have the same length",
+                        );
+                      return {
+                        branchId,
+                        result: reference(
+                          z.string().parse(args.evidence?.[index]),
+                        ),
+                      };
+                    }),
+                }
+              : {
+                  ...common,
+                  action: args.action,
+                  route: routeSchema.parse(args.name),
+                  reason: z.string().parse(args.reason),
+                  plannedPhases:
+                    args.plan ??
+                    routeDefinitions[routeSchema.parse(args.name)].phases,
+                  ...(args.action === "select" && args.requestEvent
+                    ? { request: reference(args.requestEvent) }
+                    : {}),
+                };
         process.stdout.write(
           JSON.stringify(recordWorkflow({ store, runId, annotation })) + "\n",
         );

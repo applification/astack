@@ -16,7 +16,11 @@
     "./evaluation-fixtures": "./src/evaluation-fixtures.ts",
     "./workflow": "./src/workflow.ts",
     "./workflow-view": "./src/workflow-view.ts",
-    "./workflow-fixtures": "./src/workflow-fixtures.ts"
+    "./workflow-fixtures": "./src/workflow-fixtures.ts",
+    "./delegation": "./src/delegation.ts",
+    "./delivery-evidence": "./src/delivery-evidence.ts",
+    "./delivery-fixtures": "./src/delivery-fixtures.ts",
+    "./journey-fixtures": "./src/journey-fixtures.ts"
   },
   "dependencies": {
     "zod": "4.6.5"

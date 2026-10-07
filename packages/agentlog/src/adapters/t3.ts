@@ -19,6 +19,12 @@ import type { CollectorConfig, T3Source } from "../config";
 import type { LocalStore } from "../store";
 import { localRepository } from "../git";
 import { capability, runIdentity } from "./codex";
+import {
+  delegationSchema,
+  mergeDelegations,
+  mergeSessionReferences,
+  type SessionReference,
+} from "@astack/agent-observability/delegation";
 import { T3Reader } from "./t3-rpc";
 import { claudeVersion } from "./claude-version";
 
@@ -127,8 +133,24 @@ const supportedItem = z.union([
 export const t3ProjectionSchema = z.object({
   thread: z.object({
     id,
-    lineage: z.object({ parentThreadId: id.nullable() }),
+    lineage: z.object({
+      parentThreadId: id.nullable(),
+      relationshipToParent: z.enum(["fork", "subagent"]).nullable().optional(),
+    }),
   }),
+  subagents: z
+    .array(
+      z.object({
+        id,
+        runId: id,
+        childThreadId: id.nullable(),
+        title: z.string().nullable().optional(),
+        status: z.string(),
+        startedAt: date.nullable(),
+        completedAt: date.nullable(),
+      }),
+    )
+    .default([]),
   runs: z.array(
     z.object({
       id,
@@ -255,7 +277,71 @@ export async function normalizeT3Turn(options: {
       : `${config.machineId}:t3:${scope}:${turn.id}`;
   const previous = store.getRecord(`run:${runId}`);
   const origin = `t3:${source.environmentId}`;
-  if (previous?.kind === "run" && previous.value.source !== origin) return null;
+  const sessionReferences = mergeSessionReferences(
+    previous?.kind === "run" ? previous.value.sessionReferences : [],
+    [
+      ...(nativeSession
+        ? [
+            {
+              kind: "codex",
+              sessionId: nativeSession,
+            } satisfies SessionReference,
+          ]
+        : []),
+      {
+        kind: "t3",
+        environmentId: source.environmentId,
+        threadId: projection.thread.id,
+      },
+    ],
+  );
+  const delegations = mergeDelegations(
+    previous?.kind === "run" ? previous.value.delegations : [],
+    projection.subagents
+      .filter((task) => task.runId === appRun.id)
+      .slice(0, 32)
+      .map((task) =>
+        delegationSchema.parse({
+          id: task.id,
+          source: "t3",
+          child:
+            task.childThreadId === null
+              ? null
+              : {
+                  kind: "t3",
+                  environmentId: source.environmentId,
+                  threadId: task.childThreadId,
+                },
+          title: redactText(
+            task.title ?? "Delegated agent",
+            options.secrets,
+          ).slice(0, 240),
+          status: [
+            "running",
+            "completed",
+            "failed",
+            "cancelled",
+            "interrupted",
+          ].includes(task.status)
+            ? task.status
+            : "unknown",
+          startedAt: task.startedAt,
+          completedAt: task.completedAt,
+        }),
+      ),
+  );
+  // The original collector still owns the trace. Supplement only host identities
+  // and delegation lifecycle; never replace native events or assessed outcomes.
+  if (previous?.kind === "run" && previous.value.source !== origin)
+    return {
+      run: runSchema.parse(
+        redact(
+          { ...previous.value, sessionReferences, delegations },
+          options.secrets,
+        ),
+      ),
+      events: [],
+    };
   const sessionId =
     previous?.kind === "run"
       ? previous.value.sessionId
@@ -637,6 +723,8 @@ export async function normalizeT3Turn(options: {
     machineId: config.machineId,
     machineName: config.machineName,
     sessionId,
+    sessionReferences,
+    delegations,
     attemptId: nativeTurn ?? turn.id,
     source: origin,
     cwd: safe(options.cwd),
@@ -732,7 +820,7 @@ export class T3Adapter {
       if (!project) continue;
       const checkpoint = `t3:${this.source.environmentId}:${thread.id}:updated`;
       const fingerprint = createHash("sha256")
-        .update(JSON.stringify({ captureVersion: 2, thread }))
+        .update(JSON.stringify({ captureVersion: 3, thread }))
         .digest("hex");
       if (
         !["running", "starting", "waiting", "preparing"].includes(

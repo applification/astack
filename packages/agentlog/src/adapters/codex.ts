@@ -14,6 +14,7 @@ import {
   launchContextSchema,
 } from "@astack/agent-observability";
 import { detectProblems } from "@astack/agent-observability/analysis";
+import { delegationSchema } from "@astack/agent-observability/delegation";
 import { redact, redactText } from "@astack/agent-observability/redaction";
 import { CodexReader } from "./rpc";
 import type { CollectorConfig } from "../config";
@@ -460,12 +461,12 @@ export async function normalizeTurn(options: {
         emit(
           itemId,
           seq,
-          item.status === "inProgress" ? "subagent_start" : "subagent_result",
-          `Subagent ${item.tool}`,
+          item.status === "inProgress" ? "tool_call" : "tool_result",
+          `Agent coordination: ${item.tool}`,
           {
             tool: item.tool,
             failed: item.status === "failed",
-            data: { sessions: item.receiverThreadIds },
+            data: { sessions: item.receiverThreadIds, status: item.status },
           },
         );
         break;
@@ -542,6 +543,29 @@ export async function normalizeTurn(options: {
     machineId: machine.machineId,
     machineName: machine.machineName,
     sessionId: thread.id,
+    sessionReferences: [{ kind: "codex", sessionId: thread.id }],
+    delegations: turn.items
+      .flatMap((raw) => {
+        const parsed = itemSchemas.collabAgentToolCall.safeParse(raw);
+        if (
+          !parsed.success ||
+          !["spawnAgent", "spawn_agent"].includes(parsed.data.tool)
+        )
+          return [];
+        return parsed.data.receiverThreadIds.map((sessionId) =>
+          delegationSchema.parse({
+            id: `${runId}:delegate:${parsed.data.id}:${sessionId}`,
+            source: "codex",
+            child: { kind: "codex", sessionId },
+            title: "Delegated agent",
+            // A completed spawn tool call says nothing about the child's outcome.
+            status: "unknown",
+            startedAt: null,
+            completedAt: null,
+          }),
+        );
+      })
+      .slice(0, 32),
     attemptId: turn.id,
     ...(thread.parentThreadId
       ? { parentSessionId: thread.parentThreadId }
