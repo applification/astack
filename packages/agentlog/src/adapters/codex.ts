@@ -17,6 +17,11 @@ import { detectProblems } from "@astack/agent-observability/analysis";
 import { delegationSchema } from "@astack/agent-observability/delegation";
 import { redact, redactText } from "@astack/agent-observability/redaction";
 import { CodexReader } from "./rpc";
+import { CodexAutomations } from "./codex-automations";
+import {
+  automationSchema,
+  type Automation,
+} from "@astack/agent-observability/automations";
 import type { CollectorConfig } from "../config";
 import type { LocalStore } from "../store";
 import { localRepository } from "../git";
@@ -114,6 +119,7 @@ export const threadSchema = z.object({
   cwd: z.string(),
   source: z.unknown(),
   originator: z.string().nullable().optional(),
+  threadSource: z.string().nullable().optional(),
   cliVersion: z.string(),
   createdAt: z.number(),
   updatedAt: z.number(),
@@ -241,11 +247,22 @@ export async function normalizeTurn(options: {
   observedAt: number;
   work?: WorkReference;
   projectId?: string;
+  automation?: Automation;
 }): Promise<AgentSnapshot> {
   const { thread, turn, machine, observedAt } = options;
   const safeText = (value: string) => redactText(value, options.knownSecrets);
   const safeData = (value: unknown) => redact(value, options.knownSecrets);
   const runId = runIdentity(machine.machineId, thread.id, turn.id);
+  const automation =
+    options.automation ??
+    (thread.threadSource === "automation"
+      ? ({
+          provider: "codex",
+          id: null,
+          name: null,
+          schedule: null,
+        } satisfies Automation)
+      : undefined);
   const events: AgentEvent[] = [];
   const signature = (value: string) =>
     createHmac("sha256", options.signatureKey).update(value).digest("hex");
@@ -573,6 +590,9 @@ export async function normalizeTurn(options: {
     source:
       thread.originator ??
       (typeof thread.source === "string" ? thread.source : "subagent"),
+    ...(automation
+      ? { automation: automationSchema.parse(safeData(automation)) }
+      : {}),
     cwd: safeText(thread.cwd),
     ...(thread.gitInfo?.originUrl
       ? { repo: safeText(thread.gitInfo.originUrl) }
@@ -639,92 +659,105 @@ export class CodexAdapter {
       await this.reader.initialize();
       this.initialized = true;
     }
-    for (const archived of [false, true]) {
-      const checkpoint = `codex:${this.home}:${archived}:updated`;
-      const since =
-        Number(this.store.getMeta(checkpoint) ?? this.config.since / 1000) - 2;
-      let cursor: string | null = null;
-      let newest = since + 2;
-      do {
-        const page = listSchema.parse(
-          await this.reader.request("thread/list", {
-            limit: 100,
-            sortKey: "updated_at",
-            sortDirection: "desc",
-            sourceKinds,
-            archived,
-            ...(cursor ? { cursor } : {}),
-          }),
-        );
-        let past = false;
-        for (const thread of page.data) {
-          if (thread.updatedAt < since) {
-            past = true;
-            break;
-          }
-          newest = Math.max(newest, thread.updatedAt);
-          let resolvedThread = thread;
-          if (!thread.gitInfo?.originUrl?.trim()) {
-            if (!repositories.has(thread.cwd))
-              repositories.set(thread.cwd, await localRepository(thread.cwd));
-            const repo = repositories.get(thread.cwd);
-            if (repo)
-              resolvedThread = {
-                ...thread,
-                gitInfo: { ...thread.gitInfo, originUrl: repo },
-              };
-          }
-          const project = resolveProject(this.projects, {
-            machineId: this.config.machineId,
-            cwd: thread.cwd,
-            ...(resolvedThread.gitInfo?.originUrl
-              ? { repo: resolvedThread.gitInfo.originUrl }
-              : {}),
-          });
-          if (!project) continue;
-          let turnCursor: string | null = null;
-          do {
-            const turns = turnListSchema.parse(
-              await this.reader.request("thread/turns/list", {
-                threadId: thread.id,
-                limit: 50,
-                sortDirection: "desc",
-                itemsView: "full",
-                ...(turnCursor ? { cursor: turnCursor } : {}),
-              }),
-            );
-            for (const turn of turns.data) {
-              if (
-                (turn.startedAt ?? thread.createdAt) * 1000 <
-                this.config.since
-              )
-                continue;
-              const context = this.store.getMeta(`context:${thread.id}`);
-              const parsed = context
-                ? launchContextSchema.parse(JSON.parse(context))
-                : {};
-              const snapshot = await normalizeTurn({
-                thread: resolvedThread,
-                turn,
-                machine: this.config,
-                signatureKey: this.signatureKey,
-                knownSecrets: this.knownSecrets,
-                observedAt: Date.now(),
-                ...parsed,
-                projectId: project.projectId,
-              });
-              if (resolvedThread !== thread)
-                snapshot.run.coverage.push(
-                  "Repository resolved from local Git at capture time; native origin unavailable.",
-                );
-              yield snapshot;
+    const automationVersion = `codex:${this.home}:automation-capture-version`;
+    const replayAutomations = this.store.getMeta(automationVersion) !== "1";
+    const automations = new CodexAutomations(this.home);
+    try {
+      for (const archived of [false, true]) {
+        const checkpoint = `codex:${this.home}:${archived}:updated`;
+        const since =
+          Number(
+            (replayAutomations ? null : this.store.getMeta(checkpoint)) ??
+              this.config.since / 1000,
+          ) - 2;
+        let cursor: string | null = null;
+        let newest = since + 2;
+        do {
+          const page = listSchema.parse(
+            await this.reader.request("thread/list", {
+              limit: 100,
+              sortKey: "updated_at",
+              sortDirection: "desc",
+              sourceKinds,
+              archived,
+              ...(cursor ? { cursor } : {}),
+            }),
+          );
+          let past = false;
+          for (const thread of page.data) {
+            if (thread.updatedAt < since) {
+              past = true;
+              break;
             }
-            turnCursor = turns.nextCursor;
-          } while (turnCursor);
-        }
-        cursor = past ? null : page.nextCursor;
-      } while (cursor);
-      this.store.setMeta(checkpoint, String(newest));
+            newest = Math.max(newest, thread.updatedAt);
+            let resolvedThread = thread;
+            if (!thread.gitInfo?.originUrl?.trim()) {
+              if (!repositories.has(thread.cwd))
+                repositories.set(thread.cwd, await localRepository(thread.cwd));
+              const repo = repositories.get(thread.cwd);
+              if (repo)
+                resolvedThread = {
+                  ...thread,
+                  gitInfo: { ...thread.gitInfo, originUrl: repo },
+                };
+            }
+            const project = resolveProject(this.projects, {
+              machineId: this.config.machineId,
+              cwd: thread.cwd,
+              ...(resolvedThread.gitInfo?.originUrl
+                ? { repo: resolvedThread.gitInfo.originUrl }
+                : {}),
+            });
+            if (!project) continue;
+            const automation = automations.lookup(thread.id, Date.now());
+            let turnCursor: string | null = null;
+            do {
+              const turns = turnListSchema.parse(
+                await this.reader.request("thread/turns/list", {
+                  threadId: thread.id,
+                  limit: 50,
+                  sortDirection: "desc",
+                  itemsView: "full",
+                  ...(turnCursor ? { cursor: turnCursor } : {}),
+                }),
+              );
+              for (const turn of turns.data) {
+                if (
+                  (turn.startedAt ?? thread.createdAt) * 1000 <
+                  this.config.since
+                )
+                  continue;
+                const context = this.store.getMeta(`context:${thread.id}`);
+                const parsed = context
+                  ? launchContextSchema.parse(JSON.parse(context))
+                  : {};
+                const snapshot = await normalizeTurn({
+                  thread: resolvedThread,
+                  turn,
+                  machine: this.config,
+                  signatureKey: this.signatureKey,
+                  knownSecrets: this.knownSecrets,
+                  observedAt: Date.now(),
+                  ...parsed,
+                  projectId: project.projectId,
+                  ...(automation ? { automation } : {}),
+                });
+                if (resolvedThread !== thread)
+                  snapshot.run.coverage.push(
+                    "Repository resolved from local Git at capture time; native origin unavailable.",
+                  );
+                yield snapshot;
+              }
+              turnCursor = turns.nextCursor;
+            } while (turnCursor);
+          }
+          cursor = past ? null : page.nextCursor;
+        } while (cursor);
+        this.store.setMeta(checkpoint, String(newest));
+      }
+      this.store.setMeta(automationVersion, "1");
+    } finally {
+      automations.close();
     }
   }
   async close() {

@@ -15,6 +15,7 @@ import { queuePrompt, queueStoredPrompt, storeWorkLabel } from "./naming";
 import { storeEvaluation } from "./evaluations";
 import { sessionReferenceKey } from "@astack/agent-observability/delegation";
 import { repositoryIdentity } from "@astack/agent-observability/projects";
+import { automationKey } from "@astack/agent-observability/automations";
 
 function capabilities(run: AgentRun) {
   return new Map(run.skills.map((skill) => [capabilityKey(skill), skill]));
@@ -26,6 +27,8 @@ function facets(run: AgentRun) {
     ["status", run.status],
     ["outcome", run.outcome],
   ];
+  const taskKey = automationKey(run);
+  if (taskKey) pairs.push(["scheduled", "yes"], ["automation", taskKey]);
   for (const [dimension, value] of [
     ["version", run.agentVersion],
     ["project", run.projectId],

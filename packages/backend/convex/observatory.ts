@@ -13,6 +13,7 @@ import {
 import { query } from "./_generated/server";
 import { requireOwner } from "./access";
 import { getProject } from "./projectData";
+import { automationKey } from "@astack/agent-observability/automations";
 
 // Choices have their own cursor and project scope, independent of result filters.
 // Return only categorical metadata, deduplicated within each bounded page.
@@ -64,6 +65,10 @@ const matches = (
   value: string,
 ) => {
   switch (dimension) {
+    case "scheduled":
+      return value === "yes" && !!run.automation;
+    case "automation":
+      return automationKey(run) === value;
     case "agent":
       return run.agent === value;
     case "machine":
@@ -108,7 +113,10 @@ export const runs = query({
   }),
   handler: async (ctx, args) => {
     await requireOwner(ctx);
-    if (args.filters.length > 13 || args.paginationOpts.numItems > 100)
+    if (
+      args.filters.length > filterSchema.shape.dimension.options.length ||
+      args.paginationOpts.numItems > 100
+    )
       throw new Error("Invalid page");
     const filters = [
       ...(args.projectId
@@ -116,7 +124,11 @@ export const runs = query({
         : []),
       ...args.filters,
     ].map((f) => filterSchema.parse(f));
-    const first = filters[0];
+    // Task views should scan task facets even when a project scope is supplied.
+    const first =
+      filters.find((filter) => filter.dimension === "automation") ??
+      filters.find((filter) => filter.dimension === "scheduled") ??
+      filters[0];
     if (first) {
       const page = await ctx.db
         .query("facets")
@@ -131,7 +143,11 @@ export const runs = query({
           .query("runs")
           .withIndex("by_runId", (q) => q.eq("runId", facet.runId))
           .unique();
-        if (!row?.enrolled) continue;
+        if (
+          !row?.enrolled ||
+          (args.projectId && row.projectId !== args.projectId)
+        )
+          continue;
         const run = runSchema.parse(JSON.parse(row.data));
         if (
           filters.every((f) => matches(run, f.dimension, f.value)) &&

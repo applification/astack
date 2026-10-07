@@ -13,6 +13,9 @@ import {
   mergeFilterOptions,
 } from "@astack/agent-observability/filters";
 import { workNameKey } from "@astack/agent-observability/naming";
+import { automationKey } from "@astack/agent-observability/automations";
+import { fixtureAutomation } from "@astack/agent-observability/automation-fixtures";
+import type { FunctionReturnType } from "convex/server";
 
 // Explicit module loaders work in Bun without a Vite-only import.meta.glob.
 const modules = {
@@ -484,6 +487,168 @@ test("naming rejects a result when an enabled project's matching capture folder 
     }),
   ).toBe(0);
 });
+test("scheduled history enrichment creates indexed, project-scoped filters and keeps machines distinct", async () => {
+  const t = await setup();
+  const owner = t.withIdentity({ subject: process.env.OBSERVATORY_OWNER_ID });
+  const historical = run(machineId, "historical");
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [entry(historical), entry(run())],
+  });
+  const upgraded = { ...historical, automation: fixtureAutomation };
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [
+      entry(upgraded, 2),
+      entry({
+        ...run(machineId, "older"),
+        startedAt: 500,
+        automation: fixtureAutomation,
+      }),
+    ],
+  });
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: secondId,
+    records: [
+      entry({
+        ...run(secondId, "other-machine"),
+        automation: fixtureAutomation,
+      }),
+    ],
+  });
+  const foreignProject = "00000000-0000-4000-8000-000000000101";
+  await t.run(async (ctx) => {
+    await ctx.db.insert("projects", {
+      projectId: foreignProject,
+      name: "Other project",
+      enabled: true,
+      repositories: [],
+      folders: [{ machineId, path: "/other" }],
+    });
+  });
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [
+      entry({
+        ...run(machineId, "other-project"),
+        cwd: "/other",
+        projectId: foreignProject,
+        automation: fixtureAutomation,
+      }),
+    ],
+  });
+  const taskKey = automationKey(upgraded);
+  if (!taskKey) throw new Error("Missing fixture task key");
+  const filters = [
+    { dimension: "automation", value: taskKey },
+    { dimension: "scheduled", value: "yes" },
+  ];
+  const ids: string[] = [];
+  let cursor: string | null = null;
+  for (let pageNumber = 0; pageNumber < 10; pageNumber++) {
+    const page: FunctionReturnType<typeof api.observatory.runs> =
+      await owner.query(api.observatory.runs, {
+        projectId,
+        filters,
+        paginationOpts: { numItems: 1, cursor },
+      });
+    ids.push(
+      ...page.page.map((value) => runSchema.parse(JSON.parse(value)).id),
+    );
+    if (page.isDone) break;
+    cursor = page.continueCursor;
+  }
+  expect(ids).toEqual([historical.id, run(machineId, "older").id]);
+  const allScheduled = await owner.query(api.observatory.runs, {
+    projectId,
+    filters: [{ dimension: "scheduled", value: "yes" }],
+    paginationOpts,
+  });
+  expect(allScheduled.page).toHaveLength(3);
+  expect(
+    allScheduled.page
+      .map((raw) => runSchema.parse(JSON.parse(raw)).machineId)
+      .sort(),
+  ).toEqual([machineId, machineId, secondId]);
+  const options = await owner.query(api.observatory.filterOptions, {
+    projectId,
+    paginationOpts: { numItems: 50, cursor: null },
+  });
+  const choices = options.page.flatMap((value) =>
+    filterOptionsSchema.parse(JSON.parse(value)),
+  );
+  const otherMachineKey = automationKey({ ...upgraded, machineId: secondId });
+  if (!otherMachineKey) throw new Error("Missing other machine task key");
+  expect(
+    choices
+      .filter((choice) => choice.dimension === "automation")
+      .map((choice) => choice.value)
+      .sort(),
+  ).toEqual([taskKey, otherMachineKey].sort());
+  expect(
+    choices.find(
+      (choice) => choice.dimension === "automation" && choice.value === taskKey,
+    )?.label,
+  ).toBe("Daily health scan · Fixture");
+  await expect(
+    t.query(api.observatory.runs, { filters, paginationOpts }),
+  ).rejects.toThrow("Unauthorized");
+  const persisted = await owner.query(api.observatory.run, {
+    runId: historical.id,
+    projectId,
+  });
+  expect(persisted ? runSchema.parse(JSON.parse(persisted)) : null).toEqual(
+    upgraded,
+  );
+  const filtered = await owner.query(api.observatory.runs, {
+    projectId,
+    filters: [...filters, { dimension: "status", value: "failed" }],
+    paginationOpts,
+  });
+  expect(filtered.page).toEqual([]);
+});
+
+test("automation facet changes replace prior task history rather than leaving stale matches", async () => {
+  const t = await setup();
+  const owner = t.withIdentity({ subject: process.env.OBSERVATORY_OWNER_ID });
+  const scheduled = { ...run(), automation: fixtureAutomation };
+  const oldKey = automationKey(scheduled);
+  if (!oldKey) throw new Error("Missing task identity");
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [entry(scheduled)],
+  });
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [
+      entry(
+        {
+          ...scheduled,
+          automation: { ...fixtureAutomation, id: "changed-task" },
+        },
+        2,
+      ),
+    ],
+  });
+  expect(
+    (
+      await owner.query(api.observatory.runs, {
+        filters: [{ dimension: "automation", value: oldKey }],
+        paginationOpts,
+      })
+    ).page,
+  ).toEqual([]);
+  const current = await owner.query(api.observatory.runs, {
+    filters: [{ dimension: "scheduled", value: "yes" }],
+    paginationOpts,
+  });
+  expect(
+    current.page.map(
+      (value) => runSchema.parse(JSON.parse(value)).automation?.id,
+    ),
+  ).toEqual(["changed-task"]);
+});
+
 test("every data query denies anonymous users and the wrong signed subject", async () => {
   const t = await setup();
   await expect(

@@ -3,6 +3,7 @@ import { evaluationSchema } from "./evaluations";
 import { workflowAnnotationSchema } from "./workflow";
 import { delegationSchema, sessionReferenceSchema } from "./delegation";
 import { deliveryEvidenceSchema } from "./delivery-evidence";
+import { automationSchema } from "./automations";
 
 const id = z.string().min(1).max(512);
 const text = z.string().max(4096);
@@ -114,6 +115,7 @@ export const runSchema = z
     sessionReferences: z.array(sessionReferenceSchema).max(20).default([]),
     delegations: z.array(delegationSchema).max(32).default([]),
     source: id,
+    automation: automationSchema.optional(),
     cwd: text,
     repo: text.optional(),
     branch: text.optional(),
@@ -209,6 +211,8 @@ export const filterSchema = z
       "capability",
       "tool",
       "problem",
+      "scheduled",
+      "automation",
     ]),
     value: z.string().min(1).max(4096),
   })
