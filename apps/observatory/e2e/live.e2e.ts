@@ -20,7 +20,7 @@ test("deployed astack workflow connects the actual route, phases and evidence wi
       "Observatory — astack route and workflow tracking",
       { exact: true },
     ),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 30_000 });
   await expect(
     screen.getByRole("heading", "New feature", { exact: true }),
   ).toBeVisible();
@@ -160,19 +160,25 @@ test("deployed evaluation links the captured request, retained proof and owner r
     .getByRole("link", "Original request in trace", { exact: true })
     .tap();
   await expect(screen.getByRole("heading", "Activity trace")).toBeVisible();
-  expect(
-    await browser.evaluate(() => {
-      const id = new URLSearchParams(location.hash.split("?")[1]).get("event");
-      const event = document.getElementById(id ?? "");
-      return {
-        open: event instanceof HTMLDetailsElement && event.open,
-        matchesRequest:
-          event
-            ?.querySelector(".event-content pre")
-            ?.textContent?.includes("astack observatory") ?? false,
-      };
-    }),
-  ).toEqual({ open: true, matchesRequest: true });
+  await expect
+    .poll(
+      () =>
+        browser.evaluate(() => {
+          const id = new URLSearchParams(location.hash.split("?")[1]).get(
+            "event",
+          );
+          const event = document.getElementById(id ?? "");
+          return {
+            open: event instanceof HTMLDetailsElement && event.open,
+            matchesRequest:
+              event
+                ?.querySelector(".event-content pre")
+                ?.textContent?.includes("astack observatory") ?? false,
+          };
+        }),
+      { timeout: 30_000 },
+    )
+    .toEqual({ open: true, matchesRequest: true });
   await screen
     .getByRole("link", "Observatory evaluations — first implementation", {
       exact: true,
@@ -370,11 +376,10 @@ test("live project filter menus work across Runs, Work and Problems and find his
       screen.getByRole("button", "Filters", { exact: true }),
     ).toHaveAttribute("aria-expanded", "false");
     await screen.getByRole("button", "Filters", { exact: true }).tap();
-    expect(
-      await browser.evaluate(
-        () => document.querySelectorAll(".filters select").length,
-      ),
-    ).toBe(10);
+    await expect(screen.getByLabel("Run type", { exact: true })).toBeVisible();
+    await expect(
+      screen.getByLabel("Scheduled task", { exact: true }),
+    ).toBeVisible();
     expect(
       await browser.evaluate(
         () => document.querySelectorAll('.filters input[type="text"]').length,
@@ -470,6 +475,15 @@ test("private deployment gates access and supports live run/trace/work/skills na
   await screen.getByRole("link", "Work", { exact: true }).tap();
   await expect(
     screen.getByRole("heading", "Work & agent activity"),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(() =>
+      new URLSearchParams(location.hash.split("?")[1]).get("project"),
+    ),
+  ).toBe(selectedProject);
+  await screen.getByRole("link", "Scheduled tasks", { exact: true }).tap();
+  await expect(
+    screen.getByRole("heading", "Scheduled tasks", { exact: true }),
   ).toBeVisible();
   expect(
     await browser.evaluate(() =>

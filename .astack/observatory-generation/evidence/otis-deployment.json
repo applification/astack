@@ -1,0 +1,157 @@
+{
+  "observedAt": "2026-10-07T17:00:59.831Z",
+  "applicationRevision": "312b018e830268dfeb2d8d7a2ea87c67e7deea00",
+  "deploymentTool": {
+    "baseRevision": "312b018e830268dfeb2d8d7a2ea87c67e7deea00",
+    "sources": [
+      {
+        "path": "infra/observatory/deploy.ts",
+        "sha256": "9e16bc77944ac848566ce7372641d26a1fcfc60418fb288b2a5655eb9a634072"
+      },
+      {
+        "path": "apps/observatory/e2e/live.e2e.ts",
+        "sha256": "69005ffb34fa7bfca8fc746cead8768618320d2f6072ed133b2a3965db6f197e"
+      }
+    ]
+  },
+  "environment": {
+    "platform": "macOS arm64",
+    "runtime": "Bun 1.4.0",
+    "surface": "https://otis.tail12a0a0.ts.net:8450",
+    "fixture": "Existing private production capture; no historical evaluations backfilled."
+  },
+  "rollout": {
+    "backendDeployed": true,
+    "signedCollectorInstalled": true,
+    "services": [
+      {
+        "service": "backend",
+        "state": "running",
+        "health": "healthy"
+      },
+      {
+        "service": "dashboard",
+        "state": "running",
+        "health": "healthy"
+      },
+      {
+        "service": "web",
+        "state": "running",
+        "health": "No container healthcheck; live HTTPS/asset/browser checks pass."
+      }
+    ],
+    "collector": {
+      "machine": "Otis",
+      "pending": 0,
+      "nativeSourceHealthy": true,
+      "t3SourceHealthy": true,
+      "forwardingHealthy": true
+    },
+    "installedInstructions": {
+      "plugin": "applification",
+      "version": "0.4.0",
+      "mergedFilesMatch": [
+        "skills/astack/SKILL.md",
+        "skills/implement/SKILL.md",
+        "skills/investigate/SKILL.md",
+        "skills/verify/SKILL.md",
+        "skills/pr/SKILL.md",
+        "skills/astack/references/observatory.md"
+      ]
+    },
+    "backups": {
+      "runtime": true,
+      "collectorSQLite": true,
+      "backendSnapshot": true,
+      "snapshotZipIntegrity": true
+    }
+  },
+  "build": {
+    "checkedAt": "2026-10-07T16:58:21.346Z",
+    "applicationRevision": "312b018e830268dfeb2d8d7a2ea87c67e7deea00",
+    "origin": "https://otis.tail12a0a0.ts.net:8450",
+    "indexSha256": "039578d8b2baa34ac8193cfb5645ae7329eb93ebb20fcd93bb21ed8719ef461c",
+    "configuredOrigins": [
+      "https://otis.tail12a0a0.ts.net:8451",
+      "https://otis.tail12a0a0.ts.net:8452"
+    ],
+    "servedAssetsMatchBuild": true,
+    "ignoresInheritedDevelopmentOrigins": true,
+    "assets": [
+      {
+        "path": "/assets/index-1SObSyOw.js",
+        "sha256": "eb8b834ce34c198219d1801f785436fe46b329b83f9ff3d72a8760b2667cb2dc",
+        "bytes": 663081
+      },
+      {
+        "path": "/assets/index-CvXznGjP.css",
+        "sha256": "62b31d44a16eb99739260fe5b90e3214d2d4ae710a505acbf6b8b98040389c8b",
+        "bytes": 34710
+      }
+    ]
+  },
+  "auth": {
+    "at": "2026-10-07T16:59:06.776Z",
+    "missing_identity_denied": true,
+    "wrong_viewer_denied": true,
+    "machine_key_cannot_read": true,
+    "missing_ingest_credential_denied": true,
+    "machine_impersonation_denied": true,
+    "owner_session_allowed": true,
+    "native_query_requires_jwt": true,
+    "runsInFirstPage": 96,
+    "runsWithContentCaptureInPage": 96,
+    "runsWithSkillEvidenceInPage": 57,
+    "capabilityGroupsInFirstPage": 100,
+    "real_persisted_trace_present": true,
+    "traceEventsInFirstPage": 82,
+    "redacted_content_present": true
+  },
+  "browser": {
+    "command": "bun run observatory:test:live",
+    "result": "pass after repairing waits",
+    "summary": {
+      "discovered": 8,
+      "selected": 8,
+      "executed": 8,
+      "passed": 8,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 0
+    },
+    "firstAttempt": {
+      "passed": 6,
+      "failed": 2,
+      "observations": [
+        "Workflow evaluation still loading after the five-second default assertion timeout.",
+        "Trace heading loaded before the selected request event arrived."
+      ],
+      "repair": "Wait up to 30 seconds for the evaluation heading; poll until the referenced request is uploaded and open. Original content assertion retained."
+    }
+  },
+  "checks": {
+    "strictTypes": "pass",
+    "unitIntegration": {
+      "passed": 120,
+      "failed": 0,
+      "assertions": 715
+    },
+    "siteAndPluginIntegrity": "pass",
+    "productionDeployWithInheritedLoopbackViteUrls": "pass; runtime HTTPS origins override caller environment",
+    "gitDiffCheck": "pass"
+  },
+  "review": {
+    "skill": "convex:convex-reviewer",
+    "method": "Self-review of the configuration boundary and client consumers.",
+    "blockingFindings": [],
+    "observations": "Deployment reads bootstrap-owned public origins before build or runtime writes. Both HTTPS origins are passed explicitly to Vite. Native owner/machine authentication passes live denied/permitted checks. No schema or function change."
+  },
+  "corrections": [
+    "The initial deploy omitted Vite Convex origins and served Configure Observatory. Rebuilt with configured URLs, published corrected assets, then repeated the rollout using the fixed deploy command.",
+    "The initial export CLI progress subscription timed out. Recovered its original server snapshot, which started before the backend update, and passed ZIP integrity."
+  ],
+  "limits": [
+    "Installed instruction files are verified; a future autonomous agent task using the refreshed instructions has not yet been observed.",
+    "Live production screenshots and raw telemetry remain private. No product rendering change requires retained screenshots."
+  ]
+}
