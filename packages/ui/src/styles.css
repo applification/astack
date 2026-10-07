@@ -1004,3 +1004,129 @@
     font-size: 3rem;
   }
 }
+
+@utility route-journey {
+  --journey-color: #6f8eb2;
+  &[data-route="bug-fix"] {
+    --journey-color: #d7775f;
+  }
+  &[data-route="implement"] {
+    --journey-color: #4b916f;
+  }
+  &[data-route="investigate"] {
+    --journey-color: #8875a6;
+  }
+  &[data-route="performance"] {
+    --journey-color: #b78b3e;
+  }
+  &[data-route="pr"] {
+    --journey-color: #5b9d9b;
+  }
+  & > li {
+    border-left: 3px solid var(--journey-color);
+    margin-left: 0.5rem;
+    padding-left: 1.6rem;
+    padding-bottom: 1.8rem;
+  }
+  & > li::before {
+    left: -9px;
+    top: 0.25rem;
+    width: 15px;
+    height: 15px;
+    border: 3px solid var(--journey-color);
+    background: var(--color-background);
+  }
+  & > li[data-status="failed"]::before {
+    background: var(--color-destructive);
+  }
+  & > li[data-status="omitted"] {
+    border-left-style: dashed;
+  }
+  & > li.journey-join::before {
+    outline: 3px solid var(--journey-color);
+    outline-offset: 3px;
+  }
+}
+@utility journey-branches {
+  min-width: 0;
+  & h4 {
+    margin: 0;
+  }
+}
+@utility journey-branch-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  padding-top: 1.25rem;
+  @media (max-width: 700px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@utility journey-child {
+  --child-color: #4b916f;
+  min-width: 0;
+  position: relative;
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--child-color);
+  border-radius: 0.8rem;
+  padding: 0.9rem;
+  background: var(--color-card);
+  &:nth-child(even) {
+    --child-color: #b78b3e;
+  }
+  &::before {
+    content: "";
+    position: absolute;
+    top: -1.25rem;
+    left: -4px;
+    width: 1.8rem;
+    height: 1.25rem;
+    border-top: 4px solid var(--child-color);
+    border-left: 4px solid var(--child-color);
+    border-top-left-radius: 1rem;
+  }
+  & > summary {
+    cursor: pointer;
+    color: var(--color-foreground);
+    padding: 0.15rem;
+    overflow-wrap: anywhere;
+  }
+  & > summary::marker {
+    color: var(--child-color);
+  }
+  & > summary:focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 4px;
+  }
+  & > summary > .secondary {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+  }
+  & a {
+    overflow-wrap: anywhere;
+  }
+}
+@utility journey-child-title {
+  font-weight: 650;
+}
+@utility journey-child-turns {
+  padding-left: 1rem;
+  & li {
+    margin: 0.6rem 0;
+  }
+  & span {
+    display: block;
+    font-size: 0.8rem;
+  }
+}
+@utility journey-skill-read {
+  margin: 0.65rem 0;
+  & summary {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+  }
+}
+@utility journey-delegation-station { min-width: 0; }

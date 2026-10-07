@@ -205,7 +205,7 @@ function shell(cwd: string) {
 }
 async function snapshot(
   f: Awaited<ReturnType<typeof fixture>>,
-  raw = projection(),
+  raw: unknown = projection(),
   captureContent = true,
 ) {
   const parsed = t3ProjectionSchema.parse(raw);
@@ -378,10 +378,42 @@ test("native Codex overlap preserves the first collector, annotations and event 
   native.run.outcome = "success";
   native.run.work = { id: "AST-1" };
   persistSnapshot(f.store, native);
-  expect(await snapshot(f, projection("codex", "codex"))).toBeNull();
+  const supplement = await snapshot(f, {
+    ...projection("codex", "codex"),
+    subagents: [
+      {
+        id: "task-ui",
+        runId: "app-run",
+        childThreadId: "app-child",
+        title: "UI child",
+        status: "completed",
+        startedAt: time,
+        completedAt: end,
+      },
+    ],
+  });
+  if (!supplement) throw new Error("missing T3 metadata supplement");
+  expect(supplement.events).toEqual([]);
+  persistSnapshot(f.store, supplement);
+  expect(
+    f.store.runsForSession("native-session")[0]?.delegations,
+  ).toMatchObject([
+    {
+      id: "task-ui",
+      status: "completed",
+      child: { kind: "t3", threadId: "app-child" },
+    },
+  ]);
+  expect(
+    f.store.runsForSession("native-session")[0]?.sessionReferences,
+  ).toContainEqual({ kind: "t3", environmentId, threadId: "app-thread" });
   expect(f.store.runsForSession("native-session")[0]?.outcome).toBe("success");
   expect(f.store.runsForSession("native-session")[0]?.work?.id).toBe("AST-1");
   expect(f.store.events(native.run.id)).toHaveLength(native.events.length);
+  persistSnapshot(f.store, native);
+  expect(f.store.runsForSession("native-session")[0]?.delegations).toHaveLength(
+    1,
+  );
   const other = projection("codex", "codex");
   for (const turn of other.providerTurns)
     turn.nativeTurnRef.nativeId = "new-native-turn";
@@ -394,6 +426,17 @@ test("native Codex overlap preserves the first collector, annotations and event 
   const overlapping = structuredClone(native);
   overlapping.run.id = t3.run.id;
   overlapping.run.attemptId = "new-native-turn";
+  overlapping.run.delegations = [
+    {
+      id: t3.run.id + ":delegate:native-child",
+      source: "codex",
+      child: { kind: "codex", sessionId: "native-child" },
+      title: "Delegated agent",
+      status: "unknown",
+      startedAt: null,
+      completedAt: null,
+    },
+  ];
   overlapping.events.forEach((event) => {
     event.runId = t3.run.id;
     event.id = `${t3.run.id}:native-extra`;
@@ -402,7 +445,7 @@ test("native Codex overlap preserves the first collector, annotations and event 
   expect(f.store.events(t3.run.id)).toHaveLength(t3.events.length);
   expect(f.store.getRecord(`run:${t3.run.id}`)).toEqual({
     kind: "run",
-    value: t3.run,
+    value: { ...t3.run, delegations: overlapping.run.delegations },
   });
 });
 

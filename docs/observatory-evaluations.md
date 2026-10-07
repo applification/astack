@@ -59,6 +59,12 @@ Use the actual generated backend/site URLs if they differ. The script rejects ho
 
 ## Rollout and limits
 
+Route journeys add explicit delegated child identities, observed child skill reads and parent joins. Native Codex turns retain the first collector's canonical run and event set; T3 supplements task lifecycle and conversation aliases. Native coordination tool completion is not a child outcome. Fork lineage alone does not establish delegation, and child completion or result delivery never creates a join.
+
+The journey reads current enabled, enrolled, readable capture on the same machine/project. It shows up to 32 direct delegations, 20 child turns, 80 total workflow records and 32 skill reads/evidence previews within a shared 256 KiB read budget. Repeated identities, missing capture, nested delegations and display limits remain explicit. Evaluation intent, linked-run snapshots and assessment evidence eligibility are unchanged. Precise skill caller instrumentation and automatic nested expansion are outside this slice.
+
+Upgrade the backend before the collector/UI. New ingestion maintains the indexed conversation aliases; the existing bounded `ingestion:rebuildFacets` repair also projects legacy native session identities. T3 capture version 3 replays its matched active/archive metadata to add aliases and task facts. Old captures lacking relationships remain unavailable rather than receiving inferred parentage. No production rollout is included in the route journey PR.
+
 Upgrade the backend before enabling evaluation imports. The schema-v1 envelope additionally accepts `evaluation` records; older backends reject them and older collector binaries cannot read those queue records. Retain the upgraded collector for replay. Existing run/event records retain their shape and outcomes.
 
 At the owner's request, revision `37a3c0c` was deployed to Otis on 2026-10-06, with backend functions first and then the production UI/signed collector. Recovery copies and a private database export were retained. Signed CLI check/import, live evaluation auth/scope/snapshot checks and six authenticated browser journeys pass; served HTML/JavaScript match the build and source/forwarding health is good. See [deployment proof](../.astack/observatory-evals/evidence/otis-deployment.json).

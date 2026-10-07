@@ -696,3 +696,176 @@ test("timeline excerpts use real captured content and names, exclude context and
     (await read()).timeline.find((item) => item.runId === run.id)?.request,
   ).toBeNull();
 });
+
+test("current delegated journeys resolve indexed child turns and explicit joins without changing immutable evaluation runs", async () => {
+  const { journeyFixture } =
+    await import("@astack/agent-observability/journey-fixtures");
+  const { t, evaluation, owner } = await setup("inconclusive");
+  const fixture = journeyFixture();
+  await ingestWorkflow(
+    t,
+    [fixture.parent, ...fixture.children].map((value) => ({
+      kind: "run",
+      value,
+    })),
+  );
+  await ingestWorkflow(
+    t,
+    fixture.events.map((value) => ({ kind: "event", value })),
+  );
+  const read = async () =>
+    evaluationDetailSchema.parse(
+      JSON.parse(
+        (await owner.query(api.evaluations.detail, {
+          evaluationId: evaluation.id,
+          projectId: fixtureProject,
+        })) ?? "null",
+      ),
+    );
+  const captured = await read();
+  expect(captured.runs).toHaveLength(2);
+  expect(captured.runs.every(({ run }) => run.delegations.length === 0)).toBe(
+    true,
+  );
+  expect(
+    captured.workflow.branches.map((branch) => branch.runs.length),
+  ).toEqual([2, 1]);
+  expect(
+    captured.workflow.branches.map((branch) =>
+      branch.reads.map((read) => read.skill.name),
+    ),
+  ).toEqual([["react", "react"], ["testing"]]);
+  const join = captured.workflow.records.find(
+    (record) => record.annotation.action === "join",
+  );
+  expect(join?.evidence.every((item) => item.state === "available")).toBe(true);
+  expect(captured.assessments).toEqual([]);
+  await ingestWorkflow(
+    t,
+    fixture.children.map((child) => ({
+      kind: "run",
+      value: { ...child, contentCapture: false },
+    })),
+  );
+  // Force an explicitly newer revision than the earlier capture.
+  for (const child of fixture.children)
+    await t.mutation(internal.ingestion.ingest, {
+      machineId: fixtureMachine,
+      records: entries(
+        [{ kind: "run", value: { ...child, contentCapture: false } }],
+        100,
+      ),
+    });
+  const withheld = await read();
+  expect(
+    withheld.workflow.branches.every(
+      (branch) =>
+        branch.state === "unavailable" &&
+        !branch.reads.length &&
+        !branch.records.length,
+    ),
+  ).toBe(true);
+  expect(
+    withheld.workflow.records
+      .find((record) => record.annotation.action === "join")
+      ?.evidence.every((item) => item.state === "unavailable"),
+  ).toBe(true);
+});
+
+test("delegated lookup rejects stale foreign projections and cycles and bounds large child sessions", async () => {
+  const { journeyFixture } =
+    await import("@astack/agent-observability/journey-fixtures");
+  const { t, evaluation, owner } = await setup("inconclusive");
+  const fixture = journeyFixture(false);
+  await ingestWorkflow(
+    t,
+    [fixture.parent, ...fixture.children].map((value) => ({
+      kind: "run",
+      value,
+    })),
+  );
+  const read = async () =>
+    evaluationDetailSchema.parse(
+      JSON.parse(
+        (await owner.query(api.evaluations.detail, {
+          evaluationId: evaluation.id,
+          projectId: fixtureProject,
+        })) ?? "null",
+      ),
+    );
+  const child = fixture.children.find(
+    (child) => child.sessionId === "child-data",
+  );
+  const task = fixture.parent.delegations[0];
+  if (!child || !task) throw new Error("Missing child or task");
+  await t.run(async (ctx) => {
+    const row = await ctx.db
+      .query("runs")
+      .withIndex("by_runId", (q) => q.eq("runId", child.id))
+      .unique();
+    if (!row) throw new Error("Missing stored child");
+    await ctx.db.patch(row._id, { projectId: "foreign-project" });
+  });
+  const foreign = (await read()).workflow.branches.find(
+    (branch) => branch.delegation.id === "delegate-data",
+  );
+  expect(foreign).toMatchObject({
+    state: "unavailable",
+    runs: [],
+    reads: [],
+    records: [],
+  });
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries(
+      [
+        {
+          kind: "run",
+          value: {
+            ...fixture.parent,
+            delegations: [
+              {
+                ...task,
+                id: "cycle",
+                source: "codex",
+                child: { kind: "codex", sessionId: fixture.parent.sessionId },
+              },
+            ],
+          },
+        },
+      ],
+      100,
+    ),
+  });
+  expect((await read()).workflow.branches[0]).toMatchObject({
+    state: "unavailable",
+    runs: [],
+  });
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries([{ kind: "run", value: fixture.parent }], 101),
+  });
+  for (let index = 0; index < 22; index++) {
+    const value = {
+      ...child,
+      id: child.id + ":extra:" + index,
+      attemptId: "extra-" + index,
+      startedAt: child.startedAt + index,
+    };
+    await t.mutation(internal.ingestion.ingest, {
+      machineId: fixtureMachine,
+      records: entries([{ kind: "run", value }], 102),
+    });
+  }
+  const bounded = await read();
+  expect(bounded.workflow.truncated).toBe(true);
+  expect(
+    bounded.workflow.branches.reduce(
+      (count, branch) => count + branch.runs.length,
+      0,
+    ),
+  ).toBeLessThanOrEqual(20);
+  expect(bounded.workflow.branches.some((branch) => branch.truncated)).toBe(
+    true,
+  );
+});

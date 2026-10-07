@@ -18,6 +18,7 @@ import {
 import { EvaluationView, EvaluationTable } from "./evaluations";
 import { ObservatoryLayout } from "./app";
 import { workflowViewFixture } from "@astack/agent-observability/workflow-fixtures";
+import { journeyFixture } from "@astack/agent-observability/journey-fixtures";
 
 function detail(status: "pass" | "fail" | "inconclusive", assessed = false) {
   const evaluation = evaluationFixture(status);
@@ -135,6 +136,7 @@ export const MissingFlowSelection: Story = {
       ...detail("pass"),
       workflow: {
         records: workflowViewFixture().records.slice(1, 4),
+        branches: [],
         truncated: true,
       },
     },
@@ -267,4 +269,48 @@ export const FlowReview: Story = {
       initial={{ ...detail("pass"), workflow: workflowViewFixture() }}
     />
   ),
+};
+
+export const ParallelJourneys: Story = {
+  args: {
+    detail: { ...detail("inconclusive"), workflow: journeyFixture().workflow },
+  },
+};
+export const ReturnedWithoutJoin: Story = {
+  args: {
+    detail: {
+      ...detail("inconclusive"),
+      workflow: journeyFixture(false).workflow,
+    },
+  },
+};
+export const UnavailableChildJourney: Story = {
+  args: {
+    detail: {
+      ...detail("inconclusive"),
+      workflow: {
+        ...journeyFixture(false).workflow,
+        branches: [
+          {
+            parentRunId: evaluationRun().id,
+            delegation: {
+              id: "delegate-missing",
+              source: "t3",
+              child: null,
+              title: "Uncaptured child",
+              status: "cancelled",
+              startedAt: null,
+              completedAt: null,
+            },
+            state: "unavailable",
+            reason: "The host did not expose a child conversation identity.",
+            runs: [],
+            records: [],
+            reads: [],
+            truncated: false,
+          },
+        ],
+      },
+    },
+  },
 };

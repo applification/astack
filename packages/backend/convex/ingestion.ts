@@ -13,6 +13,7 @@ import { resolveProject } from "@astack/agent-observability/projects";
 import { paginationOptsValidator } from "convex/server";
 import { queuePrompt, queueStoredPrompt, storeWorkLabel } from "./naming";
 import { storeEvaluation } from "./evaluations";
+import { sessionReferenceKey } from "@astack/agent-observability/delegation";
 
 function capabilities(run: AgentRun) {
   return new Map(run.skills.map((skill) => [capabilityKey(skill), skill]));
@@ -41,6 +42,24 @@ function facets(run: AgentRun) {
     ...new Map(pairs.map((pair) => [JSON.stringify(pair), pair])).values(),
   ].slice(0, 900);
 }
+async function storeSessions(ctx: MutationCtx, run: AgentRun) {
+  const old = await ctx.db
+    .query("runSessions")
+    .withIndex("by_runId", (q) => q.eq("runId", run.id))
+    .take(21);
+  for (const item of old) await ctx.db.delete(item._id);
+  const keys = new Set(run.sessionReferences.map(sessionReferenceKey));
+  if (run.agent === "codex")
+    keys.add(sessionReferenceKey({ kind: "codex", sessionId: run.sessionId }));
+  for (const key of [...keys].slice(0, 20))
+    await ctx.db.insert("runSessions", {
+      machineId: run.machineId,
+      key,
+      runId: run.id,
+      startedAt: run.startedAt,
+    });
+}
+
 export async function storeRun(
   ctx: MutationCtx,
   run: AgentRun,
@@ -62,6 +81,7 @@ export async function storeRun(
   };
   if (previous) await ctx.db.patch(previous._id, row);
   else await ctx.db.insert("runs", row);
+  await storeSessions(ctx, run);
   await storeWorkLabel(ctx, run);
   if (
     run.work &&
@@ -220,6 +240,7 @@ export const rebuildFacets = internalMutation({
       throw new Error("Invalid repair page");
     const page = await ctx.db.query("runs").paginate(args.paginationOpts);
     for (const row of page.page) {
+      await storeSessions(ctx, runSchema.parse(JSON.parse(row.data)));
       const old = await ctx.db
         .query("facets")
         .withIndex("by_runId", (q) => q.eq("runId", row.runId))

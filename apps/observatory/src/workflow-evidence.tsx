@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from "react";
+import { Fragment, useId, useRef, useState } from "react";
 import { Badge, Button } from "@astack/ui";
 import type { EvaluationDetail } from "@astack/agent-observability/evaluation-view";
 import { routeDefinitions } from "@astack/agent-observability/workflow";
@@ -7,6 +7,7 @@ import {
   type WorkflowFlow,
   type WorkflowNode,
   type WorkflowRecord,
+  type WorkflowBranch,
 } from "@astack/agent-observability/workflow-view";
 import { runLink } from "./evaluation-evidence";
 import { SkillBadge, SkillIcon, skillLabel } from "./skill-badge";
@@ -35,12 +36,16 @@ function RecordEvidence({
           ? phaseLabel(annotation.status)
           : annotation.action === "select"
             ? "Route selected"
-            : "Route changed"}
+            : annotation.action === "join"
+              ? "Parent join declared"
+              : "Route changed"}
         {" · "}
         {new Date(record.recordedAt).toLocaleString()}
       </p>
       <p>
-        {annotation.action === "phase" ? annotation.summary : annotation.reason}
+        {annotation.action === "phase" || annotation.action === "join"
+          ? annotation.summary
+          : annotation.reason}
       </p>
       <a href={runLink(record.runId, projectId, record.eventId)}>
         Declaration in trace
@@ -97,9 +102,11 @@ type SkillSelection =
 function WorkflowPath({
   flow,
   projectId,
+  branches = [],
 }: {
   flow: WorkflowFlow;
   projectId: string;
+  branches?: WorkflowBranch[];
 }) {
   const [mode, setMode] = useState<"phases" | "sequence">("phases");
   const [selection, setSelection] = useState<SkillSelection | null>(null);
@@ -109,6 +116,29 @@ function WorkflowPath({
     node.kind === "phase" ? [node] : [],
   );
   const skills = [...new Set(phases.flatMap(declaredSkills))];
+  const firstBranchTime = Math.min(
+    ...branches.map((branch) => branch.delegation.startedAt ?? Infinity),
+  );
+  const branchIndex = flow.nodes.findIndex((node) => {
+    const record = node.kind === "phase" ? node.records[0] : node.record;
+    return record && record.recordedAt >= firstBranchTime;
+  });
+  const firstJoinIndex = flow.nodes.findIndex(
+    (node) =>
+      node.kind === "join" &&
+      node.record.annotation.action === "join" &&
+      node.record.annotation.inputs.some((input) =>
+        branches.some((branch) => branch.delegation.id === input.branchId),
+      ),
+  );
+  const insertionIndex = Math.min(
+    branchIndex < 0 ? flow.nodes.length : branchIndex,
+    firstJoinIndex < 0 ? flow.nodes.length : firstJoinIndex,
+  );
+  const selectedRoute = flow.selection?.annotation;
+  const joins = flow.nodes.flatMap((node) =>
+    node.kind === "join" ? [node.record] : [],
+  );
   const selectedRecords = selection
     ? phases
         .filter(
@@ -190,7 +220,7 @@ function WorkflowPath({
           {selection?.kind === "flow" && skillEvidence}
         </div>
       )}
-      {flow.nodes.length > 0 ? (
+      {flow.nodes.length > 0 || branches.length > 0 ? (
         <>
           <div
             role="group"
@@ -202,7 +232,7 @@ function WorkflowPath({
               aria-pressed={mode === "phases"}
               onClick={() => setMode("phases")}
             >
-              Work phases
+              Route journey
             </Button>
             <Button
               variant="ghost"
@@ -220,7 +250,14 @@ function WorkflowPath({
           )}
           <ol
             className={
-              mode === "sequence" ? "astack-flow skill-sequence" : "astack-flow"
+              mode === "sequence"
+                ? "astack-flow skill-sequence"
+                : "astack-flow route-journey"
+            }
+            data-route={
+              selectedRoute?.action === "select"
+                ? selectedRoute.route
+                : undefined
             }
             aria-label={
               mode === "sequence"
@@ -229,28 +266,56 @@ function WorkflowPath({
             }
           >
             {flow.nodes.map((node, index) => {
+              const branchStation =
+                index === insertionIndex && branches.length > 0 ? (
+                  <li className="journey-delegation-station">
+                    <BranchJourneys
+                      branches={branches}
+                      projectId={projectId}
+                      joins={joins}
+                    />
+                  </li>
+                ) : null;
               if (node.kind === "route") {
                 const annotation = node.record.annotation;
                 return annotation.action === "change" ? (
-                  <li key={node.record.eventId} data-step={index + 1}>
-                    <h4>
-                      Changed route → {routeDefinitions[annotation.route].label}
-                    </h4>
-                    <p>{annotation.reason}</p>
-                    <p className="secondary">
-                      Revised plan:{" "}
-                      {annotation.plannedPhases.map(phaseLabel).join(" → ")}
-                    </p>
-                    <details>
-                      <summary>View route change</summary>
+                  <Fragment key={node.record.eventId}>
+                    {branchStation}
+                    <li data-step={index + 1}>
+                      <h4>
+                        Changed route →{" "}
+                        {routeDefinitions[annotation.route].label}
+                      </h4>
+                      <p>{annotation.reason}</p>
+                      <p className="secondary">
+                        Revised plan:{" "}
+                        {annotation.plannedPhases.map(phaseLabel).join(" → ")}
+                      </p>
+                      <details>
+                        <summary>View route change</summary>
+                        <RecordEvidence
+                          record={node.record}
+                          projectId={projectId}
+                        />
+                      </details>
+                    </li>
+                  </Fragment>
+                ) : null;
+              }
+              if (node.kind === "join")
+                return (
+                  <Fragment key={node.record.eventId}>
+                    {branchStation}
+                    <li className="journey-join" data-step={index + 1}>
+                      <h4>Join back to main</h4>
+                      <p>Agent declared which child results it used.</p>
                       <RecordEvidence
                         record={node.record}
                         projectId={projectId}
                       />
-                    </details>
-                  </li>
-                ) : null;
-              }
+                    </li>
+                  </Fragment>
+                );
               const first = node.records[0];
               const last = node.records.at(-1);
               const summary =
@@ -259,109 +324,265 @@ function WorkflowPath({
                   : null;
               const nodeSkills = declaredSkills(node);
               return (
-                <li key={first?.eventId} data-step={index + 1}>
-                  <div className="workflow-phase-heading">
-                    <h4>{phaseLabel(node.phase)}</h4>
-                    <span
-                      className={
-                        node.status === "failed"
-                          ? "text-destructive"
-                          : "text-muted-foreground"
-                      }
-                    >
-                      <Badge>{statusLabel[node.status]}</Badge>
-                    </span>
-                    {mode === "sequence" && first && (
-                      <time
-                        dateTime={new Date(first.recordedAt).toISOString()}
-                        className="workflow-sequence-time"
-                      >
-                        {new Date(first.recordedAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </time>
-                    )}
-                  </div>
-                  {mode === "phases" && summary && <p>{summary}</p>}
-                  <div
-                    className="skill-badges"
-                    aria-label={phaseLabel(node.phase) + " declared skills"}
+                <Fragment key={first?.eventId}>
+                  {branchStation}
+                  <li
+                    data-step={index + 1}
+                    data-status={node.status}
+                    data-route={node.route ?? undefined}
                   >
-                    {nodeSkills.map((skill) => {
-                      const active =
-                        selection?.kind === "phase" &&
-                        selection.eventId === first?.eventId &&
-                        selection.skill === skill;
-                      return (
-                        <SkillBadge
-                          key={skill}
-                          name={skill}
-                          aria-label={
-                            "View " +
-                            skillLabel(skill) +
-                            " in " +
-                            phaseLabel(node.phase)
-                          }
-                          aria-expanded={active}
-                          aria-controls={active ? evidenceId : undefined}
-                          onClick={(event) => {
-                            if (!first) return;
-                            trigger.current = event.currentTarget;
-                            setSelection(
-                              active
-                                ? null
-                                : {
-                                    kind: "phase",
-                                    skill,
-                                    eventId: first.eventId,
-                                  },
-                            );
-                          }}
-                        />
-                      );
-                    })}
-                    {mode === "sequence" && nodeSkills.length === 0 && (
-                      <span className="secondary">
-                        No skills declared for this phase.
+                    <div className="workflow-phase-heading">
+                      <h4>{phaseLabel(node.phase)}</h4>
+                      <span
+                        className={
+                          node.status === "failed"
+                            ? "text-destructive"
+                            : "text-muted-foreground"
+                        }
+                      >
+                        <Badge>{statusLabel[node.status]}</Badge>
                       </span>
-                    )}
-                  </div>
-                  {selection?.kind === "phase" &&
-                    selection.eventId === first?.eventId &&
-                    skillEvidence}
-                  <details>
-                    <summary>View phase evidence</summary>
-                    <div className="evaluation-step-evidence">
-                      {node.route && (
-                        <p className="secondary">
-                          Route at this phase:{" "}
-                          {routeDefinitions[node.route].label}
-                        </p>
+                      {mode === "sequence" && first && (
+                        <time
+                          dateTime={new Date(first.recordedAt).toISOString()}
+                          className="workflow-sequence-time"
+                        >
+                          {new Date(first.recordedAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </time>
                       )}
-                      {node.records.map((record) => (
-                        <RecordEvidence
-                          key={record.eventId}
-                          record={record}
-                          projectId={projectId}
-                        />
-                      ))}
-                      <p className="secondary">
-                        Declarations and skill reads do not establish
-                        application. Inspect the linked actions, outputs and
-                        verification results.
-                      </p>
                     </div>
-                  </details>
-                </li>
+                    {mode === "phases" && summary && <p>{summary}</p>}
+                    <div
+                      className="skill-badges"
+                      aria-label={phaseLabel(node.phase) + " declared skills"}
+                    >
+                      {nodeSkills.map((skill) => {
+                        const active =
+                          selection?.kind === "phase" &&
+                          selection.eventId === first?.eventId &&
+                          selection.skill === skill;
+                        return (
+                          <SkillBadge
+                            key={skill}
+                            name={skill}
+                            aria-label={
+                              "View " +
+                              skillLabel(skill) +
+                              " in " +
+                              phaseLabel(node.phase)
+                            }
+                            aria-expanded={active}
+                            aria-controls={active ? evidenceId : undefined}
+                            onClick={(event) => {
+                              if (!first) return;
+                              trigger.current = event.currentTarget;
+                              setSelection(
+                                active
+                                  ? null
+                                  : {
+                                      kind: "phase",
+                                      skill,
+                                      eventId: first.eventId,
+                                    },
+                              );
+                            }}
+                          />
+                        );
+                      })}
+                      {mode === "sequence" && nodeSkills.length === 0 && (
+                        <span className="secondary">
+                          No skills declared for this phase.
+                        </span>
+                      )}
+                    </div>
+                    {selection?.kind === "phase" &&
+                      selection.eventId === first?.eventId &&
+                      skillEvidence}
+                    <details>
+                      <summary>View phase evidence</summary>
+                      <div className="evaluation-step-evidence">
+                        {node.route && (
+                          <p className="secondary">
+                            Route at this phase:{" "}
+                            {routeDefinitions[node.route].label}
+                          </p>
+                        )}
+                        {node.records.map((record) => (
+                          <RecordEvidence
+                            key={record.eventId}
+                            record={record}
+                            projectId={projectId}
+                          />
+                        ))}
+                        <p className="secondary">
+                          Declarations and skill reads do not establish
+                          application. Inspect the linked actions, outputs and
+                          verification results.
+                        </p>
+                      </div>
+                    </details>
+                  </li>
+                </Fragment>
               );
             })}
+            {insertionIndex === flow.nodes.length && branches.length > 0 && (
+              <li className="journey-delegation-station">
+                <BranchJourneys
+                  branches={branches}
+                  projectId={projectId}
+                  joins={joins}
+                />
+              </li>
+            )}
           </ol>
         </>
       ) : (
         <p className="subtitle">No phase transitions recorded yet.</p>
       )}
     </>
+  );
+}
+
+function BranchJourneys({
+  branches,
+  projectId,
+  joins = [],
+}: {
+  branches: WorkflowBranch[];
+  projectId: string;
+  joins?: WorkflowRecord[];
+}) {
+  return (
+    <section aria-label="Delegated journeys" className="journey-branches">
+      <h4>Delegated work</h4>
+      <p className="secondary">
+        Each line is a child conversation. Task completion and parent
+        integration are recorded separately; spacing does not measure
+        concurrency.
+      </p>
+      <div className="journey-branch-grid">
+        {branches.map((branch) => {
+          const flows = workflowFlows(branch.records);
+          const used = joins.some(
+            (record) =>
+              record.annotation.action === "join" &&
+              record.annotation.inputs.some(
+                (input) =>
+                  input.branchId === branch.delegation.id &&
+                  branch.runs.some((run) => run.runId === input.result.runId) &&
+                  record.evidence.some(
+                    (item) =>
+                      item.state === "available" &&
+                      item.reference.eventId === input.result.eventId &&
+                      item.reference.runId === input.result.runId,
+                  ),
+              ),
+          );
+          return (
+            <details key={branch.delegation.id} className="journey-child">
+              <summary>
+                <span className="journey-child-title">
+                  {branch.delegation.title || "Delegated agent"}
+                </span>
+                <span className="secondary">
+                  Task {branch.delegation.status} · {branch.runs.length}{" "}
+                  captured turns · {branch.reads.length} skill reads
+                </span>
+              </summary>
+              <p className="secondary">
+                {used
+                  ? "Child result referenced at a parent join."
+                  : "No captured parent join referencing this result."}
+              </p>
+              {branch.delegation.startedAt !== null && (
+                <p className="secondary">
+                  Host started:{" "}
+                  {new Date(branch.delegation.startedAt).toLocaleString()}
+                  {branch.delegation.completedAt !== null && (
+                    <>
+                      {" "}
+                      · Finished:{" "}
+                      {new Date(branch.delegation.completedAt).toLocaleString()}
+                    </>
+                  )}
+                </p>
+              )}
+              {branch.reason && <p role="status">{branch.reason}</p>}
+              {branch.runs.length > 0 && (
+                <ul
+                  className="journey-child-turns"
+                  aria-label="Captured child turns"
+                >
+                  {branch.runs.map((run) => (
+                    <li key={run.runId}>
+                      <a href={runLink(run.runId, projectId)}>{run.title}</a>
+                      <span className="secondary">
+                        Turn {run.status} · capture revision {run.revision}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {flows.map((flow) => (
+                <WorkflowPath key={flow.id} flow={flow} projectId={projectId} />
+              ))}
+              {!flows.length && branch.state === "available" && (
+                <p className="secondary">
+                  {branch.truncated
+                    ? "Child phase details reached the display limit."
+                    : "Child phases were not declared in this capture."}
+                </p>
+              )}
+              <section aria-label="Captured child skill reads">
+                <h5>Observed skill reads</h5>
+                {branch.reads.length ? (
+                  branch.reads.map((read) => (
+                    <details
+                      key={read.reference.eventId}
+                      className="journey-skill-read"
+                    >
+                      <summary>
+                        <SkillIcon name={read.skill.name} />
+                        {skillLabel(read.skill.name)}
+                      </summary>
+                      <p className="secondary">
+                        {read.skill.evidence.replace(/_/g, " ")} ·{" "}
+                        {read.skill.provenance.replace(/_/g, " ")} · capture
+                        revision {read.revision}
+                      </p>
+                      <a
+                        href={runLink(
+                          read.reference.runId,
+                          projectId,
+                          read.reference.eventId,
+                        )}
+                      >
+                        Skill read in child trace
+                      </a>
+                    </details>
+                  ))
+                ) : (
+                  <p className="secondary">
+                    {branch.truncated
+                      ? "Skill reads are unavailable in this bounded display."
+                      : "No local skill reads captured for this child."}
+                  </p>
+                )}
+              </section>
+              {branch.truncated && (
+                <p role="status" className="notice">
+                  Child journey reached a display limit. Additional turns, reads
+                  or nested delegations may require the full trace.
+                </p>
+              )}
+            </details>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
@@ -373,6 +594,21 @@ export function WorkflowEvidence({
   view: "selection" | "path";
 }) {
   const flows = workflowFlows(detail.workflow.records);
+  const flowRunIds = (flow: WorkflowFlow) =>
+    new Set([
+      ...(flow.selection ? [flow.selection.runId] : []),
+      ...flow.nodes.flatMap((node) =>
+        node.kind === "phase"
+          ? node.records.map((record) => record.runId)
+          : [node.record.runId],
+      ),
+    ]);
+  const branchFlow = (branch: WorkflowBranch) => {
+    const matching = flows.filter((flow) =>
+      flowRunIds(flow).has(branch.parentRunId),
+    );
+    return matching.length === 1 ? matching[0]?.id : undefined;
+  };
   return (
     <section
       aria-label={view === "selection" ? "Astack approach" : "Astack workflow"}
@@ -442,12 +678,24 @@ export function WorkflowEvidence({
                 <WorkflowPath
                   flow={flow}
                   projectId={detail.evaluation.projectId}
+                  branches={detail.workflow.branches.filter(
+                    (branch) => branchFlow(branch) === flow.id,
+                  )}
                 />
               </>
             )}
           </section>
         );
       })}
+      {view === "path" &&
+        detail.workflow.branches.some((branch) => !branchFlow(branch)) && (
+          <BranchJourneys
+            branches={detail.workflow.branches.filter(
+              (branch) => !branchFlow(branch),
+            )}
+            projectId={detail.evaluation.projectId}
+          />
+        )}
       {view === "path" && detail.workflow.truncated && (
         <p role="status" className="notice">
           Workflow capture or evidence previews reached the display limit.

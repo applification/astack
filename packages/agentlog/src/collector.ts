@@ -17,6 +17,10 @@ import { drainQueue } from "./delivery";
 import { loadConfig, type CollectorConfig } from "./config";
 import { syncProjects, cachedProjects } from "./projects";
 import { resolveProject } from "@astack/agent-observability/projects";
+import {
+  mergeDelegations,
+  mergeSessionReferences,
+} from "@astack/agent-observability/delegation";
 import type { Project } from "@astack/agent-observability/projects";
 
 type CaptureAdapter = AgentAdapter & {
@@ -48,8 +52,25 @@ export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
     owner.value.source !== snapshot.run.source &&
     (owner.value.source.startsWith("t3:") ||
       snapshot.run.source.startsWith("t3:"))
-  )
+  ) {
+    // Either host can add verified identities and task facts; the first source
+    // continues to own all trace events and assessed outcomes.
+    store.put({
+      kind: "run",
+      value: runSchema.parse({
+        ...owner.value,
+        sessionReferences: mergeSessionReferences(
+          owner.value.sessionReferences,
+          snapshot.run.sessionReferences,
+        ),
+        delegations: mergeDelegations(
+          owner.value.delegations,
+          snapshot.run.delegations,
+        ),
+      }),
+    });
     return;
+  }
   for (const event of snapshot.events) {
     const previous = store.getRecord(`event:${event.id}`);
     if (event.skill && previous?.kind === "event" && previous.value.skill)
@@ -76,6 +97,14 @@ export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
   const previous = store.getRecord(`run:${snapshot.run.id}`);
   const run = snapshot.run;
   if (previous?.kind === "run") {
+    run.sessionReferences = mergeSessionReferences(
+      previous.value.sessionReferences,
+      run.sessionReferences,
+    );
+    run.delegations = mergeDelegations(
+      previous.value.delegations,
+      run.delegations,
+    );
     if (!run.work && previous.value.work) run.work = previous.value.work;
     if (!run.projectId && previous.value.projectId)
       run.projectId = previous.value.projectId;

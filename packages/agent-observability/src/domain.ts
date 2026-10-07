@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { evaluationSchema } from "./evaluations";
 import { workflowAnnotationSchema } from "./workflow";
+import { delegationSchema, sessionReferenceSchema } from "./delegation";
 
 const id = z.string().min(1).max(512);
 const text = z.string().max(4096);
@@ -101,6 +102,8 @@ export const runSchema = z
     sessionId: id,
     attemptId: id,
     parentSessionId: id.optional(),
+    sessionReferences: z.array(sessionReferenceSchema).max(20).default([]),
+    delegations: z.array(delegationSchema).max(32).default([]),
     source: id,
     cwd: text,
     repo: text.optional(),

@@ -214,3 +214,93 @@ test("the CLI records structured transitions and preserves the legacy workflow c
     await rm(directory, { recursive: true, force: true });
   }
 });
+
+test("explicit joins require a result from the named delegated child and preserve unfinished parent verification", async () => {
+  const { journeyFixture } =
+    await import("@astack/agent-observability/journey-fixtures");
+  const directory = await mkdtemp(join(tmpdir(), "astack-join-"));
+  const store = new LocalStore(directory);
+  try {
+    const fixture = journeyFixture(false);
+    store.setMeta(
+      "projectPolicy",
+      JSON.stringify([
+        {
+          projectId: fixtureProject,
+          name: "Fixture",
+          enabled: true,
+          repositories: [],
+          folders: [{ machineId: fixtureMachine, path: "/fixture" }],
+        },
+      ]),
+    );
+    for (const value of [
+      fixture.parent,
+      evaluationRun("reproduce"),
+      ...fixture.children,
+    ])
+      store.put({ kind: "run", value });
+    for (const value of fixture.events) store.put({ kind: "event", value });
+    const flowId = fixture.workflow.records[0]?.annotation.flowId;
+    const ui = fixture.children.findLast(
+      (child) => child.sessionId === "child-ui",
+    );
+    const data = fixture.children.find(
+      (child) => child.sessionId === "child-data",
+    );
+    if (!flowId || !ui || !data) throw new Error("Missing fixture identities");
+    const join = {
+      schemaVersion: 1,
+      flowId,
+      action: "join",
+      summary: "Used the UI result.",
+      inputs: [
+        {
+          branchId: "delegate-ui",
+          result: { runId: ui.id, eventId: ui.id + ":result" },
+        },
+      ],
+    } as const;
+    const recorded = recordWorkflow({
+      store,
+      runId: fixture.parent.id,
+      annotation: { ...join, inputs: [...join.inputs] },
+    });
+    expect(store.getRecord("event:" + recorded.eventId)?.kind).toBe("event");
+    expect(() =>
+      recordWorkflow({
+        store,
+        runId: fixture.parent.id,
+        annotation: {
+          ...join,
+          inputs: [
+            {
+              branchId: "delegate-ui",
+              result: { runId: data.id, eventId: data.id + ":result" },
+            },
+          ],
+        },
+      }),
+    ).toThrow("recorded delegated branch");
+    expect(() =>
+      recordWorkflow({
+        store,
+        runId: fixture.parent.id,
+        annotation: {
+          ...join,
+          inputs: [
+            { branchId: "invented-branch", result: join.inputs[0].result },
+          ],
+        },
+      }),
+    ).toThrow("recorded delegated branch");
+    expect(
+      store
+        .runsForSession(fixture.parent.sessionId)
+        .every((run) => run.outcome === "unknown"),
+    ).toBe(true);
+  } finally {
+    store.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});

@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { workflowAnnotationSchema, type AstackRoute } from "./workflow";
+import { delegationSchema } from "./delegation";
+import { skillUseSchema } from "./domain";
 
 const reference = z.object({ runId: z.string(), eventId: z.string() });
 export const workflowEvidenceSchema = z.discriminatedUnion("state", [
@@ -15,13 +17,38 @@ export const workflowEvidenceSchema = z.discriminatedUnion("state", [
 export const workflowRecordSchema = z.object({
   eventId: z.string(),
   runId: z.string(),
+  sessionId: z.string().optional(),
   revision: z.number(),
   recordedAt: z.number(),
   annotation: workflowAnnotationSchema,
   evidence: z.array(workflowEvidenceSchema).max(8),
 });
+export const workflowBranchSchema = z.object({
+  parentRunId: z.string(),
+  delegation: delegationSchema,
+  state: z.enum(["available", "unavailable"]),
+  reason: z.string().nullable(),
+  runs: z
+    .array(
+      z.object({
+        runId: z.string(),
+        sessionId: z.string(),
+        title: z.string(),
+        status: z.string(),
+        revision: z.number(),
+      }),
+    )
+    .max(20),
+  records: z.array(workflowRecordSchema).max(80),
+  reads: z
+    .array(z.object({ reference, skill: skillUseSchema, revision: z.number() }))
+    .max(32),
+  truncated: z.boolean(),
+});
+export type WorkflowBranch = z.infer<typeof workflowBranchSchema>;
 export const workflowCaptureSchema = z.object({
   records: z.array(workflowRecordSchema).max(80),
+  branches: z.array(workflowBranchSchema).max(32).default([]),
   truncated: z.boolean(),
 });
 export type WorkflowRecord = z.infer<typeof workflowRecordSchema>;
@@ -31,6 +58,7 @@ type PhaseAnnotation = Extract<
 >;
 export type WorkflowNode =
   | { kind: "route"; record: WorkflowRecord }
+  | { kind: "join"; record: WorkflowRecord }
   | {
       kind: "phase";
       phase: string;
@@ -61,13 +89,18 @@ export function workflowFlows(records: WorkflowRecord[]): WorkflowFlow[] {
       a.eventId.localeCompare(b.eventId),
   )) {
     const annotation = record.annotation;
-    let flow = flows.get(annotation.flowId);
+    // Conversation identity spans turns but separates siblings sharing a flow ID.
+    const flowKey = JSON.stringify([
+      record.sessionId ?? "legacy",
+      annotation.flowId,
+    ]);
+    let flow = flows.get(flowKey);
     if (!flow) {
-      flow = { id: annotation.flowId, selection: null, nodes: [] };
-      flows.set(annotation.flowId, flow);
-      state.set(annotation.flowId, { route: null, active: new Map() });
+      flow = { id: flowKey, selection: null, nodes: [] };
+      flows.set(flowKey, flow);
+      state.set(flowKey, { route: null, active: new Map() });
     }
-    const context = state.get(annotation.flowId);
+    const context = state.get(flowKey);
     if (!context) continue;
     if (annotation.action === "select") {
       if (!flow.selection) flow.selection = record;
@@ -76,12 +109,18 @@ export function workflowFlows(records: WorkflowRecord[]): WorkflowFlow[] {
       flow.nodes.push({ kind: "route", record });
       context.route = annotation.route;
       context.active.clear();
+    } else if (annotation.action === "join") {
+      flow.nodes.push({ kind: "join", record });
     } else {
-      const prior = context.active.get(annotation.phase);
+      const attemptKey = JSON.stringify([
+        annotation.phase,
+        annotation.attemptId ?? "legacy",
+      ]);
+      const prior = context.active.get(attemptKey);
       if (annotation.status !== "started" && prior) {
         prior.records.push(record);
         prior.status = annotation.status;
-        context.active.delete(annotation.phase);
+        context.active.delete(attemptKey);
       } else {
         const node: Extract<WorkflowNode, { kind: "phase" }> = {
           kind: "phase",
@@ -92,7 +131,7 @@ export function workflowFlows(records: WorkflowRecord[]): WorkflowFlow[] {
         };
         flow.nodes.push(node);
         if (annotation.status === "started")
-          context.active.set(annotation.phase, node);
+          context.active.set(attemptKey, node);
       }
     }
   }

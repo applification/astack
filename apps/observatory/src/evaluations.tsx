@@ -234,7 +234,7 @@ export function AssessmentForm({
     (record) => record.annotation.action === "phase",
   );
   const routeOptions = (workflow?.records ?? []).flatMap((record) =>
-    record.annotation.action !== "phase"
+    record.annotation.action === "select" || record.annotation.action === "change"
       ? [
           {
             runId: record.runId,

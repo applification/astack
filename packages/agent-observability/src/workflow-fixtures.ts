@@ -76,7 +76,7 @@ export function workflowFixture(
         observedAt: 1000 + index * 25,
         timing: "agent",
         title:
-          annotation.action === "phase"
+          annotation.action === "phase" || annotation.action === "join"
             ? annotation.summary
             : annotation.reason,
         workflow: annotation,

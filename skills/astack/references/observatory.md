@@ -21,6 +21,14 @@ Selection returns a `flowId` and `eventId`. Later transitions in the same sessio
 
 Phases use `started`, `completed`, `failed` or `omitted`. Supply the observation or omission reason with `--summary`, declare the skills actually applied with `--skills`, and cite already captured action/result events with `--evidence`. A failed attempt followed by a fresh start retains both attempts. Route changes use `--action change --name ROUTE --reason REASON`; customize the proposed phases with `--plan PHASES...`. Reasons describe decisions the owner needs to assess, not private reasoning. Existing unstructured `--name/--step` calls remain compatible but do not establish a selected route.
 
+Delegated children have independent journeys and local skill reads. A fork, a completed spawn call, a returned child result or host delivery does not declare parent integration. When using a child result, record an explicit join with the captured delegation ID and the child's result event; pair `--branches` and `--evidence` in the same order. Context includes recorded delegation identities. Continue without recording if the host or collector has not exposed the required evidence.
+
+```sh
+agentlog workflow --session SESSION_ID --turn TURN_ID --action join --summary "Used the UI and data recommendations to define the regression checks." --branches UI_DELEGATION_ID DATA_DELEGATION_ID --evidence UI_CHILD_RESULT_EVENT_ID DATA_CHILD_RESULT_EVENT_ID
+```
+
+Child conversations stay separate even when they use the same flow or phase name. An optional `--attempt ATTEMPT_ID` distinguishes overlapping attempts within one conversation; use the same identity on its start and finish. These records describe phase order and declared skill groups, not skill-to-skill caller relationships.
+
 Readable capture must be enabled. Recording validates project scope and references, redacts before local queueing, and never changes outcome grades. Missing identities, collector versions, capture gaps or forwarding failures leave telemetry unknown; do not repeatedly troubleshoot them or let them delay the engineering task. The backend and collector must be upgraded together before structured annotations are used.
 
 Use Observatory evidence to improve skills and instructions. Compare matching hash/provenance groups, inspect supporting traces, and keep descriptive correlations separate from causal claims. Do not assume a current file hash was the version used historically. Readable capture redacts secrets before buffering; the trace's Show content toggle only hides details on screen. Machine capture can separately use metadata-only mode. Capture gaps stay visible.

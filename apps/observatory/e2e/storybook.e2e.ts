@@ -62,7 +62,7 @@ test("skill sequence keeps grouped declarations and repeated attempts, with focu
     .getByRole("link", "Declaration in trace")
     .getAttribute("href");
   expect(trace).toContain("event=");
-  await screen.getByRole("button", "Work phases", { exact: true }).tap();
+  await screen.getByRole("button", "Route journey", { exact: true }).tap();
   await expect(evidence).toBeVisible();
   await screen.getByRole("button", "Close skill evidence").tap();
   expect(
@@ -1492,4 +1492,143 @@ test("project empty/loading/failed-save states keep unsaved input and do not cla
   await expect(
     screen.getByRole("link", "Unsaved project", { exact: true }),
   ).toHaveCount(0);
+});
+
+test("parallel child journeys expand independently, retain failed retries and link evidence to the owning child", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--parallel-journeys&viewMode=story",
+  );
+  await expect(screen.getByText("UI checks", { exact: true })).toBeVisible();
+  expect(
+    await browser.evaluate(() =>
+      [...document.querySelectorAll(".journey-child")].map((child) =>
+        child.hasAttribute("open"),
+      ),
+    ),
+  ).toEqual([false, false]);
+  await browser.evaluate(() => {
+    document.querySelector<HTMLElement>(".journey-child > summary")?.focus();
+    return true;
+  });
+  await browser.keyboard.press("Enter");
+  expect(
+    await browser.evaluate(() =>
+      [...document.querySelectorAll(".journey-child")].map((child) =>
+        child.hasAttribute("open"),
+      ),
+    ),
+  ).toEqual([true, false]);
+  await screen.getByText("Data review", { exact: true }).tap();
+  expect(
+    await browser.evaluate(() =>
+      [...document.querySelectorAll(".journey-child")].map((child) =>
+        child.hasAttribute("open"),
+      ),
+    ),
+  ).toEqual([true, true]);
+  expect(
+    await browser.evaluate(() =>
+      [
+        ...document.querySelectorAll(
+          ".journey-child:first-child .astack-flow > li[data-status]",
+        ),
+      ].map((phase) => phase.getAttribute("data-status")),
+    ),
+  ).toEqual(["failed", "completed"]);
+  await screen
+    .getByRole("button", "View React in Verify", { exact: true })
+    .last()
+    .tap();
+  const evidence = screen.getByRole("region", "React skill evidence", {
+    exact: true,
+  });
+  await expect(
+    evidence.getByRole("link", "UI verification failed"),
+  ).not.toBeVisible();
+  await expect(
+    evidence.getByRole("link", "Child returned proposed checks"),
+  ).toBeVisible();
+  expect(
+    await evidence
+      .getByRole("link", "Declaration in trace")
+      .first()
+      .getAttribute("href"),
+  ).toContain("child-ui%3Aretry");
+  await screen.getByRole("button", "Close skill evidence").tap();
+  expect(
+    await browser.evaluate(
+      () => document.activeElement?.getAttribute("aria-label") ?? null,
+    ),
+  ).toBe("View React in Verify");
+  await screen.getByText("UI checks", { exact: true }).tap();
+  expect(
+    await browser.evaluate(() =>
+      [...document.querySelectorAll(".journey-child")].map((child) =>
+        child.hasAttribute("open"),
+      ),
+    ),
+  ).toEqual([false, true]);
+  await expect(
+    screen.getByRole("heading", "Join back to main", { exact: true }),
+  ).toBeVisible();
+  await app.screenshot("parallel-journeys-light");
+  await browser.setViewport({ width: 390, height: 844 });
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.dataset.theme ?? null,
+    ),
+  ).toBe("dark");
+  await screen.getByText("UI checks", { exact: true }).tap();
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth,
+    ),
+  ).toBe(false);
+  await browser.evaluate(() => {
+    document
+      .querySelector('[aria-label="Delegated journeys"]')
+      ?.scrollIntoView();
+    return true;
+  });
+  await app.screenshot("parallel-journeys-narrow-dark");
+});
+
+test("completed and unavailable children never create an implicit parent join", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--returned-without-join&viewMode=story",
+  );
+  await screen.getByText("UI checks", { exact: true }).tap();
+  await expect(
+    screen
+      .getByText("No captured parent join referencing this result.", {
+        exact: true,
+      })
+      .first(),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("heading", "Join back to main", { exact: true }),
+  ).not.toBeVisible();
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--unavailable-child-journey&viewMode=story",
+  );
+  await screen.getByText("Uncaptured child", { exact: true }).tap();
+  await expect(
+    screen.getByText("The host did not expose a child conversation identity.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(
+      () => document.querySelectorAll(".journey-child a").length,
+    ),
+  ).toBe(0);
 });
