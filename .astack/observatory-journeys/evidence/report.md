@@ -86,3 +86,14 @@ The authorized UI-only Otis rollout serves HTML, JavaScript and CSS matching the
 
 - [Full route with the fork card and copied toast](copy-toast-light.png): synthetic T3 browser capture, 1600 × 2300 viewport saved at 1280 × 1840.
 - [Narrow dark fork card, stable badge and toast](copy-toast-narrow-dark.png): synthetic T3 browser capture, 390 × 844 viewport saved at 780 × 1688; horizontal map scrolling remains available.
+
+## Original prompt leading into the journey
+
+Runtime source `63225edff47b7c1aa8084b94400be46d5542fc1e` presents the original intent as a centered prompt card, with a user-message label and a quotation accent. The exact request and paragraph breaks remain intact; its trace link and agreed scope sit inside the card. A neutral connector leads into the first astack node and tracks scope expansion, resizing and horizontal panning. It disappears when the node is outside the map viewport or no route is available. A request without captured prompt evidence retains its declared-request label.
+
+UI lint, strict types, 102 tests/605 assertions and production/Storybook builds pass. All 39 browser checks pass in run `01a11583-242c-7b01-ba73-44b886c2f854`, including exact prompt preservation, trace navigation, scope placement, measured connector endpoints, responsive panning, missing-source and missing-route cases. The run tested the modified tree based on `d3381a62f2f30ae635099d459f900cf53b0bbdf2`, subsequently committed unchanged as the runtime source. The first run passed 38 checks and failed the existing immediate resize overflow check: the measured SVG temporarily retained its desktop width. Constraining its width and clipping its paint while measurement updates fixes that defect; the final run passes without retries.
+
+Otis serves HTML, JavaScript and CSS matching the production build. All seven live checks pass in run `01a11584-fa2c-7fea-8162-ba94c0c7fecb`. Authenticated inspection of the actual delivered-feature review confirms prompt-to-astack endpoints on desktop and at 390px, after opening its four clarifications, and after horizontal panning. Both child captures and both explicit join references remain available; no owner assessment was written. The UI-only rollout preserves backend/collector source and retains the previous UI privately for recovery. [Sanitized deployment observations](prompt-origin-deployment.json) record runtime identities, checks, measured geometry and served hashes.
+
+- [Prompt flowing into astack and the route map](prompt-origin-light.png): synthetic T3 browser capture, 1600 × 2100 viewport saved at 1280 × 1680.
+- [Narrow dark prompt and its connection to astack](prompt-origin-narrow-dark.png): synthetic T3 browser capture, 390 × 844 viewport saved at 780 × 1688.

@@ -1,0 +1,126 @@
+{
+  "at": "2026-10-07T08:39:44.332723+00:00",
+  "runtimeRevision": "63225edff47b7c1aa8084b94400be46d5542fc1e",
+  "target": "https://otis.tail12a0a0.ts.net:8450",
+  "authorizedBy": "Owner requested a visually distinct original prompt leading into the agentic skill flow; existing Otis review deployment authorization remains in force.",
+  "uiOnly": true,
+  "backendAndCollectorRevision": "4e7b870975c569688594ebdbb39edd0a7446eb1f",
+  "servedAssetsMatchBuild": true,
+  "assets": [
+    {
+      "asset": "/assets/index-WZFNdzVH.js",
+      "sha256": "7343febff05e49c462f31d9365d86ad1042b2b0d35968e4a039e72fea4fadf9e"
+    },
+    {
+      "asset": "/assets/index-C2Rj8V0C.css",
+      "sha256": "b1dc1d6ebd1ad8fb51b205deeb5065c5c301b1cec5b57978ddbae047f8678d94"
+    }
+  ],
+  "checks": {
+    "lint": "passed",
+    "strictTypes": "passed",
+    "unitTests": 102,
+    "assertions": 605,
+    "storybookBuild": "passed",
+    "productionBuild": "passed"
+  },
+  "storybook": {
+    "runId": "01a11583-242c-7b01-ba73-44b886c2f854",
+    "passed": 39,
+    "failed": 0,
+    "retries": 0,
+    "testedWorkingTreeBase": "d3381a62f2f30ae635099d459f900cf53b0bbdf2",
+    "testedWorkingTreeDirty": true,
+    "sourceCommittedAs": "63225edff47b7c1aa8084b94400be46d5542fc1e",
+    "exactPromptAndParagraphsPreserved": true,
+    "traceAndScopeInsideCard": true,
+    "readOnlyPrompt": true,
+    "declaredRequestFallback": true,
+    "noConnectorWithoutRoute": true,
+    "connectionFollowsScopePanAndResize": true,
+    "connectionHiddenWhenTargetOffscreen": true,
+    "noPageOverflow": true
+  },
+  "initialFailure": {
+    "runId": "01a11581-c440-78f0-ae7e-dafccd406014",
+    "passed": 38,
+    "failed": 1,
+    "cause": "The measured SVG temporarily retained its desktop width during a narrow resize.",
+    "fix": "Constrain the SVG to the wrapper width and clip its paint until the observer updates its path."
+  },
+  "liveBrowser": {
+    "runId": "01a11584-fa2c-7fea-8162-ba94c0c7fecb",
+    "passed": 7,
+    "failed": 0,
+    "retries": 0,
+    "testedWorkingTreeBase": "63225edff47b7c1aa8084b94400be46d5542fc1e",
+    "testedWorkingTreeDirty": false
+  },
+  "manualBrowser": {
+    "desktop": {
+      "startsAtPrompt": true,
+      "endsAtAgent": true,
+      "cardFits": true,
+      "pageFits": true,
+      "onePrompt": true,
+      "paragraphsPreserved": true,
+      "traceLinkInCard": true,
+      "scopeInCard": true
+    },
+    "expandedScope": {
+      "startsAtPrompt": true,
+      "endsAtAgent": true,
+      "cardFits": true,
+      "pageFits": true,
+      "onePrompt": true,
+      "paragraphsPreserved": true,
+      "traceLinkInCard": true,
+      "scopeInCard": true
+    },
+    "narrow": {
+      "startsAtPrompt": true,
+      "endsAtAgent": true,
+      "cardFits": true,
+      "pageFits": true,
+      "onePrompt": true,
+      "paragraphsPreserved": true,
+      "traceLinkInCard": true,
+      "scopeInCard": true
+    },
+    "pannedNarrow": {
+      "startsAtPrompt": true,
+      "endsAtAgent": true,
+      "cardFits": true,
+      "pageFits": true,
+      "onePrompt": true,
+      "paragraphsPreserved": true,
+      "traceLinkInCard": true,
+      "scopeInCard": true
+    }
+  },
+  "realJourney": {
+    "linkedParentTurns": 3,
+    "directChildren": 2,
+    "childCaptureAvailable": true,
+    "joinReferenceStates": ["available", "available"],
+    "ownerAssessmentWritten": false
+  },
+  "recovery": {
+    "previousUiRetained": true,
+    "existingBindMountPreserved": true,
+    "oldImmutableAssetsRetained": true
+  },
+  "selectedSyntheticMedia": [
+    {
+      "path": "prompt-origin-light.png",
+      "synthetic": true,
+      "sha256": "996d7556e6215ccdbd8ec29b7e446860fbba39615fba5cf860d861ffc67dcccc"
+    },
+    {
+      "path": "prompt-origin-narrow-dark.png",
+      "synthetic": true,
+      "sha256": "479658f30388cc114b9097238968b5cbb99841a3827d3caee9333196592cebb5"
+    }
+  ],
+  "privatePixelsPublished": false
+}
