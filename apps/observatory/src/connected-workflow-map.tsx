@@ -73,16 +73,6 @@ export function ConnectedWorkflowMap({
         });
       };
       const main = [...element.querySelectorAll("[data-map-main]")];
-      const viewport = element.parentElement;
-      if (viewport && main[0]) {
-        const mainX = point(main[0]).x;
-        const width = viewport.clientWidth;
-        const previous = centeredViewport.current;
-        if (previous?.mainX !== mainX || previous.width !== width) {
-          viewport.scrollLeft = mainX - width / 2;
-          centeredViewport.current = { mainX, width };
-        }
-      }
       const root = element.querySelector("[data-map-root]");
       if (root && main[0]) connect(root, main[0], "root");
       main.forEach((stop, index) => {
@@ -114,6 +104,17 @@ export function ConnectedWorkflowMap({
       setGeometry((previous) =>
         JSON.stringify(previous) === JSON.stringify(next) ? previous : next,
       );
+      // Measure every stop against one coordinate origin before moving the viewport.
+      const viewport = element.parentElement;
+      if (viewport && main[0]) {
+        const mainX = point(main[0]).x;
+        const width = viewport.clientWidth;
+        const previous = centeredViewport.current;
+        if (previous?.mainX !== mainX || previous.width !== width) {
+          viewport.scrollLeft = mainX - width / 2;
+          centeredViewport.current = { mainX, width };
+        }
+      }
     };
     const schedule = () => {
       cancelAnimationFrame(frame);
