@@ -9,10 +9,33 @@ import { installBackendStartup } from "./startup";
 const root = resolve(import.meta.dir, "../..");
 const runtime = join(homedir(), ".local/share/astack/observatory");
 const state = join(homedir(), ".agentlog");
-function run(args: string[], cwd = root) {
-  execFileSync(args[0] ?? "", args.slice(1), { cwd, stdio: "inherit" });
+function run(
+  args: string[],
+  cwd = root,
+  environment: Record<string, string> = {},
+) {
+  execFileSync(args[0] ?? "", args.slice(1), {
+    cwd,
+    stdio: "inherit",
+    env: { ...process.env, ...environment },
+  });
 }
-run(["bun", "run", "observatory:build"]);
+const deploymentEnvironment = await readFile(join(runtime, ".env"), "utf8");
+const cloud = deploymentEnvironment.match(/^CONVEX_CLOUD_ORIGIN=(.+)$/m)?.[1];
+const site = deploymentEnvironment.match(/^CONVEX_SITE_ORIGIN=(.+)$/m)?.[1];
+if (
+  !cloud ||
+  !site ||
+  new URL(cloud).protocol !== "https:" ||
+  new URL(site).protocol !== "https:"
+)
+  throw new Error(
+    "The private deployment needs configured HTTPS Convex origins.",
+  );
+run(["bun", "run", "observatory:build"], root, {
+  VITE_CONVEX_URL: cloud,
+  VITE_CONVEX_SITE_URL: site,
+});
 await writeFile(
   join(runtime, "compose.yml"),
   (await readFile(join(root, "infra/observatory/compose.yml"), "utf8")).replace(
