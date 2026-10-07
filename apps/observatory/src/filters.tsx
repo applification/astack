@@ -11,6 +11,8 @@ import {
 const dimensions = [
   ["repo", "Repository"],
   ["work", "Work reference"],
+  ["scheduled", "Run type"],
+  ["automation", "Scheduled task"],
   ["agent", "Agent"],
   ["version", "Agent version"],
   ["machine", "Machine"],
@@ -119,7 +121,7 @@ export function RunFilters({
                 value={selected}
                 disabled={
                   options === undefined &&
-                  !["status", "outcome"].includes(dimension)
+                  !["status", "outcome", "scheduled"].includes(dimension)
                 }
                 onChange={(e) => change(dimension, e.target.value)}
               >
