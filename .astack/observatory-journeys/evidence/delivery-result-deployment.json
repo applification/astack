@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "sourceRevision": "a0056c11101348f0f4b45a5cb30a4be42c471271",
   "backendRevision": "a0056c11101348f0f4b45a5cb30a4be42c471271",
-  "collectorRevision": "a0056c11101348f0f4b45a5cb30a4be42c471271",
-  "collectorSha256": "0102dd74612d4b53e2ec1a59c4e337306c713d1b52a7ccbc56ca64b6e74cc623",
+  "collectorRevision": "c68f0069ed1015d3209b3514b86282b68a6032d0",
+  "collectorSha256": "37950aab9c1131f68b07c0d5bb63fe5e18e1af9fd5814b2035f46aeffa7bc222",
   "assets": [
     {
       "asset": "/assets/index-3HCMnOVh.js",
@@ -26,7 +26,11 @@
       "passed": 41,
       "runId": "01a115b6-6e99-7fda-80ee-5d0c452b842b"
     },
-    "convexReviewer": "complete; no unresolved findings"
+    "convexReviewer": "complete; no unresolved findings",
+    "live": {
+      "passed": 8,
+      "runId": "01a115c6-4c48-76ca-9fb8-f309ce499757"
+    }
   },
   "actualDelivery": {
     "pr": 26,
@@ -36,6 +40,19 @@
     "availableChildren": 2,
     "availableJoinResults": 2,
     "anonymousDenied": true,
-    "ownerAssessments": 0
+    "ownerAssessments": 0,
+    "captureRevision": "c68f0069ed1015d3209b3514b86282b68a6032d0",
+    "inlineImages": 1,
+    "imageRevision": "a0056c11101348f0f4b45a5cb30a4be42c471271",
+    "imageSha256": "47d0b35193f441751c0fa03ace38e0c70a344a8c43363fe2f52a110179c6324a",
+    "imageDigestMatches": true,
+    "refreshPreservesSnapshot": true,
+    "refreshPreservesEvaluationAndAssessments": true
+  },
+  "deploymentHeaders": {
+    "publicImageHostAllowed": "https://raw.githubusercontent.com",
+    "htmlCacheControl": "no-cache",
+    "indexConditionalResponsesDisabled": true,
+    "nginxSha256": "5d8839395629708a34cb96780e84a8a9f61c972fbf2e310fc845cc2f7ce147bc"
   }
 }
