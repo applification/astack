@@ -1,0 +1,90 @@
+{
+  "at": "2026-10-07T07:19:26.478Z",
+  "runtimeRevision": "3f74b17b67d61692591ce6207f23974080d6aff6",
+  "target": "https://otis.tail12a0a0.ts.net:8450",
+  "uiOnly": true,
+  "backendAndCollectorRevision": "4e7b870975c569688594ebdbb39edd0a7446eb1f",
+  "authorizedBy": "Owner requested Otis deployment for review and then one connected, expanded map.",
+  "servedAssetsMatchBuild": true,
+  "checks": {
+    "lint": "passed",
+    "strictTypes": "passed",
+    "unitTests": 102,
+    "assertions": 605,
+    "storybookBuild": "passed",
+    "productionBuild": "passed"
+  },
+  "storybook": {
+    "runId": "01a11538-15d5-72d9-abaa-3a6bc9b1e87b",
+    "passed": 36,
+    "failed": 0,
+    "retries": 0,
+    "testedWorkingTreeBase": "bc803ae8250e3494f2a7f52136d1e910d21df322",
+    "testedWorkingTreeDirty": true,
+    "sourceCommittedAs": "3f74b17b67d61692591ce6207f23974080d6aff6"
+  },
+  "liveBrowser": {
+    "runId": "01a11539-ad07-736e-a54f-ec5064e58b01",
+    "passed": 7,
+    "failed": 0,
+    "retries": 0
+  },
+  "manualBrowser": {
+    "desktop": {
+      "oneMap": true,
+      "noMapDisclosures": true,
+      "root": 1,
+      "forks": 2,
+      "joins": 2,
+      "pathsMeetStops": true,
+      "pageFits": true
+    },
+    "narrow": {
+      "pageFits": true,
+      "scrollable": true,
+      "scrolled": true,
+      "noDisclosures": true
+    },
+    "childSkillOpensOwningEvent": true
+  },
+  "realJourney": {
+    "linkedParentTurns": 3,
+    "directChildren": 2,
+    "childCaptureAvailable": true,
+    "joinReferenceStates": [
+      "available",
+      "available"
+    ],
+    "ownerAssessmentWritten": false
+  },
+  "recovery": {
+    "previousUiRetained": true,
+    "existingBindMountPreserved": true,
+    "oldImmutableAssetsRetained": true
+  },
+  "privatePixelsPublished": false,
+  "assets": [
+    {
+      "asset": "/assets/index-D6SuIhzo.js",
+      "sha256": "6bb31e96e1d6c94dfc7bf310a598764ac97647c581385258d35f6f278f0eb274"
+    },
+    {
+      "asset": "/assets/index-vrXP6yAO.css",
+      "sha256": "36809edbd9faaa64ab8fdeed7e93166465202ba4490181acd98093bbf1aff39d"
+    }
+  ],
+  "syntheticMedia": [
+    {
+      "file": "connected-map-light.png",
+      "width": 1280,
+      "height": 1867,
+      "sha256": "3778ff0f54f998c598e96991e945765d29499cf634fdbba6919f397a3a23250b"
+    },
+    {
+      "file": "connected-map-narrow-dark.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "0571ee2e9589d6d357f935974b14719a45d574fe4f454bb4049a4e412e17cb72"
+    }
+  ]
+}
