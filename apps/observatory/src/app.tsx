@@ -29,6 +29,7 @@ import {
 } from "./run-metadata";
 import { Activity, ArrowLeft, ExternalLink, ShieldCheck } from "lucide-react";
 import { Trace } from "./trace";
+import { CopyToastProvider } from "./copy-toast";
 import { Brand, ThemeControl } from "./theme";
 import { ProjectSelector, Projects } from "./projects";
 import type { Project } from "@astack/agent-observability/projects";
@@ -865,54 +866,56 @@ export function ObservatoryLayout({
   children: ReactNode;
 }) {
   return (
-    <div className="app-shell">
-      <header className="app-header">
-        <div className="header-inner">
-          <div className="brand-lockup">
-            <Brand projectId={projectId} />
-            <span className="product-label">Observatory</span>
-          </div>
-          <nav className="navigation" aria-label="Observatory">
-            {[
-              ["runs", "Runs"],
-              ["work", "Work"],
-              ["evaluations", "Evaluations"],
-              ["skills", "Skills & workflows"],
-              ["problems", "Problems"],
-              ["health", "Capture health"],
-              ["projects", "Projects"],
-            ].map(([key, label]) => (
+    <CopyToastProvider>
+      <div className="app-shell">
+        <header className="app-header">
+          <div className="header-inner">
+            <div className="brand-lockup">
+              <Brand projectId={projectId} />
+              <span className="product-label">Observatory</span>
+            </div>
+            <nav className="navigation" aria-label="Observatory">
+              {[
+                ["runs", "Runs"],
+                ["work", "Work"],
+                ["evaluations", "Evaluations"],
+                ["skills", "Skills & workflows"],
+                ["problems", "Problems"],
+                ["health", "Capture health"],
+                ["projects", "Projects"],
+              ].map(([key, label]) => (
+                <a
+                  href={`#${key}${projectId ? `?${new URLSearchParams({ project: projectId })}` : ""}`}
+                  key={key}
+                  aria-current={section === key ? "page" : undefined}
+                >
+                  {label}
+                </a>
+              ))}
               <a
-                href={`#${key}${projectId ? `?${new URLSearchParams({ project: projectId })}` : ""}`}
-                key={key}
-                aria-current={section === key ? "page" : undefined}
+                href="https://otis.tail12a0a0.ts.net:8453/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1"
               >
-                {label}
+                Convex dashboard <ExternalLink size={14} aria-hidden="true" />
               </a>
-            ))}
-            <a
-              href="https://otis.tail12a0a0.ts.net:8453/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1"
-            >
-              Convex dashboard <ExternalLink size={14} aria-hidden="true" />
-            </a>
-          </nav>
-          <ThemeControl />
-        </div>
-      </header>
-      <main className="workspace" id="main">
-        <div className="scope-bar">
-          {projectControl}
-          <div className="status-strip">
-            <ShieldCheck size={15} aria-hidden="true" />
-            Private over Tailscale · <Activity size={15} aria-hidden="true" />
-            {connectionLabel}
+            </nav>
+            <ThemeControl />
           </div>
-        </div>
-        {children}
-      </main>
-    </div>
+        </header>
+        <main className="workspace" id="main">
+          <div className="scope-bar">
+            {projectControl}
+            <div className="status-strip">
+              <ShieldCheck size={15} aria-hidden="true" />
+              Private over Tailscale · <Activity size={15} aria-hidden="true" />
+              {connectionLabel}
+            </div>
+          </div>
+          {children}
+        </main>
+      </div>
+    </CopyToastProvider>
   );
 }

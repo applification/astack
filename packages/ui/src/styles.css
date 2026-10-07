@@ -433,9 +433,39 @@
   gap: 0.2rem;
   flex-wrap: wrap;
 }
-@utility copy-feedback {
-  color: var(--color-muted-foreground);
-  font-size: 0.7rem;
+@utility copy-toast {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 80;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  max-width: min(24rem, calc(100vw - 2rem));
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-card);
+  color: var(--color-foreground);
+  box-shadow: 0 4px 18px rgb(0 0 0 / 15%);
+  font-size: 0.875rem;
+  & > div {
+    min-width: 0;
+    align-self: center;
+  }
+  & p {
+    margin: 0;
+  }
+  & code {
+    display: block;
+    margin-top: 0.4rem;
+    overflow-wrap: anywhere;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+  & button {
+    flex-shrink: 0;
+  }
 }
 @utility help-trigger {
   display: inline-flex;
@@ -944,6 +974,7 @@
 }
 @utility workflow-map-grid {
   --map-lane-width: clamp(264px, calc((100vw - 12rem) / 4), 320px);
+  --map-fork-header-height: 4.5rem;
   display: grid;
   width: max-content;
   margin-inline: auto;
@@ -1077,7 +1108,7 @@
   grid-row: var(--map-row);
   --child-color: #6776c9;
   position: relative;
-  padding-top: 3.5rem;
+  padding-top: calc(3.5rem + var(--map-fork-header-height));
   padding-bottom: 1.4rem;
   display: flex;
   flex-direction: column;
@@ -1149,5 +1180,36 @@
   padding-bottom: 1.75rem;
 }
 @utility journey-delegation-station {
-  min-height: 90px;
+  &.map-station {
+    padding: 0 0 3rem;
+  }
+  & > .map-stop {
+    top: auto;
+    bottom: 1rem;
+  }
+}
+@utility journey-delegation-card {
+  position: relative;
+  left: 8.5px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.125rem;
+  width: max-content;
+  max-width: var(--map-lane-width);
+  min-height: var(--map-fork-header-height);
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.4rem;
+  background: var(--color-card);
+  text-align: center;
+  & h4 {
+    font-size: 0.875rem;
+  }
+  & p {
+    margin: 0;
+    font-size: 0.78rem;
+  }
 }

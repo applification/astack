@@ -540,12 +540,14 @@ function WorkflowPath({
                   className="map-station journey-delegation-station"
                   data-map-station=""
                 >
+                  <div className="journey-delegation-card">
+                    <h4>Delegated work</h4>
+                    <p className="secondary">
+                      {branches.length} child{" "}
+                      {branches.length === 1 ? "conversation" : "conversations"}
+                    </p>
+                  </div>
                   <MapStop lane="main" id={flow.id + ":fork"} fork />
-                  <h4>Delegated work</h4>
-                  <p className="secondary">
-                    {branches.length} child{" "}
-                    {branches.length === 1 ? "conversation" : "conversations"}
-                  </p>
                 </section>
               ) : (
                 <WorkflowNodeStop

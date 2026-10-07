@@ -1625,6 +1625,18 @@ test("map descriptions compact revisions without losing the full value", async (
       };
     }),
   ).toEqual({ smaller: true, fullHashInSentence: false, distinctBranch: true });
+  const beforeCopy = await browser.evaluate(() => {
+    const badge = document.querySelector(".map-revision");
+    if (!badge) return null;
+    const bounds = badge.getBoundingClientRect();
+    return {
+      width: bounds.width,
+      height: bounds.height,
+      text: badge.textContent,
+      icon: badge.querySelector("button svg")?.innerHTML ?? null,
+    };
+  });
+  expect(beforeCopy).not.toBeNull();
   await browser.evaluate(() => {
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -1642,13 +1654,36 @@ test("map descriptions compact revisions without losing the full value", async (
     ),
   ).toBe(revision);
   await expect(screen.getByText("Copied", { exact: true })).toBeVisible();
+  expect(
+    await browser.evaluate(() => {
+      const badge = document.querySelector(".map-revision");
+      if (!badge) return null;
+      const bounds = badge.getBoundingClientRect();
+      return {
+        width: bounds.width,
+        height: bounds.height,
+        text: badge.textContent,
+        icon: badge.querySelector("button svg")?.innerHTML ?? null,
+      };
+    }),
+  ).toEqual(beforeCopy);
+  expect(
+    await browser.evaluate(
+      () =>
+        document.querySelector(".copy-toast")?.parentElement === document.body,
+    ),
+  ).toBe(true);
   await browser.evaluate(() => {
     const map = document.querySelector(".workflow-map-scroll");
     if (map)
       window.scrollTo(0, map.getBoundingClientRect().top + scrollY - 100);
     return true;
   });
-  await app.screenshot("compact-revisions-light");
+  await app.screenshot("copy-toast-light");
+  await expect(screen.getByRole("status")).toHaveCount(0);
+  await screen.getByRole("button", "Copy revision", { exact: true }).tap();
+  await screen.getByRole("button", "Copy revision", { exact: true }).tap();
+  await expect(screen.getByRole("status")).toHaveCount(1);
   await browser.evaluate(() => {
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -1673,6 +1708,16 @@ test("map descriptions compact revisions without losing the full value", async (
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+  await expect(screen.getByRole("alert")).toContainText(revision);
+  expect(
+    await browser.evaluate(
+      () => document.querySelector(".map-revision")?.textContent ?? null,
+    ),
+  ).toBe("01234567");
+  await screen
+    .getByRole("button", "Dismiss copy notification", { exact: true })
+    .tap();
+  await expect(screen.getByRole("alert")).toHaveCount(0);
 });
 
 test("main rail stays centered with zero through four outward child lanes", async ({
@@ -1705,6 +1750,8 @@ test("main rail stays centered with zero through four outward child lanes", asyn
           };
           const x = center(main);
           const branches = [...map.querySelectorAll("[data-map-branch]")];
+          const fork = map.querySelector("[data-map-fork]");
+          const card = map.querySelector(".journey-delegation-card");
           return {
             count: branches.length,
             rootAligned: Math.abs(center(root) - x) < 1,
@@ -1730,6 +1777,22 @@ test("main rail stays centered with zero through four outward child lanes", asyn
                 ? side === "left" && center(stop) < x && b.right < a.left - 12
                 : side === "right" && center(stop) > x && b.left > a.right + 12;
             }),
+            forkCardAboveJunction:
+              branches.length === 0
+                ? card === null
+                : !!fork &&
+                  !!card &&
+                  Math.abs(center(card) - x) < 1 &&
+                  card.getBoundingClientRect().bottom <
+                    fork.getBoundingClientRect().top - 12 &&
+                  branches.every((branch) => {
+                    const stop = branch.querySelector("[data-map-child-stop]");
+                    return (
+                      !!stop &&
+                      stop.getBoundingClientRect().top >
+                        fork.getBoundingClientRect().bottom
+                    );
+                  }),
             pageFits: document.documentElement.scrollWidth <= innerWidth,
           };
         }),
@@ -1741,6 +1804,7 @@ test("main rail stays centered with zero through four outward child lanes", asyn
         viewportCentered: true,
         distinctLanes: true,
         outwardLabels: true,
+        forkCardAboveJunction: true,
         pageFits: true,
       });
   }
