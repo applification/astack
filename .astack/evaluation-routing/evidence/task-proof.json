@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "revision": "0187a892191bbe755f0d72e0ac2f5200bb304455",
+  "dirty": true,
+  "sourceDigest": "dbecde75defb5a798ef906bec06e46f753113dfb2b4fb350d664ffcfa76dbe8d",
+  "target": "Private Otis production runtime and synthetic Storybook, macOS arm64",
+  "actor": "Owning agent running deterministic browser assertions and fresh native owner readback",
+  "fixture": "Reported generated evaluation with 19 skill reads; existing annotated Astack route; synthetic retries, child lanes and disclosure states. Deployed UI/backend325b044 code matches0187a89; collector0187a89. Source digest is SHA-256 of git archive0187a89.",
+  "command": "E2E_TELEMETRY_DISABLED=1 bun x --no-install e2e run --config e2e.live.config.ts --grep 'reported generated evaluation|deployed astack workflow' --output .proof/evaluation-routing/otis-browser --retries 0",
+  "cases": [
+    {
+      "caseId": "C1",
+      "attempts": [
+        {
+          "status": "pass",
+          "observed": "The original generated evaluation shows all 19 captured parent skill reads in trace order, 19 connected main lines plus root/prompt/result bridges, working exact trace links and no desktop/mobile page overflow. Missing route/phase declarations remain explicit.",
+          "artifacts": [
+            {
+              "label": "Retained verification facts and report hashes",
+              "path": ".astack/evaluation-routing/evidence/verification.json",
+              "sha256": "9ca48144333648791fdb20a47d0983f699421fe617c2a6cd5e9b1a97f0cfdf2f"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "C2",
+      "attempts": [
+        {
+          "status": "pass",
+          "observed": "The existing annotated Astack route and evidence interaction pass on Otis. The illustrated journey retains two available children and an explicit join. Nine synthetic route/retry/child/disclosure regressions pass without retries.",
+          "artifacts": [
+            {
+              "label": "Retained verification facts and report hashes",
+              "path": ".astack/evaluation-routing/evidence/verification.json",
+              "sha256": "9ca48144333648791fdb20a47d0983f699421fe617c2a6cd5e9b1a97f0cfdf2f"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
