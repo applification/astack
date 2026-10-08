@@ -544,6 +544,61 @@ test("Claude Read and Skill tools provide direct skill evidence; failed reads an
   expect(result?.run.skills[2]?.hash).toBeNull();
 });
 
+test("T3 Codex captures successful wrapped and multi-file skill reads without duplicates on replay", async () => {
+  const f = await fixture();
+  for (const name of ["astack", "implement", "react"])
+    await mkdir(join(f.dir, "skills", name), { recursive: true });
+  for (const name of ["astack", "implement", "react"])
+    await writeFile(join(f.dir, "skills", name, "SKILL.md"), name);
+  const raw = projection("codex", "codex");
+  raw.turnItems = [
+    item("wrapped", "command_execution", {
+      ordinal: 1,
+      input:
+        "/bin/zsh -lc 'cat skills/astack/SKILL.md skills/implement/SKILL.md'",
+      exitCode: 0,
+      output: "astack\nimplement",
+    }),
+    item("bare", "command_execution", {
+      ordinal: 2,
+      input: "cat skills/react/SKILL.md",
+      exitCode: 0,
+      output: "react",
+    }),
+    ...[
+      { status: "failed", exitCode: 1 },
+      { status: "completed", exitCode: 1 },
+      { status: "running", exitCode: 0 },
+      { status: "completed", exitCode: 0, outputIndicatesFailure: true },
+    ].map((failure, index) =>
+      item("failed-" + index, "command_execution", {
+        ordinal: index + 3,
+        input: "/bin/zsh -lc 'cat skills/react/SKILL.md'",
+        ...failure,
+      }),
+    ),
+  ];
+  const normalized = await snapshot(f, raw);
+  if (!normalized) throw new Error("Missing normalized fixture");
+  expect(normalized.run.skills.map((skill) => skill.name)).toEqual([
+    "astack",
+    "implement",
+    "react",
+  ]);
+  expect(
+    normalized.events
+      .filter((event) => event.kind === "skill_loaded")
+      .map((event) => event.skill?.name),
+  ).toEqual(["astack", "implement", "react"]);
+  persistSnapshot(f.store, normalized);
+  persistSnapshot(f.store, normalized);
+  expect(
+    f.store
+      .events(normalized.run.id)
+      .filter((event) => event.kind === "skill_loaded"),
+  ).toHaveLength(3);
+});
+
 test("T3 matches enrollment before reading history, includes archives, and commits replay checkpoints only after persistence", async () => {
   const f = await fixture();
   const calls: string[] = [];
@@ -603,7 +658,9 @@ test("T3 matches enrollment before reading history, includes archives, and commi
   f.store.setMeta(
     `t3:${environmentId}:app-thread:updated`,
     createHash("sha256")
-      .update(JSON.stringify(shellState.threads[0]))
+      .update(
+        JSON.stringify({ captureVersion: 3, thread: shellState.threads[0] }),
+      )
       .digest("hex"),
   );
   await drain();

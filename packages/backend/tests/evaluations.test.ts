@@ -378,6 +378,118 @@ test("generation enforces owner identity, project scope, readable capture and cu
     owner.mutation(api.evaluations.generate, { runId }),
   ).rejects.toThrow("unavailable");
 });
+test("generated evaluations retain ordered parent skill reads without inventing a route", async () => {
+  const { t, owner } = await setup();
+  const prompt = evaluationPrompt();
+  const skillEvents = ["astack", "react", "verify", "react"].map(
+    (name, index) =>
+      eventSchema.parse({
+        ...prompt,
+        id: prompt.runId + ":skill:" + index,
+        sequence: index + 1,
+        kind: "skill_loaded",
+        title: "Read " + name,
+        skill: {
+          name,
+          kind: "skill",
+          hash: null,
+          provenance: "observation_time",
+          evidence: "read",
+        },
+        data: {},
+      }),
+  );
+  // Ingestion order differs from trace order, and the immutable run snapshot
+  // has no summary skills. Only the captured events establish these reads.
+  await ingestWorkflow(
+    t,
+    [...skillEvents].reverse().map((value) => ({ kind: "event", value })),
+  );
+  const saved = await owner.mutation(api.evaluations.generate, {
+    runId: prompt.runId,
+    projectId: fixtureProject,
+  });
+  const read = async () =>
+    evaluationDetailSchema.parse(
+      JSON.parse(
+        (await owner.query(api.evaluations.detail, {
+          evaluationId: saved.evaluationId,
+          projectId: fixtureProject,
+        })) ?? "null",
+      ),
+    );
+  expect((await read()).workflow).toMatchObject({
+    records: [],
+    reads: skillEvents.map((event) => ({
+      reference: { runId: event.runId, eventId: event.id },
+      skill: { name: event.skill?.name, evidence: "read" },
+    })),
+    truncated: false,
+  });
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries(
+      [
+        {
+          kind: "run",
+          value: { ...evaluationRun("reproduce"), contentCapture: false },
+        },
+      ],
+      1000,
+    ),
+  });
+  expect((await read()).workflow).toMatchObject({ reads: [] });
+});
+
+test("parent skill projections respect trace limits and paused-project policy", async () => {
+  const { t, evaluation, owner } = await setup();
+  const prompt = evaluationPrompt();
+  for (let index = 0; index < 70; index++)
+    await ingestWorkflow(t, [
+      {
+        kind: "event",
+        value: eventSchema.parse({
+          ...prompt,
+          id: prompt.runId + ":read:" + index,
+          sequence: index + 1,
+          kind: "skill_loaded",
+          skill: {
+            name: "react",
+            kind: "skill",
+            hash: null,
+            provenance: "observation_time",
+            evidence: "read",
+          },
+          data: {},
+        }),
+      },
+    ]);
+  const read = async () =>
+    evaluationDetailSchema.parse(
+      JSON.parse(
+        (await owner.query(api.evaluations.detail, {
+          evaluationId: evaluation.id,
+        })) ?? "null",
+      ),
+    );
+  const captured = await read();
+  expect(captured.workflow.reads).toHaveLength(64);
+  expect(captured.workflow.reads.at(-1)?.reference.eventId).toBe(
+    prompt.runId + ":read:63",
+  );
+  expect(captured.workflow.truncated).toBe(true);
+  await owner.mutation(api.projects.save, {
+    project: {
+      projectId: fixtureProject,
+      name: "Fixture",
+      enabled: false,
+      repositories: [],
+      folders: [{ machineId: fixtureMachine, path: "/fixture" }],
+    },
+  });
+  expect((await read()).workflow.reads).toEqual([]);
+});
+
 test("workflow detail resolves multi-turn evidence, hides foreign references and respects readable capture", async () => {
   const { t, evaluation, owner } = await setup();
   const { annotations, support } = workflowFixture("changed");

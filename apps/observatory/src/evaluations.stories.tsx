@@ -19,7 +19,10 @@ import {
 } from "@astack/agent-observability/evaluation-fixtures";
 import { EvaluationView, EvaluationTable } from "./evaluations";
 import { ObservatoryLayout } from "./app";
-import { workflowViewFixture } from "@astack/agent-observability/workflow-fixtures";
+import {
+  observedWorkflowFixture,
+  workflowViewFixture,
+} from "@astack/agent-observability/workflow-fixtures";
 import { journeyFixture } from "@astack/agent-observability/journey-fixtures";
 import { generateEvaluation } from "@astack/agent-observability/evaluation-generation";
 
@@ -163,6 +166,22 @@ export const GeneratedFromCapture: Story = {
 export const BugFixFlow: Story = {
   args: { detail: { ...detail("pass"), workflow: workflowViewFixture() } },
 };
+export const ObservedSkills: Story = {
+  args: {
+    detail: { ...detail("inconclusive"), workflow: observedWorkflowFixture() },
+  },
+};
+export const RecordedFlowWithObservedSkills: Story = {
+  args: {
+    detail: {
+      ...detail("pass"),
+      workflow: {
+        ...workflowViewFixture(),
+        reads: observedWorkflowFixture().reads,
+      },
+    },
+  },
+};
 export const NewFeatureFlow: Story = {
   args: {
     detail: {
@@ -191,6 +210,7 @@ export const MissingFlowSelection: Story = {
       ...detail("pass"),
       workflow: {
         records: workflowViewFixture().records.slice(1, 4),
+        reads: [],
         branches: [],
         truncated: true,
       },

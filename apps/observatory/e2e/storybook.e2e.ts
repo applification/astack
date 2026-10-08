@@ -671,9 +671,12 @@ test("astack route changes, missing selection and unavailable evidence stay expl
     "/iframe.html?id=observatory-evaluations--awaiting-review&viewMode=story",
   );
   await expect(
-    screen.getByText("Flow not recorded in the linked readable capture.", {
-      exact: false,
-    }),
+    screen.getByText(
+      "Route and phases were not recorded in the linked capture.",
+      {
+        exact: false,
+      },
+    ),
   ).toBeVisible();
 });
 test("owner flow judgments select captured evidence and remain separate from outcome feedback", async ({
@@ -2409,4 +2412,122 @@ test("failed private delivery and missing image previews retain honest evidence 
   await expect(
     result.getByText("Your review pending", { exact: true }),
   ).toBeVisible();
+});
+test("evaluation shows connected parent skill reads without route annotations", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--observed-skills&viewMode=story",
+  );
+  const workflow = screen.getByRole("region", "Astack workflow", {
+    exact: true,
+  });
+  await expect(
+    workflow.getByRole("heading", "Observed skill reads", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    workflow.getByText(
+      "Route and phases were not recorded in the linked capture.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  const captured = () =>
+    browser.evaluate(() => ({
+      labels: [
+        ...document.querySelectorAll(".map-main-cell .journey-skill-read a"),
+      ].map((node) => node.textContent?.trim()),
+      mainLines: document.querySelectorAll('path[data-connection="main"]')
+        .length,
+      rootLines: document.querySelectorAll('path[data-connection="root"]')
+        .length,
+      promptLines: document.querySelectorAll("[data-prompt-connection]").length,
+      resultLines: document.querySelectorAll("[data-result-connection]").length,
+      pageFits: document.documentElement.scrollWidth <= innerWidth,
+    }));
+  await expect.poll(captured).toEqual({
+    labels: ["Astack", "React", "Verify", "React"],
+    mainLines: 4,
+    rootLines: 1,
+    promptLines: 1,
+    resultLines: 1,
+    pageFits: true,
+  });
+  const react = workflow.getByRole("link", "React skill read in main trace", {
+    exact: true,
+  });
+  await expect(react).toHaveCount(2);
+  expect(await react.first().getAttribute("href")).toBe(
+    "#run/00000000-0000-4000-8000-000000000001%3Acodex%3Asaved-edit%3Areproduce?project=00000000-0000-4000-8000-000000000100&event=observed-skill%3A1",
+  );
+  await browser.setViewport({ width: 1280, height: 1100 });
+  await browser.evaluate(() => {
+    document.querySelector(".workflow-section")?.scrollIntoView();
+    return true;
+  });
+  await app.screenshot("observed-parent-skill-path");
+  await browser.setViewport({ width: 390, height: 844 });
+  await expect.poll(captured).toEqual({
+    labels: ["Astack", "React", "Verify", "React"],
+    mainLines: 4,
+    rootLines: 1,
+    promptLines: 1,
+    resultLines: 1,
+    pageFits: true,
+  });
+});
+
+test("recorded routes retain declared phases and disclose observed parent reads separately", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--recorded-flow-with-observed-skills&viewMode=story",
+  );
+  const workflow = screen.getByRole("region", "Astack workflow", {
+    exact: true,
+  });
+  await expect(
+    workflow.getByRole("heading", "Bug fix", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    workflow.getByRole("button", "View Bug fix in Reproduce", { exact: true }),
+  ).toBeVisible();
+  const bridge = () =>
+    browser.evaluate(() => {
+      const path = document.querySelector("[data-result-connection]");
+      const last = [...document.querySelectorAll("[data-map-main]")]
+        .filter((node) => node.checkVisibility())
+        .at(-1);
+      if (!(path instanceof SVGPathElement) || !last || !path.ownerSVGElement)
+        return false;
+      const origin = path.ownerSVGElement.getBoundingClientRect();
+      const source = last.getBoundingClientRect();
+      const start = path.getPointAtLength(0);
+      return (
+        Math.abs(origin.left + start.x - source.left - source.width / 2) <
+          0.5 && Math.abs(origin.top + start.y - source.bottom) < 0.5
+      );
+    });
+  await expect.poll(bridge).toBe(true);
+  await workflow.getByText("Observed skill reads · 4", { exact: true }).tap();
+  await expect(
+    workflow.getByRole("link", "React skill read in main trace", {
+      exact: true,
+    }),
+  ).toHaveCount(2);
+  expect(
+    await browser.evaluate(
+      () =>
+        document.querySelectorAll(".map-main-cell .journey-skill-read").length,
+    ),
+  ).toBe(4);
+  await expect(
+    workflow.getByRole("heading", "Bug fix", { exact: true }),
+  ).toBeVisible();
+  await expect.poll(bridge).toBe(true);
+  await workflow.getByText("Observed skill reads · 4", { exact: true }).tap();
+  await expect.poll(bridge).toBe(true);
 });

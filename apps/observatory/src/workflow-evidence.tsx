@@ -8,6 +8,7 @@ import {
   type WorkflowNode,
   type WorkflowRecord,
   type WorkflowBranch,
+  type WorkflowRead,
 } from "@astack/agent-observability/workflow-view";
 import { ConnectedWorkflowMap } from "./connected-workflow-map";
 import { runLink } from "./evaluation-evidence";
@@ -137,6 +138,37 @@ function MapStop({
       data-map-fork={fork ? "" : undefined}
       aria-hidden="true"
     />
+  );
+}
+
+function SkillReadStop({
+  read,
+  projectId,
+  lane,
+}: {
+  read: WorkflowRead;
+  projectId: string;
+  lane: "main" | "child";
+}) {
+  return (
+    <div className="map-station journey-skill-read" data-map-station="">
+      <MapStop lane={lane} id={read.reference.eventId} />
+      <a
+        className="skill-badge-content"
+        aria-label={
+          skillLabel(read.skill.name) + " skill read in " + lane + " trace"
+        }
+        href={runLink(read.reference.runId, projectId, read.reference.eventId)}
+        title={
+          read.skill.evidence.replace(/_/g, " ") +
+          " · " +
+          read.skill.provenance.replace(/_/g, " ")
+        }
+      >
+        <SkillIcon name={read.skill.name} />
+        <span>{skillLabel(read.skill.name)}</span>
+      </a>
+    </div>
   );
 }
 
@@ -364,32 +396,12 @@ function ChildJourney({
         >
           <h5>Observed skills</h5>
           {branch.reads.map((read) => (
-            <div
-              className="map-station journey-skill-read"
+            <SkillReadStop
               key={read.reference.eventId}
-              data-map-station=""
-            >
-              <MapStop lane="child" id={read.reference.eventId} />
-              <a
-                className="skill-badge-content"
-                aria-label={
-                  skillLabel(read.skill.name) + " skill read in child trace"
-                }
-                href={runLink(
-                  read.reference.runId,
-                  projectId,
-                  read.reference.eventId,
-                )}
-                title={
-                  read.skill.evidence.replace(/_/g, " ") +
-                  " · " +
-                  read.skill.provenance.replace(/_/g, " ")
-                }
-              >
-                <SkillIcon name={read.skill.name} />
-                <span>{skillLabel(read.skill.name)}</span>
-              </a>
-            </div>
+              read={read}
+              projectId={projectId}
+              lane="child"
+            />
           ))}
         </section>
       )}
@@ -431,15 +443,20 @@ function ChildJourney({
   );
 }
 
-type MapStation = { kind: "fork" } | { kind: "node"; node: WorkflowNode };
+type MapStation =
+  | { kind: "fork" }
+  | { kind: "node"; node: WorkflowNode }
+  | { kind: "read"; read: WorkflowRead };
 function WorkflowPath({
   flow,
   projectId,
   branches = [],
+  reads = [],
 }: {
   flow: WorkflowFlow;
   projectId: string;
   branches?: WorkflowBranch[];
+  reads?: WorkflowRead[];
 }) {
   const selected = flow.selection?.annotation;
   const firstBranchTime = Math.min(
@@ -467,6 +484,7 @@ function WorkflowPath({
     node,
   }));
   if (branches.length) stations.splice(insertionIndex, 0, { kind: "fork" });
+  stations.push(...reads.map((read): MapStation => ({ kind: "read", read })));
   const forkRow = insertionIndex + 3;
   const branchRadius = Math.ceil(branches.length / 2);
   const mainColumn = branchRadius + 1;
@@ -485,7 +503,7 @@ function WorkflowPath({
         <div className="map-root">
           <span data-map-root="" data-map-key="root">
             <SkillIcon name="astack" />
-            astack
+            {flow.selection || flow.nodes.length ? "astack" : "Captured work"}
           </span>
         </div>
         <header className="map-station map-route-heading" data-map-station="">
@@ -493,13 +511,17 @@ function WorkflowPath({
           <h3>
             {selected?.action === "select"
               ? routeDefinitions[selected.route].label
-              : "Route not recorded"}
+              : reads.length
+                ? "Observed skill reads"
+                : "Route not recorded"}
           </h3>
           <MapDescription
             text={
               selected?.action === "select"
                 ? selected.reason
-                : "The recorded activity follows."
+                : reads.length
+                  ? "Captured in turn and trace order. A skill read alone does not establish how it was applied."
+                  : "The recorded activity follows."
             }
           />
           {flow.selection && (
@@ -514,7 +536,7 @@ function WorkflowPath({
               Route selection in trace
             </a>
           )}
-          {!flow.nodes.length && !branches.length && (
+          {!flow.nodes.length && !branches.length && !reads.length && (
             <p className="secondary">No phase transitions recorded yet.</p>
           )}
         </header>
@@ -527,9 +549,11 @@ function WorkflowPath({
               key={
                 station.kind === "fork"
                   ? "fork"
-                  : station.node.kind === "phase"
-                    ? (station.node.records[0]?.eventId ?? index)
-                    : station.node.record.eventId
+                  : station.kind === "read"
+                    ? station.read.reference.eventId
+                    : station.node.kind === "phase"
+                      ? (station.node.records[0]?.eventId ?? index)
+                      : station.node.record.eventId
               }
               className="map-main-cell"
               style={rowStyle}
@@ -549,6 +573,12 @@ function WorkflowPath({
                   </div>
                   <MapStop lane="main" id={flow.id + ":fork"} fork />
                 </section>
+              ) : station.kind === "read" ? (
+                <SkillReadStop
+                  read={station.read}
+                  projectId={projectId}
+                  lane="main"
+                />
               ) : (
                 <WorkflowNodeStop
                   node={station.node}
@@ -602,6 +632,7 @@ function WorkflowPath({
 
 export function WorkflowEvidence({ detail }: { detail: EvaluationDetail }) {
   const flows = workflowFlows(detail.workflow.records);
+  const reads = detail.workflow.reads;
   const flowRunIds = (flow: WorkflowFlow) =>
     new Set([
       ...(flow.selection ? [flow.selection.runId] : []),
@@ -623,10 +654,12 @@ export function WorkflowEvidence({ detail }: { detail: EvaluationDetail }) {
   return (
     <section aria-label="Astack workflow" className="workflow-section">
       <h2>Path taken</h2>
-      {!flows.length && !unplaced.length && (
+      {!flows.length && (
         <p className="subtitle">
-          Flow not recorded in the linked readable capture. Recorded skill reads
-          are available in the turn details below.
+          Route and phases were not recorded in the linked capture.
+          {!reads.length &&
+            !unplaced.length &&
+            " No skill reads or delegated work were captured for this path."}
         </p>
       )}
       {flows.map((flow) => (
@@ -639,7 +672,25 @@ export function WorkflowEvidence({ detail }: { detail: EvaluationDetail }) {
           )}
         />
       ))}
-      {unplaced.length > 0 && (
+      {!flows.length && (reads.length > 0 || unplaced.length > 0) && (
+        <WorkflowPath
+          flow={{ id: "observed", selection: null, nodes: [] }}
+          projectId={detail.evaluation.projectId}
+          branches={unplaced}
+          reads={reads}
+        />
+      )}
+      {flows.length > 0 && reads.length > 0 && (
+        <details className="evaluation-disclosure">
+          <summary>Observed skill reads · {reads.length}</summary>
+          <WorkflowPath
+            flow={{ id: "observed", selection: null, nodes: [] }}
+            projectId={detail.evaluation.projectId}
+            reads={reads}
+          />
+        </details>
+      )}
+      {flows.length > 0 && unplaced.length > 0 && (
         <section>
           <h3>Unplaced delegated work</h3>
           <p className="secondary">
@@ -652,10 +703,12 @@ export function WorkflowEvidence({ detail }: { detail: EvaluationDetail }) {
           />
         </section>
       )}
-      {(flows.length > 0 || unplaced.length > 0) && (
+      {(flows.length > 0 || reads.length > 0 || unplaced.length > 0) && (
         <p className="secondary map-caption">
-          Recorded phase order and declared joins; line spacing is not a time
-          scale.
+          {flows.length
+            ? "Recorded phase order and declared joins; "
+            : "Lines connect captured activity, not skill-to-skill calls; "}
+          line spacing is not a time scale.
         </p>
       )}
       {detail.workflow.truncated && (

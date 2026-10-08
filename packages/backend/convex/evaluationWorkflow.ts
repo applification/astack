@@ -10,6 +10,7 @@ import {
   workflowCaptureSchema,
   type WorkflowRecord,
   type WorkflowBranch,
+  type WorkflowRead,
 } from "@astack/agent-observability/workflow-view";
 import type { EvaluationDetail } from "@astack/agent-observability/evaluation-view";
 import type { QueryCtx } from "./_generated/server";
@@ -257,41 +258,56 @@ export async function evaluationWorkflow(
   const delegatedRuns = new Set(
     branches.flatMap((branch) => branch.runs.map((run) => run.runId)),
   );
-  for (const { run } of roots)
-    if (!delegatedRuns.has(run.id)) records.push(...(await recordsFor(run)));
-  let readCount = 0;
+  const parentRuns = roots.filter(({ run }) => !delegatedRuns.has(run.id));
+  for (const { run } of parentRuns) records.push(...(await recordsFor(run)));
   for (const branch of branches) {
     for (const summary of branch.runs) {
       const child = eligible.get(summary.runId);
       if (!child) continue;
       branch.records.push(...(await recordsFor(child.run)));
       if (recordCount >= 80 || bytes > 256 * 1024) branch.truncated = true;
-      let count = 0;
-      for await (const row of ctx.db
-        .query("events")
-        .withIndex("by_runId_and_kind_and_sequence", (q) =>
-          q.eq("runId", summary.runId).eq("kind", "skill_loaded"),
-        )) {
-        if (++count > 32) {
-          branch.truncated = truncated = true;
-          break;
-        }
-        bytes += bytesOf(row.data);
-        if (readCount >= 32 || bytes > 256 * 1024) {
-          branch.truncated = truncated = true;
-          break;
-        }
-        if (row.machineId !== child.run.machineId) continue;
-        const event = eventSchema.parse(redact(JSON.parse(row.data)));
-        if (!event.skill) continue;
-        readCount++;
-        branch.reads.push({
-          reference: { runId: event.runId, eventId: event.id },
-          skill: event.skill,
-          revision: row.revision,
-        });
-      }
     }
   }
-  return workflowCaptureSchema.parse({ records, branches, truncated });
+  async function readsFor(
+    run: AgentRun,
+    budget: { count: number; limit: number },
+  ) {
+    const reads: WorkflowRead[] = [];
+    let limited = false;
+    for await (const row of ctx.db
+      .query("events")
+      .withIndex("by_runId_and_kind_and_sequence", (q) =>
+        q.eq("runId", run.id).eq("kind", "skill_loaded"),
+      )) {
+      bytes += bytesOf(row.data);
+      if (budget.count >= budget.limit || bytes > 256 * 1024) {
+        limited = truncated = true;
+        break;
+      }
+      budget.count++;
+      if (row.machineId !== run.machineId) continue;
+      const event = eventSchema.parse(redact(JSON.parse(row.data)));
+      if (!event.skill) continue;
+      reads.push({
+        reference: { runId: event.runId, eventId: event.id },
+        skill: event.skill,
+        revision: row.revision,
+      });
+    }
+    return { reads, limited };
+  }
+  const reads: WorkflowRead[] = [];
+  const parentBudget = { count: 0, limit: 64 };
+  for (const { run } of parentRuns)
+    reads.push(...(await readsFor(run, parentBudget)).reads);
+  const childBudget = { count: 0, limit: 32 };
+  for (const branch of branches)
+    for (const summary of branch.runs) {
+      const child = eligible.get(summary.runId);
+      if (!child) continue;
+      const capture = await readsFor(child.run, childBudget);
+      branch.reads.push(...capture.reads);
+      if (capture.limited) branch.truncated = true;
+    }
+  return workflowCaptureSchema.parse({ records, reads, branches, truncated });
 }

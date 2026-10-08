@@ -27,6 +27,7 @@ import {
 } from "@astack/agent-observability/delegation";
 import { T3Reader } from "./t3-rpc";
 import { claudeVersion } from "./claude-version";
+import { commandReadPaths } from "./command-reads";
 
 const id = z.string().min(1).max(512);
 const date = z.iso
@@ -518,26 +519,27 @@ export async function normalizeT3Turn(options: {
               },
             },
           );
-        const match = item.input.match(
-          /^\s*(?:cat|read_file)\s+(?:'([^']+)'|"([^"]+)"|([^\s;|&]+))\s*$/,
-        );
-        const path = match?.[1] ?? match?.[2] ?? match?.[3];
-        if (path && successful(item.status) && item.exitCode === 0) {
-          const skill = await capability(
-            path,
-            options.cwd,
-            "read",
-            "observation_time",
-          );
-          if (skill)
-            emit(
-              `${item.id}:skill`,
-              seq + 2,
-              skill.kind === "skill" ? "skill_loaded" : "instruction_loaded",
-              "Capability read",
-              { skill },
+        if (
+          successful(item.status) &&
+          item.exitCode === 0 &&
+          item.outputIndicatesFailure !== true
+        )
+          for (const [index, path] of commandReadPaths(item.input).entries()) {
+            const skill = await capability(
+              path,
+              options.cwd,
+              "read",
+              "observation_time",
             );
-        }
+            if (skill)
+              emit(
+                index === 0 ? `${item.id}:skill` : `${item.id}:skill:${index}`,
+                seq + 2 + index,
+                skill.kind === "skill" ? "skill_loaded" : "instruction_loaded",
+                "Capability read",
+                { skill },
+              );
+          }
         break;
       }
       case "dynamic_tool": {
@@ -820,7 +822,7 @@ export class T3Adapter {
       if (!project) continue;
       const checkpoint = `t3:${this.source.environmentId}:${thread.id}:updated`;
       const fingerprint = createHash("sha256")
-        .update(JSON.stringify({ captureVersion: 3, thread }))
+        .update(JSON.stringify({ captureVersion: 4, thread }))
         .digest("hex");
       if (
         !["running", "starting", "waiting", "preparing"].includes(

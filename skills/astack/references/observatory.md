@@ -4,6 +4,8 @@ An installed `agentlog` captures persisted Codex turns independently of the agen
 
 Keep work identities owned by their originating COS or dispatcher. When an actual launcher knows the session ID, bind it with `agentlog link --session SESSION_ID --work WORK_ID --project PROJECT_ID`; this also updates already captured runs. A `codex exec --json` launch through `agentlog run --work WORK_ID --project PROJECT_ID -- codex exec --json ...` binds automatically from `thread.started`. Other launchers may propagate stable `ASTACK_WORK_ID`/`ASTACK_PROJECT_ID` through owner-trusted asynchronous hooks. Do not invent a work tracker or fabricate identities for ordinary direct requests.
 
+Use the bundled [agentlog launcher](../../../assets/agentlog-launcher.sh) by its absolute path from this installed plugin. It resolves a command on PATH or the collector's private install at `~/.local/share/astack/observatory/bin/agentlog`; an unsuccessful `command -v agentlog` alone does not mean capture is unavailable. Set `AGENTLOG` to that launcher path once and use `"$AGENTLOG"` in the commands below. No shell-profile or global PATH change is required. If the launcher reports no installed collector, continue the task without telemetry.
+
 When available, explicitly record meaningful workflow transitions with `agentlog workflow --session SESSION_ID --turn TURN_ID --name WORKFLOW --step STEP`. Record an engineering outcome only with evidence using `agentlog outcome ... --value success|failure|unknown`; completion of a model turn is not proof of work success. These operations write only local metadata and queue it.
 
 ## Record the route and path
@@ -11,10 +13,10 @@ When available, explicitly record meaningful workflow transitions with `agentlog
 Use the selected astack route's identifier (`bug-fix`, `implement`, `performance`, `investigate`, `refactor`, `pr`, `project-setup`, `app-control`, or `cloud-transition`). The UI labels `implement` as New feature. Select it when interpreting the prompt, give a concise visible reason, and record only useful phases. Suggested plans are defaults, not mandatory checklists.
 
 ```sh
-agentlog workflow --session SESSION_ID --action context
-agentlog workflow --session SESSION_ID --turn TURN_ID --action select --name bug-fix --reason "Restore the existing save behaviour and rerun the reported symptom." --request-event PROMPT_EVENT_ID
-agentlog workflow --session SESSION_ID --turn TURN_ID --action phase --step reproduce --status started --summary "Reproduce save and reopen on a disposable document." --skills bug-fix app-control
-agentlog workflow --session SESSION_ID --turn TURN_ID --action phase --step reproduce --status completed --summary "Reopening returns the previous value." --skills bug-fix app-control --evidence RESULT_EVENT_ID
+"$AGENTLOG" workflow --session SESSION_ID --action context
+"$AGENTLOG" workflow --session SESSION_ID --turn TURN_ID --action select --name bug-fix --reason "Restore the existing save behaviour and rerun the reported symptom." --request-event PROMPT_EVENT_ID
+"$AGENTLOG" workflow --session SESSION_ID --turn TURN_ID --action phase --step reproduce --status started --summary "Reproduce save and reopen on a disposable document." --skills bug-fix app-control
+"$AGENTLOG" workflow --session SESSION_ID --turn TURN_ID --action phase --step reproduce --status completed --summary "Reopening returns the previous value." --skills bug-fix app-control --evidence RESULT_EVENT_ID
 ```
 
 Selection returns a `flowId` and `eventId`. Later transitions in the same session default to its last selected flow; use `--flow FLOW_ID` to continue a specific flow in later turns or another captured session in the same project. Start a new selection for a new intended outcome. Context lists captured turn/prompt IDs and the last flow; it does not decide which historical turn represents the active request. Use actual host/capture identities, never guessed IDs. If the active turn has not been captured yet, continue delivery without blocking for telemetry.
@@ -24,7 +26,7 @@ Phases use `started`, `completed`, `failed` or `omitted`. Supply the observation
 Delegated children have independent journeys and local skill reads. A fork, a completed spawn call, a returned child result or host delivery does not declare parent integration. When using a child result, record an explicit join with the captured delegation ID and the child's result event; pair `--branches` and `--evidence` in the same order. Context includes recorded delegation identities. Continue without recording if the host or collector has not exposed the required evidence.
 
 ```sh
-agentlog workflow --session SESSION_ID --turn TURN_ID --action join --summary "Used the UI and data recommendations to define the regression checks." --branches UI_DELEGATION_ID DATA_DELEGATION_ID --evidence UI_CHILD_RESULT_EVENT_ID DATA_CHILD_RESULT_EVENT_ID
+"$AGENTLOG" workflow --session SESSION_ID --turn TURN_ID --action join --summary "Used the UI and data recommendations to define the regression checks." --branches UI_DELEGATION_ID DATA_DELEGATION_ID --evidence UI_CHILD_RESULT_EVENT_ID DATA_CHILD_RESULT_EVENT_ID
 ```
 
 Child conversations stay separate even when they use the same flow or phase name. An optional `--attempt ATTEMPT_ID` distinguishes overlapping attempts within one conversation; use the same identity on its start and finish. These records describe phase order and declared skill groups, not skill-to-skill caller relationships.
@@ -36,9 +38,9 @@ Readable capture must be enabled. Recording validates project scope and referenc
 When owning a substantive task in a project with agentlog readable capture, automatically record its acceptance criteria at the start and queue its evaluation at delivery. This is part of the task handoff, without asking the user to write a manifest or opt in again. Preserve one returned task ID across follow-ups; contributors reuse the owner's task instead of creating duplicate evaluations.
 
 ```sh
-agentlog evaluation begin --title "Preserve saved edits" --case "The saved edit survives reopening." --skill "bug-fix=Reproduce the failure and repair its cause."
-agentlog evaluation finish --task RETURNED_TASK_ID --proof ACTUAL_PROOF_REPORT
-agentlog evaluation status --task RETURNED_TASK_ID
+"$AGENTLOG" evaluation begin --title "Preserve saved edits" --case "The saved edit survives reopening." --skill "bug-fix=Reproduce the failure and repair its cause."
+"$AGENTLOG" evaluation finish --task RETURNED_TASK_ID --proof ACTUAL_PROOF_REPORT
+"$AGENTLOG" evaluation status --task RETURNED_TASK_ID
 ```
 
 In a native Codex host, the CLI uses the trusted `CODEX_THREAD_ID`/`CODEX_SESSION_ID` and resolves the active turn through the native reader. An explicit `--session SESSION_ID --turn TURN_ID` overrides that lookup. Other hosts use the actual canonical `--run CAPTURED_RUN_ID`. Never invent these identities or select an unrelated historical turn. Begin requires an active native turn when resolving implicitly; use an explicit original run for a deliberate late declaration. The stored recording timestamp makes lateness visible.
