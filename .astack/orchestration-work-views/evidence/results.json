@@ -138,5 +138,33 @@
     "cases": ["legacy", "mixed"],
     "scope": "earliest prompt and latest response, optional kind projection absent",
     "revision": "135ae74594cd3ed73960ea04f851874a30ad5625"
+  },
+  "independentReview": {
+    "status": "clean",
+    "rounds": [
+      {
+        "revision": "2888bfcb8de6ae09223c69d6b914f594eaa02245",
+        "findings": [
+          "R1: response lookup budget",
+          "R2: missing child capture hides parent observations",
+          "R3: event count disagreement"
+        ]
+      },
+      {
+        "revision": "eefc1bc8b6e50481861931637cbd3b55e472d00b",
+        "resolved": ["R1", "R2", "R3"],
+        "findings": ["R4: legacy optional kind projection missing"]
+      },
+      {
+        "revision": "135ae74594cd3ed73960ea04f851874a30ad5625",
+        "resolved": ["R4"],
+        "findings": [],
+        "evaluationTests": 44,
+        "collectorT3Tests": 48,
+        "strictTypes": "passed",
+        "installedConvexReview": "passed"
+      }
+    ],
+    "scope": "Product revisions; later docs and retained evidence were reviewed by the parent."
   }
 }

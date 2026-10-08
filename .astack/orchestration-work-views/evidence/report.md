@@ -61,8 +61,12 @@ legacy rows without the optional indexed kind projection lost their excerpts.
 `135ae74` adds a separately indexed, bounded legacy slice and combines its
 sequence order with modern rows. Two permanent regressions cover all-legacy
 and mixed captures. Both slices retain 12-row bounds and share the existing
-32 KiB per-end and 256 KiB total limits. Follow-up R4 review is pending when
-this report is first written.
+32 KiB per-end and 256 KiB total limits. Independent round 3 at `135ae74` reproduced R4 against the previous revision
+and cleared the fix, including mixed captures with 30 modern messages and
+probes of row/byte limits. Its 44 evaluation and 48 collector/T3 tests and
+strict TypeScript checks passed. No material functional or Convex finding
+remains. The parent reviewed the subsequent documentation, contract and
+retained evidence for consistency; these were outside the pinned child review.
 
 Earlier browser attempts exposed two test issues: an immediate count before
 React readiness, and an ambiguous synthetic title locator. The first full run
