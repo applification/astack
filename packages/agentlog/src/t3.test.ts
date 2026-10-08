@@ -28,6 +28,7 @@ import { envelopeSchema } from "@astack/agent-observability";
 import { projectSchema } from "@astack/agent-observability/projects";
 import {
   T3Adapter,
+  resolveOrchestrationRoot,
   normalizeT3Turn,
   t3ProjectionSchema,
   type T3ReadSource,
@@ -49,6 +50,37 @@ const machineId = "00000000-0000-4000-8000-000000000001";
 const environmentId = "00000000-0000-4000-8000-000000000002";
 const projectId = "00000000-0000-4000-8000-000000000003";
 const time = "2026-10-06T10:00:00.000Z";
+test("orchestration ancestry follows delegated parents but starts a new group at a fork", async () => {
+  const node = (
+    id: string,
+    parentThreadId: string | null,
+    relationshipToParent: "subagent" | "fork" | null,
+  ) => ({ id, lineage: { parentThreadId, relationshipToParent } });
+  const records = new Map([
+    ["root", node("root", null, null)],
+    ["child", node("child", "root", "subagent")],
+    ["nested", node("nested", "child", "subagent")],
+    ["fork", node("fork", "child", "fork")],
+    ["fork-child", node("fork-child", "fork", "subagent")],
+    ["cycle", node("cycle", "cycle", "subagent")],
+  ]);
+  const read = async (id: string) => records.get(id) ?? null;
+  expect(await resolveOrchestrationRoot(records.get("nested")!, read)).toBe(
+    "root",
+  );
+  expect(await resolveOrchestrationRoot(records.get("fork-child")!, read)).toBe(
+    "fork",
+  );
+  expect(
+    await resolveOrchestrationRoot(records.get("cycle")!, read),
+  ).toBeNull();
+  expect(
+    await resolveOrchestrationRoot(
+      node("missing", "unknown", "subagent"),
+      read,
+    ),
+  ).toBeNull();
+});
 const end = "2026-10-06T10:01:00.000Z";
 const secret = "synthetic-private-t3-access-token";
 async function fixture() {
@@ -408,9 +440,19 @@ test("native Codex overlap preserves the first collector, annotations and event 
     f.store.runsForSession("native-session")[0]?.sessionReferences,
   ).toContainEqual({ kind: "t3", environmentId, threadId: "app-thread" });
   expect(f.store.runsForSession("native-session")[0]?.outcome).toBe("success");
+  expect(
+    f.store.runsForSession("native-session")[0]?.conversation,
+  ).toMatchObject({
+    self: { kind: "t3", environmentId, threadId: "app-thread" },
+    root: { kind: "t3", environmentId, threadId: "app-thread" },
+    hostRun: { id: "app-run" },
+  });
   expect(f.store.runsForSession("native-session")[0]?.work?.id).toBe("AST-1");
   expect(f.store.events(native.run.id)).toHaveLength(native.events.length);
   persistSnapshot(f.store, native);
+  expect(
+    f.store.runsForSession("native-session")[0]?.conversation?.root.kind,
+  ).toBe("t3");
   expect(f.store.runsForSession("native-session")[0]?.delegations).toHaveLength(
     1,
   );
@@ -716,7 +758,7 @@ test("T3 matches enrollment before reading history, includes archives, and commi
     `t3:${environmentId}:app-thread:updated`,
     createHash("sha256")
       .update(
-        JSON.stringify({ captureVersion: 4, thread: shellState.threads[0] }),
+        JSON.stringify({ captureVersion: 5, thread: shellState.threads[0] }),
       )
       .digest("hex"),
   );

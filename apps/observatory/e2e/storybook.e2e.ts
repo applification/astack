@@ -2640,3 +2640,66 @@ test("recorded routes retain declared phases and disclose observed parent reads 
   await workflow.getByText("Observed skill reads · 4", { exact: true }).tap();
   await expect.poll(bridge).toBe(true);
 });
+
+test("orchestration hierarchy retains provider changes, nested children, review rounds and capture gaps", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-orchestration--nested-and-missing&viewMode=story",
+  );
+  await expect(
+    screen.getByRole("link", "root · request-one", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("link", "root · request-two", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Review round one · completed", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Review round two · completed", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Unresolved child identity · failed", { exact: true }),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(() => {
+      const nested = [
+        ...document.querySelectorAll("li[data-conversation-key]"),
+      ].find((node) =>
+        node.getAttribute("data-conversation-key")?.endsWith(":nested"),
+      );
+      return (
+        nested?.parentElement
+          ?.closest("li[data-conversation-key]")
+          ?.getAttribute("data-conversation-key")
+          ?.endsWith(":review") ?? false
+      );
+    }),
+  ).toBe(true);
+  await app.screenshot("orchestration-nested-synthetic");
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await app.open(
+    "/iframe.html?id=observatory-orchestration--partial-page&viewMode=story",
+  );
+  await expect(
+    screen
+      .getByText("Parent conversation not loaded", { exact: false })
+      .first(),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Parent turns are not in the loaded pages yet.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("link", "nested · first", { exact: true }),
+  ).toBeVisible();
+});

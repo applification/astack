@@ -4,6 +4,7 @@ import { workflowAnnotationSchema } from "./workflow";
 import { delegationSchema, sessionReferenceSchema } from "./delegation";
 import { deliveryEvidenceSchema } from "./delivery-evidence";
 import { automationSchema } from "./automations";
+import { conversationSchema } from "./conversations";
 
 const id = z.string().min(1).max(512);
 const text = z.string().max(4096);
@@ -113,6 +114,7 @@ export const runSchema = z
     attemptId: id,
     parentSessionId: id.optional(),
     sessionReferences: z.array(sessionReferenceSchema).max(20).default([]),
+    conversation: conversationSchema.optional(),
     delegations: z.array(delegationSchema).max(32).default([]),
     source: id,
     automation: automationSchema.optional(),

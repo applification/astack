@@ -25,6 +25,7 @@ import { workflowFixture } from "@astack/agent-observability/workflow-fixtures";
 const modules = {
   "../convex/_generated/server.ts": () => import("../convex/_generated/server"),
   "../convex/observatory.ts": () => import("../convex/observatory"),
+  "../convex/conversations.ts": () => import("../convex/conversations"),
   "../convex/ingestion.ts": () => import("../convex/ingestion"),
   "../convex/evaluations.ts": () => import("../convex/evaluations"),
   "../convex/projects.ts": () => import("../convex/projects"),
@@ -48,6 +49,47 @@ async function ingestWorkflow(
       records: entries(records.slice(index, index + 2), 10 + index),
     });
 }
+
+test("thread association uses current capture without changing an immutable task evaluation", async () => {
+  const { t, owner, evaluation } = await setup();
+  const before = await t.run(
+    async (ctx) => await ctx.db.query("evaluations").first(),
+  );
+  const first = evaluationRun("repair");
+  const self = {
+    kind: "t3",
+    environmentId: "synthetic-host",
+    threadId: "root",
+  } as const;
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries(
+      [
+        {
+          kind: "run",
+          value: { ...first, conversation: { self, root: self } },
+        },
+      ],
+      2,
+    ),
+  });
+  const groups = await owner.query(api.conversations.forEvaluation, {
+    evaluationId: evaluation.id,
+    projectId: fixtureProject,
+  });
+  expect(groups).toHaveLength(2); // The other native root remains separately identified.
+  const after = await t.run(
+    async (ctx) => await ctx.db.query("evaluations").first(),
+  );
+  expect(after?.data).toBe(before?.data);
+  expect(after?.snapshot).toBe(before?.snapshot);
+  expect(
+    await owner.query(api.conversations.forEvaluation, {
+      evaluationId: evaluation.id,
+      projectId: "another-project",
+    }),
+  ).toEqual([]);
+});
 async function setup(
   status: "pass" | "fail" | "inconclusive" = "pass",
   request?: string,

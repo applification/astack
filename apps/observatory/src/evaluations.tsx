@@ -33,6 +33,8 @@ import {
 import { OutcomeFeedbackForm } from "./outcome-feedback";
 import { WorkflowEvidence } from "./workflow-evidence";
 import { PromptJourney } from "./prompt-journey";
+import { conversationGroupSchema } from "@astack/agent-observability/conversations";
+import { threadLink } from "./conversations";
 import { DeliveryResult } from "./delivery-result";
 
 export const evaluationLink = (id: string, projectId: string) =>
@@ -663,6 +665,10 @@ export function EvaluationPage({
   id: string;
   projectId?: string;
 }) {
+  const threadGroups = useQuery(api.conversations.forEvaluation, {
+    evaluationId: id,
+    ...(projectId ? { projectId } : {}),
+  });
   const raw = useQuery(api.evaluations.detail, {
     evaluationId: id,
     ...(projectId ? { projectId } : {}),
@@ -678,22 +684,38 @@ export function EvaluationPage({
       </>
     );
   return (
-    <EvaluationView
-      detail={evaluationDetailSchema.parse(JSON.parse(raw))}
-      saveFeedback={async (feedback, requestId) => {
-        await reviewOutcome({
-          evaluationId: id,
-          requestId,
-          feedback: JSON.stringify(feedback),
-        });
-      }}
-      save={async (assessment, requestId) => {
-        await assess({
-          evaluationId: id,
-          requestId,
-          assessment: JSON.stringify(assessment),
-        });
-      }}
-    />
+    <>
+      {threadGroups && threadGroups.length > 0 && (
+        <p className="secondary">
+          Orchestration thread:{" "}
+          {threadGroups.map((value, index) => {
+            const group = conversationGroupSchema.parse(JSON.parse(value));
+            return (
+              <a key={group.id} href={threadLink(group.id, group.projectId)}>
+                {index > 0 ? " · " : ""}
+                {group.title}
+              </a>
+            );
+          })}
+        </p>
+      )}
+      <EvaluationView
+        detail={evaluationDetailSchema.parse(JSON.parse(raw))}
+        saveFeedback={async (feedback, requestId) => {
+          await reviewOutcome({
+            evaluationId: id,
+            requestId,
+            feedback: JSON.stringify(feedback),
+          });
+        }}
+        save={async (assessment, requestId) => {
+          await assess({
+            evaluationId: id,
+            requestId,
+            assessment: JSON.stringify(assessment),
+          });
+        }}
+      />
+    </>
   );
 }

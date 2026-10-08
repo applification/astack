@@ -15,12 +15,17 @@ import {
 import { workNameKey } from "@astack/agent-observability/naming";
 import { automationKey } from "@astack/agent-observability/automations";
 import { fixtureAutomation } from "@astack/agent-observability/automation-fixtures";
+import {
+  conversationGroupKey,
+  conversationGroupSchema,
+} from "@astack/agent-observability/conversations";
 import type { FunctionReturnType } from "convex/server";
 
 // Explicit module loaders work in Bun without a Vite-only import.meta.glob.
 const modules = {
   "../convex/_generated/server.ts": () => import("../convex/_generated/server"),
   "../convex/observatory.ts": () => import("../convex/observatory"),
+  "../convex/conversations.ts": () => import("../convex/conversations"),
   "../convex/ingestion.ts": () => import("../convex/ingestion"),
   "../convex/auth.ts": () => import("../convex/auth"),
   "../convex/projects.ts": () => import("../convex/projects"),
@@ -69,6 +74,180 @@ function run(id = machineId, attempt = "turn") {
 function entry(value = run(), revision = 1) {
   return { revision, record: JSON.stringify({ kind: "run", value }) };
 }
+test("indexed conversation groups include cross-provider children, preserve work links and paginate independently", async () => {
+  const t = await setup();
+  const owner = t.withIdentity({ subject: process.env.OBSERVATORY_OWNER_ID });
+  const root = {
+    kind: "t3",
+    environmentId: "fixture-host",
+    threadId: "root",
+  } as const;
+  const first = {
+    ...run(),
+    conversation: { self: root, root },
+    work: { id: "issue-1" },
+  };
+  const child = {
+    ...run(machineId, "child"),
+    sessionId: "child-session",
+    agent: "claude",
+    source: "t3:fixture-host",
+    startedAt: 1100,
+    conversation: {
+      self: { ...root, threadId: "child" },
+      root,
+      parent: { reference: root, relationship: "subagent" as const },
+    },
+    work: { id: "issue-2" },
+  };
+  const nested = {
+    ...child,
+    id: run(machineId, "grandchild").id,
+    sessionId: "grandchild-session",
+    startedAt: 1200,
+    conversation: {
+      self: { ...root, threadId: "grandchild" },
+      root,
+      parent: {
+        reference: child.conversation.self,
+        relationship: "subagent" as const,
+      },
+    },
+  };
+  // Children can arrive before the root without creating separate work identities.
+  for (const value of [child, nested, first])
+    await t.mutation(internal.ingestion.ingest, {
+      machineId,
+      records: [entry(value)],
+
+    });
+  const groupId = conversationGroupKey(first)!;
+  const raw = await owner.query(api.conversations.group, {
+    groupId,
+    projectId,
+  });
+  expect(conversationGroupSchema.parse(JSON.parse(raw!))).toMatchObject({
+    turns: 3,
+    delegatedTurns: 2,
+    rootRunId: first.id,
+  });
+  const page = await owner.query(api.conversations.turns, {
+    groupId,
+    projectId,
+    paginationOpts: { numItems: 1, cursor: null },
+  });
+  expect(page.isDone).toBe(false);
+  expect(
+    page.page.map((value) => runSchema.parse(JSON.parse(value)).id),
+  ).toEqual([nested.id]);
+  const next = await owner.query(api.conversations.turns, {
+    groupId,
+    projectId,
+    paginationOpts: { numItems: 2, cursor: page.continueCursor },
+  });
+  expect(
+    next.page.map((value) => runSchema.parse(JSON.parse(value)).work?.id),
+  ).toEqual(["issue-2", "issue-1"]);
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [entry(first, 2), entry(child, 2)],
+
+  });
+  const replay = await owner.query(api.conversations.group, {
+    groupId,
+    projectId,
+  });
+  expect(conversationGroupSchema.parse(JSON.parse(replay!)).turns).toBe(3);
+});
+
+test("conversation queries enforce owner, project and machine scope", async () => {
+  const t = await setup();
+  const owner = t.withIdentity({ subject: process.env.OBSERVATORY_OWNER_ID });
+  const first = run();
+  const second = run(secondId);
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [entry(first)],
+
+  });
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: secondId,
+    records: [entry(second)],
+
+  });
+  const a = conversationGroupKey(first)!;
+  const b = conversationGroupKey(second)!;
+  expect(a).not.toBe(b);
+  const groups = await owner.query(api.conversations.groups, {
+    projectId,
+    paginationOpts: { numItems: 50, cursor: null },
+  });
+  expect(groups.page).toHaveLength(2);
+  expect(
+    await owner.query(api.conversations.group, {
+      groupId: a,
+      projectId: "outside",
+    }),
+  ).toBeNull();
+  expect(
+    (
+      await owner.query(api.conversations.turns, {
+        groupId: a,
+        paginationOpts: { numItems: 50, cursor: null },
+      })
+    ).page.map((value) => runSchema.parse(JSON.parse(value)).machineId),
+  ).toEqual([machineId]);
+  for (const query of [
+    () =>
+      t.query(api.conversations.groups, {
+        paginationOpts: { numItems: 50, cursor: null },
+      }),
+    () => t.query(api.conversations.group, { groupId: a }),
+    () =>
+      t.query(api.conversations.turns, {
+        groupId: a,
+        paginationOpts: { numItems: 50, cursor: null },
+      }),
+    () =>
+      t.query(api.conversations.forEvaluation, { evaluationId: "anything" }),
+  ])
+    await expect(query()).rejects.toThrow();
+});
+
+test("conversation membership enrichment moves a turn without retaining an orphan group", async () => {
+  const t = await setup();
+  const owner = t.withIdentity({ subject: process.env.OBSERVATORY_OWNER_ID });
+  const first = run();
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [entry(first)],
+
+  });
+  const self = {
+    kind: "t3",
+    environmentId: "fixture",
+    threadId: "root",
+  } as const;
+  const enriched = { ...first, conversation: { self, root: self } };
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [entry(enriched, 2)],
+
+  });
+  expect(
+    await owner.query(api.conversations.group, {
+      groupId: conversationGroupKey(first)!,
+    }),
+  ).toBeNull();
+  const groups = await owner.query(api.conversations.groups, {
+    paginationOpts: { numItems: 50, cursor: null },
+  });
+  expect(
+    groups.page.map(
+      (value) => conversationGroupSchema.parse(JSON.parse(value)).turns,
+    ),
+  ).toEqual([1]);
+});
 async function setup() {
   const t = convexTest(schema, modules);
   await t.run(async (ctx) => {

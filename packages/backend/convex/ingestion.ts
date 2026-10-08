@@ -16,6 +16,7 @@ import { storeEvaluation } from "./evaluations";
 import { sessionReferenceKey } from "@astack/agent-observability/delegation";
 import { repositoryIdentity } from "@astack/agent-observability/projects";
 import { automationKey } from "@astack/agent-observability/automations";
+import { storeConversation } from "./conversations";
 
 function capabilities(run: AgentRun) {
   return new Map(run.skills.map((skill) => [capabilityKey(skill), skill]));
@@ -86,6 +87,7 @@ export async function storeRun(
   if (previous) await ctx.db.patch(previous._id, row);
   else await ctx.db.insert("runs", row);
   await storeSessions(ctx, run);
+  await storeConversation(ctx, run);
   await storeWorkLabel(ctx, run);
   if (
     run.work &&

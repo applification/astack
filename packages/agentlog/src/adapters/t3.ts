@@ -28,6 +28,7 @@ import {
 import { T3Reader } from "./t3-rpc";
 import { claudeVersion } from "./claude-version";
 import { commandReadPaths } from "./command-reads";
+import { conversationSchema } from "@astack/agent-observability/conversations";
 
 const id = z.string().min(1).max(512);
 const date = z.iso
@@ -136,6 +137,7 @@ export const t3ProjectionSchema = z.object({
     id,
     lineage: z.object({
       parentThreadId: id.nullable(),
+      rootThreadId: id.nullable().optional(),
       relationshipToParent: z.enum(["fork", "subagent"]).nullable().optional(),
     }),
   }),
@@ -156,6 +158,7 @@ export const t3ProjectionSchema = z.object({
     z.object({
       id,
       modelSelection: model,
+      ordinal: z.number().int().positive().optional(),
       startedAt: date.nullable(),
       requestedAt: date,
       completedAt: date.nullable(),
@@ -250,6 +253,7 @@ export async function normalizeT3Turn(options: {
   signatureKey: string;
   secrets: readonly string[];
   observedAt: number;
+  orchestrationRootThreadId?: string | null;
 }): Promise<AgentSnapshot | null> {
   const { projection, turn, config, source, store, observedAt } = options;
   const provider = projection.providerThreads.find(
@@ -278,6 +282,36 @@ export async function normalizeT3Turn(options: {
       : `${config.machineId}:t3:${scope}:${turn.id}`;
   const previous = store.getRecord(`run:${runId}`);
   const origin = `t3:${source.environmentId}`;
+  const rootThreadId =
+    options.orchestrationRootThreadId === undefined
+      ? !projection.thread.lineage.parentThreadId ||
+        projection.thread.lineage.relationshipToParent === "fork"
+        ? projection.thread.id
+        : projection.thread.lineage.rootThreadId
+      : options.orchestrationRootThreadId;
+  const t3Reference = (threadId: string) =>
+    ({ kind: "t3", environmentId: source.environmentId, threadId }) as const;
+  const conversation = rootThreadId
+    ? conversationSchema.parse({
+        self: t3Reference(projection.thread.id),
+        root: t3Reference(rootThreadId),
+        ...(projection.thread.lineage.parentThreadId
+          ? {
+              parent: {
+                reference: t3Reference(
+                  projection.thread.lineage.parentThreadId,
+                ),
+                relationship:
+                  projection.thread.lineage.relationshipToParent ?? "unknown",
+              },
+            }
+          : {}),
+        hostRun: {
+          id: appRun.id,
+          ...(appRun.ordinal ? { ordinal: appRun.ordinal } : {}),
+        },
+      })
+    : undefined;
   const sessionReferences = mergeSessionReferences(
     previous?.kind === "run" ? previous.value.sessionReferences : [],
     [
@@ -337,7 +371,12 @@ export async function normalizeT3Turn(options: {
     return {
       run: runSchema.parse(
         redact(
-          { ...previous.value, sessionReferences, delegations },
+          {
+            ...previous.value,
+            sessionReferences,
+            delegations,
+            ...(conversation ? { conversation } : {}),
+          },
           options.secrets,
         ),
       ),
@@ -361,6 +400,10 @@ export async function normalizeT3Turn(options: {
     "Times are recorded by T3; unavailable native facts remain unknown",
     "Skill hashes are observation-time evidence; automatically supplied instructions are not inferred",
   ];
+  if (!conversation)
+    coverage.push(
+      "Orchestration ancestry unavailable or outside the enrolled project; no thread group inferred.",
+    );
   let agentVersion =
     previous?.kind === "run" ? previous.value.agentVersion : undefined;
   if (agent === "claude") {
@@ -734,6 +777,7 @@ export async function normalizeT3Turn(options: {
     machineName: config.machineName,
     sessionId,
     sessionReferences,
+    ...(conversation ? { conversation } : {}),
     delegations,
     attemptId: nativeTurn ?? turn.id,
     source: origin,
@@ -775,6 +819,26 @@ export async function normalizeT3Turn(options: {
   };
 }
 
+export async function resolveOrchestrationRoot(
+  thread: Projection["thread"],
+  parent: (id: string) => Promise<Projection["thread"] | null>,
+): Promise<string | null> {
+  const seen = new Set<string>();
+  let current = thread;
+  for (let depth = 0; depth < 16; depth++) {
+    if (seen.has(current.id)) return null;
+    seen.add(current.id);
+    const lineage = current.lineage;
+    if (!lineage.parentThreadId || lineage.relationshipToParent === "fork")
+      return current.id;
+    if (lineage.relationshipToParent !== "subagent") return null;
+    const ancestor = await parent(lineage.parentThreadId);
+    if (!ancestor || ancestor.id !== lineage.parentThreadId) return null;
+    current = ancestor;
+  }
+  return null;
+}
+
 export class T3Adapter {
   readonly agent = "t3";
   deferredTurns = 0;
@@ -805,6 +869,7 @@ export class T3Adapter {
       ),
     );
     const repositories = new Map<string, string | null>();
+    const ancestry = new Map<string, Projection["thread"]>();
     for (const thread of threads.values()) {
       const t3Project = shell.projects.find((p) => p.id === thread.projectId);
       const cwd = thread.worktreePath ?? t3Project?.workspaceRoot;
@@ -830,7 +895,7 @@ export class T3Adapter {
       if (!project) continue;
       const checkpoint = `t3:${this.source.environmentId}:${thread.id}:updated`;
       const fingerprint = createHash("sha256")
-        .update(JSON.stringify({ captureVersion: 5, thread }))
+        .update(JSON.stringify({ captureVersion: 6, thread }))
         .digest("hex");
       if (
         !["running", "starting", "waiting", "preparing"].includes(
@@ -844,6 +909,37 @@ export class T3Adapter {
       );
       if (projection.thread.id !== thread.id)
         throw new Error("t3_thread_mismatch");
+      ancestry.set(thread.id, projection.thread);
+      const orchestrationRootThreadId = await resolveOrchestrationRoot(
+        projection.thread,
+        async (parentId) => {
+          const parent = threads.get(parentId);
+          // Follow only lineage inside this T3 project; no unrelated history reads.
+          if (!parent || parent.projectId !== thread.projectId) return null;
+          const parentCwd = parent.worktreePath ?? t3Project?.workspaceRoot;
+          if (!parentCwd) return null;
+          if (!repositories.has(parentCwd))
+            repositories.set(parentCwd, await localRepository(parentCwd));
+          const parentProject = resolveProject(this.projects, {
+            machineId: this.config.machineId,
+            cwd: parentCwd,
+            ...(repositories.get(parentCwd)
+              ? { repo: repositories.get(parentCwd)! }
+              : repo
+                ? { repo }
+                : {}),
+          });
+          if (parentProject?.projectId !== project.projectId) return null;
+          if (ancestry.has(parentId)) return ancestry.get(parentId)!;
+          const parentProjection = t3ProjectionSchema.parse(
+            snapshotSchema.parse(await this.reader.thread(parentId)).projection,
+          );
+          if (parentProjection.thread.id !== parentId)
+            throw new Error("t3_thread_mismatch");
+          ancestry.set(parentId, parentProjection.thread);
+          return parentProjection.thread;
+        },
+      );
       for (const [index, raw] of projection.turnItems.entries()) {
         const item = baseItem
           .extend({ outputOmitted: z.boolean().optional() })
@@ -907,6 +1003,7 @@ export class T3Adapter {
           signatureKey: this.signatureKey,
           secrets: [...this.knownSecrets, ...this.reader.secrets],
           observedAt: Date.now(),
+          orchestrationRootThreadId,
         });
         if (snapshot) {
           if (repo)

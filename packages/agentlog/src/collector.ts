@@ -65,6 +65,9 @@ export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
       kind: "run",
       value: runSchema.parse({
         ...owner.value,
+        ...(snapshot.run.conversation
+          ? { conversation: snapshot.run.conversation }
+          : {}),
         ...(automation ? { automation } : {}),
         sessionReferences: mergeSessionReferences(
           owner.value.sessionReferences,
@@ -109,6 +112,8 @@ export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
       run.automation,
     );
     if (automation) run.automation = automation;
+    if (!run.conversation && previous.value.conversation)
+      run.conversation = previous.value.conversation;
     run.sessionReferences = mergeSessionReferences(
       previous.value.sessionReferences,
       run.sessionReferences,
