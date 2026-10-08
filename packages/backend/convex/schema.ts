@@ -2,6 +2,36 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  conversationGroups: defineTable({
+    groupId: v.string(),
+    projectId: v.string(),
+    machineId: v.string(),
+    machineName: v.string(),
+    root: v.string(),
+    rootRunId: v.optional(v.string()),
+    rootStartedAt: v.optional(v.number()),
+    turns: v.number(),
+    delegatedTurns: v.number(),
+    lastActivityAt: v.number(),
+  })
+    .index("by_groupId", ["groupId"])
+    .index("by_projectId_and_lastActivityAt", ["projectId", "lastActivityAt"])
+    .index("by_lastActivityAt", ["lastActivityAt"]),
+  conversationTurns: defineTable({
+    runId: v.string(),
+    groupId: v.string(),
+    isRoot: v.boolean(),
+    startedAt: v.number(),
+    lastActivityAt: v.number(),
+  })
+    .index("by_runId", ["runId"])
+    .index("by_groupId_and_startedAt", ["groupId", "startedAt"])
+    .index("by_groupId_and_isRoot_and_startedAt", [
+      "groupId",
+      "isRoot",
+      "startedAt",
+    ])
+    .index("by_groupId_and_lastActivityAt", ["groupId", "lastActivityAt"]),
   runSessions: defineTable({
     machineId: v.string(),
     key: v.string(),

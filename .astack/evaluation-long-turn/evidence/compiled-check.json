@@ -1,0 +1,9 @@
+{
+  "revision": "37301bff6c142e1d0ad90755e7e382b2f2f688d4",
+  "environment": "signed compiled CLI, disposable SQLite fixture",
+  "followups": 101,
+  "exactOrderedFollowups": true,
+  "idempotentFinish": true,
+  "state": "queued",
+  "binarySha256": "4e184ebb82eb3b769730a637df68c89b085cf49fd3798209271aaae9ea261eb2"
+}

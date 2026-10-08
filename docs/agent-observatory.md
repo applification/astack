@@ -1,5 +1,11 @@
 # Agent Observatory
 
+The **Work** view lists orchestration threads independently of optional external work references. Open a thread to follow its parent turns and nested delegated conversations, including provider changes, review rounds and unavailable captures. Group identity comes from recorded ancestry within one enrolled project and machine; a fork starts another group. Turn lists and thread lists paginate independently. Evaluations link to the owning thread while retaining each task's immutable scope, evidence and owner judgment. Completion of a child does not record a parent join.
+
+T3 capture version 7 replays eligible completed threads once to retain typed root/parent identities and host run ordinals. Native Codex capture follows recorded subagent parents through metadata-only reads and replays its configured history once on upgrade. An enclosing T3 conversation keeps precedence when both sources observe a provider turn. Unresolved or out-of-project ancestry remains an evidence gap rather than being grouped by title, directory or work ID. A bounded administrative `conversations:rebuild` projects existing captured history after a backend upgrade without rewriting evaluation snapshots.
+
+Native conversation capture version 2 also recovers children skipped by the earlier activity checkpoint. Pending ancestry is retained separately, including across collector restarts. Subsequent polls retry metadata without rereading unchanged unavailable turn content; once the ancestry resolves, eligible turns are recaptured. T3's version-7 fingerprint invalidates earlier completed-thread checkpoints and leaves unresolved ancestry eligible for retry.
+
 Agent Observatory is Astack’s private feedback system for coding-agent behavior. It captures native Codex desktop/CLI turns and, when configured, provider turns recorded by T3 Code, including Claude and Codex. It observes enrolled projects, groups runs by project and optional external work references, and shows traces and skill-version correlations. It lives in this repository. There is no COS work store or agent dispatcher in Astack today; Observatory does not create either.
 
 ```mermaid

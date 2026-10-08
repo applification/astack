@@ -6,6 +6,8 @@ The reference includes a Pen (pen.dev) visual design in `.astack/design/` inside
 
 ## Start from the reference
 
+Generated projects include root [AGENTS.md](../AGENTS.md), a [Claude pointer](../CLAUDE.md) and [the runtime profile](../.astack/project.md). Their main agent owns the request, selects useful delegation with the actual host, and verifies integrated results. Setup/upgrades reconcile these project-owned instructions in place, preserving custom text and framework-managed blocks. No T3 connection or separate orchestrator prompt is required.
+
 From an astack checkout, generate a separate project:
 
 ```sh

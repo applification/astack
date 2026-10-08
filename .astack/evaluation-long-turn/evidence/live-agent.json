@@ -1,0 +1,18 @@
+{
+  "at": "2026-10-08T18:54:00.059Z",
+  "revision": "37301bff6c142e1d0ad90755e7e382b2f2f688d4",
+  "environment": "private Otis deployed native Convex",
+  "method": "agent",
+  "followups": 11,
+  "exactOrderedFollowups": true,
+  "sourceRevisionPreserved": true,
+  "generationIdempotent": true,
+  "deniedOperations": 2,
+  "ownerAssessments": 0,
+  "feedback": 0,
+  "evaluationDigest": "bd172a205cbb2c80f3bc387230cd9eae9871ddb5b7093c1635a3f3b5f4c12e17",
+  "priorTaskRecovered": true,
+  "frozenDeliveryUnchanged": true,
+  "proofRevision": "4c2c8ad6ec94e1cc4d799bf9c0db738b62d55d95",
+  "frozenDigest": "9d758c2bbe4b5cde67c91b82098db2f97d1db666123aac67fc46371687c07ab1"
+}

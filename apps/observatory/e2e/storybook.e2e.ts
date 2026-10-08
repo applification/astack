@@ -671,9 +671,12 @@ test("astack route changes, missing selection and unavailable evidence stay expl
     "/iframe.html?id=observatory-evaluations--awaiting-review&viewMode=story",
   );
   await expect(
-    screen.getByText("Flow not recorded in the linked readable capture.", {
-      exact: false,
-    }),
+    screen.getByText(
+      "Route and phases were not recorded in the linked capture.",
+      {
+        exact: false,
+      },
+    ),
   ).toBeVisible();
 });
 test("owner flow judgments select captured evidence and remain separate from outcome feedback", async ({
@@ -2224,6 +2227,115 @@ test("main rail stays centered with zero through four outward child lanes", asyn
   await app.screenshot("centered-four-child-lanes-narrow");
 });
 
+test("five child routes fit the desktop width and remain reachable on narrow screens", async ({
+  app,
+  browser,
+}) => {
+  await browser.setViewport({ width: 1600, height: 1000 });
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--five-journeys&viewMode=story",
+  );
+  const visibility = () =>
+    browser.evaluate(() => {
+      const viewport = document.querySelector(".workflow-map-scroll");
+      const map = viewport?.querySelector(".workflow-map");
+      if (!viewport || !map) return null;
+      const bounds = viewport.getBoundingClientRect();
+      const branches = [...map.querySelectorAll("[data-map-branch]")];
+      const anchors = [...map.querySelectorAll("[data-map-key]")];
+      const paths = [...map.querySelectorAll("path[data-connection]")];
+      const linesAligned =
+        paths.length > 0 &&
+        paths.every((path) => {
+          if (!(path instanceof SVGPathElement)) return false;
+          const matrix = path.getScreenCTM();
+          if (!matrix) return false;
+          const endpoints = [
+            path.getPointAtLength(0),
+            path.getPointAtLength(path.getTotalLength()),
+          ];
+          return ["from", "to"].every((key, index) => {
+            const anchor = anchors.find(
+              (item) =>
+                item.getAttribute("data-map-key") ===
+                path.getAttribute("data-" + key),
+            );
+            const endpoint = endpoints[index];
+            if (!anchor || !endpoint) return false;
+            const rect = anchor.getBoundingClientRect();
+            const point = new DOMPoint(endpoint.x, endpoint.y).matrixTransform(
+              matrix,
+            );
+            return (
+              Math.abs(point.x - rect.left - rect.width / 2) < 0.5 &&
+              Math.abs(point.y - rect.top - rect.height / 2) < 0.5
+            );
+          });
+        });
+      return {
+        children: branches.length,
+        allBranchesVisible: branches.every((branch) => {
+          const rect = branch.getBoundingClientRect();
+          return rect.left >= bounds.left - 1 && rect.right <= bounds.right + 1;
+        }),
+        mapFits: viewport.scrollWidth <= viewport.clientWidth + 1,
+        pageFits: document.documentElement.scrollWidth <= innerWidth,
+        linesAligned,
+      };
+    });
+  for (const width of [1600, 1280, 1920]) {
+    await browser.setViewport({ width, height: 1000 });
+    await expect.poll(visibility).toEqual({
+      children: 5,
+      allBranchesVisible: true,
+      mapFits: true,
+      pageFits: true,
+      linesAligned: true,
+    });
+  }
+  await browser.setViewport({ width: 1600, height: 1000 });
+  await browser.evaluate(() => {
+    document.querySelector(".journey-delegation-card")?.scrollIntoView();
+    window.scrollBy(0, -100);
+    return true;
+  });
+  await app.screenshot("five-child-routes-full-width");
+  await browser.setViewport({ width: 390, height: 844 });
+  await expect.poll(visibility).toMatchObject({
+    children: 5,
+    pageFits: true,
+    linesAligned: true,
+  });
+  // Narrow screens retain readable lanes; both outer routes can be panned into view.
+  for (const side of ["left", "right"]) {
+    await expect
+      .poll(() =>
+        browser.evaluate((side) => {
+          const viewport = document.querySelector(".workflow-map-scroll");
+          if (!viewport) return false;
+          const branches = [
+            ...viewport.querySelectorAll(
+              `[data-map-branch][data-side="${side}"]`,
+            ),
+          ];
+          const branch = branches.at(-1);
+          if (!branch) return false;
+          branch
+            .querySelector("h4")
+            ?.scrollIntoView({ inline: "center", block: "nearest" });
+          const heading = branch.querySelector("h4")?.getBoundingClientRect();
+          const bounds = viewport.getBoundingClientRect();
+          return (
+            !!heading &&
+            heading.left >= bounds.left - 1 &&
+            heading.right <= bounds.right + 1
+          );
+        }, side),
+      )
+      .toBe(true);
+  }
+});
+
 test("completed and unavailable children never create an implicit parent join", async ({
   app,
   screen,
@@ -2409,4 +2521,196 @@ test("failed private delivery and missing image previews retain honest evidence 
   await expect(
     result.getByText("Your review pending", { exact: true }),
   ).toBeVisible();
+});
+test("evaluation shows connected parent skill reads without route annotations", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--observed-skills&viewMode=story",
+  );
+  const workflow = screen.getByRole("region", "Astack workflow", {
+    exact: true,
+  });
+  await expect(
+    workflow.getByRole("heading", "Observed skill reads", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    workflow.getByText(
+      "Route and phases were not recorded in the linked capture.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  const captured = () =>
+    browser.evaluate(() => ({
+      labels: [
+        ...document.querySelectorAll(".map-main-cell .journey-skill-read a"),
+      ].map((node) => node.textContent?.trim()),
+      mainLines: document.querySelectorAll('path[data-connection="main"]')
+        .length,
+      rootLines: document.querySelectorAll('path[data-connection="root"]')
+        .length,
+      promptLines: document.querySelectorAll("[data-prompt-connection]").length,
+      resultLines: document.querySelectorAll("[data-result-connection]").length,
+      pageFits: document.documentElement.scrollWidth <= innerWidth,
+    }));
+  await expect.poll(captured).toEqual({
+    labels: ["Astack", "React", "Verify", "React"],
+    mainLines: 4,
+    rootLines: 1,
+    promptLines: 1,
+    resultLines: 1,
+    pageFits: true,
+  });
+  const react = workflow.getByRole("link", "React skill read in main trace", {
+    exact: true,
+  });
+  await expect(react).toHaveCount(2);
+  expect(await react.first().getAttribute("href")).toBe(
+    "#run/00000000-0000-4000-8000-000000000001%3Acodex%3Asaved-edit%3Areproduce?project=00000000-0000-4000-8000-000000000100&event=observed-skill%3A1",
+  );
+  await browser.setViewport({ width: 1280, height: 1100 });
+  await browser.evaluate(() => {
+    document.querySelector(".workflow-section")?.scrollIntoView();
+    return true;
+  });
+  await app.screenshot("observed-parent-skill-path");
+  await browser.setViewport({ width: 390, height: 844 });
+  await expect.poll(captured).toEqual({
+    labels: ["Astack", "React", "Verify", "React"],
+    mainLines: 4,
+    rootLines: 1,
+    promptLines: 1,
+    resultLines: 1,
+    pageFits: true,
+  });
+});
+
+test("recorded routes retain declared phases and disclose observed parent reads separately", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--recorded-flow-with-observed-skills&viewMode=story",
+  );
+  const workflow = screen.getByRole("region", "Astack workflow", {
+    exact: true,
+  });
+  await expect(
+    workflow.getByRole("heading", "Bug fix", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    workflow.getByRole("button", "View Bug fix in Reproduce", { exact: true }),
+  ).toBeVisible();
+  const bridge = () =>
+    browser.evaluate(() => {
+      const path = document.querySelector("[data-result-connection]");
+      const last = [...document.querySelectorAll("[data-map-main]")]
+        .filter((node) => node.checkVisibility())
+        .at(-1);
+      if (!(path instanceof SVGPathElement) || !last || !path.ownerSVGElement)
+        return false;
+      const origin = path.ownerSVGElement.getBoundingClientRect();
+      const source = last.getBoundingClientRect();
+      const start = path.getPointAtLength(0);
+      return (
+        Math.abs(origin.left + start.x - source.left - source.width / 2) <
+          0.5 && Math.abs(origin.top + start.y - source.bottom) < 0.5
+      );
+    });
+  await expect.poll(bridge).toBe(true);
+  await workflow.getByText("Observed skill reads · 4", { exact: true }).tap();
+  await expect(
+    workflow.getByRole("link", "React skill read in main trace", {
+      exact: true,
+    }),
+  ).toHaveCount(2);
+  expect(
+    await browser.evaluate(
+      () =>
+        document.querySelectorAll(".map-main-cell .journey-skill-read").length,
+    ),
+  ).toBe(4);
+  await expect(
+    workflow.getByRole("heading", "Bug fix", { exact: true }),
+  ).toBeVisible();
+  await expect.poll(bridge).toBe(true);
+  await workflow.getByText("Observed skill reads · 4", { exact: true }).tap();
+  await expect.poll(bridge).toBe(true);
+});
+
+test("orchestration hierarchy retains provider changes, nested children, review rounds and capture gaps", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-orchestration--nested-and-missing&viewMode=story",
+  );
+  await expect(
+    screen.getByRole("link", "root · request-one", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("link", "root · request-two", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Review round one · completed", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Review round two · completed", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Unresolved child identity · failed", { exact: true }),
+  ).toBeVisible();
+  expect(
+    await browser.evaluate(() => {
+      const nested = [
+        ...document.querySelectorAll("li[data-conversation-key]"),
+      ].find((node) =>
+        node.getAttribute("data-conversation-key")?.endsWith(":nested"),
+      );
+      return (
+        nested?.parentElement
+          ?.closest("li[data-conversation-key]")
+          ?.getAttribute("data-conversation-key")
+          ?.endsWith(":review") ?? false
+      );
+    }),
+  ).toBe(true);
+  await app.screenshot("orchestration-nested-synthetic");
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await app.open(
+    "/iframe.html?id=observatory-orchestration--partial-page&viewMode=story",
+  );
+  await expect(
+    screen
+      .getByText("Parent conversation not loaded", { exact: false })
+      .first(),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Parent turns are not in the loaded pages yet.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    screen.getByRole("link", "nested · first", { exact: true }),
+  ).toBeVisible();
+  await app.open(
+    "/iframe.html?id=observatory-orchestration--missing-intermediate&viewMode=story",
+  );
+  await expect(
+    screen
+      .getByText("Parent conversation capture unavailable", { exact: false })
+      .first(),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Parent conversation not loaded", { exact: false }),
+  ).toHaveCount(0);
 });

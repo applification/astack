@@ -3,6 +3,28 @@ import { evaluationRun, evaluationPrompt } from "./evaluation-fixtures";
 import { routeDefinitions, type WorkflowAnnotation } from "./workflow";
 import { workflowCaptureSchema } from "./workflow-view";
 
+export function observedWorkflowFixture() {
+  return workflowCaptureSchema.parse({
+    records: [],
+    branches: [],
+    truncated: false,
+    reads: ["astack", "react", "verify", "react"].map((name, index) => ({
+      reference: {
+        runId: evaluationRun(index < 2 ? "reproduce" : "repair").id,
+        eventId: "observed-skill:" + index,
+      },
+      skill: {
+        name,
+        kind: "skill",
+        hash: null,
+        provenance: "observation_time",
+        evidence: "read",
+      },
+      revision: 1,
+    })),
+  });
+}
+
 export function workflowFixture(
   variant: "bug-fix" | "feature" | "changed" = "bug-fix",
 ) {

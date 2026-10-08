@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   useConvexConnectionState,
   usePaginatedQuery,
   useQuery,
-  useQueries,
 } from "convex/react";
 import { api } from "@astack/observatory-backend/api";
 import {
@@ -41,36 +40,19 @@ import type { Project } from "@astack/agent-observability/projects";
 import { Evaluations, EvaluationPage, evaluationLink } from "./evaluations";
 import { GenerateEvaluation } from "./generate-evaluation";
 import {
+  ConversationGroups,
+  ConversationPage,
+  threadLink,
+} from "./conversations";
+import { conversationGroupKey } from "@astack/agent-observability/conversations";
+import {
   activityHeading,
   workHeading,
-  runNamesSchema,
   type RunNames,
 } from "@astack/agent-observability/naming";
 
-export function useRunNames(runs: readonly AgentRun[]) {
-  // Each bounded subscription tracks the corresponding loaded page.
-  const serializedIds = JSON.stringify(runs.map((run) => run.id));
-  // useQueries requires a stable request object across its internal rerenders.
-  const queries = useMemo(() => {
-    const ids = runSchema.shape.id.array().parse(JSON.parse(serializedIds));
-    return Object.fromEntries(
-      Array.from({ length: Math.ceil(ids.length / 50) }, (_, index) => [
-        String(index),
-        {
-          query: api.naming.labels,
-          args: {
-            runIds: ids.slice(index * 50, (index + 1) * 50),
-          },
-        },
-      ]),
-    );
-  }, [serializedIds]);
-  const results = useQueries(queries);
-  return Object.values(results).flatMap((value) => {
-    const parsed = runNamesSchema.array().safeParse(value);
-    return parsed.success ? parsed.data : [];
-  });
-}
+export { useRunNames } from "./run-names";
+import { useRunNames } from "./run-names";
 
 const duration = (run: AgentRun) => {
   if (!run.startTimeKnown) return "Unknown";
@@ -191,6 +173,17 @@ export function RunTable({
                       href={listLink("work", run.work.id, run.projectId)}
                     >
                       Work · {workHeading([run], names)}
+                    </a>
+                  )}
+                  {conversationGroupKey(run) && run.projectId && (
+                    <a
+                      className="secondary"
+                      href={threadLink(
+                        conversationGroupKey(run)!,
+                        run.projectId,
+                      )}
+                    >
+                      Orchestration thread
                     </a>
                   )}
                 </td>
@@ -410,6 +403,7 @@ function Runs({
               ? "Deterministic signals with trace evidence."
               : "Follow the evidence. Improve the harness."}
       </p>
+      {view === "work" && <ConversationGroups projectId={projectId} />}
       <div className="metrics">
         <div>
           <strong>{runs.length}</strong>
@@ -459,11 +453,11 @@ function Runs({
         <>
           {!workGroups.size && (
             <div className="notice">
-              <strong>No linked work in these pages.</strong>
+              <strong>No external work links in these pages.</strong>
               <p>
-                There is no COS work store yet. Enrolled projects capture
-                standalone runs; launch context can supply external work
-                references.
+                Orchestration threads group captured conversations above. A
+                supplied work reference can also link turns to an issue or
+                another work system.
               </p>
             </div>
           )}
@@ -815,6 +809,19 @@ export function App() {
     } catch {}
     page = (
       <RunDetail key={`${id}:${projectId}`} id={id} projectId={projectId} />
+    );
+  } else if (route.startsWith("#thread/")) {
+    section = "work";
+    let id = "";
+    try {
+      id = decodeURIComponent(route.slice(8).split("?")[0] ?? "");
+    } catch {}
+    page = (
+      <ConversationPage
+        key={`${id}:${projectId}`}
+        id={id}
+        projectId={projectId}
+      />
     );
   } else if (route.startsWith("#evaluation/")) {
     section = "evaluations";

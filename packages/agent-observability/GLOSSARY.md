@@ -6,6 +6,8 @@
 | Capture policy        | The owner's selection of projects whose conversations may be observed.                                     |
 | Work reference        | Identity of work owned by another system; optional parent context for one or more runs.                    |
 | Session               | A conversation that can contain multiple execution attempts.                                               |
+| Orchestration thread  | A parent conversation that owns delegated work and integrates its results across turns.                   |
+| Conversation group    | Captured turns in a recorded root conversation and its delegated descendants, scoped to project and machine. Forks start separate groups; grouping does not assess integration or outcome. |
 | Provider              | The agent system that executes a turn; a model is the selected model within that system.                   |
 | Provider turn         | One provider's bounded execution within a conversation.                                                    |
 | T3 run                | A T3 orchestration request that may contain several provider turns or attempts.                            |

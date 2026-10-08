@@ -97,8 +97,10 @@ export function ConnectedWorkflowMap({
         if (last && join) connect(last, join, "join", color);
       });
       const next = {
-        width: element.scrollWidth,
-        height: element.scrollHeight,
+        // The previous SVG can overflow after a resize or disclosure closes.
+        // Size it from the laid-out map, so it cannot keep the old canvas alive.
+        width: bounds.width,
+        height: bounds.height,
         connections,
       };
       setGeometry((previous) =>

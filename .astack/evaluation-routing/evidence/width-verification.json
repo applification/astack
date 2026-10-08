@@ -1,0 +1,78 @@
+{
+  "at": "2026-10-08T16:50:43.493Z",
+  "sourceRevision": "bf1616c0e633d6ecab273351641bbf20871fd398",
+  "before": {
+    "syntheticFiveChild": "failed: allBranchesVisible=false, mapFits=false",
+    "liveFiveChild": "failed: allRoutesVisible=false, mapFits=false",
+    "resizeFirstRepair": "failed: allBranchesVisible=true, mapFits=false (old SVG retained)"
+  },
+  "checks": {
+    "strictTypes": "passed",
+    "unitTests": 151,
+    "assertions": 781,
+    "lint": "passed",
+    "siteAndPluginIntegrity": "passed",
+    "productionBuild": "passed",
+    "storybookBuild": "passed"
+  },
+  "syntheticBrowser": {
+    "passed": 9,
+    "failed": 0,
+    "retries": 0,
+    "desktopWidths": [
+      1280,
+      1600,
+      1920
+    ],
+    "narrowWidth": 390,
+    "allFiveBranchesVisible": true,
+    "connectorsAligned": true,
+    "outerBranchesReachable": true,
+    "reportSha256": "27cc5dc79c30b2b012f62025da9cdcf9a8aaaddd8c6666a6bf29db11767952b6"
+  },
+  "liveBrowser": {
+    "passed": 3,
+    "failed": 0,
+    "retries": 0,
+    "reportedFiveChildEvaluation": "85af7a33-15c4-4e26-8d1e-50b754ca0f91",
+    "desktopWidths": [
+      1280,
+      1600,
+      1920
+    ],
+    "allFiveBranchesVisible": true,
+    "originalParentSkills": 19,
+    "reportedAndOlderPathsPreserved": true,
+    "reportSha256": "4a4c6cfe3e777adb856d2ca623e4a346b3d93637b596e0819d4ccb5d1cfe8ae1"
+  },
+  "rollout": {
+    "uiOnly": true,
+    "servedHtmlMatchesBuild": true,
+    "assets": [
+      {
+        "asset": "/assets/index-BaLkKid4.js",
+        "sha256": "681ae756f56b9d45bd22d87e687a74e0454da230feb9d5ed7abbdaa37c486a5a"
+      },
+      {
+        "asset": "/assets/index-BzP8abd8.css",
+        "sha256": "448a922977da641c7dfe0fc3fb8c72b1e2db8cc8c6a14b6b14810d55c151a9c6"
+      }
+    ],
+    "priorAssetsRetained": true,
+    "rollbackRetainedPrivately": true
+  },
+  "review": {
+    "actor": "parent",
+    "independence": "self-review",
+    "scope": "responsive layout and measured SVG canvas; prior independent reviews cover capture/projection only"
+  },
+  "media": {
+    "path": "five-child-routes-full-width.png",
+    "synthetic": true,
+    "sha256": "e999f8a515e2f95850c5b49285c33c93214c5ac5ad46c339f947367173072734"
+  },
+  "limits": [
+    "Narrow screens keep readable lanes and need horizontal panning.",
+    "Larger branch counts may exceed a desktop viewport at the minimum lane width."
+  ]
+}

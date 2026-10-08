@@ -28,6 +28,7 @@ import { envelopeSchema } from "@astack/agent-observability";
 import { projectSchema } from "@astack/agent-observability/projects";
 import {
   T3Adapter,
+  resolveOrchestrationRoot,
   normalizeT3Turn,
   t3ProjectionSchema,
   type T3ReadSource,
@@ -49,6 +50,37 @@ const machineId = "00000000-0000-4000-8000-000000000001";
 const environmentId = "00000000-0000-4000-8000-000000000002";
 const projectId = "00000000-0000-4000-8000-000000000003";
 const time = "2026-10-06T10:00:00.000Z";
+test("orchestration ancestry follows delegated parents but starts a new group at a fork", async () => {
+  const node = (
+    id: string,
+    parentThreadId: string | null,
+    relationshipToParent: "subagent" | "fork" | null,
+  ) => ({ id, lineage: { parentThreadId, relationshipToParent } });
+  const records = new Map([
+    ["root", node("root", null, null)],
+    ["child", node("child", "root", "subagent")],
+    ["nested", node("nested", "child", "subagent")],
+    ["fork", node("fork", "child", "fork")],
+    ["fork-child", node("fork-child", "fork", "subagent")],
+    ["cycle", node("cycle", "cycle", "subagent")],
+  ]);
+  const read = async (id: string) => records.get(id) ?? null;
+  expect(await resolveOrchestrationRoot(records.get("nested")!, read)).toBe(
+    "root",
+  );
+  expect(await resolveOrchestrationRoot(records.get("fork-child")!, read)).toBe(
+    "fork",
+  );
+  expect(
+    await resolveOrchestrationRoot(records.get("cycle")!, read),
+  ).toBeNull();
+  expect(
+    await resolveOrchestrationRoot(
+      node("missing", "unknown", "subagent"),
+      read,
+    ),
+  ).toBeNull();
+});
 const end = "2026-10-06T10:01:00.000Z";
 const secret = "synthetic-private-t3-access-token";
 async function fixture() {
@@ -408,9 +440,19 @@ test("native Codex overlap preserves the first collector, annotations and event 
     f.store.runsForSession("native-session")[0]?.sessionReferences,
   ).toContainEqual({ kind: "t3", environmentId, threadId: "app-thread" });
   expect(f.store.runsForSession("native-session")[0]?.outcome).toBe("success");
+  expect(
+    f.store.runsForSession("native-session")[0]?.conversation,
+  ).toMatchObject({
+    self: { kind: "t3", environmentId, threadId: "app-thread" },
+    root: { kind: "t3", environmentId, threadId: "app-thread" },
+    hostRun: { id: "app-run" },
+  });
   expect(f.store.runsForSession("native-session")[0]?.work?.id).toBe("AST-1");
   expect(f.store.events(native.run.id)).toHaveLength(native.events.length);
   persistSnapshot(f.store, native);
+  expect(
+    f.store.runsForSession("native-session")[0]?.conversation?.root.kind,
+  ).toBe("t3");
   expect(f.store.runsForSession("native-session")[0]?.delegations).toHaveLength(
     1,
   );
@@ -544,6 +586,118 @@ test("Claude Read and Skill tools provide direct skill evidence; failed reads an
   expect(result?.run.skills[2]?.hash).toBeNull();
 });
 
+test("T3 Codex captures successful wrapped and multi-file skill reads without duplicates on replay", async () => {
+  const f = await fixture();
+  for (const name of ["astack", "implement", "react"])
+    await mkdir(join(f.dir, "skills", name), { recursive: true });
+  for (const name of ["astack", "implement", "react"])
+    await writeFile(join(f.dir, "skills", name, "SKILL.md"), name);
+  const raw = projection("codex", "codex");
+  raw.turnItems = [
+    item("wrapped", "command_execution", {
+      ordinal: 1,
+      input:
+        "/bin/zsh -lc 'cat skills/astack/SKILL.md skills/implement/SKILL.md'",
+      exitCode: 0,
+      output: "astack\nimplement",
+    }),
+    item("bare", "command_execution", {
+      ordinal: 2,
+      input: "cat skills/react/SKILL.md",
+      exitCode: 0,
+      output: "react",
+    }),
+    ...[
+      { status: "failed", exitCode: 1 },
+      { status: "completed", exitCode: 1 },
+      { status: "running", exitCode: 0 },
+      { status: "completed", exitCode: 0, outputIndicatesFailure: true },
+    ].map((failure, index) =>
+      item("failed-" + index, "command_execution", {
+        ordinal: index + 3,
+        input: "/bin/zsh -lc 'cat skills/react/SKILL.md'",
+        ...failure,
+      }),
+    ),
+    ...[
+      "cat skills/react/SKILL.md\necho skills/fiction/SKILL.md",
+      "cat missing/SKILL.md\ncat skills/react/SKILL.md",
+      "/bin/zsh -lc 'cat skills/react/SKILL.md\necho skills/fiction/SKILL.md'",
+      "cat skills/{astack,react}/SKILL.md",
+      "/bin/zsh -lc 'cat skills/{astack,react}/SKILL.md'",
+    ].map((input, index) =>
+      item("ambiguous-" + index, "command_execution", {
+        ordinal: index + 7,
+        input,
+        exitCode: 0,
+      }),
+    ),
+  ];
+  const normalized = await snapshot(f, raw);
+  if (!normalized) throw new Error("Missing normalized fixture");
+  expect(normalized.run.skills.map((skill) => skill.name)).toEqual([
+    "astack",
+    "implement",
+    "react",
+  ]);
+  expect(
+    normalized.events
+      .filter((event) => event.kind === "skill_loaded")
+      .map((event) => event.skill?.name),
+  ).toEqual(["astack", "implement", "react"]);
+  persistSnapshot(f.store, normalized);
+  persistSnapshot(f.store, normalized);
+  expect(
+    f.store
+      .events(normalized.run.id)
+      .filter((event) => event.kind === "skill_loaded"),
+  ).toHaveLength(3);
+});
+
+test("long T3 item identities retain bounded distinct event IDs and stable replay", async () => {
+  const f = await fixture();
+  await mkdir(join(f.dir, "skills", "astack"), { recursive: true });
+  await writeFile(join(f.dir, "skills", "astack", "SKILL.md"), "astack");
+  const raw = projection("codex", "codex");
+  raw.turnItems = [
+    item("legacy", "assistant_message", { ordinal: 1, text: "Reply" }),
+    ...["a", "b"].map((ending, index) =>
+      item("nested:" + "x".repeat(480) + ending, "command_execution", {
+        ordinal: index + 2,
+        input: "cat skills/astack/SKILL.md",
+        exitCode: 0,
+      }),
+    ),
+  ];
+  const normalized = await snapshot(f, raw);
+  if (!normalized) throw new Error("Missing normalized fixture");
+  expect(
+    normalized.events.find((event) => event.kind === "assistant_output")?.id,
+  ).toBe(`${normalized.run.id}:t3:legacy`);
+  expect(normalized.events.every((event) => event.id.length <= 512)).toBe(true);
+  expect(
+    normalized.events.every((event) =>
+      event.id.startsWith(normalized.run.id + ":"),
+    ),
+  ).toBe(true);
+  expect(new Set(normalized.events.map((event) => event.id)).size).toBe(
+    normalized.events.length,
+  );
+  expect(
+    normalized.events.filter((event) => event.kind === "skill_loaded"),
+  ).toHaveLength(2);
+  persistSnapshot(f.store, normalized);
+  const replay = await snapshot(f, raw);
+  if (!replay) throw new Error("Missing replay fixture");
+  expect(replay.events.map((event) => event.id)).toEqual(
+    normalized.events.map((event) => event.id),
+  );
+  persistSnapshot(f.store, replay);
+  expect(f.store.events(normalized.run.id)).toHaveLength(
+    normalized.events.length,
+  );
+});
+
 test("T3 matches enrollment before reading history, includes archives, and commits replay checkpoints only after persistence", async () => {
   const f = await fixture();
   const calls: string[] = [];
@@ -603,7 +757,9 @@ test("T3 matches enrollment before reading history, includes archives, and commi
   f.store.setMeta(
     `t3:${environmentId}:app-thread:updated`,
     createHash("sha256")
-      .update(JSON.stringify(shellState.threads[0]))
+      .update(
+        JSON.stringify({ captureVersion: 5, thread: shellState.threads[0] }),
+      )
       .digest("hex"),
   );
   await drain();
@@ -618,6 +774,69 @@ test("T3 matches enrollment before reading history, includes archives, and commi
   expect(f.store.events(first.value.run.id)).toHaveLength(
     first.value.events.length,
   );
+});
+
+test("completed children retry unchanged shell metadata when missing ancestry becomes available", async () => {
+  const f = await fixture();
+  const shellState = shell(f.dir);
+  const child = {
+    ...projection("codex", "codex"),
+    thread: {
+      id: "app-thread",
+      lineage: { parentThreadId: "root", relationshipToParent: "subagent" },
+    },
+  };
+  const root = {
+    ...projection("codex", "codex"),
+    thread: { id: "root", lineage: { parentThreadId: null } },
+    providerTurns: [],
+  };
+  const reader: T3ReadSource = {
+    secrets: [],
+    serverVersion: "fixture",
+    initialize: async () => {},
+    shell: async () => shellState,
+    archived: async () => ({ threads: [] }),
+    thread: async (id) => ({ projection: id === "root" ? root : child }),
+    item: async () => ({ item: null }),
+    close: async () => {},
+  };
+  const adapter = new T3Adapter(
+    f.config,
+    f.source,
+    f.store,
+    "fixture",
+    [],
+    reader,
+  );
+  adapter.setProjects([f.project]);
+  const drain = async () => {
+    for await (const value of adapter.collect())
+      persistSnapshot(f.store, value);
+  };
+  await drain();
+  expect(f.store.runsForSession("native-session")[0]?.conversation).toBeNull();
+  expect(f.store.getMeta(`t3:${environmentId}:app-thread:updated`)).toBeNull();
+  // Recover checkpoints produced before the unresolved-ancestry retry repair.
+  f.store.setMeta(
+    `t3:${environmentId}:app-thread:updated`,
+    createHash("sha256")
+      .update(
+        JSON.stringify({ captureVersion: 6, thread: shellState.threads[0] }),
+      )
+      .digest("hex"),
+  );
+  shellState.threads.push({ ...shellState.threads[0]!, id: "root" });
+  await drain();
+  expect(
+    f.store.runsForSession("native-session")[0]?.conversation?.root,
+  ).toEqual({ kind: "t3", environmentId, threadId: "root" });
+  expect(
+    f.store.getMeta(`t3:${environmentId}:app-thread:updated`),
+  ).not.toBeNull();
+  await adapter.close();
+  f.store.close();
+  await rm(f.dir, { recursive: true, force: true });
 });
 
 test("deferred Codex identities retry unchanged completed threads; omitted tool outputs use the full-item read", async () => {

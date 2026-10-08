@@ -1,0 +1,55 @@
+{
+  "sourceRevision": "fadc4c10c7780129b95d634060081374a0216be1",
+  "baseRevision": "611e4ef",
+  "scope": "Portable orchestration/setup guidance; no runtime grouping or installed-host proof.",
+  "ownerEvaluationTaskID": null,
+  "recordedAt": "2026-10-08 17:08:14 UTC",
+  "checks": [
+    {
+      "label": "site-plugin-integrity",
+      "command": "bun run check",
+      "chunk_id": "d4cf71",
+      "wall_time_seconds": 0.000008916,
+      "exit_code": 0,
+      "original_token_count": 56,
+      "output": "$ node site/check.mjs && bun scripts/check-plugins.ts\nSite routes, 118 eval examples, principle indexes and guide links match this checkout.\nPortable plugin schemas, package assets, skills and marketplace identities pass.\n"
+    },
+    {
+      "label": "affected-tests",
+      "command": "bun test scripts/create-foundation.test.ts scripts/check-plugins.test.ts examples/foundation/tests/setup.test.ts",
+      "chunk_id": "ffc986",
+      "wall_time_seconds": 0.52428275,
+      "exit_code": 0,
+      "original_token_count": 424,
+      "output": "bun test v1.4.0 (34cbb9a40)\n\nscripts/create-foundation.test.ts:\n(pass) scaffold keeps source and environment examples while excluding local state and generated hooks [50.73ms]\n(pass) scaffold preserves an existing destination and refuses a dangling symlink [42.78ms]\n(pass) scaffold refuses destinations inside its reference [62.02ms]\n(pass) real scaffold retains reachable project instructions after relocation [101.66ms]\n\nscripts/check-plugins.test.ts:\n(pass) portable package retains existing publisher identity [46.64ms]\n(pass) legacy fallback cannot silently coexist with the portable package [17.96ms]\n(pass) packaged server cannot reference a missing executable asset [44.25ms]\n(pass) a callable skill must have its own matching identity [25.09ms]\n(pass) relocated skill composition cannot point at missing instructions [36.75ms]\n(pass) skill references must remain inside the portable package [31.82ms]\n(pass) every callable skill has packaged UI metadata [25.66ms]\n(pass) skill frontmatter identity is parsed as YAML strings [25.67ms]\n(pass) a skill invocation prompt selects its owning skill [25.77ms]\n(pass) a local reference must identify an existing heading [37.01ms]\n(pass) template links in fenced examples do not refer to packaged project files [45.42ms]\n\nexamples/foundation/tests/setup.test.ts:\n(pass) WorkOS setup is repeatable, preserves local state and refuses to replace another environment [3.10ms]\n(pass) plain HTTP WorkOS resources are limited to the exact local Convex MCP endpoint [0.12ms]\n(pass) MCP OAuth callbacks need a one-use state and cannot reuse another resource session [2.40ms]\n\n 18 pass\n 0 fail\n 77 expect() calls\nRan 18 tests across 3 files. [660.00ms]\n"
+    },
+    {
+      "label": "targeted-typescript",
+      "command": "bunx --no-install tsc6 --ignoreConfig --noEmit --target ESNext --module Preserve --moduleResolution Bundler --types bun --strict --noUncheckedIndexedAccess scripts/create-foundation.test.ts",
+      "chunk_id": "58c506",
+      "wall_time_seconds": 0.000020792,
+      "original_token_count": 0,
+      "output": "",
+      "exit_code": 0
+    },
+    {
+      "label": "skill-frontmatter",
+      "command": "/tmp/astack-guidance-validation-20261008/bin/python /Users/rufus/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/astack && /tmp/astack-guidance-validation-20261008/bin/python /Users/rufus/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/project-setup",
+      "chunk_id": "5d0e31",
+      "wall_time_seconds": 0.000007041,
+      "exit_code": 0,
+      "original_token_count": 8,
+      "output": "Skill is valid!\nSkill is valid!\n"
+    }
+  ],
+  "earlierSetupFailures": [
+    "First test run lacked @cfworker/json-schema and convex/values in the isolated worktree.",
+    "After root dependency installation, the foundation setup test lacked @modelcontextprotocol/sdk/shared/auth.js.",
+    "Skill quick_validate initially lacked PyYAML; validation passed using a temporary virtual environment.",
+    "The initial targeted TypeScript command required TypeScript 6 --ignoreConfig; corrected command passed."
+  ],
+  "setupActions": [
+    "Installed root and foundation frozen lockfile dependencies with --ignore-scripts and a temporary dependency cache.",
+    "Installed PyYAML only in a temporary validation virtual environment."
+  ]
+}

@@ -23,6 +23,12 @@ export const workflowRecordSchema = z.object({
   annotation: workflowAnnotationSchema,
   evidence: z.array(workflowEvidenceSchema).max(8),
 });
+export const workflowReadSchema = z.object({
+  reference,
+  skill: skillUseSchema,
+  revision: z.number(),
+});
+export type WorkflowRead = z.infer<typeof workflowReadSchema>;
 export const workflowBranchSchema = z.object({
   parentRunId: z.string(),
   delegation: delegationSchema,
@@ -40,14 +46,13 @@ export const workflowBranchSchema = z.object({
     )
     .max(20),
   records: z.array(workflowRecordSchema).max(80),
-  reads: z
-    .array(z.object({ reference, skill: skillUseSchema, revision: z.number() }))
-    .max(32),
+  reads: z.array(workflowReadSchema).max(32),
   truncated: z.boolean(),
 });
 export type WorkflowBranch = z.infer<typeof workflowBranchSchema>;
 export const workflowCaptureSchema = z.object({
   records: z.array(workflowRecordSchema).max(80),
+  reads: z.array(workflowReadSchema).max(64).default([]),
   branches: z.array(workflowBranchSchema).max(32).default([]),
   truncated: z.boolean(),
 });

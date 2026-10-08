@@ -9,8 +9,9 @@
   "dependencies": {
     "@astack/agent-observability": "workspace:*",
     "@astack/observatory-backend": "workspace:*",
-    "convex": "1.46.0",
     "commander": "15.0.0",
+    "convex": "1.46.0",
+    "shell-quote": "1.12.0",
     "zod": "4.6.5"
   },
   "scripts": {

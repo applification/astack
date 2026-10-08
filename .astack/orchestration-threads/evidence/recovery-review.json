@@ -1,0 +1,111 @@
+{
+  "verdict": "PASS within the requested recovery follow-up scope",
+  "reviewedRevision": "4c2c8ad6ec94e1cc4d799bf9c0db738b62d55d95",
+  "ownerEvaluationTaskId": "9e39ccdd-bd3f-4ae0-89be-0b15c3ed8cac",
+  "actor": "Independent read-only review sub-agent; parent is sole tracked writer and integration owner",
+  "readStrategy": "git archive of resolved pin; all executed source and workspace imports use the archived pin; existing third-party dependencies are read-only links",
+  "scope": [
+    "N1 native unresolved completed-child recovery independent of activity watermarks",
+    "N2 replay of preexisting T3 capture-version-5 and version-6 checkpoints",
+    "Persisted retry state, native v1 migration, archive history, interruptions, per-poll duplicates, trace ownership, T3 root priority and enrollment/content boundaries"
+  ],
+  "materialFindings": [],
+  "priorFindings": [
+    {
+      "id": "N1",
+      "status": "closed",
+      "paths": [
+        "packages/agentlog/src/adapters/codex.ts:717",
+        "packages/agentlog/src/adapters/codex.ts:719",
+        "packages/agentlog/src/adapters/codex.ts:790",
+        "packages/agentlog/src/adapters/codex.ts:842",
+        "packages/agentlog/src/adapters/codex.ts:884",
+        "packages/agentlog/src/adapters/codex.ts:888"
+      ],
+      "independentEvidence": [
+        "N1-active-restart",
+        "N1-archived-v1-migration",
+        "N1-retry-list-window-deduplication",
+        "N1-checkpoint-interruption",
+        "N1-recovery-partial-turns-interruption",
+        "N1-consumer-return-interruption",
+        "N1-boundary-retry"
+      ],
+      "observed": "Prior N1 case adapted to persisted adapter-to-persistSnapshot probes: child10 remains retryable after newer100 advances the watermark, survives real SQLite reopens and unavailable self metadata, and is recovered exactly once after root200 metadata becomes available. Pending drains and the final watermark becomes200. An existing v1 store with empty pending and checkpoint1000 replays an archived old child and recovers nested ancestry. Self and parent reads use includeTurns:false; unresolved retries do not reread unchanged child turns. Foreign/other-project/cyclic ancestry stays unresolved. Recovery with captureContent:false retains withheld content. Pending retry plus both active/archive listings yield only one child snapshot. Interruptions after the active checkpoint, after a partial turn page, and consumer return preserve recoverability."
+    },
+    {
+      "id": "N2",
+      "status": "closed",
+      "paths": [
+        "packages/agentlog/src/adapters/t3.ts:898"
+      ],
+      "independentEvidence": [
+        "N2-version-5-native-first",
+        "N2-version-6-native-first",
+        "N2-t3-first-native-overlap",
+        "N2-consumer-return-interruption"
+      ],
+      "observed": "Seeded matching old v5 and v6 completed-child fingerprints; reopened SQLite and recovered the unchanged child after parent appears in shell. Transient read errors and consumer return retain the old checkpoint until persisted recovery completes. Unavailable ancestry continues to retry without shell updates. Recovery stores v7 and the next restarted adapter skips the unchanged recovered child. Native-first and T3-first traces remain byte-identical, exactly one run exists per native turn, and T3 root context survives subsequent native pending recovery."
+    }
+  ],
+  "verification": [
+    {
+      "command": "TMPDIR=<review>/tmp bun test packages/agentlog/src/conversations.test.ts packages/agentlog/src/t3.test.ts",
+      "cwd": "<review>/pin",
+      "exitCode": 0,
+      "pass": 22,
+      "fail": 0,
+      "assertions": 153,
+      "output": "targeted.log"
+    },
+    {
+      "command": "./node_modules/.bin/tsc6 --noEmit --incremental false",
+      "cwd": "<review>/pin",
+      "exitCode": 0,
+      "strictTypes": "pass",
+      "diagnostics": 0,
+      "output": "types.log"
+    },
+    {
+      "command": "bun .proof/orchestration-threads/recovery-review/recovery-probes.ts",
+      "cwd": "repository root",
+      "exitCode": 0,
+      "pass": 11,
+      "fail": 0,
+      "output": "recovery-probes.json"
+    },
+    {
+      "command": "git diff --check 4c2c8ad6ec94e1cc4d799bf9c0db738b62d55d95^ 4c2c8ad6ec94e1cc4d799bf9c0db738b62d55d95",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff 8f5d77f 4c2c8ad6ec94e1cc4d799bf9c0db738b62d55d95 -- packages/backend",
+      "exitCode": 0,
+      "output": "empty; no backend change since prior review"
+    }
+  ],
+  "convexReviewer": {
+    "verdict": "Prior scoped PASS remains applicable",
+    "basis": "The backend source is unchanged from reviewed 8f5d77f; this follow-up carries its existing owner-auth, enrollment, native pagination/split-field and immutable-evaluation verdict only within that original scope. No fresh Convex or backend rollout verdict is asserted.",
+    "priorEvidence": "../final-review/review.json"
+  },
+  "limits": [
+    "Recovery probes use synthetic native/T3 readers with real disposable SQLite stores; they do not establish live native-host child creation or live T3 transport behavior.",
+    "Metadata-only boundaries are independently asserted on every synthetic native thread/read call. Project-folder enrollment, foreign and other-project ancestry, cycles, disabled capture and wrong-machine content exclusion were exercised; this does not replace the prior scoped backend owner-auth verdict.",
+    "The new live UI navigation test source is at the pin, but live UI/collector rollout was intentionally not exercised by this read-only reviewer. Parent rollout and deployed navigation remain separate proof.",
+    "No fresh review or host-loading trial is claimed for the already-cleared routing, portable setup, browser tree and immutable evaluation surfaces; prior PASS carries only within their original reviewed scope.",
+    "No secrets read, deployments, runtime/config/cache/PR writes, evaluation begin/finish, external messages or nested delegation occurred.",
+    "All reviewer writes, temporary fixtures and evidence are confined to .proof/orchestration-threads/recovery-review. Fixtures were removed after each probe. Parent-owned untracked .astack/orchestration-threads/evidence is excluded."
+  ],
+  "finishState": {
+    "head": "4c2c8ad6ec94e1cc4d799bf9c0db738b62d55d95",
+    "trackedDiff": "",
+    "status": "?? .astack/orchestration-threads/evidence/"
+  },
+  "evidence": [
+    "recovery-probes.ts",
+    "recovery-probes.json",
+    "targeted.log",
+    "types.log"
+  ]
+}

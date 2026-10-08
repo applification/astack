@@ -12,6 +12,8 @@ import {
   outcomeFeedbackInputSchema,
   outcomeFeedbackSchema,
   type Evaluation,
+  capturedEvaluationLimits,
+  redactEvaluation,
 } from "@astack/agent-observability/evaluations";
 import {
   evaluationDetailSchema,
@@ -187,7 +189,7 @@ export async function storeEvaluation(
   machineId: string,
 ) {
   // Evaluation record/snapshot byte budgets own size; redaction must not shorten captured intent.
-  const value = evaluationSchema.parse(redact(input, [], 0, null));
+  const value = redactEvaluation(input);
   if (
     value.machineId !== machineId ||
     !value.id.startsWith(machineId + ":evaluation:")
@@ -311,13 +313,24 @@ export const generate = mutation({
         evaluationId: previous.evaluationId,
         projectId: project.projectId,
       };
-    const prompts = await ctx.db
+    const prompts: Doc<"events">[] = [];
+    let promptBytes = 0;
+    for await (const prompt of ctx.db
       .query("events")
       .withIndex("by_runId_and_kind_and_sequence", (q) =>
         q.eq("runId", run.id).eq("kind", "user_prompt"),
       )
-      .order("asc")
-      .take(12);
+      .order("asc")) {
+      promptBytes += new TextEncoder().encode(prompt.data).byteLength;
+      if (
+        prompts.length >= capturedEvaluationLimits.prompts ||
+        promptBytes > capturedEvaluationLimits.bytes
+      )
+        throw new ConvexError(
+          "This turn exceeds the evaluation request capture budget.",
+        );
+      prompts.push(prompt);
+    }
     // Legacy captures may predate the indexed kind projection.
     const candidates = prompts.length
       ? prompts
@@ -336,10 +349,6 @@ export const generate = mutation({
         revision: item.revision,
       }))
       .filter(({ event }) => event.kind === "user_prompt");
-    if (requests.length > 11)
-      throw new ConvexError(
-        "This turn exceeds the evaluation clarification limit.",
-      );
     const source = requests[0];
     if (!source)
       throw new ConvexError("This turn has no captured original request.");

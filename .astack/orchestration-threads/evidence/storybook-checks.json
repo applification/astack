@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "8f5d77ffde3ce988e04cee4b93f2b342ea4dc1a2",
+  "dirty": false,
+  "status": "passed",
+  "exitCode": 0,
+  "startedAt": "2026-10-08T17:43:44.960Z",
+  "finishedAt": "2026-10-08T17:43:58.560Z",
+  "tests": [
+    {
+      "title": [
+        "child lanes stay expanded, connect to declared joins and retain separate retry evidence"
+      ],
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "title": [
+        "map descriptions compact revisions without losing the full value"
+      ],
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "title": [
+        "main rail stays centered with zero through four outward child lanes"
+      ],
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "title": [
+        "five child routes fit the desktop width and remain reachable on narrow screens"
+      ],
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "title": [
+        "completed and unavailable children never create an implicit parent join"
+      ],
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "title": [
+        "delivery evidence connects to the last main stop and keeps captured checks separate from current PR state"
+      ],
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "title": [
+        "failed private delivery and missing image previews retain honest evidence links"
+      ],
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "title": [
+        "evaluation shows connected parent skill reads without route annotations"
+      ],
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "title": [
+        "recorded routes retain declared phases and disclose observed parent reads separately"
+      ],
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "title": [
+        "orchestration hierarchy retains provider changes, nested children, review rounds and capture gaps"
+      ],
+      "status": "passed",
+      "attempts": 1
+    }
+  ],
+  "scope": "Synthetic production Storybook browser tests, including five-child widths and orchestration hierarchy.",
+  "selectedPassed": 10,
+  "deselected": 41
+}

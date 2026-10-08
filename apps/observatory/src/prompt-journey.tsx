@@ -24,7 +24,12 @@ export function PromptJourney({ children }: { children: ReactNode }) {
       const bounds = element.getBoundingClientRect();
       const visible = (node: Element) => {
         const viewport = node.closest(".workflow-map-scroll");
-        if (!viewport) return false;
+        if (
+          !viewport ||
+          node.closest("details:not([open])") ||
+          !node.getClientRects().length
+        )
+          return false;
         const rect = node.getBoundingClientRect();
         const clip = viewport.getBoundingClientRect();
         const x = rect.left + rect.width / 2;
@@ -49,7 +54,12 @@ export function PromptJourney({ children }: { children: ReactNode }) {
         width: bounds.width,
         height: bounds.height,
         prompt: root && visible(root) ? connect(prompt, root) : null,
-        result: last && visible(last) ? connect(last, result) : null,
+        result: connect(
+          [...element.querySelectorAll("[data-map-main]")]
+            .filter(visible)
+            .at(-1),
+          result,
+        ),
       };
       setBridge((previous) =>
         previous?.width === next.width &&
@@ -69,12 +79,14 @@ export function PromptJourney({ children }: { children: ReactNode }) {
       if (node) observer.observe(node);
     for (const viewport of viewports)
       viewport.addEventListener("scroll", schedule, { passive: true });
+    element.addEventListener("toggle", schedule, true);
     measure();
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
       for (const viewport of viewports)
         viewport.removeEventListener("scroll", schedule);
+      element.removeEventListener("toggle", schedule, true);
     };
   }, [children]);
 

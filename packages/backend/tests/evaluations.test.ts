@@ -19,12 +19,14 @@ import {
 } from "@astack/agent-observability/evaluation-fixtures";
 import { deliveryFixture } from "@astack/agent-observability/delivery-fixtures";
 import { eventSchema } from "@astack/agent-observability";
+import { capturedEvaluationLimits } from "@astack/agent-observability/evaluations";
 import type { TelemetryRecord } from "@astack/agent-observability";
 import { workflowFixture } from "@astack/agent-observability/workflow-fixtures";
 
 const modules = {
   "../convex/_generated/server.ts": () => import("../convex/_generated/server"),
   "../convex/observatory.ts": () => import("../convex/observatory"),
+  "../convex/conversations.ts": () => import("../convex/conversations"),
   "../convex/ingestion.ts": () => import("../convex/ingestion"),
   "../convex/evaluations.ts": () => import("../convex/evaluations"),
   "../convex/projects.ts": () => import("../convex/projects"),
@@ -48,6 +50,47 @@ async function ingestWorkflow(
       records: entries(records.slice(index, index + 2), 10 + index),
     });
 }
+
+test("thread association uses current capture without changing an immutable task evaluation", async () => {
+  const { t, owner, evaluation } = await setup();
+  const before = await t.run(
+    async (ctx) => await ctx.db.query("evaluations").first(),
+  );
+  const first = evaluationRun("repair");
+  const self = {
+    kind: "t3",
+    environmentId: "synthetic-host",
+    threadId: "root",
+  } as const;
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries(
+      [
+        {
+          kind: "run",
+          value: { ...first, conversation: { self, root: self } },
+        },
+      ],
+      2,
+    ),
+  });
+  const groups = await owner.query(api.conversations.forEvaluation, {
+    evaluationId: evaluation.id,
+    projectId: fixtureProject,
+  });
+  expect(groups).toHaveLength(2); // The other native root remains separately identified.
+  const after = await t.run(
+    async (ctx) => await ctx.db.query("evaluations").first(),
+  );
+  expect(after?.data).toBe(before?.data);
+  expect(after?.snapshot).toBe(before?.snapshot);
+  expect(
+    await owner.query(api.conversations.forEvaluation, {
+      evaluationId: evaluation.id,
+      projectId: "another-project",
+    }),
+  ).toEqual([]);
+});
 async function setup(
   status: "pass" | "fail" | "inconclusive" = "pass",
   request?: string,
@@ -127,10 +170,94 @@ test.each([5633, 16000])(
   },
 );
 
+test.each([32, 101])(
+  "generation preserves every ordered follow-up in a %i-follow-up orchestration turn",
+  async (count) => {
+    const { t, owner } = await setup();
+    const prompt = evaluationPrompt();
+    const followups = Array.from(
+      { length: count },
+      (_, index) => `Follow-up ${index + 1}: retain the agreed scope.`,
+    );
+    await ingestWorkflow(
+      t,
+      followups.map((content, index) => ({
+        kind: "event",
+        value: {
+          ...prompt,
+          id: prompt.id + ":followup:" + index,
+          sequence: index + 1,
+          data: { content },
+        },
+      })),
+    );
+    const saved = await owner.mutation(api.evaluations.generate, {
+      runId: prompt.runId,
+    });
+    const detail = evaluationDetailSchema.parse(
+      JSON.parse(
+        (await owner.query(api.evaluations.detail, {
+          evaluationId: saved.evaluationId,
+        })) ?? "null",
+      ),
+    );
+    expect(detail.evaluation.intent.clarifications).toEqual(followups);
+    expect(evaluationRequest(detail)).toBe(
+      "Fix edits disappearing after saving and reopening.",
+    );
+    expect(detail.source?.revision).toBe(1);
+    expect(detail.assessments).toEqual([]);
+    expect(
+      await owner.mutation(api.evaluations.generate, { runId: prompt.runId }),
+    ).toEqual(saved);
+  },
+);
+
+test.each(["rows", "bytes"])(
+  "generation rejects an oversized %s lookup without truncating or saving",
+  async (budget) => {
+    const { t, owner } = await setup();
+    const prompt = evaluationPrompt();
+    await t.run(async (ctx) => {
+      const count = budget === "rows" ? capturedEvaluationLimits.prompts : 3;
+      for (let index = 0; index < count; index++) {
+        const event = {
+          ...prompt,
+          id: prompt.id + ":budget:" + index,
+          sequence: index + 1,
+          data: { content: budget === "bytes" ? "€".repeat(260000) : "x" },
+        };
+        await ctx.db.insert("events", {
+          eventId: event.id,
+          runId: event.runId,
+          machineId: fixtureMachine,
+          revision: 1,
+          sequence: event.sequence,
+          kind: "user_prompt",
+          data: JSON.stringify(event),
+        });
+      }
+    });
+    await expect(
+      owner.mutation(api.evaluations.generate, { runId: prompt.runId }),
+    ).rejects.toThrow("evaluation request capture budget");
+    expect(
+      await t.run(async (ctx) =>
+        ctx.db
+          .query("evaluations")
+          .withIndex("by_generationKey", (q) =>
+            q.eq("generationKey", "ui:" + prompt.runId),
+          )
+          .unique(),
+      ),
+    ).toBeNull();
+  },
+);
+
 test("generation reports a byte budget error and rolls back oversized clarification records", async () => {
   const { t, owner } = await setup();
   const prompt = evaluationPrompt();
-  for (let index = 1; index <= 3; index++)
+  for (let index = 1; index <= 103; index++)
     await t.mutation(internal.ingestion.ingest, {
       machineId: fixtureMachine,
       records: entries([
@@ -140,7 +267,9 @@ test("generation reports a byte budget error and rolls back oversized clarificat
             ...prompt,
             id: prompt.id + ":clarification:" + index,
             sequence: index,
-            data: { content: "Scope clarification. ".repeat(2500) },
+            data: {
+              content: "Scope clarification. ".repeat(index > 100 ? 2500 : 1),
+            },
           },
         },
       ]),
@@ -378,6 +507,118 @@ test("generation enforces owner identity, project scope, readable capture and cu
     owner.mutation(api.evaluations.generate, { runId }),
   ).rejects.toThrow("unavailable");
 });
+test("generated evaluations retain ordered parent skill reads without inventing a route", async () => {
+  const { t, owner } = await setup();
+  const prompt = evaluationPrompt();
+  const skillEvents = ["astack", "react", "verify", "react"].map(
+    (name, index) =>
+      eventSchema.parse({
+        ...prompt,
+        id: prompt.runId + ":skill:" + index,
+        sequence: index + 1,
+        kind: "skill_loaded",
+        title: "Read " + name,
+        skill: {
+          name,
+          kind: "skill",
+          hash: null,
+          provenance: "observation_time",
+          evidence: "read",
+        },
+        data: {},
+      }),
+  );
+  // Ingestion order differs from trace order, and the immutable run snapshot
+  // has no summary skills. Only the captured events establish these reads.
+  await ingestWorkflow(
+    t,
+    [...skillEvents].reverse().map((value) => ({ kind: "event", value })),
+  );
+  const saved = await owner.mutation(api.evaluations.generate, {
+    runId: prompt.runId,
+    projectId: fixtureProject,
+  });
+  const read = async () =>
+    evaluationDetailSchema.parse(
+      JSON.parse(
+        (await owner.query(api.evaluations.detail, {
+          evaluationId: saved.evaluationId,
+          projectId: fixtureProject,
+        })) ?? "null",
+      ),
+    );
+  expect((await read()).workflow).toMatchObject({
+    records: [],
+    reads: skillEvents.map((event) => ({
+      reference: { runId: event.runId, eventId: event.id },
+      skill: { name: event.skill?.name, evidence: "read" },
+    })),
+    truncated: false,
+  });
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries(
+      [
+        {
+          kind: "run",
+          value: { ...evaluationRun("reproduce"), contentCapture: false },
+        },
+      ],
+      1000,
+    ),
+  });
+  expect((await read()).workflow).toMatchObject({ reads: [] });
+});
+
+test("parent skill projections respect trace limits and paused-project policy", async () => {
+  const { t, evaluation, owner } = await setup();
+  const prompt = evaluationPrompt();
+  for (let index = 0; index < 70; index++)
+    await ingestWorkflow(t, [
+      {
+        kind: "event",
+        value: eventSchema.parse({
+          ...prompt,
+          id: prompt.runId + ":read:" + index,
+          sequence: index + 1,
+          kind: "skill_loaded",
+          skill: {
+            name: "react",
+            kind: "skill",
+            hash: null,
+            provenance: "observation_time",
+            evidence: "read",
+          },
+          data: {},
+        }),
+      },
+    ]);
+  const read = async () =>
+    evaluationDetailSchema.parse(
+      JSON.parse(
+        (await owner.query(api.evaluations.detail, {
+          evaluationId: evaluation.id,
+        })) ?? "null",
+      ),
+    );
+  const captured = await read();
+  expect(captured.workflow.reads).toHaveLength(64);
+  expect(captured.workflow.reads.at(-1)?.reference.eventId).toBe(
+    prompt.runId + ":read:63",
+  );
+  expect(captured.workflow.truncated).toBe(true);
+  await owner.mutation(api.projects.save, {
+    project: {
+      projectId: fixtureProject,
+      name: "Fixture",
+      enabled: false,
+      repositories: [],
+      folders: [{ machineId: fixtureMachine, path: "/fixture" }],
+    },
+  });
+  expect((await read()).workflow.reads).toEqual([]);
+});
+
 test("workflow detail resolves multi-turn evidence, hides foreign references and respects readable capture", async () => {
   const { t, evaluation, owner } = await setup();
   const { annotations, support } = workflowFixture("changed");

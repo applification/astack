@@ -53,6 +53,7 @@ export function redact(
   knownSecrets: readonly string[] = [],
   depth = 0,
   maximumTextCharacters: number | null = 8000,
+  maximumArrayItems = 100,
 ): z.infer<ReturnType<typeof z.json>> {
   if (depth > 16) return "[OMITTED: depth]";
   if (typeof value === "string")
@@ -61,9 +62,15 @@ export function redact(
   if (typeof value === "number") return Number.isFinite(value) ? value : null;
   if (Array.isArray(value))
     return value
-      .slice(0, 100)
+      .slice(0, maximumArrayItems)
       .map((item) =>
-        redact(item, knownSecrets, depth + 1, maximumTextCharacters),
+        redact(
+          item,
+          knownSecrets,
+          depth + 1,
+          maximumTextCharacters,
+          maximumArrayItems,
+        ),
       );
   if (typeof value === "object" && value !== null) {
     return Object.fromEntries(
@@ -73,7 +80,13 @@ export function redact(
           redactText(key, knownSecrets).slice(0, 128),
           sensitiveKey.test(key)
             ? replacement
-            : redact(item, knownSecrets, depth + 1, maximumTextCharacters),
+            : redact(
+                item,
+                knownSecrets,
+                depth + 1,
+                maximumTextCharacters,
+                maximumArrayItems,
+              ),
         ]),
     );
   }

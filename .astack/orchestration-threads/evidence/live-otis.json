@@ -1,0 +1,18 @@
+{
+  "environment": "private Otis",
+  "at": "2026-10-08T18:10:12.580Z",
+  "rootKind": "t3",
+  "groupDigest": "28dbb39b96be0510b5ecb82ba475591b8dd5c466cfe31a3dbdbaea5484a6c9e2",
+  "capturedTurns": 15,
+  "delegatedTurns": 13,
+  "parentTurns": 2,
+  "providers": [
+    "codex"
+  ],
+  "pages": 1,
+  "originalChildrenCaptured": 5,
+  "anonymousQueriesDenied": 4,
+  "foreignProjectHidden": true,
+  "evaluationDigest": "72be2727c364791e790734f6f030ba2d680d85afc0836ef8f54d112c6133582f",
+  "originalEvaluationUnchanged": true
+}

@@ -1,0 +1,30 @@
+{
+  "at": "2026-10-08T18:56:33.816Z",
+  "revision": "37301bff6c142e1d0ad90755e7e382b2f2f688d4",
+  "backendPushed": true,
+  "servedAssetsMatchBuild": true,
+  "assets": [
+    {
+      "asset": "/assets/index-CAAD3VqA.js",
+      "sha256": "19ac7ed49b0636ee2c33f25ee5937b94ac2c10a690471d6b343e6bef42c1580e"
+    },
+    {
+      "asset": "/assets/index-C2VOCUpK.css",
+      "sha256": "8738b680f9562eee09e1c2f23f56cbf814b0ab2f4dd45f4986a8ca971b1d4aac"
+    }
+  ],
+  "testedCollectorSha256": "4e184ebb82eb3b769730a637df68c89b085cf49fd3798209271aaae9ea261eb2",
+  "signedCollectorVerified": true,
+  "collectorConfigUnchanged": true,
+  "privateRuntimeAndDataBackupsRetained": true,
+  "localQueueBackupRetained": true,
+  "promptQueryPlan": [
+    "SEARCH records USING INDEX by_prompt_sequence (run_id=?)"
+  ],
+  "originalEvaluationSnapshotAndJudgmentsUnchanged": true,
+  "originalEvaluationDigest": "72be2727c364791e790734f6f030ba2d680d85afc0836ef8f54d112c6133582f",
+  "uiBackupUnchangedAfterOwnerRecovery": true,
+  "forwardingStatus": "ok",
+  "pendingAtRead": 0,
+  "pluginReleasePerformed": false
+}

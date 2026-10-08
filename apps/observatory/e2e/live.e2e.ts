@@ -1,5 +1,218 @@
 import { test } from "@e2e-dev/web";
 import { expect, secrets } from "e2e";
+test("reported evaluation opens its orchestration group with separate delegated review rounds", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  const project = "a20a2fb3-646f-40fe-9b12-c64f759afaea";
+  await app.open(
+    "/#evaluation/" +
+      encodeURIComponent(
+        "bbb1fd30-527f-4326-b685-fb9c2e021092:evaluation:85af7a33-15c4-4e26-8d1e-50b754ca0f91",
+      ) +
+      "?project=" +
+      project,
+  );
+  await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect
+    .poll(
+      () =>
+        browser.evaluate(
+          () => document.querySelectorAll('a[href^="#thread/"]').length,
+        ),
+      { timeout: 30_000 },
+    )
+    .toBe(1);
+  const title = await browser.evaluate(
+    () => document.querySelector('a[href^="#thread/"]')?.textContent ?? "",
+  );
+  const threadLink = screen.getByRole("link", title, { exact: true });
+  const href = await threadLink.getAttribute("href");
+  await threadLink.tap();
+  const hierarchy = screen.getByRole("list", "Conversation hierarchy", {
+    exact: true,
+  });
+  await expect(hierarchy).toBeVisible({ timeout: 30_000 });
+  for (let page = 0; page < 20; page++) {
+    const more = screen.getByRole("button", "Load more turns", { exact: true });
+    if (!(await more.count())) break;
+    await more.tap();
+    await expect
+      .poll(() =>
+        browser.evaluate(() =>
+          [...document.querySelectorAll("button")].some(
+            (button) =>
+              button.textContent === "Load more turns" && button.disabled,
+          ),
+        ),
+      )
+      .toBe(false);
+  }
+  await expect
+    .poll(() =>
+      browser.evaluate(() => {
+        const nodes = [...document.querySelectorAll("[data-conversation-key]")];
+        const expected = [
+          "evaluation-routing-capture-diagnosis-20261008-1",
+          "evaluation-routing-review-20261008-1",
+          "evaluation-routing-review-20261008-2",
+          "evaluation-routing-review-20261008-3",
+          "evaluation-routing-id-diagnosis-20261008-1",
+        ];
+        return expected.filter((id) =>
+          nodes.some(
+            (node) =>
+              node.getAttribute("data-conversation-key")?.includes(id) &&
+              node.querySelector('a[href^="#run/"]'),
+          ),
+        ).length;
+      }),
+    )
+    .toBe(5);
+  expect(await hierarchy.getByRole("link").count()).toBeGreaterThan(5);
+  expect(
+    await browser.evaluate(() =>
+      new URLSearchParams(location.hash.split("?")[1]).get("project"),
+    ),
+  ).toBe(project);
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await screen.getByRole("link", "Back to work", { exact: true }).tap();
+  const groups = screen.getByRole("region", "Orchestration threads", {
+    exact: true,
+  });
+  await expect(groups).toBeVisible();
+  await expect(
+    groups.getByRole("link", title, { exact: true }),
+  ).toHaveAttribute("href", href!);
+});
+test("reported five-child evaluation shows every route across desktop widths", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await browser.setViewport({ width: 1600, height: 1000 });
+  await app.open(
+    "/#evaluation/" +
+      encodeURIComponent(
+        "bbb1fd30-527f-4326-b685-fb9c2e021092:evaluation:85af7a33-15c4-4e26-8d1e-50b754ca0f91",
+      ) +
+      "?project=a20a2fb3-646f-40fe-9b12-c64f759afaea",
+  );
+  await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect(
+    screen.getByRole("heading", "Path taken", { exact: true }),
+  ).toBeVisible({ timeout: 30_000 });
+  for (const width of [1600, 1280, 1920]) {
+    await browser.setViewport({ width, height: 1000 });
+    await expect
+      .poll(() =>
+        browser.evaluate(() => {
+          const viewport = document.querySelector(".workflow-map-scroll");
+          if (!viewport) return null;
+          const bounds = viewport.getBoundingClientRect();
+          const children = [...viewport.querySelectorAll("[data-map-branch]")];
+          return {
+            children: children.length,
+            allRoutesVisible: children.every((child) => {
+              const rect = child.getBoundingClientRect();
+              return (
+                rect.left >= bounds.left - 1 && rect.right <= bounds.right + 1
+              );
+            }),
+            mapFits: viewport.scrollWidth <= viewport.clientWidth + 1,
+            pageFits: document.documentElement.scrollWidth <= innerWidth,
+            promptBridge: document.querySelectorAll("[data-prompt-connection]")
+              .length,
+            resultBridge: document.querySelectorAll("[data-result-connection]")
+              .length,
+          };
+        }),
+      )
+      .toEqual({
+        children: 5,
+        allRoutesVisible: true,
+        mapFits: true,
+        pageFits: true,
+        promptBridge: 1,
+        resultBridge: 1,
+      });
+  }
+});
+
+test("reported generated evaluation connects all captured parent skills and exact trace links", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  const id =
+    "bbb1fd30-527f-4326-b685-fb9c2e021092:evaluation:5b226ef2-442f-4dbe-9ebb-a6d4a5b5ea9a";
+  await app.open(
+    "/#evaluation/" +
+      encodeURIComponent(id) +
+      "?project=673cbb36-3688-4d26-8bf9-010b7ec026ed",
+  );
+  await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
+  await screen.getByRole("button", "Open Observatory").tap();
+  const workflow = screen.getByRole("region", "Astack workflow", {
+    exact: true,
+  });
+  await expect(
+    workflow.getByRole("heading", "Observed skill reads", { exact: true }),
+  ).toBeVisible({ timeout: 30_000 });
+  await expect(
+    workflow.getByText(
+      "Route and phases were not recorded in the linked capture.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  const geometry = () =>
+    browser.evaluate(() => ({
+      skills: document.querySelectorAll(".map-main-cell .journey-skill-read a")
+        .length,
+      mainLines: document.querySelectorAll('path[data-connection="main"]')
+        .length,
+      rootLines: document.querySelectorAll('path[data-connection="root"]')
+        .length,
+      promptLines: document.querySelectorAll("[data-prompt-connection]").length,
+      resultLines: document.querySelectorAll("[data-result-connection]").length,
+      pageFits: document.documentElement.scrollWidth <= innerWidth,
+    }));
+  const expected = {
+    skills: 19,
+    mainLines: 19,
+    rootLines: 1,
+    promptLines: 1,
+    resultLines: 1,
+    pageFits: true,
+  };
+  await expect.poll(geometry).toEqual(expected);
+  await browser.setViewport({ width: 390, height: 844 });
+  await expect.poll(geometry).toEqual(expected);
+  await workflow
+    .getByRole("link", "Astack skill read in main trace", { exact: true })
+    .tap();
+  await expect(screen.getByRole("heading", "Activity trace")).toBeVisible();
+  await expect
+    .poll(() =>
+      browser.evaluate(() => {
+        const id = new URLSearchParams(location.hash.split("?")[1]).get(
+          "event",
+        );
+        const event = document.getElementById(id ?? "");
+        return event instanceof HTMLDetailsElement && event.open;
+      }),
+    )
+    .toBe(true);
+});
+
 test("deployed astack workflow connects the actual route, phases and evidence without assigning owner grades", async ({
   app,
   screen,

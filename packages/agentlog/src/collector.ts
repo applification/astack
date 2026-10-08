@@ -24,6 +24,7 @@ import {
 } from "@astack/agent-observability/delegation";
 import type { Project } from "@astack/agent-observability/projects";
 import { mergeAutomation } from "@astack/agent-observability/automations";
+import { mergeConversations } from "@astack/agent-observability/conversations";
 
 type CaptureAdapter = AgentAdapter & {
   setProjects(projects: readonly Project[]): void;
@@ -61,10 +62,15 @@ export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
       owner.value.automation,
       snapshot.run.automation,
     );
+    const conversation = mergeConversations(
+      owner.value.conversation,
+      snapshot.run.conversation,
+    );
     store.put({
       kind: "run",
       value: runSchema.parse({
         ...owner.value,
+        ...(conversation !== undefined ? { conversation } : {}),
         ...(automation ? { automation } : {}),
         sessionReferences: mergeSessionReferences(
           owner.value.sessionReferences,
@@ -109,6 +115,12 @@ export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
       run.automation,
     );
     if (automation) run.automation = automation;
+    const conversation = mergeConversations(
+      previous.value.conversation,
+      run.conversation,
+    );
+    if (conversation !== undefined) run.conversation = conversation;
+    else delete run.conversation;
     run.sessionReferences = mergeSessionReferences(
       previous.value.sessionReferences,
       run.sessionReferences,

@@ -40,6 +40,7 @@ export const evaluationDetailSchema = z
     moreFeedback: z.boolean().default(false),
     workflow: workflowCaptureSchema.default({
       records: [],
+      reads: [],
       branches: [],
       truncated: false,
     }),

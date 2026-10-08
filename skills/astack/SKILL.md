@@ -9,6 +9,8 @@ metadata:
 
 Treat the prompt after `$applification:astack` as the task; ask for it when none is supplied. The user describes the outcome; you select and compose the work rather than asking them to choose skill names. Read project instructions, `.astack/project.md` when present, affected source and existing proof commands. Confirm the intended outcome when ambiguity matters; ask about material product choices while continuing independent work. Preserve user choices, scope, authority and the existing PR. An ordinary feature or fix uses the established stack; a setup/upgrade request can improve it through project-setup. A small fix can keep intent and proof in the conversation and PR.
 
+Apply [main-thread orchestration](references/orchestration.md): the main agent owns the request through integration and verification; children return bounded contributions. This default also applies to standalone sessions and direct skill invocation. Delegate only when useful, through the actual host's available mechanism.
+
 ## Compose only useful expertise
 
 Choose the workflow for the outcome: [implement](../implement/SKILL.md) for changed behavior, [bug-fix](../bug-fix/SKILL.md) for a defect, [refactor](../refactor/SKILL.md) for structure with behavior held steady, [performance](../performance/SKILL.md) for measured slowness, [investigate](../investigate/SKILL.md) for a read-only question, or [pr](../pr/SKILL.md) for review/publication.
@@ -51,4 +53,4 @@ Use [portable handoffs](references/handoffs.md) and [examples](references/handof
 
 Use [Observatory context](references/observatory.md) for stable work/session correlation and explicit workflow/outcome annotations. Automatic capture is independent of this method; telemetry must never block delivery. Keep external work ownership and capture provenance intact when using observed behavior to improve the harness.
 
-For substantive tasks with readable capture, use the [automatic evaluation handoff](references/observatory.md#automatic-task-evaluations): record criteria at task start, preserve its task ID across follow-ups, and queue the evaluation at delivery. The user does not need to request or author the review record.
+For an owned substantive task with readable capture, use the [automatic evaluation handoff](references/observatory.md#automatic-task-evaluations): record criteria at task start, preserve its evaluation task ID across active follow-ups, and queue the evaluation at delivery. Children return evidence under the owner's supplied ID. The user does not need to request or author the review record.

@@ -4,6 +4,8 @@ Specialists contribute within the existing delivery route; they are not addition
 
 These briefs apply when assigning or reporting a contribution. Ordinary direct work selects the owning skill without creating a role record.
 
+Apply [main-thread orchestration](orchestration.md) for host selection and child lifecycle. The parent owns the task evaluation; contributions return evidence and its supplied evaluation task ID, preserving external work identity. A child does not begin or finish a duplicate owner evaluation.
+
 ## Select by behavior and risk
 
 Inspect the intended outcome, diff or proposed boundaries, project profile, accepted ADRs and available evidence. Select contributions that can resolve a specific uncertainty, protect an affected boundary or supply a required review. Record the selected roles and purpose briefly in the assignment or PR. Reassess when investigation changes the scope.

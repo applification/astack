@@ -238,7 +238,7 @@
   max-width: 1320px;
   margin-inline: auto;
   &:has(.evaluation-page) {
-    max-width: 1540px;
+    max-width: none;
   }
 }
 @utility eyebrow {
@@ -680,7 +680,7 @@
   gap: 1rem;
 }
 @utility evaluation-page {
-  max-width: 1440px;
+  max-width: 100%;
   overflow-wrap: anywhere;
   & > section:not(.workflow-section) {
     max-width: 900px;
@@ -700,6 +700,23 @@
     color: var(--color-foreground);
     border: 1px solid var(--color-border);
     border-radius: 0.375rem;
+  }
+}
+@utility conversation-tree {
+  list-style: none;
+  padding-left: 0;
+  margin-block: 1rem;
+  & > li {
+    margin-block: 1rem;
+  }
+  & .conversation-tree {
+    border-left: 2px solid var(--color-border);
+    padding-left: 1rem;
+  }
+  & summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding-block: 0.7rem;
   }
 }
 @utility evaluation-intent {
@@ -1104,6 +1121,7 @@
 }
 
 @utility workflow-map-scroll {
+  container-type: inline-size;
   overflow-x: auto;
   max-width: 100%;
   padding: 0.5rem 0 1rem;
@@ -1134,16 +1152,29 @@
   }
 }
 @utility workflow-map-grid {
-  --map-lane-width: clamp(264px, calc((100vw - 12rem) / 4), 320px);
+  --map-lane-gap: 1.25rem;
+  /* Include the outward label gutter, so the entire route fits its viewport. */
+  --map-lane-width: clamp(
+    128px,
+    calc(
+      (100cqw - (var(--map-lane-count) - 1) * var(--map-lane-gap) - 1rem) /
+        (var(--map-lane-count) + 1)
+    ),
+    320px
+  );
   --map-fork-header-height: 4.5rem;
   display: grid;
   width: max-content;
   margin-inline: auto;
   grid-template-columns: repeat(var(--map-lane-count), var(--map-lane-width));
-  column-gap: 2.5rem;
+  column-gap: var(--map-lane-gap);
   padding: 0 1rem 0 var(--map-lane-width);
   position: relative;
   align-items: stretch;
+  @media (max-width: 1024px) {
+    --map-lane-width: 264px;
+    --map-lane-gap: 2.5rem;
+  }
 }
 @utility workflow-map-lines {
   position: absolute;
