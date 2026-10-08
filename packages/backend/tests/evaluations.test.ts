@@ -19,6 +19,7 @@ import {
 } from "@astack/agent-observability/evaluation-fixtures";
 import { deliveryFixture } from "@astack/agent-observability/delivery-fixtures";
 import { eventSchema } from "@astack/agent-observability";
+import { capturedEvaluationLimits } from "@astack/agent-observability/evaluations";
 import type { TelemetryRecord } from "@astack/agent-observability";
 import { workflowFixture } from "@astack/agent-observability/workflow-fixtures";
 
@@ -166,6 +167,87 @@ test.each([5633, 16000])(
       kind: "original_request",
     });
     expect(detail.evaluation.proof).toBeNull();
+  },
+);
+
+test("generation preserves every ordered follow-up in a long orchestration turn", async () => {
+  const { t, owner } = await setup();
+  const prompt = evaluationPrompt();
+  const followups = Array.from(
+    { length: 32 },
+    (_, index) => `Follow-up ${index + 1}: retain the agreed scope.`,
+  );
+  await ingestWorkflow(
+    t,
+    followups.map((content, index) => ({
+      kind: "event",
+      value: {
+        ...prompt,
+        id: prompt.id + ":followup:" + index,
+        sequence: index + 1,
+        data: { content },
+      },
+    })),
+  );
+  const saved = await owner.mutation(api.evaluations.generate, {
+    runId: prompt.runId,
+  });
+  const detail = evaluationDetailSchema.parse(
+    JSON.parse(
+      (await owner.query(api.evaluations.detail, {
+        evaluationId: saved.evaluationId,
+      })) ?? "null",
+    ),
+  );
+  expect(detail.evaluation.intent.clarifications).toEqual(followups);
+  expect(evaluationRequest(detail)).toBe(
+    "Fix edits disappearing after saving and reopening.",
+  );
+  expect(detail.source?.revision).toBe(1);
+  expect(detail.assessments).toEqual([]);
+  expect(
+    await owner.mutation(api.evaluations.generate, { runId: prompt.runId }),
+  ).toEqual(saved);
+});
+
+test.each(["rows", "bytes"])(
+  "generation rejects an oversized %s lookup without truncating or saving",
+  async (budget) => {
+    const { t, owner } = await setup();
+    const prompt = evaluationPrompt();
+    await t.run(async (ctx) => {
+      const count = budget === "rows" ? capturedEvaluationLimits.prompts : 3;
+      for (let index = 0; index < count; index++) {
+        const event = {
+          ...prompt,
+          id: prompt.id + ":budget:" + index,
+          sequence: index + 1,
+          data: { content: budget === "bytes" ? "€".repeat(260000) : "x" },
+        };
+        await ctx.db.insert("events", {
+          eventId: event.id,
+          runId: event.runId,
+          machineId: fixtureMachine,
+          revision: 1,
+          sequence: event.sequence,
+          kind: "user_prompt",
+          data: JSON.stringify(event),
+        });
+      }
+    });
+    await expect(
+      owner.mutation(api.evaluations.generate, { runId: prompt.runId }),
+    ).rejects.toThrow("evaluation request capture budget");
+    expect(
+      await t.run(async (ctx) =>
+        ctx.db
+          .query("evaluations")
+          .withIndex("by_generationKey", (q) =>
+            q.eq("generationKey", "ui:" + prompt.runId),
+          )
+          .unique(),
+      ),
+    ).toBeNull();
   },
 );
 

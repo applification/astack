@@ -7,6 +7,7 @@ import {
 import {
   evaluationManifestSchema,
   proofReportSchema,
+  capturedEvaluationLimits,
 } from "@astack/agent-observability/evaluations";
 import type { LocalStore } from "./store";
 import { approvedRun } from "./projects";
@@ -146,18 +147,27 @@ function recordRevision(store: LocalStore, key: string) {
   if (!row) throw new Error("Capture revision unavailable.");
   return row.revision;
 }
-function capturedPrompts(store: LocalStore, runId: string) {
-  return store.db
-    .query<{ payload: string; revision: number }, [string]>(
-      "SELECT payload,revision FROM records WHERE run_id=? AND kind='event' AND json_extract(payload,'$.value.kind')='user_prompt' ORDER BY json_extract(payload,'$.value.sequence') LIMIT 12",
-    )
-    .all(runId)
-    .flatMap((row) => {
+function capturedPrompts(store: LocalStore, runIds: string[]) {
+  const prompts = [];
+  let bytes = 0;
+  const query = store.db.query<{ payload: string; revision: number }, [string]>(
+    "SELECT payload,revision FROM records WHERE run_id=? AND kind='event' AND json_extract(payload,'$.value.kind')='user_prompt' ORDER BY json_extract(payload,'$.value.sequence')",
+  );
+  for (const runId of runIds)
+    for (const row of query.iterate(runId)) {
+      bytes += Buffer.byteLength(row.payload);
+      if (
+        prompts.length >= capturedEvaluationLimits.prompts ||
+        bytes > capturedEvaluationLimits.bytes
+      )
+        throw new Error(
+          "Captured task exceeds the evaluation request capture budget.",
+        );
       const record = recordSchema.parse(JSON.parse(row.payload));
-      return record.kind === "event"
-        ? [{ event: record.value, revision: row.revision }]
-        : [];
-    });
+      if (record.kind === "event")
+        prompts.push({ event: record.value, revision: row.revision });
+    }
+  return prompts;
 }
 export function publishEvaluationTasks(store: LocalStore) {
   const cursor = store.getMeta("evaluationTasksCursor") ?? "";
@@ -217,15 +227,16 @@ export function publishEvaluationTasks(store: LocalStore) {
                 });
         if (selected.some((run) => !approvedRun(store, run.id)))
           throw new Error("Task includes a turn outside enabled capture.");
-        const source = capturedPrompts(store, first.id)[0];
+        const prompts = capturedPrompts(
+          store,
+          selected.map((run) => run.id),
+        );
+        const source = prompts.find(({ event }) => event.runId === first.id);
         if (!source)
           throw new Error("Original request is unavailable in captured work.");
-        const clarifications = selected
-          .flatMap((run) =>
-            capturedPrompts(store, run.id)
-              .filter(({ event }) => event.id !== source.event.id)
-              .map(({ event }) => event.data.content),
-          )
+        const clarifications = prompts
+          .filter(({ event }) => event.id !== source.event.id)
+          .map(({ event }) => event.data.content)
           .filter(
             (value): value is string =>
               typeof value === "string" && !!value.trim(),

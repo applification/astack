@@ -3,6 +3,12 @@ import { z } from "zod";
 const id = z.string().min(1).max(512);
 const text = z.string().trim().min(1).max(4096);
 const digest = z.string().regex(/^[a-f0-9]{64}$/);
+// Bound capture reads independently of the 128 KiB serialized evaluation budget.
+// Include the original request; captured follow-ups share the remaining slots.
+export const capturedEvaluationLimits = {
+  prompts: 4097,
+  bytes: 2 * 1024 * 1024,
+} as const;
 const unique = <T>(items: T[], key: (item: T) => string) =>
   new Set(items.map(key)).size === items.length;
 export const traceReferenceSchema = z
@@ -51,7 +57,7 @@ const capturedIntentSchema = z
           .min(1)
           .refine((value) => value.trim().length > 0, "Empty clarification"),
       )
-      .max(10),
+      .max(capturedEvaluationLimits.prompts - 1),
   })
   .strict();
 export const verdictSchema = z.enum(["pass", "fail", "inconclusive"]);

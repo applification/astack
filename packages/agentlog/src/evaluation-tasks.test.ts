@@ -135,6 +135,126 @@ test("agent handoff survives capture lag and restart, preserving criteria and pu
   }
 });
 
+test("long task publication preserves all follow-ups across turns and retries frozen failed delivery", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "astack-long-generation-"));
+  const store = new LocalStore(directory);
+  try {
+    store.setMeta("projectPolicy", JSON.stringify(policy));
+    const first = evaluationRun("reproduce");
+    const last = { ...evaluationRun(), startedAt: 1500 };
+    const prompt = evaluationPrompt();
+    const followups = Array.from(
+      { length: 32 },
+      (_, index) => `Follow-up ${index + 1}`,
+    );
+    store.put({ kind: "run", value: first });
+    store.put({ kind: "run", value: last });
+    store.put({ kind: "event", value: prompt });
+    for (const [index, content] of followups.entries()) {
+      const runId = index < 16 ? first.id : last.id;
+      store.put({
+        kind: "event",
+        value: {
+          ...prompt,
+          runId,
+          id: runId + ":followup:" + index,
+          sequence: index + 1,
+          data: { content },
+        },
+      });
+    }
+    const task = beginEvaluationTask(store, {
+      firstRunId: first.id,
+      title: "Review long orchestration work",
+      cases: [
+        {
+          id: "C1",
+          expected: "Retain all scope",
+          requiresIndependentObservation: false,
+        },
+      ],
+      skillCriteria: [],
+    });
+    const finished = finishEvaluationTask(store, task.id, last.id, null);
+    store.saveEvaluationTask(task.id, "failed", {
+      ...finished,
+      state: "failed",
+      error: "Captured task exceeds the evaluation content or turn limits.",
+    });
+    expect(() => finishEvaluationTask(store, task.id, first.id, null)).toThrow(
+      "immutable",
+    );
+    expect(finishEvaluationTask(store, task.id, last.id, null).state).toBe(
+      "pending",
+    );
+    expect(publishEvaluationTasks(store)).toBe(1);
+    const saved = store.getRecord(
+      "evaluation:" + fixtureMachine + ":evaluation:" + task.id,
+    );
+    if (saved?.kind !== "evaluation")
+      throw new Error("Evaluation not published");
+    expect(saved.value.intent.clarifications).toEqual(followups);
+    expect(saved.value.cases).toEqual(task.criteria.cases);
+    expect(saved.value.generation?.method).toBe("agent");
+    expect(saved.value.runIds).toEqual([first.id, last.id]);
+    expect(finishEvaluationTask(store, task.id, last.id, null).state).toBe(
+      "queued",
+    );
+    expect(publishEvaluationTasks(store)).toBe(0);
+  } finally {
+    store.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("long automatic publication retains the serialized byte budget without a partial evaluation", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "astack-long-budget-"));
+  const store = new LocalStore(directory);
+  try {
+    store.setMeta("projectPolicy", JSON.stringify(policy));
+    const run = evaluationRun("reproduce");
+    const prompt = evaluationPrompt();
+    store.put({ kind: "run", value: run });
+    store.put({ kind: "event", value: prompt });
+    for (let index = 0; index < 32; index++)
+      store.put({
+        kind: "event",
+        value: {
+          ...prompt,
+          id: prompt.id + ":large:" + index,
+          sequence: index + 1,
+          data: { content: "€".repeat(4000) },
+        },
+      });
+    const task = beginEvaluationTask(store, {
+      firstRunId: run.id,
+      title: "Review large work",
+      cases: [
+        {
+          id: "C1",
+          expected: "Retain the budget",
+          requiresIndependentObservation: false,
+        },
+      ],
+      skillCriteria: [],
+    });
+    finishEvaluationTask(store, task.id, run.id, null);
+    expect(publishEvaluationTasks(store)).toBe(0);
+    const failed = evaluationTask(store, task.id);
+    expect(failed?.state === "failed" && failed.error).toBe(
+      "Evaluation exceeds the 128 KiB record budget",
+    );
+    expect(
+      store.getRecord(
+        "evaluation:" + fixtureMachine + ":evaluation:" + task.id,
+      ),
+    ).toBeNull();
+  } finally {
+    store.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 test("disabled and unreadable capture are reported rather than generating a review", async () => {
   const directory = await mkdtemp(join(tmpdir(), "astack-generation-policy-"));
   const store = new LocalStore(directory);

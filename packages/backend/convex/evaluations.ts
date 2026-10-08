@@ -12,6 +12,7 @@ import {
   outcomeFeedbackInputSchema,
   outcomeFeedbackSchema,
   type Evaluation,
+  capturedEvaluationLimits,
 } from "@astack/agent-observability/evaluations";
 import {
   evaluationDetailSchema,
@@ -311,13 +312,24 @@ export const generate = mutation({
         evaluationId: previous.evaluationId,
         projectId: project.projectId,
       };
-    const prompts = await ctx.db
+    const prompts: Doc<"events">[] = [];
+    let promptBytes = 0;
+    for await (const prompt of ctx.db
       .query("events")
       .withIndex("by_runId_and_kind_and_sequence", (q) =>
         q.eq("runId", run.id).eq("kind", "user_prompt"),
       )
-      .order("asc")
-      .take(12);
+      .order("asc")) {
+      promptBytes += new TextEncoder().encode(prompt.data).byteLength;
+      if (
+        prompts.length >= capturedEvaluationLimits.prompts ||
+        promptBytes > capturedEvaluationLimits.bytes
+      )
+        throw new ConvexError(
+          "This turn exceeds the evaluation request capture budget.",
+        );
+      prompts.push(prompt);
+    }
     // Legacy captures may predate the indexed kind projection.
     const candidates = prompts.length
       ? prompts
@@ -336,10 +348,6 @@ export const generate = mutation({
         revision: item.revision,
       }))
       .filter(({ event }) => event.kind === "user_prompt");
-    if (requests.length > 11)
-      throw new ConvexError(
-        "This turn exceeds the evaluation clarification limit.",
-      );
     const source = requests[0];
     if (!source)
       throw new ConvexError("This turn has no captured original request.");
