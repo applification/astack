@@ -18,12 +18,11 @@ export function PromptJourney({ children }: { children: ReactNode }) {
     const root = element.querySelector("[data-map-root]");
     const last = [...element.querySelectorAll("[data-map-main]")].at(-1);
     const result = element.querySelector("[data-result-card]");
-    const viewports = [...element.querySelectorAll(".workflow-map-scroll")];
     let frame = 0;
     const measure = () => {
       const bounds = element.getBoundingClientRect();
       const visible = (node: Element) => {
-        const viewport = node.closest(".workflow-map-scroll");
+        const viewport = node.closest(".workflow-map-scroll, .work-content");
         if (
           !viewport ||
           node.closest("details:not([open])") ||
@@ -33,7 +32,12 @@ export function PromptJourney({ children }: { children: ReactNode }) {
         const rect = node.getBoundingClientRect();
         const clip = viewport.getBoundingClientRect();
         const x = rect.left + rect.width / 2;
-        return x >= clip.left && x <= clip.right;
+        return (
+          x >= clip.left &&
+          x <= clip.right &&
+          rect.bottom > clip.top &&
+          rect.top < clip.bottom
+        );
       };
       const connect = (
         from: Element | null | undefined,
@@ -75,17 +79,21 @@ export function PromptJourney({ children }: { children: ReactNode }) {
       frame = requestAnimationFrame(measure);
     };
     const observer = new ResizeObserver(schedule);
-    for (const node of [element, prompt, root, result, last, ...viewports])
+    for (const node of [element, prompt, root, result, last])
       if (node) observer.observe(node);
-    for (const viewport of viewports)
-      viewport.addEventListener("scroll", schedule, { passive: true });
+    const mutations = new MutationObserver(schedule);
+    mutations.observe(element, { childList: true, subtree: true });
+    element.addEventListener("scroll", schedule, {
+      passive: true,
+      capture: true,
+    });
     element.addEventListener("toggle", schedule, true);
     measure();
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
-      for (const viewport of viewports)
-        viewport.removeEventListener("scroll", schedule);
+      mutations.disconnect();
+      element.removeEventListener("scroll", schedule, true);
       element.removeEventListener("toggle", schedule, true);
     };
   }, [children]);

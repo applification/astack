@@ -378,6 +378,278 @@ test("metadata-only replay keeps stable identities and observations and removes 
   expect(events.find((e) => e.kind === "test_result")?.failed).toBe(true);
 });
 
+const hostTask = (extra: object = {}) => ({
+  id: "observed-task",
+  runId: "app-run",
+  childThreadId: "observed-child",
+  title: "Scoped child",
+  status: "completed",
+  startedAt: time,
+  completedAt: end,
+  origin: "app_owned",
+  result: "Scoped result " + secret,
+  updatedAt: end,
+  ...extra,
+});
+const observed = (
+  events: NonNullable<Awaited<ReturnType<typeof snapshot>>>["events"],
+) => events.filter((event) => event.kind === "delegation_result");
+
+test.each([
+  {
+    name: "terminal null result",
+    task: hostTask({ result: null }),
+    states: [],
+  },
+  {
+    name: "result plus pre-consumed transfer",
+    task: hostTask(),
+    states: ["present"],
+  },
+  {
+    name: "pending delivery",
+    task: hostTask({
+      completionDelivery: { state: "pending", observedByRunId: null },
+    }),
+    states: ["present"],
+  },
+  {
+    name: "claimed delivery",
+    task: hostTask({
+      completionDelivery: { state: "claimed", observedByRunId: null },
+    }),
+    states: ["present"],
+  },
+  {
+    name: "explicit host delivery",
+    task: hostTask({
+      completionDelivery: { state: "delivered", observedByRunId: null },
+    }),
+    states: ["present", "delivered"],
+  },
+  {
+    name: "explicit terminal read without delivery",
+    task: hostTask({
+      completionDelivery: {
+        state: "acknowledged",
+        observedByRunId: "observer-run",
+      },
+    }),
+    states: ["present", "acknowledged"],
+  },
+  {
+    name: "acknowledged null result",
+    task: hostTask({
+      result: null,
+      completionDelivery: { state: "acknowledged", observedByRunId: null },
+    }),
+    states: ["acknowledged"],
+  },
+  {
+    name: "native task cannot claim app delivery",
+    task: hostTask({
+      origin: "provider_native",
+      completionDelivery: { state: "delivered", observedByRunId: null },
+    }),
+    states: ["present"],
+  },
+])("passive task observations distinguish $name", async ({ task, states }) => {
+  const f = await fixture();
+  const captured = await snapshot(f, {
+    ...projection(),
+    subagents: [task],
+    contextTransfers: [
+      { type: "subagent_result", status: "consumed", consumedAt: end },
+    ],
+    resultContextTransferId: "already-consumed-transfer",
+  });
+  if (!captured) throw new Error("missing snapshot");
+  persistSnapshot(f.store, captured);
+  const events = observed(f.store.events(captured.run.id));
+  expect(
+    events.map((event) => event.delegationResult?.observation.state),
+  ).toEqual([...states]);
+  expect(captured.run.delegations[0]?.status).toBe("completed");
+  for (const event of events) {
+    expect(event.timestamp).toBeNull();
+    expect(event.timing).toBe("unavailable");
+    expect(event.delegationResult).toMatchObject({
+      sourceUpdatedAt: Date.parse(end),
+      occurredAt: null,
+    });
+    expect(event.data.result).not.toContain(secret);
+  }
+});
+
+test("old hosts and nullable task and observer runs remain readable without invented facts", async () => {
+  const f = await fixture();
+  const old = await snapshot(f, {
+    ...projection(),
+    subagents: [
+      {
+        id: "old-task",
+        runId: null,
+        childThreadId: null,
+        status: "completed",
+        startedAt: null,
+        completedAt: null,
+      },
+    ],
+  });
+  if (!old) throw new Error("missing old-host snapshot");
+  expect(old.run.delegations[0]).toMatchObject({
+    id: "old-task",
+    status: "completed",
+    child: null,
+  });
+  expect(observed(old.events)).toEqual([]);
+  const nullable = await snapshot(f, {
+    ...projection(),
+    subagents: [
+      hostTask({
+        runId: null,
+        childThreadId: null,
+        completionDelivery: { state: "acknowledged", observedByRunId: null },
+      }),
+    ],
+  });
+  if (!nullable) throw new Error("missing nullable snapshot");
+  persistSnapshot(f.store, nullable);
+  expect(
+    observed(f.store.events(nullable.run.id)).map(
+      (event) => event.delegationResult?.observation,
+    ),
+  ).toEqual([
+    { state: "present", resultId: expect.any(String) },
+    {
+      state: "acknowledged",
+      resultId: expect.any(String),
+      observedByRunId: null,
+    },
+  ]);
+  expect(observed(nullable.events)[0]?.delegationResult).toMatchObject({
+    child: null,
+    host: { runId: null },
+  });
+});
+
+test("polls, restart and multiple provider turns anchor each result variant once and retain first source times", async () => {
+  const f = await fixture();
+  const raw = {
+    ...projection(),
+    subagents: [
+      hostTask({
+        completionDelivery: { state: "delivered", observedByRunId: null },
+      }),
+    ],
+  };
+  const parsed = t3ProjectionSchema.parse(raw);
+  const firstTurn = parsed.providerTurns[0];
+  if (!firstTurn) throw new Error("missing first turn");
+  parsed.providerTurns.push({ ...firstTurn, id: "later-turn", ordinal: 2 });
+  const capture = async (store: LocalStore, observedAt: number) => {
+    for (const turn of [...parsed.providerTurns].reverse()) {
+      const value = await normalizeT3Turn({
+        projection: parsed,
+        turn,
+        config: f.config,
+        source: f.source,
+        cwd: f.dir,
+        projectId,
+        store,
+        signatureKey: "fixture-key",
+        secrets: [secret],
+        observedAt,
+      });
+      if (value) persistSnapshot(store, value);
+    }
+  };
+  await capture(f.store, 1000);
+  const parent = f.store
+    .runsForSession()
+    .find((run) => run.attemptId === "provider-turn");
+  if (!parent) throw new Error("missing observation anchor");
+  const initial = observed(f.store.events(parent.id));
+  expect(
+    initial.map((event) => event.delegationResult?.observation.state),
+  ).toEqual(["present", "delivered"]);
+  const initialRevisions = initial.map(
+    (event) =>
+      f.store.db
+        .query<{ revision: number }, [string]>(
+          "SELECT revision FROM records WHERE key=?",
+        )
+        .get("event:" + event.id)?.revision,
+  );
+  parsed.subagents[0]!.updatedAt = Date.parse(end) + 60_000;
+  await capture(f.store, 2000);
+  expect(observed(f.store.events(parent.id))).toEqual(initial);
+  const restarted = new LocalStore(join(f.dir, "state"), [secret]);
+  cleanup.push(() => restarted.close());
+  await capture(restarted, 3000);
+  expect(
+    initial.map(
+      (event) =>
+        restarted.db
+          .query<{ revision: number }, [string]>(
+            "SELECT revision FROM records WHERE key=?",
+          )
+          .get("event:" + event.id)?.revision,
+    ),
+  ).toEqual(initialRevisions);
+  parsed.subagents[0]!.completionDelivery = {
+    state: "acknowledged",
+    observedByRunId: null,
+  };
+  await capture(restarted, 4000);
+  expect(
+    observed(restarted.events(parent.id))
+      .map((event) => event.delegationResult?.observation.state)
+      .sort(),
+  ).toEqual(["acknowledged", "delivered", "present"]);
+  expect(
+    restarted
+      .runsForSession()
+      .filter((run) => run.id !== parent.id)
+      .flatMap((run) => observed(restarted.events(run.id))),
+  ).toEqual([]);
+  parsed.subagents[0]!.result = "Revised result";
+  await capture(restarted, 5000);
+  const revisions = observed(restarted.events(parent.id)).filter(
+    (event) => event.delegationResult?.observation.state === "present",
+  );
+  expect(revisions).toHaveLength(2);
+  expect(revisions[0]?.id).not.toBe(revisions[1]?.id);
+});
+
+test("observation content is redacted, withheld on metadata replay and bounded without losing facts", async () => {
+  const f = await fixture();
+  const raw = {
+    ...projection(),
+    subagents: [hostTask({ result: "x".repeat(9000) + secret })],
+  };
+  const readable = await snapshot(f, raw);
+  if (!readable) throw new Error("missing readable snapshot");
+  persistSnapshot(f.store, readable);
+  const bounded = observed(f.store.events(readable.run.id))[0];
+  expect(typeof bounded?.data.result).toBe("string");
+  expect(bounded?.data.result).toBe("x".repeat(8000));
+  expect(Buffer.byteLength(JSON.stringify(bounded))).toBeLessThan(128 * 1024);
+  expect(bounded?.delegationResult?.observation.state).toBe("present");
+  const metadata = await snapshot(f, raw, false);
+  if (!metadata) throw new Error("missing metadata snapshot");
+  persistSnapshot(f.store, metadata);
+  expect(observed(f.store.events(readable.run.id))).toHaveLength(1);
+  expect(observed(f.store.events(readable.run.id))[0]?.data).toEqual({
+    result: "[WITHHELD]",
+  });
+  expect(
+    observed(f.store.events(readable.run.id))[0]?.delegationResult?.observation
+      .state,
+  ).toBe("present");
+  expect(JSON.stringify(f.store.events(readable.run.id))).not.toContain(secret);
+});
+
 test("native Codex overlap preserves the first collector, annotations and event set in either capture order", async () => {
   const f = await fixture();
   const native = await normalizeTurn({
@@ -490,6 +762,121 @@ test("native Codex overlap preserves the first collector, annotations and event 
     value: { ...t3.run, delegations: overlapping.run.delegations },
   });
 });
+
+test.each(["native-first", "t3-first"])(
+  "strict result supplements preserve the canonical trace and assessed outcome in %s order",
+  async (order) => {
+    const f = await fixture();
+    const native = await normalizeTurn({
+      thread: threadSchema.parse({
+        id: "native-session",
+        cwd: f.dir,
+        source: "cli",
+        cliVersion: "fixture",
+        createdAt: 1,
+        updatedAt: 2,
+      }),
+      turn: turnSchema.parse({
+        id: "native-turn",
+        status: "completed",
+        startedAt: 1,
+        completedAt: 2,
+        items: [
+          {
+            id: "native-output",
+            type: "agentMessage",
+            text: "Canonical native output",
+          },
+        ],
+      }),
+      machine: f.config,
+      signatureKey: "fixture",
+      observedAt: 1,
+      projectId,
+    });
+    const raw = {
+      ...projection("codex", "codex"),
+      subagents: [
+        hostTask({
+          completionDelivery: { state: "delivered", observedByRunId: null },
+        }),
+      ],
+    };
+    if (order === "native-first") persistSnapshot(f.store, native);
+    const host = await snapshot(f, raw);
+    if (!host) throw new Error("missing host snapshot");
+    persistSnapshot(f.store, host);
+    const owner = f.store.getRecord(`run:${host.run.id}`);
+    if (owner?.kind !== "run") throw new Error("missing canonical owner");
+    f.store.put({
+      kind: "run",
+      value: {
+        ...owner.value,
+        outcome: "success",
+        work: { id: "AST-preserved" },
+      },
+    });
+    const canonical = f.store
+      .events(host.run.id)
+      .filter((event) => event.kind !== "delegation_result");
+    const canonicalRun = f.store.getRecord(`run:${host.run.id}`);
+    if (canonicalRun?.kind !== "run") throw new Error("missing assessed owner");
+    persistSnapshot(f.store, native);
+    const repeat = await snapshot(f, raw);
+    if (!repeat) throw new Error("missing repeat");
+    persistSnapshot(f.store, repeat);
+    expect(
+      f.store
+        .events(host.run.id)
+        .filter((event) => event.kind !== "delegation_result"),
+    ).toEqual(canonical);
+    expect(
+      observed(f.store.events(host.run.id)).map(
+        (event) => event.delegationResult?.observation.state,
+      ),
+    ).toEqual(["present", "delivered"]);
+    const saved = f.store.getRecord(`run:${host.run.id}`);
+    expect(saved).toMatchObject({
+      kind: "run",
+      value: {
+        source: canonicalRun.value.source,
+        outcome: "success",
+        work: { id: "AST-preserved" },
+        eventCount: canonical.length,
+        status: canonicalRun.value.status,
+        findings: canonicalRun.value.findings,
+      },
+    });
+    // A generic T3 trace item or a parsed but wrongly scoped observation cannot
+    // enlarge the native owner's canonical event history.
+    const incoming = structuredClone(repeat);
+    incoming.run.source =
+      order === "native-first" ? `t3:${environmentId}` : "cli";
+    const wrong = observed(repeat.events)[0];
+    if (!wrong?.delegationResult) throw new Error("missing result observation");
+    incoming.events = [
+      {
+        ...wrong,
+        id: wrong.id + "-foreign",
+        delegationResult: {
+          ...wrong.delegationResult,
+          host: {
+            ...wrong.delegationResult.host,
+            environmentId: "foreign-environment",
+          },
+        },
+      },
+      { ...native.events[0]!, id: host.run.id + ":unexpected-host-history" },
+    ];
+    persistSnapshot(f.store, incoming);
+    expect(
+      f.store
+        .events(host.run.id)
+        .filter((event) => event.kind !== "delegation_result"),
+    ).toEqual(canonical);
+    expect(observed(f.store.events(host.run.id))).toHaveLength(2);
+  },
+);
 
 test("multiple native turns, provider instances and providers stay distinct; weak Codex identities never produce provisional duplicates", async () => {
   const f = await fixture();
@@ -758,7 +1145,7 @@ test("T3 matches enrollment before reading history, includes archives, and commi
     `t3:${environmentId}:app-thread:updated`,
     createHash("sha256")
       .update(
-        JSON.stringify({ captureVersion: 5, thread: shellState.threads[0] }),
+        JSON.stringify({ captureVersion: 7, thread: shellState.threads[0] }),
       )
       .digest("hex"),
   );

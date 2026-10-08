@@ -1,716 +1,197 @@
-import { useId, useRef, useState, type CSSProperties } from "react";
+import { useId, useRef, useState } from "react";
 import { Badge, Button } from "@astack/ui";
 import type { EvaluationDetail } from "@astack/agent-observability/evaluation-view";
-import { routeDefinitions } from "@astack/agent-observability/workflow";
 import {
-  workflowFlows,
-  type WorkflowFlow,
-  type WorkflowNode,
-  type WorkflowRecord,
-  type WorkflowBranch,
-  type WorkflowRead,
-} from "@astack/agent-observability/workflow-view";
-import { ConnectedWorkflowMap } from "./connected-workflow-map";
-import { runLink } from "./evaluation-evidence";
-import { CopyValue } from "./run-metadata";
-import { SkillBadge, SkillIcon, skillLabel } from "./skill-badge";
+  buildWorkView,
+  type WorkView,
+} from "@astack/agent-observability/work-view";
+import { WorkEvidenceDetails } from "./work-evidence-details";
+import { WorkGraph } from "./work-graph";
+import { WorkCard } from "./work-card";
 
-const phaseLabel = (phase: string) =>
-  phase.replace(/[-_]/g, " ").replace(/^./, (letter) => letter.toUpperCase());
-const statusLabel = {
-  started: "Started · no finish recorded",
-  completed: "Completed · agent reported",
-  failed: "Failed · agent reported",
-  omitted: "Omitted",
-};
-
-function MapDescription({ text }: { text: string }) {
-  const parts = text.split(/(\b(?:[a-f0-9]{64}|[a-f0-9]{40})\b)/gi);
-  return (
-    <p className="map-description">
-      {parts.map((part, index) =>
-        index % 2 === 1 ? (
-          <span className="map-revision" key={index}>
-            <code title={part} aria-label={"Revision " + part}>
-              {part.slice(0, 8)}
-            </code>
-            <CopyValue value={part} label="revision" showValueOnFailure />
-          </span>
-        ) : (
-          part
-        ),
-      )}
-    </p>
-  );
-}
-
-function RecordEvidence({
-  record,
-  projectId,
+function WorkStory({
+  view,
+  selected,
+  onSelect,
 }: {
-  record: WorkflowRecord;
-  projectId: string;
+  view: WorkView;
+  selected: string | null;
+  onSelect: (id: string) => void;
 }) {
-  const annotation = record.annotation;
-  return (
-    <section className="workflow-record">
-      <p className="secondary">
-        {annotation.action === "phase"
-          ? phaseLabel(annotation.status)
-          : annotation.action === "select"
-            ? "Route selected"
-            : annotation.action === "join"
-              ? "Parent join declared"
-              : "Route changed"}
-        {" · "}
-        {new Date(record.recordedAt).toLocaleString()}
-      </p>
-      <MapDescription
-        text={
-          annotation.action === "phase" || annotation.action === "join"
-            ? annotation.summary
-            : annotation.reason
-        }
-      />
-      <a href={runLink(record.runId, projectId, record.eventId)}>
-        Declaration in trace
-      </a>
-      {record.evidence.length > 0 ? (
-        <ul className="workflow-evidence-links">
-          {record.evidence.map((item) => (
-            <li key={item.reference.eventId}>
-              {item.state === "available" ? (
-                <>
-                  <a
-                    href={runLink(
-                      item.reference.runId,
-                      projectId,
-                      item.reference.eventId,
-                    )}
-                  >
-                    {item.title || item.kind}
-                  </a>
-                  <span className="secondary">
-                    {item.kind.replace(/_/g, " ")} · capture revision{" "}
-                    {item.revision}
-                  </span>
-                </>
-              ) : (
-                <span className="secondary">{item.reason}</span>
-              )}
-            </li>
-          ))}
-        </ul>
-      ) : annotation.action === "phase" ? (
-        <p className="secondary">
-          No supporting trace references supplied for this transition.
-        </p>
-      ) : null}
-    </section>
-  );
-}
-
-function declaredSkills(node: Extract<WorkflowNode, { kind: "phase" }>) {
-  return [
-    ...new Set(
-      node.records.flatMap((record) =>
-        record.annotation.action === "phase" ? record.annotation.skills : [],
-      ),
-    ),
-  ];
-}
-
-function MapStop({
-  lane,
-  id,
-  fork = false,
-}: {
-  lane: "main" | "child";
-  id: string;
-  fork?: boolean;
-}) {
-  return (
-    <span
-      className="map-stop"
-      data-map-key={id}
-      data-map-main={lane === "main" ? "" : undefined}
-      data-map-child-stop={lane === "child" ? "" : undefined}
-      data-map-fork={fork ? "" : undefined}
-      aria-hidden="true"
-    />
-  );
-}
-
-function SkillReadStop({
-  read,
-  projectId,
-  lane,
-}: {
-  read: WorkflowRead;
-  projectId: string;
-  lane: "main" | "child";
-}) {
-  return (
-    <div className="map-station journey-skill-read" data-map-station="">
-      <MapStop lane={lane} id={read.reference.eventId} />
-      <a
-        className="skill-badge-content"
-        aria-label={
-          skillLabel(read.skill.name) + " skill read in " + lane + " trace"
-        }
-        href={runLink(read.reference.runId, projectId, read.reference.eventId)}
-        title={
-          read.skill.evidence.replace(/_/g, " ") +
-          " · " +
-          read.skill.provenance.replace(/_/g, " ")
-        }
-      >
-        <SkillIcon name={read.skill.name} />
-        <span>{skillLabel(read.skill.name)}</span>
-      </a>
-    </div>
-  );
-}
-
-function PhaseStop({
-  node,
-  projectId,
-  lane,
-}: {
-  node: Extract<WorkflowNode, { kind: "phase" }>;
-  projectId: string;
-  lane: "main" | "child";
-}) {
-  const [selection, setSelection] = useState<string | null>(null);
-  const trigger = useRef<HTMLButtonElement | null>(null);
-  const evidenceId = useId();
-  const first = node.records[0],
-    last = node.records.at(-1);
-  const skills = declaredSkills(node);
-  const records = node.records.filter(
-    (record) =>
-      record.annotation.action === "phase" &&
-      record.annotation.skills.includes(selection ?? ""),
-  );
-  return (
-    <article
-      className="map-station"
-      data-map-station=""
-      data-status={node.status}
-    >
-      <MapStop lane={lane} id={first?.eventId ?? node.phase} />
-      <h4>{phaseLabel(node.phase)}</h4>
-      <p
-        className={
-          node.status === "failed"
-            ? "text-destructive map-status"
-            : "secondary map-status"
-        }
-      >
-        {statusLabel[node.status]}
-      </p>
-      {last?.annotation.action === "phase" && (
-        <MapDescription text={last.annotation.summary} />
-      )}
-      <div
-        className="skill-badges"
-        aria-label={phaseLabel(node.phase) + " declared skills"}
-      >
-        {skills.map((skill) => (
-          <SkillBadge
-            key={skill}
-            name={skill}
-            aria-label={
-              "View " + skillLabel(skill) + " in " + phaseLabel(node.phase)
-            }
-            aria-expanded={selection === skill}
-            aria-controls={selection === skill ? evidenceId : undefined}
-            onClick={(event) => {
-              trigger.current = event.currentTarget;
-              setSelection(selection === skill ? null : skill);
-            }}
-          />
-        ))}
-      </div>
-      {!skills.length && (
-        <p className="secondary">No skills declared for this phase.</p>
-      )}
-      {selection && (
-        <section
-          id={evidenceId}
-          aria-label={skillLabel(selection) + " skill evidence"}
-          className="workflow-skill-evidence"
-        >
-          <div className="workflow-phase-heading">
-            <h5>{skillLabel(selection)}</h5>
-            <Button
-              variant="ghost"
-              aria-label="Close skill evidence"
-              onClick={() => {
-                setSelection(null);
-                if (trigger.current?.isConnected) trigger.current.focus();
-              }}
-            >
-              Close
-            </Button>
-          </div>
-          <p className="secondary">
-            Recorded name: {selection}. Agent declarations; supporting links
-            describe the phase and do not prove a skill invocation.
-          </p>
-          {records.map((record) => (
-            <RecordEvidence
-              key={record.eventId}
-              record={record}
-              projectId={projectId}
-            />
-          ))}
-        </section>
-      )}
-      {first && (
-        <a
-          className="map-evidence-link"
-          href={runLink(first.runId, projectId, first.eventId)}
-        >
-          Phase declaration in trace
-        </a>
-      )}
-    </article>
-  );
-}
-
-function WorkflowNodeStop({
-  node,
-  projectId,
-  lane,
-}: {
-  node: WorkflowNode;
-  projectId: string;
-  lane: "main" | "child";
-}) {
-  if (node.kind === "phase")
-    return <PhaseStop node={node} projectId={projectId} lane={lane} />;
-  const annotation = node.record.annotation;
-  if (node.kind === "route")
-    return annotation.action === "change" ? (
-      <article className="map-station" data-map-station="">
-        <MapStop lane={lane} id={node.record.eventId} />
-        <h4>Changed route → {routeDefinitions[annotation.route].label}</h4>
-        <MapDescription text={annotation.reason} />
-        <a
-          className="map-evidence-link"
-          href={runLink(node.record.runId, projectId, node.record.eventId)}
-        >
-          Route change in trace
-        </a>
-      </article>
-    ) : null;
-  return (
-    <article className="map-station journey-join" data-map-station="">
-      <MapStop lane={lane} id={node.record.eventId} />
-      <h4>Join back to main</h4>
-      <RecordEvidence record={node.record} projectId={projectId} />
-    </article>
-  );
-}
-
-function branchJoin(branch: WorkflowBranch, nodes: WorkflowNode[]) {
-  return nodes.find(
-    (node) =>
-      node.kind === "join" &&
-      node.record.annotation.action === "join" &&
-      node.record.annotation.inputs.some(
-        (input) =>
-          input.branchId === branch.delegation.id &&
-          branch.runs.some((run) => run.runId === input.result.runId) &&
-          node.record.evidence.some(
-            (item) =>
-              item.state === "available" &&
-              item.reference.runId === input.result.runId &&
-              item.reference.eventId === input.result.eventId,
-          ),
-      ),
-  );
-}
-
-function ChildJourney({
-  branch,
-  projectId,
-  joined,
-}: {
-  branch: WorkflowBranch;
-  projectId: string;
-  joined: boolean;
-}) {
-  const flows = workflowFlows(branch.records);
+  const nodes = new Map(view.nodes.map((node) => [node.id, node]));
+  const skills = view.nodes.filter((node) => node.item.kind === "skills");
   return (
     <>
-      <header className="map-station journey-child-heading" data-map-station="">
-        <MapStop lane="child" id={branch.delegation.id} />
-        <h4>{branch.delegation.title || "Delegated agent"}</h4>
-        <p
-          className="secondary map-status"
-          title={
-            branch.delegation.startedAt === null
-              ? undefined
-              : "Host started: " +
-                new Date(branch.delegation.startedAt).toLocaleString()
-          }
-        >
-          Task {branch.delegation.status} · {branch.runs.length}{" "}
-          {branch.runs.length === 1 ? "turn" : "turns"}
-        </p>
-        {branch.reason && (
-          <p className="map-description" role="status">
-            {branch.reason}
-          </p>
-        )}
-      </header>
-      {flows.map((flow) => (
-        <ol
-          key={flow.id}
-          className="child-phase-stops"
-          aria-label="Recorded child phases"
-        >
-          {flow.nodes.map((node, index) => (
+      <ol className="work-story" aria-label="Captured work story">
+        {view.main.map((id) => {
+          const node = nodes.get(id);
+          if (!node) return null;
+          const childEdge = view.edges.find(
+            (edge) => edge.from === id && edge.kind === "delegation",
+          );
+          const child = childEdge ? nodes.get(childEdge.to) : null;
+          const branchId =
+            child?.item.kind === "contribution"
+              ? child.item.branch.delegation.id
+              : null;
+          return (
             <li
-              key={
-                node.kind === "phase"
-                  ? (node.records[0]?.eventId ?? index)
-                  : node.record.eventId
+              key={id}
+              data-story-step={id}
+              data-map-main=""
+              className={
+                child
+                  ? "work-story-row work-story-delegation"
+                  : "work-story-row"
               }
             >
-              <WorkflowNodeStop
-                node={node}
-                projectId={projectId}
-                lane="child"
-              />
+              <WorkCard node={node} selected={selected} onSelect={onSelect} />
+              {child && (
+                <div className="work-contribution">
+                  <WorkCard
+                    node={child}
+                    selected={selected}
+                    onSelect={onSelect}
+                  />
+                  {view.nodes
+                    .filter(
+                      (item) =>
+                        item.item.kind === "result" &&
+                        item.item.result.delegationId === branchId,
+                    )
+                    .map((result) => (
+                      <Button
+                        key={result.id}
+                        variant="ghost"
+                        data-work-id={result.id}
+                        data-work-kind="result"
+                        aria-label={"Inspect " + result.title}
+                        aria-pressed={selected === result.id}
+                        onClick={() => onSelect(result.id)}
+                      >
+                        {result.title}
+                      </Button>
+                    ))}
+                </div>
+              )}
             </li>
-          ))}
-        </ol>
+          );
+        })}
+      </ol>
+      {skills.map((node) => (
+        <div className="work-skills-card" key={node.id}>
+          <WorkCard node={node} selected={selected} onSelect={onSelect} />
+        </div>
       ))}
-      {branch.reads.length > 0 && (
-        <section
-          aria-label="Captured child skill reads"
-          className="child-read-stops"
-        >
-          <h5>Observed skills</h5>
-          {branch.reads.map((read) => (
-            <SkillReadStop
-              key={read.reference.eventId}
-              read={read}
-              projectId={projectId}
-              lane="child"
-            />
-          ))}
-        </section>
-      )}
-      <footer className="journey-child-end">
-        <div className="map-station" data-map-station="">
-          {branch.runs.map((run, index) => (
-            <a
-              key={run.runId}
-              className="map-evidence-link"
-              href={runLink(run.runId, projectId)}
-              title={run.title}
-            >
-              Open child turn {branch.runs.length > 1 ? index + 1 : ""} ·{" "}
-              {run.status}
-            </a>
-          ))}
-          {branch.truncated && (
-            <p role="status" className="notice">
-              Child capture reached a display limit. More activity is available
-              in the full trace.
-            </p>
-          )}
-          {branch.state === "available" &&
-            !branch.reads.length &&
-            !flows.length && (
-              <p className="secondary">
-                No child phases or skill reads captured.
-              </p>
-            )}
-        </div>
-        <div className="map-station" data-map-station="">
-          <MapStop lane="child" id={branch.delegation.id + ":end"} />
-          <p className="secondary">
-            {joined ? "Result used at parent join" : "No parent join recorded"}
-          </p>
-        </div>
-      </footer>
     </>
   );
 }
 
-type MapStation =
-  | { kind: "fork" }
-  | { kind: "node"; node: WorkflowNode }
-  | { kind: "read"; read: WorkflowRead };
-function WorkflowPath({
-  flow,
-  projectId,
-  branches = [],
-  reads = [],
-}: {
-  flow: WorkflowFlow;
-  projectId: string;
-  branches?: WorkflowBranch[];
-  reads?: WorkflowRead[];
-}) {
-  const selected = flow.selection?.annotation;
-  const firstBranchTime = Math.min(
-    ...branches.map((branch) => branch.delegation.startedAt ?? Infinity),
-  );
-  const branchIndex = flow.nodes.findIndex(
-    (node) =>
-      ((node.kind === "phase" ? node.records[0] : node.record)?.recordedAt ??
-        -Infinity) >= firstBranchTime,
-  );
-  const firstJoinIndex = flow.nodes.findIndex(
-    (node) =>
-      node.kind === "join" &&
-      node.record.annotation.action === "join" &&
-      node.record.annotation.inputs.some((input) =>
-        branches.some((branch) => branch.delegation.id === input.branchId),
-      ),
-  );
-  const insertionIndex = Math.min(
-    branchIndex < 0 ? flow.nodes.length : branchIndex,
-    firstJoinIndex < 0 ? flow.nodes.length : firstJoinIndex,
-  );
-  const stations: MapStation[] = flow.nodes.map((node) => ({
-    kind: "node",
-    node,
-  }));
-  if (branches.length) stations.splice(insertionIndex, 0, { kind: "fork" });
-  stations.push(...reads.map((read): MapStation => ({ kind: "read", read })));
-  const forkRow = insertionIndex + 3;
-  const branchRadius = Math.ceil(branches.length / 2);
-  const mainColumn = branchRadius + 1;
-  const columnsStyle: CSSProperties & {
-    "--map-lane-count": number;
-    "--map-main-column": number;
-  } = {
-    "--map-lane-count": branchRadius * 2 + 1,
-    "--map-main-column": mainColumn,
-  };
-  return (
-    <ConnectedWorkflowMap
-      route={selected?.action === "select" ? selected.route : undefined}
-    >
-      <div className="workflow-map-grid" style={columnsStyle}>
-        <div className="map-root">
-          <span data-map-root="" data-map-key="root">
-            <SkillIcon name="astack" />
-            {flow.selection || flow.nodes.length ? "astack" : "Captured work"}
-          </span>
-        </div>
-        <header className="map-station map-route-heading" data-map-station="">
-          <MapStop lane="main" id={flow.id + ":selection"} />
-          <h3>
-            {selected?.action === "select"
-              ? routeDefinitions[selected.route].label
-              : reads.length
-                ? "Observed skill reads"
-                : "Route not recorded"}
-          </h3>
-          <MapDescription
-            text={
-              selected?.action === "select"
-                ? selected.reason
-                : reads.length
-                  ? "Captured in turn and trace order. A skill read alone does not establish how it was applied."
-                  : "The recorded activity follows."
-            }
-          />
-          {flow.selection && (
-            <a
-              className="map-evidence-link"
-              href={runLink(
-                flow.selection.runId,
-                projectId,
-                flow.selection.eventId,
-              )}
-            >
-              Route selection in trace
-            </a>
-          )}
-          {!flow.nodes.length && !branches.length && !reads.length && (
-            <p className="secondary">No phase transitions recorded yet.</p>
-          )}
-        </header>
-        {stations.map((station, index) => {
-          const rowStyle: CSSProperties & { "--map-row": number } = {
-            "--map-row": index + 3,
-          };
-          return (
-            <div
-              key={
-                station.kind === "fork"
-                  ? "fork"
-                  : station.kind === "read"
-                    ? station.read.reference.eventId
-                    : station.node.kind === "phase"
-                      ? (station.node.records[0]?.eventId ?? index)
-                      : station.node.record.eventId
-              }
-              className="map-main-cell"
-              style={rowStyle}
-            >
-              {station.kind === "fork" ? (
-                <section
-                  aria-label="Delegated journeys"
-                  className="map-station journey-delegation-station"
-                  data-map-station=""
-                >
-                  <div className="journey-delegation-card">
-                    <h4>Delegated work</h4>
-                    <p className="secondary">
-                      {branches.length} child{" "}
-                      {branches.length === 1 ? "conversation" : "conversations"}
-                    </p>
-                  </div>
-                  <MapStop lane="main" id={flow.id + ":fork"} fork />
-                </section>
-              ) : station.kind === "read" ? (
-                <SkillReadStop
-                  read={station.read}
-                  projectId={projectId}
-                  lane="main"
-                />
-              ) : (
-                <WorkflowNodeStop
-                  node={station.node}
-                  projectId={projectId}
-                  lane="main"
-                />
-              )}
-            </div>
-          );
-        })}
-        {branches.map((branch, index) => {
-          const side = index % 2 === 0 ? "left" : "right";
-          const distance = Math.floor(index / 2) + 1;
-          const join = branchJoin(branch, flow.nodes);
-          const joinIndex = stations.findIndex(
-            (station) => station.kind === "node" && station.node === join,
-          );
-          const placement: CSSProperties & {
-            "--map-column": number;
-            "--map-row": string;
-          } = {
-            "--map-column":
-              mainColumn + (side === "left" ? -distance : distance),
-            "--map-row": `${forkRow} / ${joinIndex < 0 ? stations.length + 3 : joinIndex + 3}`,
-          };
-          return (
-            <section
-              key={branch.delegation.id}
-              aria-label={branch.delegation.title || "Delegated agent"}
-              className="journey-child"
-              data-map-branch=""
-              data-side={side}
-              data-color={index % 5}
-              data-join-target={
-                join?.kind === "join" ? join.record.eventId : undefined
-              }
-              style={placement}
-            >
-              <ChildJourney
-                branch={branch}
-                projectId={projectId}
-                joined={!!join}
-              />
-            </section>
-          );
-        })}
-      </div>
-    </ConnectedWorkflowMap>
-  );
-}
-
 export function WorkflowEvidence({ detail }: { detail: EvaluationDetail }) {
-  const flows = workflowFlows(detail.workflow.records);
-  const reads = detail.workflow.reads;
-  const flowRunIds = (flow: WorkflowFlow) =>
-    new Set([
-      ...(flow.selection ? [flow.selection.runId] : []),
-      ...flow.nodes.flatMap((node) =>
-        node.kind === "phase"
-          ? node.records.map((record) => record.runId)
-          : [node.record.runId],
-      ),
-    ]);
-  const branchFlow = (branch: WorkflowBranch) => {
-    const matching = flows.filter((flow) =>
-      flowRunIds(flow).has(branch.parentRunId),
-    );
-    return matching.length === 1 ? matching[0]?.id : undefined;
+  const [mode, setMode] = useState<"story" | "graph">("story");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
+  const content = useRef<HTMLDivElement>(null);
+  const id = useId();
+  const view = buildWorkView(
+    detail.workflow,
+    detail.runs.map(({ run }) => run),
+  );
+  const selected = view.nodes.find((node) => node.id === selectedId);
+  const select = (nodeId: string) => {
+    setSelectedId(nodeId);
+    requestAnimationFrame(() => heading.current?.focus());
   };
-  const unplaced = detail.workflow.branches.filter(
-    (branch) => !branchFlow(branch),
+  const back = () => {
+    const target = [
+      ...(content.current?.querySelectorAll<HTMLButtonElement>(
+        "[data-work-id]",
+      ) ?? []),
+    ].find((button) => button.dataset.workId === selectedId);
+    target?.focus();
+  };
+  const phases = detail.workflow.records.some(
+    (record) => record.annotation.action === "phase",
   );
   return (
     <section aria-label="Astack workflow" className="workflow-section">
-      <h2>Path taken</h2>
-      {!flows.length && (
-        <p className="subtitle">
-          Route and phases were not recorded in the linked capture.
-          {!reads.length &&
-            !unplaced.length &&
-            " No skill reads or delegated work were captured for this path."}
-        </p>
-      )}
-      {flows.map((flow) => (
-        <WorkflowPath
-          key={flow.id}
-          flow={flow}
-          projectId={detail.evaluation.projectId}
-          branches={detail.workflow.branches.filter(
-            (branch) => branchFlow(branch) === flow.id,
-          )}
-        />
-      ))}
-      {!flows.length && (reads.length > 0 || unplaced.length > 0) && (
-        <WorkflowPath
-          flow={{ id: "observed", selection: null, nodes: [] }}
-          projectId={detail.evaluation.projectId}
-          branches={unplaced}
-          reads={reads}
-        />
-      )}
-      {flows.length > 0 && reads.length > 0 && (
-        <details className="evaluation-disclosure">
-          <summary>Observed skill reads · {reads.length}</summary>
-          <WorkflowPath
-            flow={{ id: "observed", selection: null, nodes: [] }}
-            projectId={detail.evaluation.projectId}
-            reads={reads}
-          />
-        </details>
-      )}
-      {flows.length > 0 && unplaced.length > 0 && (
-        <section>
-          <h3>Unplaced delegated work</h3>
+      <div className="work-heading">
+        <div>
+          <h2>Captured work</h2>
           <p className="secondary">
-            These children have no unique recorded parent flow.
+            Follow the work, then inspect the evidence behind each step.
           </p>
-          <WorkflowPath
-            flow={{ id: "unplaced", selection: null, nodes: [] }}
-            projectId={detail.evaluation.projectId}
-            branches={unplaced}
-          />
-        </section>
-      )}
-      {(flows.length > 0 || reads.length > 0 || unplaced.length > 0) && (
-        <p className="secondary map-caption">
-          {flows.length
-            ? "Recorded phase order and declared joins; "
-            : "Lines connect captured activity, not skill-to-skill calls; "}
-          line spacing is not a time scale.
+        </div>
+        <div className="work-view-toggle" role="group" aria-label="Work view">
+          <Button
+            variant="outline"
+            aria-pressed={mode === "story"}
+            aria-controls={id}
+            onClick={() => setMode("story")}
+          >
+            Work story
+          </Button>
+          <Button
+            variant="outline"
+            aria-pressed={mode === "graph"}
+            aria-controls={id}
+            onClick={() => setMode("graph")}
+          >
+            Graph
+          </Button>
+        </div>
+      </div>
+      <div className="work-overview">
+        <Badge>{detail.workflow.branches.length} delegated tasks</Badge>
+        <Badge>{detail.workflow.results.length} result observations</Badge>
+        <Badge>{detail.workflow.reads.length} skill reads</Badge>
+      </div>
+      {!detail.workflow.records.some(
+        (record) => record.annotation.action === "select",
+      ) && (
+        <p className="secondary">
+          Route and phases were not recorded in the linked capture.
+          {phases &&
+            " Phase declarations are shown below; route selection is unavailable."}
         </p>
       )}
+      <div className="work-layout">
+        <div ref={content} id={id} className="work-content">
+          <div className="work-root" data-map-root="">
+            Parent conversation
+          </div>
+          {mode === "story" ? (
+            <WorkStory view={view} selected={selectedId} onSelect={select} />
+          ) : (
+            <WorkGraph view={view} selected={selectedId} onSelect={select} />
+          )}
+          <p className="secondary">
+            Position groups captured activity; spacing is not elapsed time.
+            Completion, result receipt and declared use are separate facts.
+          </p>
+        </div>
+        <aside className="work-inspector" aria-label="Work evidence">
+          <div className="work-inspector-heading">
+            <h3 tabIndex={-1} ref={heading}>
+              {selected?.title ?? "Inspect a step"}
+            </h3>
+            {selected && (
+              <Button variant="ghost" onClick={back}>
+                Back to selected step
+              </Button>
+            )}
+          </div>
+          {selected ? (
+            <WorkEvidenceDetails node={selected} detail={detail} />
+          ) : (
+            <p className="secondary">
+              {selectedId
+                ? "This step is no longer available in the current bounded capture. Select another step."
+                : "Select a parent step or child contribution to see its status, declarations and linked trace evidence."}
+            </p>
+          )}
+        </aside>
+      </div>
       {detail.workflow.truncated && (
         <p role="status" className="notice">
           Workflow capture or evidence previews reached the display limit.

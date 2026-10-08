@@ -1,9 +1,22 @@
 import { z } from "zod";
 import { workflowAnnotationSchema, type AstackRoute } from "./workflow";
-import { delegationSchema } from "./delegation";
+import { delegationSchema, delegationResultSchema } from "./delegation";
 import { skillUseSchema } from "./domain";
 
 const reference = z.object({ runId: z.string(), eventId: z.string() });
+export const workflowResultSchema = z.object({
+  delegationId: z.string(),
+  reference,
+  revision: z.number(),
+  observedAt: z.number(),
+  title: z.string(),
+  source: delegationResultSchema.shape.source,
+  host: delegationResultSchema.shape.host,
+  observation: delegationResultSchema.shape.observation,
+  sourceUpdatedAt: delegationResultSchema.shape.sourceUpdatedAt,
+  occurredAt: delegationResultSchema.shape.occurredAt,
+});
+export type WorkflowResult = z.infer<typeof workflowResultSchema>;
 export const workflowEvidenceSchema = z.discriminatedUnion("state", [
   z.object({
     state: z.literal("available"),
@@ -54,8 +67,10 @@ export const workflowCaptureSchema = z.object({
   records: z.array(workflowRecordSchema).max(80),
   reads: z.array(workflowReadSchema).max(64).default([]),
   branches: z.array(workflowBranchSchema).max(32).default([]),
+  results: z.array(workflowResultSchema).max(96).default([]),
   truncated: z.boolean(),
 });
+export type WorkflowCapture = z.infer<typeof workflowCaptureSchema>;
 export type WorkflowRecord = z.infer<typeof workflowRecordSchema>;
 type PhaseAnnotation = Extract<
   WorkflowRecord["annotation"],

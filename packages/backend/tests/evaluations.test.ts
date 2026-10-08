@@ -22,6 +22,8 @@ import { eventSchema } from "@astack/agent-observability";
 import { capturedEvaluationLimits } from "@astack/agent-observability/evaluations";
 import type { TelemetryRecord } from "@astack/agent-observability";
 import { workflowFixture } from "@astack/agent-observability/workflow-fixtures";
+import { journeyFixture } from "@astack/agent-observability/journey-fixtures";
+import type { DelegationResult } from "@astack/agent-observability/delegation";
 
 const modules = {
   "../convex/_generated/server.ts": () => import("../convex/_generated/server"),
@@ -1404,6 +1406,327 @@ test("delegated lookup rejects stale foreign projections and cycles and bounds l
     true,
   );
 });
+
+async function resultCaptureFixture() {
+  const state = await setup("inconclusive");
+  const fixture = journeyFixture();
+  const self = {
+    kind: "t3",
+    environmentId: "fixture-host",
+    threadId: "parent-thread",
+  } as const;
+  fixture.parent.sessionReferences = [self];
+  fixture.parent.conversation = {
+    self,
+    root: self,
+    hostRun: { id: "parent-host-run" },
+  };
+  const frozen = await state.t.run(
+    async (ctx) => (await ctx.db.query("evaluations").first())?.snapshot,
+  );
+  await ingestWorkflow(
+    state.t,
+    [fixture.parent, ...fixture.children].map((value) => ({
+      kind: "run",
+      value,
+    })),
+  );
+  await ingestWorkflow(
+    state.t,
+    fixture.events.map((value) => ({ kind: "event", value })),
+  );
+  const task = fixture.parent.delegations[0];
+  if (!task) throw new Error("missing direct task");
+  const event = (
+    observation: DelegationResult["observation"],
+    suffix: string = observation.state,
+    content = "Scoped child result",
+  ) =>
+    eventSchema.parse({
+      id: fixture.parent.id + ":host-observation:" + suffix,
+      runId: fixture.parent.id,
+      sequence: 500 + Number(suffix.replace(/\D/g, "") || 0),
+      kind: "delegation_result",
+      title: "Explicit " + observation.state + " observation",
+      timestamp: null,
+      timing: "unavailable",
+      observedAt: 3000,
+      delegationResult: {
+        delegationId: task.id,
+        child: task.child,
+        source: "parent_capture",
+        host: {
+          environmentId: self.environmentId,
+          threadId: self.threadId,
+          runId: "parent-host-run",
+          origin: "app_owned",
+        },
+        observation,
+        sourceUpdatedAt: 1700,
+        occurredAt: null,
+      },
+      data: { result: content },
+    });
+  const read = async () =>
+    evaluationDetailSchema.parse(
+      JSON.parse(
+        (await state.owner.query(api.evaluations.detail, {
+          evaluationId: state.evaluation.id,
+          projectId: fixtureProject,
+        })) ?? "null",
+      ),
+    );
+  return { ...state, fixture, frozen, event, read };
+}
+
+test("independent host facts appear in current work capture without altering frozen evaluation evidence or outcome", async () => {
+  const { t, event, read, frozen, fixture, evaluation } =
+    await resultCaptureFixture();
+  const before = await read();
+  const present = event({ state: "present", resultId: "revision-1" });
+  await ingestWorkflow(t, [{ kind: "event", value: present }]);
+  expect(
+    (await read()).workflow.results.map((result) => result.observation.state),
+  ).toEqual(["present"]);
+  await ingestWorkflow(
+    t,
+    [
+      event({ state: "delivered", resultId: "revision-1" }),
+      event({
+        state: "acknowledged",
+        resultId: "revision-1",
+        observedByRunId: null,
+      }),
+    ].map((value) => ({ kind: "event", value })),
+  );
+  const current = await read();
+  expect(
+    current.workflow.results.map((result) => result.observation.state).sort(),
+  ).toEqual(["acknowledged", "delivered", "present"]);
+  expect(
+    current.workflow.results.find(
+      (result) => result.observation.state === "acknowledged",
+    ),
+  ).toMatchObject({
+    source: "parent_capture",
+    observedAt: 3000,
+    sourceUpdatedAt: 1700,
+    occurredAt: null,
+    observation: { state: "acknowledged", observedByRunId: null },
+  });
+  expect(current.runs).toEqual(before.runs);
+  expect(current.assessments).toEqual(before.assessments);
+  expect(current.timeline).toEqual(before.timeline);
+  expect(
+    await t.run(
+      async (ctx) => (await ctx.db.query("evaluations").first())?.snapshot,
+    ),
+  ).toBe(frozen);
+  const parent = await t.run(async (ctx) =>
+    ctx.db
+      .query("runs")
+      .withIndex("by_runId", (q) => q.eq("runId", fixture.parent.id))
+      .unique(),
+  );
+  expect(JSON.parse(parent?.data ?? "null").outcome).toBe(
+    fixture.parent.outcome,
+  );
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries(
+      [
+        {
+          kind: "event",
+          value: { ...present, observedAt: 9999, title: "stale rewrite" },
+        },
+      ],
+      1,
+    ),
+  });
+  expect(
+    (await read()).workflow.results.find(
+      (result) => result.observation.state === "present",
+    )?.title,
+  ).toBe("Explicit present observation");
+  await expect(
+    t.query(api.evaluations.detail, { evaluationId: evaluation.id }),
+  ).rejects.toThrow("Unauthorized");
+});
+
+test("acknowledgment with nullable result and host run supplies no presence or delivery fact", async () => {
+  const { t, event, read } = await resultCaptureFixture();
+  const acknowledged = event({
+    state: "acknowledged",
+    resultId: null,
+    observedByRunId: null,
+  });
+  if (!acknowledged.delegationResult) throw new Error("missing observation");
+  acknowledged.delegationResult.host.runId = null;
+  await ingestWorkflow(t, [{ kind: "event", value: acknowledged }]);
+  expect(
+    (await read()).workflow.results.map((result) => result.observation),
+  ).toEqual([{ state: "acknowledged", resultId: null, observedByRunId: null }]);
+});
+
+test.each([
+  "foreign-child-project",
+  "foreign-child-machine",
+  "child-content-off",
+  "parent-content-off",
+  "paused-project",
+  "removed-folder",
+])(
+  "result capture rechecks %s policy rather than trusting frozen or session-index rows",
+  async (policy) => {
+    const { t, event, read, fixture, owner } = await resultCaptureFixture();
+    await ingestWorkflow(t, [
+      {
+        kind: "event",
+        value: event({ state: "present", resultId: "revision-1" }),
+      },
+    ]);
+    expect(
+      (await read()).workflow.results.map((result) => result.observation.state),
+    ).toEqual(["present"]);
+    if (policy === "paused-project" || policy === "removed-folder") {
+      await owner.mutation(api.projects.save, {
+        project: {
+          projectId: fixtureProject,
+          name: "Fixture",
+          enabled: policy !== "paused-project",
+          repositories: [],
+          folders: [
+            {
+              machineId: fixtureMachine,
+              path: policy === "removed-folder" ? "/elsewhere" : "/fixture",
+            },
+          ],
+        },
+      });
+    } else {
+      const ids =
+        policy === "parent-content-off"
+          ? [fixture.parent.id]
+          : fixture.children
+              .filter((child) => child.sessionId === "child-ui")
+              .map((child) => child.id);
+      await t.run(async (ctx) => {
+        for (const id of ids) {
+          const row = await ctx.db
+            .query("runs")
+            .withIndex("by_runId", (q) => q.eq("runId", id))
+            .unique();
+          if (!row) throw new Error("missing policy fixture run");
+          if (policy === "foreign-child-project")
+            await ctx.db.patch(row._id, { projectId: "foreign-project" });
+          else if (policy === "foreign-child-machine")
+            await ctx.db.patch(row._id, { machineId: "foreign-machine" });
+          else
+            await ctx.db.patch(row._id, {
+              data: JSON.stringify({
+                ...JSON.parse(row.data),
+                contentCapture: false,
+              }),
+            });
+        }
+      });
+    }
+    const capture = await read();
+    expect(capture.workflow.results).toEqual([]);
+    if (policy.startsWith("foreign-child") || policy === "child-content-off")
+      expect(
+        capture.workflow.branches.find(
+          (branch) => branch.delegation.id === "delegate-ui",
+        ),
+      ).toMatchObject({
+        state: "unavailable",
+        runs: [],
+        records: [],
+        reads: [],
+      });
+  },
+);
+
+test("result capture rejects mismatched host, task, child and event-machine identities", async () => {
+  const { t, event, read } = await resultCaptureFixture();
+  const valid = event({ state: "present", resultId: "revision-1" });
+  await ingestWorkflow(t, [{ kind: "event", value: valid }]);
+  if (!valid.delegationResult) throw new Error("missing observation");
+  const result = valid.delegationResult;
+  const invalid = [
+    { ...result, delegationId: "undeclared-task" },
+    { ...result, host: { ...result.host, environmentId: "other-host" } },
+    { ...result, host: { ...result.host, threadId: "other-thread" } },
+    { ...result, host: { ...result.host, runId: "other-run" } },
+    {
+      ...result,
+      child: {
+        kind: "t3",
+        environmentId: "fixture-host",
+        threadId: "not-this-child",
+      },
+    },
+  ];
+  await ingestWorkflow(
+    t,
+    invalid.map((delegationResult, index) => ({
+      kind: "event",
+      value: eventSchema.parse({
+        ...valid,
+        id: valid.id + ":invalid:" + index,
+        delegationResult,
+      }),
+    })),
+  );
+  const foreign = { ...valid, id: valid.id + ":foreign-machine" };
+  await t.run(async (ctx) => {
+    await ctx.db.insert("events", {
+      eventId: foreign.id,
+      runId: foreign.runId,
+      machineId: "other-machine",
+      revision: 100,
+      sequence: foreign.sequence,
+      kind: foreign.kind,
+      data: JSON.stringify(foreign),
+    });
+  });
+  expect(
+    (await read()).workflow.results.map((item) => item.reference.eventId),
+  ).toEqual([valid.id]);
+});
+
+test.each(["count", "bytes"])(
+  "indexed result reads expose the shared %s bound",
+  async (limit) => {
+    const { t, event, read } = await resultCaptureFixture();
+    const events = Array.from({ length: 100 }, (_, index) =>
+      event(
+        { state: "present", resultId: "revision-" + index },
+        "revision-" + index,
+        limit === "bytes" ? "🧪".repeat(4000) : "Scoped result",
+      ),
+    );
+    await ingestWorkflow(
+      t,
+      events.map((value) => ({ kind: "event", value })),
+    );
+    const current = await read();
+    expect(current.workflow.truncated).toBe(true);
+    if (limit === "count") expect(current.workflow.results).toHaveLength(96);
+    else {
+      expect(current.workflow.results.length).toBeLessThan(20);
+      expect(current.workflow.results[0]?.observation).toEqual({
+        state: "present",
+        resultId: "revision-0",
+      });
+    }
+    expect(
+      current.workflow.results.some(
+        (result) => result.observation.resultId === "revision-99",
+      ),
+    ).toBe(false);
+  },
+);
 
 test("PR delivery has owner/readable policy, immutable capture and separate current observations", async () => {
   const { t, evaluation, owner } = await setup();

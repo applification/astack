@@ -16,6 +16,10 @@ const buttonVariants = cva(
         badge:
           "max-w-full rounded-lg border border-border bg-card px-3 text-left text-foreground hover:bg-muted aria-expanded:border-link aria-expanded:bg-muted",
         ghost: "text-link hover:bg-muted",
+        workCard:
+          "work-card grid items-start justify-start w-full h-auto text-left whitespace-normal",
+        workGraph:
+          "work-graph-node flex items-stretch justify-start w-full h-full text-left whitespace-normal",
       },
     },
     defaultVariants: { variant: "default" },

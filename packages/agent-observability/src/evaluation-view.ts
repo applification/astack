@@ -42,6 +42,7 @@ export const evaluationDetailSchema = z
       records: [],
       reads: [],
       branches: [],
+      results: [],
       truncated: false,
     }),
     delivery: z

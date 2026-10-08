@@ -11,6 +11,7 @@ import {
   type WorkflowRecord,
   type WorkflowBranch,
   type WorkflowRead,
+  type WorkflowResult,
 } from "@astack/agent-observability/workflow-view";
 import type { EvaluationDetail } from "@astack/agent-observability/evaluation-view";
 import type { QueryCtx } from "./_generated/server";
@@ -297,6 +298,62 @@ export async function evaluationWorkflow(
     return { reads, limited };
   }
   const reads: WorkflowRead[] = [];
+  const results: WorkflowResult[] = [];
+  let resultCount = 0;
+  // Three independent observations per direct task fit the branch budget. The
+  // shared byte budget still covers every event, run and evidence preview.
+  for (const { run } of parentRuns) {
+    for await (const row of ctx.db
+      .query("events")
+      .withIndex("by_runId_and_kind_and_sequence", (q) =>
+        q.eq("runId", run.id).eq("kind", "delegation_result"),
+      )) {
+      bytes += bytesOf(row.data);
+      if (++resultCount > 96 || bytes > 256 * 1024) {
+        truncated = true;
+        break;
+      }
+      if (row.machineId !== run.machineId) continue;
+      const event = eventSchema.parse(redact(JSON.parse(row.data)));
+      const result = event.delegationResult;
+      if (!result || event.runId !== run.id || event.id !== row.eventId)
+        continue;
+      const branch = branches.find(
+        (entry) =>
+          entry.parentRunId === run.id &&
+          entry.delegation.id === result.delegationId &&
+          entry.delegation.source === "t3" &&
+          entry.state === "available" &&
+          JSON.stringify(entry.delegation.child) ===
+            JSON.stringify(result.child),
+      );
+      if (
+        !branch ||
+        !run.sessionReferences.some(
+          (ref) =>
+            ref.kind === "t3" &&
+            ref.environmentId === result.host.environmentId &&
+            ref.threadId === result.host.threadId,
+        ) ||
+        (result.host.runId !== null &&
+          run.conversation?.hostRun?.id !== result.host.runId)
+      )
+        continue;
+      results.push({
+        delegationId: result.delegationId,
+        reference: { runId: event.runId, eventId: event.id },
+        revision: row.revision,
+        observedAt: event.observedAt,
+        title: event.title.slice(0, 240),
+        source: result.source,
+        host: result.host,
+        observation: result.observation,
+        sourceUpdatedAt: result.sourceUpdatedAt,
+        occurredAt: result.occurredAt,
+      });
+    }
+    if (resultCount > 96 || bytes > 256 * 1024) break;
+  }
   const parentBudget = { count: 0, limit: 64 };
   for (const { run } of parentRuns)
     reads.push(...(await readsFor(run, parentBudget)).reads);
@@ -309,5 +366,11 @@ export async function evaluationWorkflow(
       branch.reads.push(...capture.reads);
       if (capture.limited) branch.truncated = true;
     }
-  return workflowCaptureSchema.parse({ records, reads, branches, truncated });
+  return workflowCaptureSchema.parse({
+    records,
+    reads,
+    branches,
+    results,
+    truncated,
+  });
 }
