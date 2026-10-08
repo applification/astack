@@ -30,6 +30,14 @@ The runtime-loop example's evaluation sentence was clarified during the trial to
 
 ## Limits and handoff
 
-Fresh Codex/Claude instruction loading and default orchestration behavior were not exercised; file reachability and generated guidance were checked. The scratch libraries have no Git or CI and exercise one parser consumer case, so they establish neither project publication nor broader product coverage. T3/native runtime correlation, capture delivery, cross-provider execution and immutable evaluation behavior were not tested by this docs/scaffold contribution. No deployment, installed plugin cache mutation, main-worktree edit or PR creation/update occurred.
+This contribution did not exercise fresh Codex/Claude instruction loading or default orchestration behavior; file reachability and generated guidance were checked. The scratch libraries have no Git or CI and exercise one parser consumer case, so they establish neither project publication nor broader product coverage. T3/native runtime correlation, capture delivery, cross-provider execution and immutable evaluation behavior were not tested by this docs/scaffold contribution. No deployment, installed plugin cache mutation, main-worktree edit or PR creation/update occurred in the contribution.
 
 The parent must inspect/cherry-pick the implementation and evidence commits, verify the integrated revision and finish the owner evaluation/PR. Retained trial statements and routing examples are bounded evidence; they do not establish the separately implemented runtime's outcome.
+
+## Parent integration
+
+The parent inspected and integrated both commits as `9cf7838` and `3bb1eb9`. Integrated site/plugin and 18 setup/scaffold tests passed. Follow-up guidance adds explicit precedence for a nonempty `AGENTS.override.md`; an independent adoption trial preserved custom and managed text and repeated without changes.
+
+A fresh ephemeral, read-only native Codex session subsequently loaded that effective override, followed its explicit shared-instructions/profile pointers, reported main-thread ownership and ran the existing synthetic library consumer successfully. [Observed host facts](../orchestration-threads/evidence/native-host.json) supersede the earlier Codex-loading gap within this bounded scope. The trial did not exercise fresh Claude loading or native child delegation. The original restricted-host initialization failure remains in the review's private evidence; it did not establish instruction loading.
+
+The parent's [integrated runtime verification](../orchestration-threads/verification.md) records grouping, capture, rollout and final review separately. The distributable package source is changed in PR32; no plugin release or automatic adoption in every existing project is claimed.

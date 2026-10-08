@@ -1,0 +1,137 @@
+{
+  "revision": "8f5d77ffde3ce988e04cee4b93f2b342ea4dc1a2",
+  "scope": "5dee1cd..8f5d77f follow-up fixes and five prior findings against .astack/orchestration-threads/behavior-contract.md",
+  "ownerEvaluationTaskId": "9e39ccdd-bd3f-4ae0-89be-0b15c3ed8cac",
+  "independent": true,
+  "trackedChangesByReviewer": false,
+  "ownerEvaluationLifecycleCalled": false,
+  "verdict": "Changes requested for native pending-ancestry recovery. Existing T3 version-6 checkpoint recovery remains unresolved if such checkpoints are supported.",
+  "priorFindings": [
+    {
+      "id": "F1",
+      "verdict": "Resolved",
+      "evidence": "Both public paginated responses preserve native optional split fields; installed Convex 1.46 source and independent loopback 1300-row range confirm SplitRecommended plus splitCursor. Soft limits do not establish a hard cap."
+    },
+    {
+      "id": "F2",
+      "verdict": "Resolved for new captures; incomplete for already-saved version-6 checkpoints",
+      "evidence": "New regression passes with initially absent checkpoint; N2 reproduces existing version-6 fingerprint skipping unchanged completed child even after parent is available."
+    },
+    {
+      "id": "F3",
+      "verdict": "Resolved",
+      "evidence": "Exhausted missing-intermediate caption now indicates unavailable capture; partial pages retain unloaded caption; Storybook/browser assertion source reviewed. Browser execution inherited from parent."
+    },
+    {
+      "id": "R1",
+      "verdict": "Resolved within bounded guidance/adoption scope",
+      "evidence": "Effective nonempty AGENTS.override.md guidance and retained independent preservation/idempotence evidence reviewed; new scaffold relocation and structure checks pass. Fresh-host loading remains separate."
+    },
+    {
+      "id": "R2",
+      "verdict": "R2.1 and R2.2 resolved",
+      "evidence": "I1 and I2 independently pass with actual subAgent spelling and originator normalization. I3-I7 exercise depth/cycle/foreign/paused/machine/ambiguous boundaries, forks, T3 precedence, historical replay and trace ownership."
+    }
+  ],
+  "findings": [
+    {
+      "id": "N1",
+      "priority": "P2",
+      "source": "packages/agentlog/src/adapters/codex.ts:857",
+      "relatedSource": "packages/agentlog/src/adapters/codex.ts:743",
+      "contract": "O2",
+      "case": "Fresh native capture stores child(updatedAt=10) with conversation:null while another thread advances checkpoint to100. When root arrives(updatedAt=200), root is captured but unchanged child is skipped before ancestry resolution. Child remains null indefinitely.",
+      "requestedChange": "Retain retryable native pending ancestry independently of global updated watermark, and recapture/enrich the unchanged completed child after parent metadata appears. Add an adapter-to-persistSnapshot regression with newer unrelated traffic.",
+      "evidence": "checkpoint-probes.json N1"
+    },
+    {
+      "id": "N2",
+      "priority": "P2",
+      "source": "packages/agentlog/src/adapters/t3.ts:898",
+      "contract": "O2",
+      "case": "A completed child checkpoint saved by 5dee1cd uses captureVersion6. The fix retains the identical fingerprint, so its completed-thread skip happens before the new no-checkpoint-on-missing-root condition. With parent now available, no child projection is read and conversation stays null.",
+      "requestedChange": "Invalidate/replay version-6 checkpoints for the correction, or explicitly revisit saved unresolved child records despite matching shell fingerprints. Cover a preexisting unresolved checkpoint rather than only a clean store.",
+      "applicability": "Requires existing version-6 checkpoints to be within supported upgrade scope; no claim that version6 was deployed to Otis.",
+      "evidence": "checkpoint-probes.json N2"
+    }
+  ],
+  "convexReviewer": {
+    "skill": "convex:convex-reviewer",
+    "verdict": "PASS for scoped completed Convex diff; no unresolved Convex-specific blocker",
+    "checked": [
+      "Owner authorization on all four public functions",
+      "Project and machine associations",
+      "args/returns validators including split-field shape against installed Convex source",
+      "Indexed pagination and read soft limits",
+      "Internal rebuild visibility and repeatability",
+      "Query determinism and reactive paginated consumers",
+      "Strict generated/client types"
+    ],
+    "independentProof": [
+      "164 unit/native tests, 839 assertions, strict types",
+      "Public real anonymous loopback backend: read-only existing 1300-row range yields SplitRecommended plus splitCursor"
+    ],
+    "limits": [
+      "No deployment or new push performed by reviewer",
+      "Parent four-turn/two-evaluation/four-denied live fixture is supplied evidence, not independently rerun",
+      "No hard row/byte cap claimed"
+    ]
+  },
+  "verification": [
+    {
+      "command": "bun run observatory:check",
+      "exitCode": 0,
+      "pass": 164,
+      "fail": 0,
+      "assertions": 839,
+      "strictTypes": "pass"
+    },
+    {
+      "command": "bun run check",
+      "exitCode": 0,
+      "observed": "Site routes, 118 eval examples, guide links, plugin schemas/assets/skills/marketplace identities pass"
+    },
+    {
+      "command": "bun test scripts/create-foundation.test.ts scripts/check-plugins.test.ts examples/foundation/tests/setup.test.ts",
+      "exitCode": 0,
+      "pass": 18,
+      "fail": 0,
+      "assertions": 77
+    },
+    {
+      "command": "bun .proof/orchestration-threads/final-review/independent-probes.ts",
+      "exitCode": 0,
+      "pass": 10,
+      "fail": 0
+    },
+    {
+      "command": "bun .proof/orchestration-threads/final-review/checkpoint-probes.ts",
+      "exitCode": 0,
+      "observed": "Both source-backed missing-recovery cases reproduced; observation probe deliberately records actual results rather than asserting corrected behavior"
+    },
+    {
+      "command": "bun .proof/orchestration-threads/final-review/live-pagination.ts",
+      "exitCode": 0,
+      "observed": "Read-only existing synthetic loopback range: 26 pages, 1300 rows, SplitRecommended and split cursor"
+    },
+    {
+      "command": "git diff --check 5dee1cd..8f5d77f",
+      "exitCode": 0
+    }
+  ],
+  "proofLimits": [
+    "Native metadata and checkpoint probes use synthetic readers and disposable stores; no live native child created",
+    "Storybook/browser execution and fresh-host instruction-loading trial not rerun by this reviewer; parent evidence and assertion source remain distinct",
+    "Initial read-only loopback pagination attempt reached its 100-page safety bound without exhausting history; corrected probe verifies only a bounded 26-page range",
+    "No Otis reads/writes, deployment, PR actions, external messages, installed-cache/config mutation or duplicate begin/finish evaluation",
+    "At finish HEAD remains pinned; parent-owned apps/observatory/e2e/live.e2e.ts working-tree change is excluded; all reviewed tracked sources remain at pin"
+  ],
+  "proofs": [
+    "independent-probes.ts",
+    "independent-probes.json",
+    "checkpoint-probes.ts",
+    "checkpoint-probes.json",
+    "live-pagination.ts",
+    "live-pagination.json"
+  ]
+}
