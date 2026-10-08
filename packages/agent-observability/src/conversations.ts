@@ -43,6 +43,16 @@ export const conversationSchema = z
   });
 export type Conversation = z.infer<typeof conversationSchema>;
 
+export function mergeConversations(
+  first: Conversation | undefined,
+  next: Conversation | undefined,
+): Conversation | undefined {
+  // T3 owns the enclosing app conversation across native provider changes.
+  return first?.self.kind === "t3" && next?.self.kind !== "t3"
+    ? first
+    : (next ?? first);
+}
+
 export function runConversation(run: AgentRun): Conversation | null {
   if (run.conversation) return run.conversation;
   // Old T3 aliases do not establish ancestry. The upgraded reader supplies it.
@@ -51,7 +61,8 @@ export function runConversation(run: AgentRun): Conversation | null {
     run.source.startsWith("t3:")
   )
     return null;
-  if (run.agent !== "codex" || run.parentSessionId) return null;
+  if (run.agent !== "codex" || run.parentSessionId || run.source === "subagent")
+    return null;
   const self = { kind: "codex", sessionId: run.sessionId } as const;
   return { self, root: self };
 }

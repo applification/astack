@@ -119,7 +119,6 @@ test("indexed conversation groups include cross-provider children, preserve work
     await t.mutation(internal.ingestion.ingest, {
       machineId,
       records: [entry(value)],
-
     });
   const groupId = conversationGroupKey(first)!;
   const raw = await owner.query(api.conversations.group, {
@@ -151,7 +150,6 @@ test("indexed conversation groups include cross-provider children, preserve work
   await t.mutation(internal.ingestion.ingest, {
     machineId,
     records: [entry(first, 2), entry(child, 2)],
-
   });
   const replay = await owner.query(api.conversations.group, {
     groupId,
@@ -168,12 +166,10 @@ test("conversation queries enforce owner, project and machine scope", async () =
   await t.mutation(internal.ingestion.ingest, {
     machineId,
     records: [entry(first)],
-
   });
   await t.mutation(internal.ingestion.ingest, {
     machineId: secondId,
     records: [entry(second)],
-
   });
   const a = conversationGroupKey(first)!;
   const b = conversationGroupKey(second)!;
@@ -221,7 +217,6 @@ test("conversation membership enrichment moves a turn without retaining an orpha
   await t.mutation(internal.ingestion.ingest, {
     machineId,
     records: [entry(first)],
-
   });
   const self = {
     kind: "t3",
@@ -232,7 +227,6 @@ test("conversation membership enrichment moves a turn without retaining an orpha
   await t.mutation(internal.ingestion.ingest, {
     machineId,
     records: [entry(enriched, 2)],
-
   });
   expect(
     await owner.query(api.conversations.group, {
@@ -247,6 +241,42 @@ test("conversation membership enrichment moves a turn without retaining an orpha
       (value) => conversationGroupSchema.parse(JSON.parse(value)).turns,
     ),
   ).toEqual([1]);
+});
+
+test("conversation rebuild is bounded, repeatable and leaves capture revisions unchanged", async () => {
+  const t = await setup();
+  const owner = t.withIdentity({ subject: process.env.OBSERVATORY_OWNER_ID });
+  const first = run();
+  await t.mutation(internal.ingestion.ingest, {
+    machineId,
+    records: [entry(first)],
+  });
+  const before = await t.run(async (ctx) => {
+    const record = await ctx.db.query("runs").first();
+    for (const row of await ctx.db.query("conversationTurns").take(10))
+      await ctx.db.delete(row._id);
+    for (const row of await ctx.db.query("conversationGroups").take(10))
+      await ctx.db.delete(row._id);
+    return record;
+  });
+  await t.mutation(internal.conversations.rebuild, {
+    paginationOpts: { numItems: 3, cursor: null },
+  });
+  await t.mutation(internal.conversations.rebuild, {
+    paginationOpts: { numItems: 3, cursor: null },
+  });
+  const group = await owner.query(api.conversations.group, {
+    groupId: conversationGroupKey(first)!,
+  });
+  expect(JSON.parse(group!).turns).toBe(1);
+  const after = await t.run(async (ctx) => await ctx.db.query("runs").first());
+  expect(after?.data).toBe(before?.data);
+  expect(after?.revision).toBe(before?.revision);
+  await expect(
+    t.mutation(internal.conversations.rebuild, {
+      paginationOpts: { numItems: 4, cursor: null },
+    }),
+  ).rejects.toThrow("Invalid repair page");
 });
 async function setup() {
   const t = convexTest(schema, modules);

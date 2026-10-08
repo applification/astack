@@ -1,3 +1,7 @@
+import {
+  conversationSchema,
+  type Conversation,
+} from "@astack/agent-observability/conversations";
 import { z } from "zod";
 import { createHash, createHmac } from "node:crypto";
 import { readFile, lstat } from "node:fs/promises";
@@ -125,6 +129,7 @@ export const threadSchema = z.object({
   updatedAt: z.number(),
   model: z.string().nullable().optional(),
   parentThreadId: z.string().nullable().optional(),
+  forkedFromId: z.string().nullable().optional(),
   gitInfo: z
     .object({
       sha: z.string().nullable().optional(),
@@ -135,6 +140,46 @@ export const threadSchema = z.object({
     .optional(),
   turns: z.array(turnSchema).default([]),
 });
+
+type NativeThread = z.infer<typeof threadSchema>;
+export async function resolveCodexConversation(
+  thread: NativeThread,
+  loadParent: (id: string) => Promise<NativeThread | null>,
+): Promise<Conversation | null> {
+  const visited = new Set<string>();
+  let current = thread;
+  for (let depth = 0; depth < 16; depth++) {
+    if (visited.has(current.id)) return null;
+    visited.add(current.id);
+    if (!current.parentThreadId) {
+      const subagentSource =
+        current.source === "subagent" ||
+        (typeof current.source === "object" &&
+          current.source !== null &&
+          "subagent" in current.source);
+      if (current.parentThreadId === undefined && subagentSource) return null;
+      const reference = (sessionId: string) =>
+        ({ kind: "codex", sessionId }) as const;
+      const parentId = thread.parentThreadId ?? thread.forkedFromId;
+      return conversationSchema.parse({
+        self: reference(thread.id),
+        root: reference(current.id),
+        ...(parentId
+          ? {
+              parent: {
+                reference: reference(parentId),
+                relationship: thread.parentThreadId ? "subagent" : "fork",
+              },
+            }
+          : {}),
+      });
+    }
+    const parent = await loadParent(current.parentThreadId);
+    if (!parent || parent.id !== current.parentThreadId) return null;
+    current = parent;
+  }
+  return null;
+}
 const listSchema = z.object({
   data: z.array(threadSchema),
   nextCursor: z.string().nullable(),
@@ -248,8 +293,13 @@ export async function normalizeTurn(options: {
   work?: WorkReference;
   projectId?: string;
   automation?: Automation;
+  conversation?: Conversation | null;
 }): Promise<AgentSnapshot> {
   const { thread, turn, machine, observedAt } = options;
+  const conversation =
+    options.conversation === undefined
+      ? await resolveCodexConversation(thread, async () => null)
+      : options.conversation;
   const safeText = (value: string) => redactText(value, options.knownSecrets);
   const safeData = (value: unknown) => redact(value, options.knownSecrets);
   const runId = runIdentity(machine.machineId, thread.id, turn.id);
@@ -587,6 +637,7 @@ export async function normalizeTurn(options: {
     ...(thread.parentThreadId
       ? { parentSessionId: thread.parentThreadId }
       : {}),
+    ...(conversation ? { conversation } : {}),
     source:
       thread.originator ??
       (typeof thread.source === "string" ? thread.source : "subagent"),
@@ -655,20 +706,24 @@ export class CodexAdapter {
     if (!this.projects.some((p) => p.enabled)) return;
     // Cache only within this poll; subsequent polls see origin/folder changes.
     const repositories = new Map<string, string | null>();
+    const ancestry = new Map<string, NativeThread>();
     if (!this.initialized) {
       await this.reader.initialize();
       this.initialized = true;
     }
     const automationVersion = `codex:${this.home}:automation-capture-version`;
     const replayAutomations = this.store.getMeta(automationVersion) !== "1";
+    const conversationVersion = `codex:${this.home}:conversation-capture-version`;
+    const replayConversations = this.store.getMeta(conversationVersion) !== "1";
     const automations = new CodexAutomations(this.home);
     try {
       for (const archived of [false, true]) {
         const checkpoint = `codex:${this.home}:${archived}:updated`;
         const since =
           Number(
-            (replayAutomations ? null : this.store.getMeta(checkpoint)) ??
-              this.config.since / 1000,
+            (replayAutomations || replayConversations
+              ? null
+              : this.store.getMeta(checkpoint)) ?? this.config.since / 1000,
           ) - 2;
         let cursor: string | null = null;
         let newest = since + 2;
@@ -709,6 +764,47 @@ export class CodexAdapter {
                 : {}),
             });
             if (!project) continue;
+            ancestry.set(thread.id, resolvedThread);
+            const conversation = await resolveCodexConversation(
+              resolvedThread,
+              async (parentId) => {
+                let parent = ancestry.get(parentId);
+                if (!parent) {
+                  try {
+                    parent = z.object({ thread: threadSchema }).parse(
+                      await this.reader.request("thread/read", {
+                        threadId: parentId,
+                        includeTurns: false,
+                      }),
+                    ).thread;
+                  } catch {
+                    return null;
+                  }
+                  if (parent.id !== parentId) return null;
+                  ancestry.set(parentId, parent);
+                }
+                if (!repositories.has(parent.cwd))
+                  repositories.set(
+                    parent.cwd,
+                    await localRepository(parent.cwd),
+                  );
+                const parentProject = resolveProject(this.projects, {
+                  machineId: this.config.machineId,
+                  cwd: parent.cwd,
+                  ...((parent.gitInfo?.originUrl ??
+                  repositories.get(parent.cwd))
+                    ? {
+                        repo:
+                          parent.gitInfo?.originUrl ??
+                          repositories.get(parent.cwd)!,
+                      }
+                    : {}),
+                });
+                return parentProject?.projectId === project.projectId
+                  ? parent
+                  : null;
+              },
+            );
             const automation = automations.lookup(thread.id, Date.now());
             let turnCursor: string | null = null;
             do {
@@ -740,11 +836,16 @@ export class CodexAdapter {
                   observedAt: Date.now(),
                   ...parsed,
                   projectId: project.projectId,
+                  conversation,
                   ...(automation ? { automation } : {}),
                 });
                 if (resolvedThread !== thread)
                   snapshot.run.coverage.push(
                     "Repository resolved from local Git at capture time; native origin unavailable.",
+                  );
+                if (!conversation)
+                  snapshot.run.coverage.push(
+                    "Orchestration ancestry unavailable or outside the enrolled project; no thread group inferred.",
                   );
                 yield snapshot;
               }
@@ -756,6 +857,7 @@ export class CodexAdapter {
         this.store.setMeta(checkpoint, String(newest));
       }
       this.store.setMeta(automationVersion, "1");
+      this.store.setMeta(conversationVersion, "1");
     } finally {
       automations.close();
     }

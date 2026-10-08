@@ -3,6 +3,7 @@ import {
   conversationGroupKey,
   conversationSchema,
   runConversation,
+  mergeConversations,
 } from "./conversations";
 import { evaluationRun } from "./evaluation-fixtures";
 
@@ -36,6 +37,17 @@ test("conversation grouping preserves project and machine boundaries without man
       sessionReferences: [self],
     }),
   ).toBeNull();
+});
+
+test("native updates cannot replace the enclosing T3 conversation", () => {
+  const self = { kind: "t3", environmentId: "host", threadId: "root" } as const;
+  const t3 = { self, root: self };
+  const native = {
+    self: { kind: "codex", sessionId: "native" } as const,
+    root: { kind: "codex", sessionId: "native" } as const,
+  };
+  expect(mergeConversations(t3, native)).toEqual(t3);
+  expect(mergeConversations(native, t3)).toEqual(t3);
 });
 
 test("T3 ancestry cannot cross environments", () => {
