@@ -1234,6 +1234,68 @@ test("timeline excerpts use real captured content and names, exclude context and
   ).toBeNull();
 });
 
+test.each(["legacy", "mixed"])(
+  "timeline retains the first prompt and last response in %s indexed capture",
+  async (mode) => {
+    const { t, owner, evaluation } = await setup();
+    const run = evaluationRun("repair");
+    const prompt = {
+      ...evaluationPrompt(),
+      id: run.id + ":old-prompt",
+      runId: run.id,
+      sequence: 0,
+      data: { content: "Original request in legacy capture." },
+    };
+    const response = {
+      ...prompt,
+      id: run.id + ":old-response",
+      sequence: 20,
+      kind: "assistant_output" as const,
+      data: { content: "Final response in legacy capture." },
+    };
+    const records = [prompt, response];
+    if (mode === "mixed")
+      records.push(
+        {
+          ...prompt,
+          id: run.id + ":new-prompt",
+          sequence: 2,
+          data: { content: "Later indexed prompt." },
+        },
+        {
+          ...response,
+          id: run.id + ":new-response",
+          sequence: 10,
+          data: { content: "Earlier indexed response." },
+        },
+      );
+    await ingestWorkflow(
+      t,
+      records.map((value) => ({ kind: "event", value })),
+    );
+    await t.run(async (ctx) => {
+      for (const event of [prompt, response]) {
+        const row = await ctx.db
+          .query("events")
+          .withIndex("by_eventId", (q) => q.eq("eventId", event.id))
+          .unique();
+        if (!row) throw new Error("Missing legacy fixture event");
+        await ctx.db.patch(row._id, { kind: undefined });
+      }
+    });
+    const detail = evaluationDetailSchema.parse(
+      JSON.parse(
+        (await owner.query(api.evaluations.detail, {
+          evaluationId: evaluation.id,
+        })) ?? "null",
+      ),
+    );
+    const step = detail.timeline.find((step) => step.runId === run.id);
+    expect(step?.request?.text).toBe("Original request in legacy capture.");
+    expect(step?.response?.text).toBe("Final response in legacy capture.");
+  },
+);
+
 test("current delegated journeys resolve indexed child turns and explicit joins without changing immutable evaluation runs", async () => {
   const { journeyFixture } =
     await import("@astack/agent-observability/journey-fixtures");
