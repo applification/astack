@@ -1,5 +1,60 @@
 import { test } from "@e2e-dev/web";
 import { expect, secrets } from "e2e";
+test("reported five-child evaluation shows every route across desktop widths", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await browser.setViewport({ width: 1600, height: 1000 });
+  await app.open(
+    "/#evaluation/" +
+      encodeURIComponent(
+        "bbb1fd30-527f-4326-b685-fb9c2e021092:evaluation:85af7a33-15c4-4e26-8d1e-50b754ca0f91",
+      ) +
+      "?project=a20a2fb3-646f-40fe-9b12-c64f759afaea",
+  );
+  await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect(
+    screen.getByRole("heading", "Path taken", { exact: true }),
+  ).toBeVisible({ timeout: 30_000 });
+  for (const width of [1600, 1280, 1920]) {
+    await browser.setViewport({ width, height: 1000 });
+    await expect
+      .poll(() =>
+        browser.evaluate(() => {
+          const viewport = document.querySelector(".workflow-map-scroll");
+          if (!viewport) return null;
+          const bounds = viewport.getBoundingClientRect();
+          const children = [...viewport.querySelectorAll("[data-map-branch]")];
+          return {
+            children: children.length,
+            allRoutesVisible: children.every((child) => {
+              const rect = child.getBoundingClientRect();
+              return (
+                rect.left >= bounds.left - 1 && rect.right <= bounds.right + 1
+              );
+            }),
+            mapFits: viewport.scrollWidth <= viewport.clientWidth + 1,
+            pageFits: document.documentElement.scrollWidth <= innerWidth,
+            promptBridge: document.querySelectorAll("[data-prompt-connection]")
+              .length,
+            resultBridge: document.querySelectorAll("[data-result-connection]")
+              .length,
+          };
+        }),
+      )
+      .toEqual({
+        children: 5,
+        allRoutesVisible: true,
+        mapFits: true,
+        pageFits: true,
+        promptBridge: 1,
+        resultBridge: 1,
+      });
+  }
+});
+
 test("reported generated evaluation connects all captured parent skills and exact trace links", async ({
   app,
   screen,

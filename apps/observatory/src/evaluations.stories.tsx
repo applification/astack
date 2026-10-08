@@ -466,6 +466,9 @@ export const ThreeJourneys: Story = {
 export const FourJourneys: Story = {
   args: { detail: laneCountDetail(4) },
 };
+export const FiveJourneys: Story = {
+  args: { detail: laneCountDetail(5) },
+};
 export const ReturnedWithoutJoin: Story = {
   args: {
     detail: {

@@ -2227,6 +2227,115 @@ test("main rail stays centered with zero through four outward child lanes", asyn
   await app.screenshot("centered-four-child-lanes-narrow");
 });
 
+test("five child routes fit the desktop width and remain reachable on narrow screens", async ({
+  app,
+  browser,
+}) => {
+  await browser.setViewport({ width: 1600, height: 1000 });
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--five-journeys&viewMode=story",
+  );
+  const visibility = () =>
+    browser.evaluate(() => {
+      const viewport = document.querySelector(".workflow-map-scroll");
+      const map = viewport?.querySelector(".workflow-map");
+      if (!viewport || !map) return null;
+      const bounds = viewport.getBoundingClientRect();
+      const branches = [...map.querySelectorAll("[data-map-branch]")];
+      const anchors = [...map.querySelectorAll("[data-map-key]")];
+      const paths = [...map.querySelectorAll("path[data-connection]")];
+      const linesAligned =
+        paths.length > 0 &&
+        paths.every((path) => {
+          if (!(path instanceof SVGPathElement)) return false;
+          const matrix = path.getScreenCTM();
+          if (!matrix) return false;
+          const endpoints = [
+            path.getPointAtLength(0),
+            path.getPointAtLength(path.getTotalLength()),
+          ];
+          return ["from", "to"].every((key, index) => {
+            const anchor = anchors.find(
+              (item) =>
+                item.getAttribute("data-map-key") ===
+                path.getAttribute("data-" + key),
+            );
+            const endpoint = endpoints[index];
+            if (!anchor || !endpoint) return false;
+            const rect = anchor.getBoundingClientRect();
+            const point = new DOMPoint(endpoint.x, endpoint.y).matrixTransform(
+              matrix,
+            );
+            return (
+              Math.abs(point.x - rect.left - rect.width / 2) < 0.5 &&
+              Math.abs(point.y - rect.top - rect.height / 2) < 0.5
+            );
+          });
+        });
+      return {
+        children: branches.length,
+        allBranchesVisible: branches.every((branch) => {
+          const rect = branch.getBoundingClientRect();
+          return rect.left >= bounds.left - 1 && rect.right <= bounds.right + 1;
+        }),
+        mapFits: viewport.scrollWidth <= viewport.clientWidth + 1,
+        pageFits: document.documentElement.scrollWidth <= innerWidth,
+        linesAligned,
+      };
+    });
+  for (const width of [1600, 1280, 1920]) {
+    await browser.setViewport({ width, height: 1000 });
+    await expect.poll(visibility).toEqual({
+      children: 5,
+      allBranchesVisible: true,
+      mapFits: true,
+      pageFits: true,
+      linesAligned: true,
+    });
+  }
+  await browser.setViewport({ width: 1600, height: 1000 });
+  await browser.evaluate(() => {
+    document.querySelector(".journey-delegation-card")?.scrollIntoView();
+    window.scrollBy(0, -100);
+    return true;
+  });
+  await app.screenshot("five-child-routes-full-width");
+  await browser.setViewport({ width: 390, height: 844 });
+  await expect.poll(visibility).toMatchObject({
+    children: 5,
+    pageFits: true,
+    linesAligned: true,
+  });
+  // Narrow screens retain readable lanes; both outer routes can be panned into view.
+  for (const side of ["left", "right"]) {
+    await expect
+      .poll(() =>
+        browser.evaluate((side) => {
+          const viewport = document.querySelector(".workflow-map-scroll");
+          if (!viewport) return false;
+          const branches = [
+            ...viewport.querySelectorAll(
+              `[data-map-branch][data-side="${side}"]`,
+            ),
+          ];
+          const branch = branches.at(-1);
+          if (!branch) return false;
+          branch
+            .querySelector("h4")
+            ?.scrollIntoView({ inline: "center", block: "nearest" });
+          const heading = branch.querySelector("h4")?.getBoundingClientRect();
+          const bounds = viewport.getBoundingClientRect();
+          return (
+            !!heading &&
+            heading.left >= bounds.left - 1 &&
+            heading.right <= bounds.right + 1
+          );
+        }, side),
+      )
+      .toBe(true);
+  }
+});
+
 test("completed and unavailable children never create an implicit parent join", async ({
   app,
   screen,
