@@ -159,7 +159,9 @@ export function ConversationTree({
       nodes.set(node.parent, {
         key: node.parent,
         parent: rootKey,
-        title: "Parent conversation not loaded",
+        title: exhausted
+          ? "Parent conversation capture unavailable"
+          : "Parent conversation not loaded",
         runs: [],
         role: "Ancestry gap",
         tasks: [],

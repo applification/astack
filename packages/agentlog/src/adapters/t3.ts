@@ -375,7 +375,7 @@ export async function normalizeT3Turn(options: {
             ...previous.value,
             sessionReferences,
             delegations,
-            ...(conversation ? { conversation } : {}),
+            conversation: conversation ?? null,
           },
           options.secrets,
         ),
@@ -777,7 +777,7 @@ export async function normalizeT3Turn(options: {
     machineName: config.machineName,
     sessionId,
     sessionReferences,
-    ...(conversation ? { conversation } : {}),
+    conversation: conversation ?? null,
     delegations,
     attemptId: nativeTurn ?? turn.id,
     source: origin,
@@ -1017,8 +1017,10 @@ export class T3Adapter {
       }
       this.deferredTurns += deferred;
       // Advance only after the consumer has durably persisted every yielded turn.
-      // Missing native identities are retried even if shell metadata is unchanged.
-      if (!deferred) this.store.setMeta(checkpoint, fingerprint);
+      // Missing native identities and ancestry retry even with unchanged shell data.
+      // A parent can become available after a completed child was captured.
+      if (!deferred && orchestrationRootThreadId !== null)
+        this.store.setMeta(checkpoint, fingerprint);
     }
   }
   close() {

@@ -776,6 +776,60 @@ test("T3 matches enrollment before reading history, includes archives, and commi
   );
 });
 
+test("completed children retry unchanged shell metadata when missing ancestry becomes available", async () => {
+  const f = await fixture();
+  const shellState = shell(f.dir);
+  const child = {
+    ...projection("codex", "codex"),
+    thread: {
+      id: "app-thread",
+      lineage: { parentThreadId: "root", relationshipToParent: "subagent" },
+    },
+  };
+  const root = {
+    ...projection("codex", "codex"),
+    thread: { id: "root", lineage: { parentThreadId: null } },
+    providerTurns: [],
+  };
+  const reader: T3ReadSource = {
+    secrets: [],
+    serverVersion: "fixture",
+    initialize: async () => {},
+    shell: async () => shellState,
+    archived: async () => ({ threads: [] }),
+    thread: async (id) => ({ projection: id === "root" ? root : child }),
+    item: async () => ({ item: null }),
+    close: async () => {},
+  };
+  const adapter = new T3Adapter(
+    f.config,
+    f.source,
+    f.store,
+    "fixture",
+    [],
+    reader,
+  );
+  adapter.setProjects([f.project]);
+  const drain = async () => {
+    for await (const value of adapter.collect())
+      persistSnapshot(f.store, value);
+  };
+  await drain();
+  expect(f.store.runsForSession("native-session")[0]?.conversation).toBeNull();
+  expect(f.store.getMeta(`t3:${environmentId}:app-thread:updated`)).toBeNull();
+  shellState.threads.push({ ...shellState.threads[0]!, id: "root" });
+  await drain();
+  expect(
+    f.store.runsForSession("native-session")[0]?.conversation?.root,
+  ).toEqual({ kind: "t3", environmentId, threadId: "root" });
+  expect(
+    f.store.getMeta(`t3:${environmentId}:app-thread:updated`),
+  ).not.toBeNull();
+  await adapter.close();
+  f.store.close();
+  await rm(f.dir, { recursive: true, force: true });
+});
+
 test("deferred Codex identities retry unchanged completed threads; omitted tool outputs use the full-item read", async () => {
   const f = await fixture();
   const raw = projection("codex", "codex");

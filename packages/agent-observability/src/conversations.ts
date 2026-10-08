@@ -44,17 +44,21 @@ export const conversationSchema = z
 export type Conversation = z.infer<typeof conversationSchema>;
 
 export function mergeConversations(
-  first: Conversation | undefined,
-  next: Conversation | undefined,
-): Conversation | undefined {
+  first: Conversation | null | undefined,
+  next: Conversation | null | undefined,
+): Conversation | null | undefined {
   // T3 owns the enclosing app conversation across native provider changes.
   return first?.self.kind === "t3" && next?.self.kind !== "t3"
     ? first
-    : (next ?? first);
+    : next === undefined
+      ? first
+      : next;
 }
 
 export function runConversation(run: AgentRun): Conversation | null {
-  if (run.conversation) return run.conversation;
+  // Null records an attempted capture whose ancestry could not be established.
+  // Undefined is legacy history, where the conservative native fallback applies.
+  if (run.conversation !== undefined) return run.conversation;
   // Old T3 aliases do not establish ancestry. The upgraded reader supplies it.
   if (
     run.sessionReferences.some((reference) => reference.kind === "t3") ||

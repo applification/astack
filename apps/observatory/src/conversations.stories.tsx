@@ -107,6 +107,9 @@ export const NestedAndMissing: Story = {};
 export const PartialPage: Story = {
   args: { runs: [nested], exhausted: false },
 };
+export const MissingIntermediate: Story = {
+  args: { runs: [nested], exhausted: true },
+};
 export const ThreadGroups: Story = {
   render: () => (
     <ConversationGroupsTable

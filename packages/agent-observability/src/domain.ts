@@ -114,7 +114,7 @@ export const runSchema = z
     attemptId: id,
     parentSessionId: id.optional(),
     sessionReferences: z.array(sessionReferenceSchema).max(20).default([]),
-    conversation: conversationSchema.optional(),
+    conversation: conversationSchema.nullable().optional(),
     delegations: z.array(delegationSchema).max(32).default([]),
     source: id,
     automation: automationSchema.optional(),

@@ -70,7 +70,7 @@ export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
       kind: "run",
       value: runSchema.parse({
         ...owner.value,
-        ...(conversation ? { conversation } : {}),
+        ...(conversation !== undefined ? { conversation } : {}),
         ...(automation ? { automation } : {}),
         sessionReferences: mergeSessionReferences(
           owner.value.sessionReferences,
@@ -119,7 +119,7 @@ export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
       previous.value.conversation,
       run.conversation,
     );
-    if (conversation) run.conversation = conversation;
+    if (conversation !== undefined) run.conversation = conversation;
     else delete run.conversation;
     run.sessionReferences = mergeSessionReferences(
       previous.value.sessionReferences,

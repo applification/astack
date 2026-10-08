@@ -2702,4 +2702,15 @@ test("orchestration hierarchy retains provider changes, nested children, review 
   await expect(
     screen.getByRole("link", "nested · first", { exact: true }),
   ).toBeVisible();
+  await app.open(
+    "/iframe.html?id=observatory-orchestration--missing-intermediate&viewMode=story",
+  );
+  await expect(
+    screen
+      .getByText("Parent conversation capture unavailable", { exact: false })
+      .first(),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Parent conversation not loaded", { exact: false }),
+  ).toHaveCount(0);
 });

@@ -6,7 +6,10 @@ import {
   CodexAdapter,
   resolveCodexConversation,
   threadSchema,
+  normalizeTurn,
+  turnSchema,
 } from "./adapters/codex";
+import { runConversation } from "@astack/agent-observability/conversations";
 import { configSchema } from "./config";
 import { LocalStore } from "./store";
 import { projectSchema } from "@astack/agent-observability/projects";
@@ -17,7 +20,7 @@ const thread = (id: string, parentThreadId: string | null = null) =>
     id,
     parentThreadId,
     cwd: "/fixture",
-    source: parentThreadId ? { subagent: "review" } : "cli",
+    source: parentThreadId ? { subAgent: "review" } : "cli",
     cliVersion: "fixture",
     createdAt: 1,
     updatedAt: 10,
@@ -54,9 +57,37 @@ test("native ancestry resolves nested children and keeps forks, missing parents 
     await resolve({
       ...thread("ambiguous"),
       parentThreadId: undefined,
-      source: { subagent: "review" },
+      source: { subAgent: "review" },
     }),
   ).toBeNull();
+});
+
+test("unavailable native ancestry survives originator normalization without manufacturing a root", async () => {
+  const snapshot = await normalizeTurn({
+    thread: {
+      ...thread("unavailable"),
+      parentThreadId: undefined,
+      source: { subAgent: "review" },
+      originator: "codex_cli_rs",
+    },
+    turn: turnSchema.parse({
+      id: "turn",
+      status: "completed",
+      startedAt: 1,
+      completedAt: 2,
+      items: [],
+    }),
+    machine: {
+      machineId: "00000000-0000-4000-8000-000000000001",
+      machineName: "Synthetic",
+      captureContent: true,
+    },
+    signatureKey: "fixture",
+    observedAt: 2000,
+  });
+  expect(snapshot.run.source).toBe("codex_cli_rs");
+  expect(snapshot.run.conversation).toBeNull();
+  expect(runConversation(snapshot.run)).toBeNull();
 });
 
 test("native capture replays historical ancestry using metadata only and stops at project boundaries", async () => {
@@ -154,7 +185,7 @@ test("native capture replays historical ancestry using metadata only and stops a
     root = { ...root, cwd: "/private" };
     store.setMeta(`codex:${dir}:false:updated`, "0");
     const foreign = await capture();
-    expect(foreign[0]?.conversation).toBeUndefined();
+    expect(foreign[0]?.conversation).toBeNull();
     expect(
       foreign[0]?.coverage.some((value) =>
         value.includes("ancestry unavailable"),

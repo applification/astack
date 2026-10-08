@@ -156,7 +156,7 @@ export async function resolveCodexConversation(
         current.source === "subagent" ||
         (typeof current.source === "object" &&
           current.source !== null &&
-          "subagent" in current.source);
+          ("subAgent" in current.source || "subagent" in current.source));
       if (current.parentThreadId === undefined && subagentSource) return null;
       const reference = (sessionId: string) =>
         ({ kind: "codex", sessionId }) as const;
@@ -637,7 +637,7 @@ export async function normalizeTurn(options: {
     ...(thread.parentThreadId
       ? { parentSessionId: thread.parentThreadId }
       : {}),
-    ...(conversation ? { conversation } : {}),
+    conversation,
     source:
       thread.originator ??
       (typeof thread.source === "string" ? thread.source : "subagent"),

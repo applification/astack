@@ -165,6 +165,14 @@ const pageValidator = v.object({
   page: v.array(v.string()),
   continueCursor: v.string(),
   isDone: v.boolean(),
+  pageStatus: v.optional(
+    v.union(
+      v.literal("SplitRecommended"),
+      v.literal("SplitRequired"),
+      v.null(),
+    ),
+  ),
+  splitCursor: v.optional(v.union(v.string(), v.null())),
 });
 // Historical capture is projected in bounded, resumable pages without rewriting it.
 export const rebuild = internalMutation({
@@ -183,7 +191,11 @@ export const rebuild = internalMutation({
       throw new Error("Invalid repair page");
     const page = await ctx.db
       .query("runs")
-      .paginate({ ...args.paginationOpts, maximumBytesRead: 1_000_000 });
+      .paginate({
+        ...args.paginationOpts,
+        maximumBytesRead: 1_000_000,
+        maximumRowsRead: 200,
+      });
     for (const row of page.page) {
       const run = runSchema.parse(JSON.parse(row.data));
       await storeConversation(
@@ -265,16 +277,19 @@ export const groups = query({
         : ctx.db.query("conversationGroups").withIndex("by_lastActivityAt")
     )
       .order("desc")
-      .paginate({ ...args.paginationOpts, maximumBytesRead: 1_000_000 });
+      .paginate({
+        ...args.paginationOpts,
+        maximumBytesRead: 1_000_000,
+        maximumRowsRead: 200,
+      });
     const page = [];
     for (const row of results.page) {
       if (await getProject(ctx, row.projectId))
         page.push(await summary(ctx, row));
     }
     return {
+      ...results,
       page,
-      continueCursor: results.continueCursor,
-      isDone: results.isDone,
     };
   },
 });
@@ -316,7 +331,11 @@ export const turns = query({
         q.eq("groupId", args.groupId),
       )
       .order("desc")
-      .paginate({ ...args.paginationOpts, maximumBytesRead: 1_000_000 });
+      .paginate({
+        ...args.paginationOpts,
+        maximumBytesRead: 1_000_000,
+        maximumRowsRead: 200,
+      });
     const page = [];
     for (const member of results.page) {
       const run = await ctx.db
@@ -331,9 +350,8 @@ export const turns = query({
         page.push(run.data);
     }
     return {
+      ...results,
       page,
-      continueCursor: results.continueCursor,
-      isDone: results.isDone,
     };
   },
 });
