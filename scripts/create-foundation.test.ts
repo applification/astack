@@ -1,7 +1,7 @@
 import { test, expect, beforeEach, afterEach } from 'bun:test';
-import { mkdtemp, mkdir, cp, writeFile, readFile, rm, symlink, lstat } from 'node:fs/promises';
+import { mkdtemp, mkdir, cp, writeFile, readFile, rm, symlink, lstat, rename } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { join, resolve, dirname, relative, sep, isAbsolute } from 'node:path';
 
 let directory: string;
 let source: string;
@@ -70,4 +70,30 @@ test('scaffold refuses destinations inside its reference', async () => {
   const dotted = join(source, '..still-inside');
   expect(create(dotted).exitCode).not.toBe(0);
   expect(await lstat(dotted).then(() => true, () => false)).toBe(false);
+});
+
+test('real scaffold retains reachable project instructions after relocation', async () => {
+  const destination = join(directory, 'generated project');
+  const result = Bun.spawnSync(['bun', resolve(import.meta.dir, 'create-foundation.ts'), destination], { cwd: directory });
+  expect(result.exitCode).toBe(0);
+  const relocated = join(directory, 'relocated project');
+  await rename(destination, relocated);
+  const reference = resolve(import.meta.dir, '../examples/foundation');
+  for (const name of ['AGENTS.md', 'CLAUDE.md', '.astack/project.md']) {
+    const content = await readFile(join(relocated, name), 'utf8');
+    expect(content).toBe(await readFile(join(reference, name), 'utf8'));
+    // Check local relationships, not instruction wording. A source-checkout or
+    // installed-cache pointer would fail containment after generation/moving.
+    const links = [...content.matchAll(/\[[^\]]*\]\(([^)]+)\)/g)];
+    expect(links.length).toBeGreaterThan(0);
+    for (const link of links) {
+      const url = link[1];
+      if (!url) throw new Error('Missing link target');
+      if (/^[a-z][a-z0-9+.-]*:/i.test(url) || url.startsWith('#')) continue;
+      const target = resolve(dirname(join(relocated, name)), decodeURIComponent(url.split('#')[0] ?? ''));
+      const relation = relative(relocated, target);
+      expect(isAbsolute(relation) || relation === '..' || relation.startsWith(`..${sep}`)).toBe(false);
+      expect((await lstat(target)).isFile()).toBe(true);
+    }
+  }
 });

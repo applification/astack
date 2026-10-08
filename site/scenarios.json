@@ -480,8 +480,33 @@
     "route": "investigation"
   },
   {
+    "request": "Start a standalone Codex session to fix one CLI label; no orchestrator prompt or T3 is supplied",
+    "decision": "The main agent owns the request through proof by default. Use the focused delivery guidance, a proportionate plan and visible check; a small task needs no child. Standalone native delegation is available only when the host exposes it; do not require T3 or invent independent review.",
+    "route": "feature"
+  },
+  {
+    "request": "Delegate a useful review in T3, but its tools are missing from the initial catalog",
+    "decision": "Make one bounded supported MCP/ACP capability attempt before declaring T3 unavailable. Discover actual models and use the host-preferred supported mechanism. Retain the T3 task ID or native handle and manage it through that host; wait timeouts do not justify duplicate children or top-level conversations.",
+    "route": "pr"
+  },
+  {
+    "request": "Return this child contribution under the owner's evaluation task ID and COS work COS-42",
+    "decision": "Return scoped changes, exact revision, actual checks, gaps and the supplied owner evaluation ID with COS-42 unchanged. The main owner begins/finishes the evaluation and verifies integration. Keep evaluation ID, delegation ID/native handle, work ID and flow ID distinct; child completion does not complete the owner task.",
+    "route": "feature"
+  },
+  {
+    "request": "Correct proof after the task evaluation was delivered as an immutable review",
+    "decision": "Preserve the original review and external work identity; the owner starts a fresh evaluation/task ID for materially revised proof. Reuse an ID for active follow-ups or identical retries, without rewriting immutable delivered intent or proof.",
+    "route": "pr"
+  },
+  {
+    "request": "Two children share a work ID; record their parent joins before captured results are available",
+    "decision": "Shared work identity does not establish typed root/child correlation or integration. Record a join only when the parent actually uses a result and trusted captured delegation/result references are exposed; continue the engineering task with the capture gap visible.",
+    "route": "investigation"
+  },
+  {
     "request": "Set up astack in a new project with no selected stack",
-    "decision": "Project setup; apply the new-product defaults to actual surfaces, establish local startup and a project-owned control CLI/map, add a meaningful regression, prove one real path through cleanup and record the profile plus agent pointer. Ask only for material product or scope choices; no tracker or model-role questionnaire.",
+    "decision": "Project setup; apply the new-product defaults to actual surfaces, establish local startup and a project-owned control CLI/map, add a meaningful regression, prove one real path through cleanup and record the profile plus main-thread instructions in the actual host entry point. Delegate when useful; T3 is optional. Ask only for material product or scope choices; no tracker or model-role questionnaire.",
     "route": "setup"
   },
   {
@@ -491,7 +516,12 @@
   },
   {
     "request": "Re-run setup after our startup script and saved-items route changed",
-    "decision": "Project setup; read the existing profile, control skill and feature map, update stale commands and handles in place, preserve custom instructions and repair the mapped path. Re-run startup, identity, action, fresh observation and cleanup; retain evidence without creating a second loop.",
+    "decision": "Project setup; read the existing profile, host instructions, control skill and feature map, update stale commands and handles in place, reconcile missing main-thread clauses outside managed blocks, preserve custom text and repair the mapped path. Re-run startup, identity, action, fresh observation and cleanup; retain evidence without creating a second loop or duplicated guidance.",
+    "route": "setup"
+  },
+  {
+    "request": "Adopt astack in a Claude project with custom instructions and framework-managed blocks",
+    "decision": "Project setup; preserve custom text and managed blocks byte-for-byte, reconcile concise project-owned orchestration clauses outside those markers, and ensure CLAUDE.md reaches the root instructions and profile. Repeating unchanged setup leaves guidance unchanged; file inspection does not prove actual host loading or runtime acceptance.",
     "route": "setup"
   },
   {

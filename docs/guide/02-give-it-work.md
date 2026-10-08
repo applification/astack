@@ -8,6 +8,8 @@ $applification:astack Saved items disappear after reopening. Reproduce it, fix t
 
 That selects bug-fix. astack finds the project control route and relevant data/UI expertise, reproduces the symptom, implements a supported repair and verifies the same behavior. The skill supplies the method; you supply the intent.
 
+The main session is already the orchestrator; no extra role prompt is needed. It keeps the plan and finish conditions, delegates useful bounded contributions through the available host, and owns their integration and final verification. A small task can stay in one session. Children return evidence to the parent, including its supplied evaluation task ID; the owner controls evaluation start and delivery.
+
 Other requests change the selected workflow:
 
 | Request | Work selected |

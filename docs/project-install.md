@@ -1,6 +1,6 @@
 # Install astack for a project
 
-The Applification plugin remains in the [astack repository](https://github.com/applification/astack). A project controls when to take an update through its marketplace entry and keeps only its own workflow profile locally. This avoids copied skill files and lets project changes review a new astack version alongside any revised guidance.
+The Applification plugin remains in the [astack repository](https://github.com/applification/astack). A project controls when to take an update through its marketplace entry and keeps its own workflow profile and concise host instructions locally. This avoids copied skill files and lets project changes review a new astack version alongside any revised guidance.
 
 ## Project files
 
@@ -59,7 +59,7 @@ Setup inspects the product and runs a safe baseline where available. It applies 
 The resulting project owns:
 
 - Tracked `.astack/project.md` with actual runtime, control and verification commands, selected defaults, upgrades, observed evidence and gaps.
-- A short pointer in its agent instructions, updated in place on re-runs.
+- Root host instructions establishing [main-thread orchestration](../skills/astack/references/orchestration.md), plus the profile pointer. Codex uses `AGENTS.md`; Claude Code needs `CLAUDE.md` with the same instructions or an explicit pointer. Setup/upgrades reconcile existing clauses in place, preserve custom text, and keep additions outside framework-managed blocks. Re-runs leave unchanged guidance unchanged.
 - A project-owned `astack-<app>` control skill/CLI in `.codex/skills/astack-<app>/` and feature map in `.astack/feature-map/<app>/` for runnable user surfaces, reusing an existing driver where sound.
 - A meaningful regression and a demonstrated loop: start/connect, identify the intended instance, drive a mapped action, inspect its result, check, capture evidence and clean up owned resources.
 
@@ -76,6 +76,8 @@ $applification:principle-boundary-discipline Review this adapter's validation bo
 
 The coordinator selects workflows, platform skills and applicable principle leaves. Every skill is independently callable and can compose other relevant skills without returning to astack. Both paths read project guidance when it applies. A missing project profile does not force a setup pass for a narrow job. Keep project-specific CLI skills in the project and reusable engineering instructions in this plugin.
 
+The main session owns the user's task without a separate orchestrator prompt, including direct focused-skill requests. Delegate when useful through the available host; T3 is optional. The parent reviews contributions, integrates them and verifies the result before completion. Installing the plugin does not install this source repository's root `AGENTS.md` into other projects; setup establishes project-owned instructions.
+
 For a project that uses Convex, also install and enable `convex@openai-curated-remote` in Codex. astack calls on its `@Convex` app and `convex:*` skills for setup, backend changes, and the required Convex PR review. Check that the plugin is available in a new task before starting Convex work; astack's plugin installation does not install companion plugins.
 
 ```sh
@@ -90,4 +92,4 @@ When adopting the root layout from an older astack revision, change the marketpl
 
 ## Update
 
-Change the marketplace `ref` or `sha` to the astack revision the project will adopt. Refresh the marketplace and reinstall the plugin, then start a new Codex task and exercise a representative project route. Update `.astack/project.md` only when the project's own commands or policies changed. Do not edit installed plugin cache files.
+Change the marketplace `ref` or `sha` to the astack revision the project will adopt. Refresh the marketplace and reinstall the plugin, then start a new Codex task and exercise a representative project route. Run project-setup for an adoption upgrade to establish missing main-thread instructions and reconcile the profile pointer without replacing custom or managed text. Update `.astack/project.md` when the project's commands or policies changed. Inspect reachable project guidance separately from observing the actual host load it. Do not edit installed plugin cache files.

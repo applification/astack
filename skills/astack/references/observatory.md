@@ -23,7 +23,7 @@ Selection returns a `flowId` and `eventId`. Later transitions in the same sessio
 
 Phases use `started`, `completed`, `failed` or `omitted`. Supply the observation or omission reason with `--summary`, declare the skills actually applied with `--skills`, and cite already captured action/result events with `--evidence`. A failed attempt followed by a fresh start retains both attempts. Route changes use `--action change --name ROUTE --reason REASON`; customize the proposed phases with `--plan PHASES...`. Reasons describe decisions the owner needs to assess, not private reasoning. Existing unstructured `--name/--step` calls remain compatible but do not establish a selected route.
 
-Delegated children have independent journeys and local skill reads. A fork, a completed spawn call, a returned child result or host delivery does not declare parent integration. When using a child result, record an explicit join with the captured delegation ID and the child's result event; pair `--branches` and `--evidence` in the same order. Context includes recorded delegation identities. Continue without recording if the host or collector has not exposed the required evidence.
+Delegated children have independent journeys and local skill reads. Use typed captured root/child conversation and delegation relationships with their actual host/capture provenance; do not infer parentage from matching work IDs, labels or timestamps. A fork, a completed spawn call, a returned child result or host delivery does not declare parent integration. When actually using a child result, record an explicit join with the trusted captured delegation ID and the child's result event; pair `--branches` and `--evidence` in the same order. Context includes recorded delegation identities. Continue without recording if the host or collector has not exposed the required evidence. These instructions do not establish runtime grouping or installed-host proof.
 
 ```sh
 "$AGENTLOG" workflow --session SESSION_ID --turn TURN_ID --action join --summary "Used the UI and data recommendations to define the regression checks." --branches UI_DELEGATION_ID DATA_DELEGATION_ID --evidence UI_CHILD_RESULT_EVENT_ID DATA_CHILD_RESULT_EVENT_ID
@@ -35,7 +35,9 @@ Readable capture must be enabled. Recording validates project scope and referenc
 
 ## Automatic task evaluations
 
-When owning a substantive task in a project with agentlog readable capture, automatically record its acceptance criteria at the start and queue its evaluation at delivery. This is part of the task handoff, without asking the user to write a manifest or opt in again. Preserve one returned task ID across follow-ups; contributors reuse the owner's task instead of creating duplicate evaluations.
+When owning a substantive task in a project with agentlog readable capture, automatically record its acceptance criteria at the start and queue its evaluation at delivery. This is part of the task handoff, without asking the user to write a manifest or opt in again. The owning main agent begins and finishes the evaluation. Children return their evidence and the supplied owner's evaluation `taskID` to that owner; they do not begin or finish duplicate parent evaluations. An absent owner ID stays unknown rather than being invented.
+
+Preserve the returned evaluation `taskID` across active follow-ups. It is distinct from T3 delegation `taskId`, native agent handles, external `work_id` and selected workflow `flowId`. Once delivered as an immutable evaluation, materially revised proof or intent needs a fresh evaluation/task ID; preserve the earlier record and the original external work identity. Identical retries retain the existing ID.
 
 ```sh
 "$AGENTLOG" evaluation begin --title "Preserve saved edits" --case "The saved edit survives reopening." --skill "bug-fix=Reproduce the failure and repair its cause."

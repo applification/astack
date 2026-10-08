@@ -4,6 +4,8 @@ The shared interface is implemented from the [Pen visual design](.astack/design/
 
 A worked profile for a private work-item app with standalone React/Vite and MCP Apps presentation. This is a reference and repeatable starting point. The Applification plugin remains the engineering method; this app supplies a concrete environment.
 
+The scaffold includes root [AGENTS.md](AGENTS.md), a [Claude Code pointer](CLAUDE.md) and [the project profile](.astack/project.md). Main sessions own the request through integration and verification; children return bounded contributions when delegation helps. These instructions use the available host and work without T3. Preserve them and custom text outside framework-managed blocks on upgrades. File generation alone does not prove host loading or runtime acceptance.
+
 From a fresh checkout, use Node 24 and Bun 1.4.0:
 
 ```sh
