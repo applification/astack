@@ -714,9 +714,145 @@ export class CodexAdapter {
     const automationVersion = `codex:${this.home}:automation-capture-version`;
     const replayAutomations = this.store.getMeta(automationVersion) !== "1";
     const conversationVersion = `codex:${this.home}:conversation-capture-version`;
-    const replayConversations = this.store.getMeta(conversationVersion) !== "1";
+    const replayConversations = this.store.getMeta(conversationVersion) !== "2";
     const automations = new CodexAutomations(this.home);
+    const pendingKey = `codex:${this.home}:conversation-pending`;
+    const pending = new Set(
+      z
+        .array(z.string().min(1).max(512))
+        .parse(JSON.parse(this.store.getMeta(pendingKey) ?? "[]")),
+    );
+    const captured = new Set<string>();
+    const adapter = this;
+    async function* captureThread(
+      thread: NativeThread,
+      retry = false,
+    ): AsyncGenerator<AgentSnapshot> {
+      let resolvedThread = thread;
+      if (!thread.gitInfo?.originUrl?.trim()) {
+        if (!repositories.has(thread.cwd))
+          repositories.set(thread.cwd, await localRepository(thread.cwd));
+        const repo = repositories.get(thread.cwd);
+        if (repo)
+          resolvedThread = {
+            ...thread,
+            gitInfo: { ...thread.gitInfo, originUrl: repo },
+          };
+      }
+      const project = resolveProject(adapter.projects, {
+        machineId: adapter.config.machineId,
+        cwd: thread.cwd,
+        ...(resolvedThread.gitInfo?.originUrl
+          ? { repo: resolvedThread.gitInfo.originUrl }
+          : {}),
+      });
+      if (!project) {
+        pending.delete(thread.id);
+        return;
+      }
+      ancestry.set(thread.id, resolvedThread);
+      const conversation = await resolveCodexConversation(
+        resolvedThread,
+        async (parentId) => {
+          let parent = ancestry.get(parentId);
+          if (!parent) {
+            try {
+              parent = z.object({ thread: threadSchema }).parse(
+                await adapter.reader.request("thread/read", {
+                  threadId: parentId,
+                  includeTurns: false,
+                }),
+              ).thread;
+            } catch {
+              return null;
+            }
+            if (parent.id !== parentId) return null;
+            ancestry.set(parentId, parent);
+          }
+          if (!repositories.has(parent.cwd))
+            repositories.set(parent.cwd, await localRepository(parent.cwd));
+          const parentProject = resolveProject(adapter.projects, {
+            machineId: adapter.config.machineId,
+            cwd: parent.cwd,
+            ...((parent.gitInfo?.originUrl ?? repositories.get(parent.cwd))
+              ? {
+                  repo:
+                    parent.gitInfo?.originUrl ?? repositories.get(parent.cwd)!,
+                }
+              : {}),
+          });
+          return parentProject?.projectId === project.projectId ? parent : null;
+        },
+      );
+      if (conversation) pending.delete(thread.id);
+      else pending.add(thread.id);
+      // Retry metadata without rereading unchanged unavailable turn content.
+      if (retry && !conversation) return;
+      captured.add(thread.id);
+      const automation = automations.lookup(thread.id, Date.now());
+      let turnCursor: string | null = null;
+      do {
+        const turns = turnListSchema.parse(
+          await adapter.reader.request("thread/turns/list", {
+            threadId: thread.id,
+            limit: 50,
+            sortDirection: "desc",
+            itemsView: "full",
+            ...(turnCursor ? { cursor: turnCursor } : {}),
+          }),
+        );
+        for (const turn of turns.data) {
+          if (
+            (turn.startedAt ?? thread.createdAt) * 1000 <
+            adapter.config.since
+          )
+            continue;
+          const context = adapter.store.getMeta(`context:${thread.id}`);
+          const parsed = context
+            ? launchContextSchema.parse(JSON.parse(context))
+            : {};
+          const snapshot = await normalizeTurn({
+            thread: resolvedThread,
+            turn,
+            machine: adapter.config,
+            signatureKey: adapter.signatureKey,
+            knownSecrets: adapter.knownSecrets,
+            observedAt: Date.now(),
+            ...parsed,
+            projectId: project.projectId,
+            conversation,
+            ...(automation ? { automation } : {}),
+          });
+          if (resolvedThread !== thread)
+            snapshot.run.coverage.push(
+              "Repository resolved from local Git at capture time; native origin unavailable.",
+            );
+          if (!conversation)
+            snapshot.run.coverage.push(
+              "Orchestration ancestry unavailable or outside the enrolled project; no thread group inferred.",
+            );
+          yield snapshot;
+        }
+        turnCursor = turns.nextCursor;
+      } while (turnCursor);
+    }
     try {
+      // Unavailable ancestry is independent of the activity checkpoint. Re-read
+      // only its metadata, then recapture turns when the parent becomes known.
+      for (const id of [...pending]) {
+        let thread: NativeThread;
+        try {
+          thread = z.object({ thread: threadSchema }).parse(
+            await this.reader.request("thread/read", {
+              threadId: id,
+              includeTurns: false,
+            }),
+          ).thread;
+        } catch {
+          continue;
+        }
+        if (thread.id === id) yield* captureThread(thread, true);
+      }
       for (const archived of [false, true]) {
         const checkpoint = `codex:${this.home}:${archived}:updated`;
         const since =
@@ -745,119 +881,16 @@ export class CodexAdapter {
               break;
             }
             newest = Math.max(newest, thread.updatedAt);
-            let resolvedThread = thread;
-            if (!thread.gitInfo?.originUrl?.trim()) {
-              if (!repositories.has(thread.cwd))
-                repositories.set(thread.cwd, await localRepository(thread.cwd));
-              const repo = repositories.get(thread.cwd);
-              if (repo)
-                resolvedThread = {
-                  ...thread,
-                  gitInfo: { ...thread.gitInfo, originUrl: repo },
-                };
-            }
-            const project = resolveProject(this.projects, {
-              machineId: this.config.machineId,
-              cwd: thread.cwd,
-              ...(resolvedThread.gitInfo?.originUrl
-                ? { repo: resolvedThread.gitInfo.originUrl }
-                : {}),
-            });
-            if (!project) continue;
-            ancestry.set(thread.id, resolvedThread);
-            const conversation = await resolveCodexConversation(
-              resolvedThread,
-              async (parentId) => {
-                let parent = ancestry.get(parentId);
-                if (!parent) {
-                  try {
-                    parent = z.object({ thread: threadSchema }).parse(
-                      await this.reader.request("thread/read", {
-                        threadId: parentId,
-                        includeTurns: false,
-                      }),
-                    ).thread;
-                  } catch {
-                    return null;
-                  }
-                  if (parent.id !== parentId) return null;
-                  ancestry.set(parentId, parent);
-                }
-                if (!repositories.has(parent.cwd))
-                  repositories.set(
-                    parent.cwd,
-                    await localRepository(parent.cwd),
-                  );
-                const parentProject = resolveProject(this.projects, {
-                  machineId: this.config.machineId,
-                  cwd: parent.cwd,
-                  ...((parent.gitInfo?.originUrl ??
-                  repositories.get(parent.cwd))
-                    ? {
-                        repo:
-                          parent.gitInfo?.originUrl ??
-                          repositories.get(parent.cwd)!,
-                      }
-                    : {}),
-                });
-                return parentProject?.projectId === project.projectId
-                  ? parent
-                  : null;
-              },
-            );
-            const automation = automations.lookup(thread.id, Date.now());
-            let turnCursor: string | null = null;
-            do {
-              const turns = turnListSchema.parse(
-                await this.reader.request("thread/turns/list", {
-                  threadId: thread.id,
-                  limit: 50,
-                  sortDirection: "desc",
-                  itemsView: "full",
-                  ...(turnCursor ? { cursor: turnCursor } : {}),
-                }),
-              );
-              for (const turn of turns.data) {
-                if (
-                  (turn.startedAt ?? thread.createdAt) * 1000 <
-                  this.config.since
-                )
-                  continue;
-                const context = this.store.getMeta(`context:${thread.id}`);
-                const parsed = context
-                  ? launchContextSchema.parse(JSON.parse(context))
-                  : {};
-                const snapshot = await normalizeTurn({
-                  thread: resolvedThread,
-                  turn,
-                  machine: this.config,
-                  signatureKey: this.signatureKey,
-                  knownSecrets: this.knownSecrets,
-                  observedAt: Date.now(),
-                  ...parsed,
-                  projectId: project.projectId,
-                  conversation,
-                  ...(automation ? { automation } : {}),
-                });
-                if (resolvedThread !== thread)
-                  snapshot.run.coverage.push(
-                    "Repository resolved from local Git at capture time; native origin unavailable.",
-                  );
-                if (!conversation)
-                  snapshot.run.coverage.push(
-                    "Orchestration ancestry unavailable or outside the enrolled project; no thread group inferred.",
-                  );
-                yield snapshot;
-              }
-              turnCursor = turns.nextCursor;
-            } while (turnCursor);
+            if (!captured.has(thread.id)) yield* captureThread(thread);
           }
           cursor = past ? null : page.nextCursor;
         } while (cursor);
+        this.store.setMeta(pendingKey, JSON.stringify([...pending]));
         this.store.setMeta(checkpoint, String(newest));
       }
       this.store.setMeta(automationVersion, "1");
-      this.store.setMeta(conversationVersion, "1");
+      this.store.setMeta(conversationVersion, "2");
+      this.store.setMeta(pendingKey, JSON.stringify([...pending]));
     } finally {
       automations.close();
     }

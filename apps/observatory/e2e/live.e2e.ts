@@ -1,5 +1,97 @@
 import { test } from "@e2e-dev/web";
 import { expect, secrets } from "e2e";
+test("reported evaluation opens its orchestration group with separate delegated review rounds", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  const project = "a20a2fb3-646f-40fe-9b12-c64f759afaea";
+  await app.open(
+    "/#evaluation/" +
+      encodeURIComponent(
+        "bbb1fd30-527f-4326-b685-fb9c2e021092:evaluation:85af7a33-15c4-4e26-8d1e-50b754ca0f91",
+      ) +
+      "?project=" +
+      project,
+  );
+  await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
+  await screen.getByRole("button", "Open Observatory").tap();
+  await expect
+    .poll(
+      () =>
+        browser.evaluate(
+          () => document.querySelectorAll('a[href^="#thread/"]').length,
+        ),
+      { timeout: 30_000 },
+    )
+    .toBe(1);
+  const title = await browser.evaluate(
+    () => document.querySelector('a[href^="#thread/"]')?.textContent ?? "",
+  );
+  const threadLink = screen.getByRole("link", title, { exact: true });
+  const href = await threadLink.getAttribute("href");
+  await threadLink.tap();
+  const hierarchy = screen.getByRole("list", "Conversation hierarchy", {
+    exact: true,
+  });
+  await expect(hierarchy).toBeVisible({ timeout: 30_000 });
+  for (let page = 0; page < 20; page++) {
+    const more = screen.getByRole("button", "Load more turns", { exact: true });
+    if (!(await more.count())) break;
+    await more.tap();
+    await expect
+      .poll(() =>
+        browser.evaluate(() =>
+          [...document.querySelectorAll("button")].some(
+            (button) =>
+              button.textContent === "Load more turns" && button.disabled,
+          ),
+        ),
+      )
+      .toBe(false);
+  }
+  await expect
+    .poll(() =>
+      browser.evaluate(() => {
+        const nodes = [...document.querySelectorAll("[data-conversation-key]")];
+        const expected = [
+          "evaluation-routing-capture-diagnosis-20261008-1",
+          "evaluation-routing-review-20261008-1",
+          "evaluation-routing-review-20261008-2",
+          "evaluation-routing-review-20261008-3",
+          "evaluation-routing-id-diagnosis-20261008-1",
+        ];
+        return expected.filter((id) =>
+          nodes.some(
+            (node) =>
+              node.getAttribute("data-conversation-key")?.includes(id) &&
+              node.querySelector('a[href^="#run/"]'),
+          ),
+        ).length;
+      }),
+    )
+    .toBe(5);
+  expect(await hierarchy.getByRole("link").count()).toBeGreaterThan(5);
+  expect(
+    await browser.evaluate(() =>
+      new URLSearchParams(location.hash.split("?")[1]).get("project"),
+    ),
+  ).toBe(project);
+  await browser.setViewport({ width: 390, height: 844 });
+  expect(
+    await browser.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await screen.getByRole("link", "Back to work", { exact: true }).tap();
+  const groups = screen.getByRole("region", "Orchestration threads", {
+    exact: true,
+  });
+  await expect(groups).toBeVisible();
+  await expect(
+    groups.getByRole("link", title, { exact: true }),
+  ).toHaveAttribute("href", href!);
+});
 test("reported five-child evaluation shows every route across desktop widths", async ({
   app,
   screen,

@@ -817,6 +817,15 @@ test("completed children retry unchanged shell metadata when missing ancestry be
   await drain();
   expect(f.store.runsForSession("native-session")[0]?.conversation).toBeNull();
   expect(f.store.getMeta(`t3:${environmentId}:app-thread:updated`)).toBeNull();
+  // Recover checkpoints produced before the unresolved-ancestry retry repair.
+  f.store.setMeta(
+    `t3:${environmentId}:app-thread:updated`,
+    createHash("sha256")
+      .update(
+        JSON.stringify({ captureVersion: 6, thread: shellState.threads[0] }),
+      )
+      .digest("hex"),
+  );
   shellState.threads.push({ ...shellState.threads[0]!, id: "root" });
   await drain();
   expect(

@@ -895,7 +895,7 @@ export class T3Adapter {
       if (!project) continue;
       const checkpoint = `t3:${this.source.environmentId}:${thread.id}:updated`;
       const fingerprint = createHash("sha256")
-        .update(JSON.stringify({ captureVersion: 6, thread }))
+        .update(JSON.stringify({ captureVersion: 7, thread }))
         .digest("hex");
       if (
         !["running", "starting", "waiting", "preparing"].includes(

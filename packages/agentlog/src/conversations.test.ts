@@ -155,6 +155,7 @@ test("native capture replays historical ancestry using metadata only and stops a
       },
     };
     store.setMeta(`codex:${dir}:automation-capture-version`, "1");
+    store.setMeta(`codex:${dir}:conversation-capture-version`, "1");
     store.setMeta(`codex:${dir}:false:updated`, "1000");
     const adapter = new CodexAdapter(config, dir, store, "fixture", [], reader);
     adapter.setProjects([project]);
@@ -178,7 +179,7 @@ test("native capture replays historical ancestry using metadata only and stops a
       { method: "thread/turns/list", id: "nested" },
     ]);
     expect(store.getMeta(`codex:${dir}:conversation-capture-version`)).toBe(
-      "1",
+      "2",
     );
     store.setMeta(`codex:${dir}:false:updated`, "1000");
     expect(await capture()).toEqual([]);
@@ -197,6 +198,140 @@ test("native capture replays historical ancestry using metadata only and stops a
         .map((value) => value.id),
     ).toEqual(["nested", "nested"]);
     await adapter.close();
+  } finally {
+    store.close();
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test("completed native children recover late ancestry after the activity checkpoint advances and the adapter restarts", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "native-ancestry-retry-"));
+  const store = new LocalStore(dir);
+  try {
+    const machineId = "00000000-0000-4000-8000-000000000001";
+    const config = configSchema.parse({
+      schemaVersion: 1,
+      machineId,
+      machineName: "Synthetic",
+      endpoint: "http://127.0.0.1:1234",
+      tokenFile: "/unused",
+      homes: [{ path: dir, label: "fixture" }],
+      since: 0,
+    });
+    const project = projectSchema.parse({
+      projectId: "00000000-0000-4000-8000-000000000100",
+      name: "Synthetic",
+      enabled: true,
+      folders: [{ machineId, path: "/fixture" }],
+      repositories: [],
+    });
+    const child = { ...thread("child", "root"), updatedAt: 100 };
+    const newer = { ...thread("newer"), updatedAt: 200 };
+    const root = { ...thread("root"), updatedAt: 300 };
+    let available = false;
+    const reads: { method: string; id: string; includeTurns?: boolean }[] = [];
+    const reader = {
+      initialize: async () => {},
+      close: async () => {},
+      request: async (method: string, input: unknown) => {
+        if (method === "thread/list") {
+          const args = z.object({ archived: z.boolean() }).parse(input);
+          return {
+            data: args.archived
+              ? []
+              : available
+                ? [root, newer, child]
+                : [newer, child],
+            nextCursor: null,
+          };
+        }
+        const args = z
+          .object({
+            threadId: z.string(),
+            includeTurns: z.boolean().optional(),
+          })
+          .parse(input);
+        reads.push({
+          method,
+          id: args.threadId,
+          ...(args.includeTurns === undefined
+            ? {}
+            : { includeTurns: args.includeTurns }),
+        });
+        if (method === "thread/read") {
+          if (args.threadId === "root" && !available)
+            throw new Error("Metadata not available yet");
+          return { thread: args.threadId === "child" ? child : root };
+        }
+        if (method === "thread/turns/list")
+          return {
+            data: [
+              {
+                id: "turn",
+                status: "completed",
+                startedAt: 1,
+                completedAt: 2,
+                items: [],
+              },
+            ],
+            nextCursor: null,
+          };
+        throw new Error("Unexpected native operation");
+      },
+    };
+    const createAdapter = () => {
+      const adapter = new CodexAdapter(
+        config,
+        dir,
+        store,
+        "fixture",
+        [],
+        reader,
+      );
+      adapter.setProjects([project]);
+      return adapter;
+    };
+    const collect = async (adapter: CodexAdapter) => {
+      const runs = [];
+      for await (const snapshot of adapter.collect()) runs.push(snapshot.run);
+      return runs;
+    };
+    const adapter = createAdapter();
+    const first = await collect(adapter);
+    expect(
+      first.find((run) => run.sessionId === "child")?.conversation,
+    ).toBeNull();
+    expect(store.getMeta(`codex:${dir}:false:updated`)).toBe("200");
+    expect(
+      JSON.parse(store.getMeta(`codex:${dir}:conversation-pending`) ?? "[]"),
+    ).toEqual(["child"]);
+    reads.length = 0;
+    await collect(adapter);
+    expect(reads).toContainEqual({
+      method: "thread/read",
+      id: "child",
+      includeTurns: false,
+    });
+    expect(
+      reads.some(
+        (read) => read.method === "thread/turns/list" && read.id === "child",
+      ),
+    ).toBe(false);
+    await adapter.close();
+    available = true;
+    const restarted = createAdapter();
+    const recovered = await collect(restarted);
+    expect(recovered.filter((run) => run.sessionId === "child")).toHaveLength(
+      1,
+    );
+    expect(
+      recovered.find((run) => run.sessionId === "child")?.conversation?.root,
+    ).toEqual({ kind: "codex", sessionId: "root" });
+    expect(
+      JSON.parse(store.getMeta(`codex:${dir}:conversation-pending`) ?? "[]"),
+    ).toEqual([]);
+    expect(store.getMeta(`codex:${dir}:false:updated`)).toBe("300");
+    await restarted.close();
   } finally {
     store.close();
     await rm(dir, { recursive: true, force: true });
