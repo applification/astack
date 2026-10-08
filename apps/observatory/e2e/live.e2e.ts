@@ -1,5 +1,71 @@
 import { test } from "@e2e-dev/web";
 import { expect, secrets } from "e2e";
+test("reported generated evaluation connects all captured parent skills and exact trace links", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  const id =
+    "bbb1fd30-527f-4326-b685-fb9c2e021092:evaluation:5b226ef2-442f-4dbe-9ebb-a6d4a5b5ea9a";
+  await app.open(
+    "/#evaluation/" +
+      encodeURIComponent(id) +
+      "?project=673cbb36-3688-4d26-8bf9-010b7ec026ed",
+  );
+  await screen.getByLabel("Private access key").fill(secrets.get("viewer"));
+  await screen.getByRole("button", "Open Observatory").tap();
+  const workflow = screen.getByRole("region", "Astack workflow", {
+    exact: true,
+  });
+  await expect(
+    workflow.getByRole("heading", "Observed skill reads", { exact: true }),
+  ).toBeVisible({ timeout: 30_000 });
+  await expect(
+    workflow.getByText(
+      "Route and phases were not recorded in the linked capture.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  const geometry = () =>
+    browser.evaluate(() => ({
+      skills: document.querySelectorAll(".map-main-cell .journey-skill-read a")
+        .length,
+      mainLines: document.querySelectorAll('path[data-connection="main"]')
+        .length,
+      rootLines: document.querySelectorAll('path[data-connection="root"]')
+        .length,
+      promptLines: document.querySelectorAll("[data-prompt-connection]").length,
+      resultLines: document.querySelectorAll("[data-result-connection]").length,
+      pageFits: document.documentElement.scrollWidth <= innerWidth,
+    }));
+  const expected = {
+    skills: 19,
+    mainLines: 19,
+    rootLines: 1,
+    promptLines: 1,
+    resultLines: 1,
+    pageFits: true,
+  };
+  await expect.poll(geometry).toEqual(expected);
+  await browser.setViewport({ width: 390, height: 844 });
+  await expect.poll(geometry).toEqual(expected);
+  await workflow
+    .getByRole("link", "Astack skill read in main trace", { exact: true })
+    .tap();
+  await expect(screen.getByRole("heading", "Activity trace")).toBeVisible();
+  await expect
+    .poll(() =>
+      browser.evaluate(() => {
+        const id = new URLSearchParams(location.hash.split("?")[1]).get(
+          "event",
+        );
+        const event = document.getElementById(id ?? "");
+        return event instanceof HTMLDetailsElement && event.open;
+      }),
+    )
+    .toBe(true);
+});
+
 test("deployed astack workflow connects the actual route, phases and evidence without assigning owner grades", async ({
   app,
   screen,

@@ -391,9 +391,17 @@ export async function normalizeT3Turn(options: {
     title: string,
     extra: Partial<AgentEvent> = {},
   ) => {
+    const legacyId = `${runId}:t3:${itemId}`;
+    // A valid host item ID can exceed the event budget once the run prefix and
+    // event variant are appended. Keep all previously valid IDs, and digest
+    // only the oversized suffix so ownership and replay identities stay stable.
+    const eventId =
+      legacyId.length <= 512
+        ? legacyId
+        : `${runId}:t3:sha256:${createHash("sha256").update(itemId).digest("hex")}`;
     events.push(
       eventSchema.parse({
-        id: `${runId}:t3:${itemId}`,
+        id: eventId,
         runId,
         sequence,
         kind,
@@ -822,7 +830,7 @@ export class T3Adapter {
       if (!project) continue;
       const checkpoint = `t3:${this.source.environmentId}:${thread.id}:updated`;
       const fingerprint = createHash("sha256")
-        .update(JSON.stringify({ captureVersion: 4, thread }))
+        .update(JSON.stringify({ captureVersion: 5, thread }))
         .digest("hex");
       if (
         !["running", "starting", "waiting", "preparing"].includes(

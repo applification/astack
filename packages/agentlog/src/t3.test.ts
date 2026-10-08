@@ -612,6 +612,50 @@ test("T3 Codex captures successful wrapped and multi-file skill reads without du
   ).toHaveLength(3);
 });
 
+test("long T3 item identities retain bounded distinct event IDs and stable replay", async () => {
+  const f = await fixture();
+  await mkdir(join(f.dir, "skills", "astack"), { recursive: true });
+  await writeFile(join(f.dir, "skills", "astack", "SKILL.md"), "astack");
+  const raw = projection("codex", "codex");
+  raw.turnItems = [
+    item("legacy", "assistant_message", { ordinal: 1, text: "Reply" }),
+    ...["a", "b"].map((ending, index) =>
+      item("nested:" + "x".repeat(480) + ending, "command_execution", {
+        ordinal: index + 2,
+        input: "cat skills/astack/SKILL.md",
+        exitCode: 0,
+      }),
+    ),
+  ];
+  const normalized = await snapshot(f, raw);
+  if (!normalized) throw new Error("Missing normalized fixture");
+  expect(
+    normalized.events.find((event) => event.kind === "assistant_output")?.id,
+  ).toBe(`${normalized.run.id}:t3:legacy`);
+  expect(normalized.events.every((event) => event.id.length <= 512)).toBe(true);
+  expect(
+    normalized.events.every((event) =>
+      event.id.startsWith(normalized.run.id + ":"),
+    ),
+  ).toBe(true);
+  expect(new Set(normalized.events.map((event) => event.id)).size).toBe(
+    normalized.events.length,
+  );
+  expect(
+    normalized.events.filter((event) => event.kind === "skill_loaded"),
+  ).toHaveLength(2);
+  persistSnapshot(f.store, normalized);
+  const replay = await snapshot(f, raw);
+  if (!replay) throw new Error("Missing replay fixture");
+  expect(replay.events.map((event) => event.id)).toEqual(
+    normalized.events.map((event) => event.id),
+  );
+  persistSnapshot(f.store, replay);
+  expect(f.store.events(normalized.run.id)).toHaveLength(
+    normalized.events.length,
+  );
+});
+
 test("T3 matches enrollment before reading history, includes archives, and commits replay checkpoints only after persistence", async () => {
   const f = await fixture();
   const calls: string[] = [];
@@ -672,7 +716,7 @@ test("T3 matches enrollment before reading history, includes archives, and commi
     `t3:${environmentId}:app-thread:updated`,
     createHash("sha256")
       .update(
-        JSON.stringify({ captureVersion: 3, thread: shellState.threads[0] }),
+        JSON.stringify({ captureVersion: 4, thread: shellState.threads[0] }),
       )
       .digest("hex"),
   );
