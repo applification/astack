@@ -12,12 +12,14 @@ returned results and explicit parent use have distinct connections.
 - W2: Parent phases, retries, skill reads and delegated contributions are
   inspectable. Separate dispatches are placed in recorded order rather than
   beneath one shared fork. Unknown timing is labelled rather than invented.
-- W3: Completed task, result present in parent capture, and parent-declared use
-  are independent facts. Completion creates no return/use edge. A join whose
+- W3: Completed task, result present in parent capture, host delivery, terminal
+  acknowledgement and parent-declared use are independent facts. Completion
+  creates no return/use edge. A join whose
   evidence is unavailable says use was declared and explains the coverage gap.
 - W4: Supported host result observations survive native/T3 overlap without
   replacing canonical native trace events, assessed outcomes or immutable
-  evaluation evidence. Null results create no result receipt.
+  evaluation evidence. A null result supplies no presence fact; delivery or
+  acknowledgement requires an explicit host classification.
 - W5: Keyboard selection, view switching and focus work; mobile has no document
   overflow. The graph permits local panning and detailed content can wrap.
 - W6: Indexed, bounded reads retain project/machine/readability checks and expose
@@ -41,7 +43,8 @@ this local implementation and review.
 
 ## Proof
 
-Record domain/collector/native Convex tests, UI lint/build, Storybook browser
-observations, local backend verification, independent review and retained
-synthetic screenshots here or in evidence/report.md. Distinguish synthetic
-presentation proof from persisted adapter proof and private live behavior.
+[Observed proof](evidence/report.md) maps these cases to domain/collector/native
+Convex tests, UI lint/build, Storybook browser observations, local backend
+verification, independent review and retained synthetic screenshots. Synthetic
+presentation proof, persisted adapter proof and private live behavior are
+reported separately.
