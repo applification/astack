@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { redact } from "./redaction";
 
 const id = z.string().min(1).max(512);
 const text = z.string().trim().min(1).max(4096);
@@ -196,6 +197,17 @@ export const evaluationSchema = evaluationManifestSchema
       });
   });
 export type Evaluation = z.infer<typeof evaluationSchema>;
+export function redactEvaluation(
+  input: unknown,
+  knownSecrets: readonly string[] = [],
+): Evaluation {
+  // Validate the bounded domain value before redaction so an oversized array
+  // cannot become a valid, silently shortened evaluation.
+  const value = evaluationSchema.parse(input);
+  return evaluationSchema.parse(
+    redact(value, knownSecrets, 0, null, capturedEvaluationLimits.prompts - 1),
+  );
+}
 export type ProofReport = z.infer<typeof proofReportSchema>;
 export const verificationResultSchema = z.object({
   caseId: id,

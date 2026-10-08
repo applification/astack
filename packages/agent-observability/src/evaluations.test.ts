@@ -3,6 +3,8 @@ import {
   evaluateProof,
   evaluationSchema,
   validateAssessment,
+  redactEvaluation,
+  capturedEvaluationLimits,
 } from "./evaluations";
 import {
   evaluationFixture,
@@ -52,6 +54,37 @@ test("captured intent resolves only its matching preserved source revision", () 
       },
     }),
   ).toThrow("captured original request revision");
+});
+
+test("evaluation redaction preserves bounded follow-ups and redacts secrets in the tail", () => {
+  const clarifications = [
+    ...Array.from({ length: 100 }, (_, index) => `Follow-up ${index}`),
+    "Keep private-test-secret out of persisted evidence.",
+  ];
+  const evaluation = generateEvaluation({
+    id: "fixture-redacted-request",
+    createdAt: 2000,
+    title: "Review long work",
+    runs: [{ run: evaluationRun("reproduce"), revision: 1 }],
+    source: { event: evaluationPrompt(), revision: 1 },
+    clarifications,
+    criteria: { method: "ui" },
+    proof: null,
+  });
+  const safe = redactEvaluation(evaluation, ["private-test-secret"]);
+  expect(safe.intent.clarifications).toEqual([
+    ...clarifications.slice(0, 100),
+    "Keep [REDACTED] out of persisted evidence.",
+  ]);
+  expect(() =>
+    redactEvaluation({
+      ...evaluation,
+      intent: {
+        ...evaluation.intent,
+        clarifications: Array(capturedEvaluationLimits.prompts).fill("x"),
+      },
+    }),
+  ).toThrow();
 });
 
 test("completed turns never substitute for proof or owner assessment", () => {

@@ -13,6 +13,7 @@ import {
   outcomeFeedbackSchema,
   type Evaluation,
   capturedEvaluationLimits,
+  redactEvaluation,
 } from "@astack/agent-observability/evaluations";
 import {
   evaluationDetailSchema,
@@ -188,7 +189,7 @@ export async function storeEvaluation(
   machineId: string,
 ) {
   // Evaluation record/snapshot byte budgets own size; redaction must not shorten captured intent.
-  const value = evaluationSchema.parse(redact(input, [], 0, null));
+  const value = redactEvaluation(input);
   if (
     value.machineId !== machineId ||
     !value.id.startsWith(machineId + ":evaluation:")

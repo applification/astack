@@ -10,6 +10,7 @@ import {
   type AgentRun,
 } from "@astack/agent-observability";
 import { redact } from "@astack/agent-observability/redaction";
+import { redactEvaluation } from "@astack/agent-observability/evaluations";
 import {
   projectPolicySchema,
   resolveProject,
@@ -34,6 +35,8 @@ export class LocalStore {
       CREATE TABLE IF NOT EXISTS records(key TEXT PRIMARY KEY, run_id TEXT NOT NULL, kind TEXT NOT NULL, payload TEXT NOT NULL, revision INTEGER NOT NULL, delivered INTEGER NOT NULL DEFAULT 0);
       CREATE INDEX IF NOT EXISTS by_pending ON records(delivered,revision);
       CREATE INDEX IF NOT EXISTS by_run ON records(run_id,kind);
+      CREATE INDEX IF NOT EXISTS by_prompt_sequence ON records(run_id,json_extract(payload,'$.value.sequence'))
+        WHERE kind='event' AND json_extract(payload,'$.value.kind')='user_prompt';
       CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY,value TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS evaluation_tasks(id TEXT PRIMARY KEY,state TEXT NOT NULL,data TEXT NOT NULL);
       CREATE INDEX IF NOT EXISTS evaluation_tasks_by_state ON evaluation_tasks(state);
@@ -41,12 +44,12 @@ export class LocalStore {
   }
   put(record: TelemetryRecord) {
     const safe = recordSchema.parse(
-      redact(
-        record,
-        this.secrets,
-        0,
-        record.kind === "evaluation" ? null : 8000,
-      ),
+      record.kind === "evaluation"
+        ? {
+            kind: record.kind,
+            value: redactEvaluation(record.value, this.secrets),
+          }
+        : redact(record, this.secrets),
     );
     if (Buffer.byteLength(JSON.stringify(safe)) > 128 * 1024) {
       if (safe.kind === "event" && safe.value.delivery)
