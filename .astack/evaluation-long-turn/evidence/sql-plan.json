@@ -1,0 +1,19 @@
+{
+  "environment": "disposable existing-schema SQLite, 2000 reverse-inserted prompts",
+  "oldPlan": [
+    "SEARCH records USING INDEX by_run (run_id=? AND kind=?)",
+    "USE TEMP B-TREE FOR ORDER BY"
+  ],
+  "migratedPlan": [
+    "SEARCH records USING INDEX by_prompt_sequence (run_id=?)"
+  ],
+  "sorterInsertAbsent": true,
+  "earlyOrderedPrefix": [
+    0,
+    1,
+    2
+  ],
+  "recordCountUnchanged": 2000,
+  "indexSurvivesRestart": true,
+  "migrationMilliseconds": 6.18
+}
