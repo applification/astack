@@ -577,6 +577,19 @@ test("T3 Codex captures successful wrapped and multi-file skill reads without du
         ...failure,
       }),
     ),
+    ...[
+      "cat skills/react/SKILL.md\necho skills/fiction/SKILL.md",
+      "cat missing/SKILL.md\ncat skills/react/SKILL.md",
+      "/bin/zsh -lc 'cat skills/react/SKILL.md\necho skills/fiction/SKILL.md'",
+      "cat skills/{astack,react}/SKILL.md",
+      "/bin/zsh -lc 'cat skills/{astack,react}/SKILL.md'",
+    ].map((input, index) =>
+      item("ambiguous-" + index, "command_execution", {
+        ordinal: index + 7,
+        input,
+        exitCode: 0,
+      }),
+    ),
   ];
   const normalized = await snapshot(f, raw);
   if (!normalized) throw new Error("Missing normalized fixture");

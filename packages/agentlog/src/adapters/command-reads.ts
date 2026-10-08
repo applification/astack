@@ -2,9 +2,16 @@ import { parse } from "shell-quote";
 
 // Recognize literal reader commands without executing captured shell text or
 // resolving its environment. Successful && chains establish every read;
-// pipelines, ; lists and dynamic paths cannot establish the same fact.
+// pipelines, command-separator newlines, ; lists and dynamic paths cannot
+// establish the same fact. Reject braces conservatively: shell-quote preserves
+// them literally, whereas the captured shell may expand them into other paths.
 export function commandReadPaths(command: string, depth = 0): string[] {
-  if (depth > 2 || command.length > 16_384 || /`|\$\(/.test(command)) return [];
+  if (
+    depth > 2 ||
+    command.length > 16_384 ||
+    /`|\$\(|[{}]|[\r\n]/.test(command.trim())
+  )
+    return [];
   try {
     const tokens = parse(command, () => {
       throw new Error("Dynamic shell path");

@@ -30,6 +30,11 @@ test.each([
   "cat skills/astack/SKILL.md && echo done",
   "cat --help",
   "cat ~/skills/astack/SKILL.md",
+  "cat skills/react/SKILL.md\necho skills/fiction/SKILL.md",
+  "cat missing/SKILL.md\ncat skills/astack/SKILL.md",
+  "/bin/zsh -lc 'cat skills/react/SKILL.md\necho skills/fiction/SKILL.md'",
+  "cat skills/{astack,react}/SKILL.md",
+  "/bin/zsh -lc 'cat skills/{astack,react}/SKILL.md'",
 ])("ambiguous command does not establish reads: %s", (command) => {
   expect(commandReadPaths(command)).toEqual([]);
 });
