@@ -9,6 +9,7 @@ Generated evaluations must show available skill evidence even when no agent decl
 - R3: Successful T3 shell wrappers and multiple literal read paths produce skill evidence. Failed commands, quoted examples, variable paths and ambiguous shell compositions do not. Upgrading replays previously checkpointed T3 history once, preserving existing event identities and source ownership.
 - R4: The bundled launcher reaches the private collector install when `agentlog` is absent from PATH. The installed Observatory reference directs agents through that launcher for route/phase and evaluation recording.
 - R5: Current readable-capture/project/machine policy governs skill projection; paused projects expose no reads. Parent reads are bounded to 64, child reads to 32 and the existing shared byte budget remains enforced. Evaluation snapshots and owner grades are unchanged.
+- R6: The five-child route fits desktop widths of 1280, 1600 and 1920 pixels with every child lane visible. Narrow screens retain readable lanes and allow both outer children to be panned into view. Resizing preserves aligned connectors and does not retain an obsolete oversized SVG canvas.
 
 ## Supported causes
 
@@ -35,3 +36,11 @@ Native Otis readback returns all 19 parent reads in exact trace order. The origi
 Independent review found F1 newline compositions and F2 brace expansion creating phantom reads. Both findings were accepted, repaired and cleared in a follow-up review. The identity repair received a separate independent pass, including Codex/Claude boundary fixtures and actual native Convex ingestion. The diagnosis proposal to hash an entire event ID without its run prefix was declined because it violates ingestion ownership. Existing limits still govern very long run prefixes; this repair covers the observed composed-item failure. Hashed IDs retain T3 timestamps or unavailable timing; native hook enrichment for those IDs was not independently verified.
 
 [Verification facts](evidence/verification.json) retain counts and hashes. [The representative capture](evidence/observed-parent-skills.png) uses synthetic data. Historical route/phase declarations were never captured and remain unknown; the map does not invent them from skill reads. No owner judgment was written.
+
+## Follow-up: clipped routing map
+
+The reported five-child evaluation used a 2816-pixel canvas inside a 1440-pixel viewport at a 1600-pixel desktop width. Fixed lane widths and page caps clipped the outer children. Evaluation pages now use the available screen width; lanes account for the viewport, lane count, gaps and outward label gutter. Text retains its normal size. Below 1025 pixels, readable 264-pixel lanes remain horizontally pannable. Larger branch counts can still need panning when their minimum readable width exceeds the viewport.
+
+A new five-child Storybook regression and the exact live evaluation both failed before repair with hidden routes and an oversized map. Resize testing then exposed an old SVG retaining its width through `scrollWidth`; measuring the map's layout box removes that stale canvas. Pen remains unnecessary for this correction to the established layout; Storybook includes a retained [synthetic five-child capture](evidence/five-child-routes-full-width.png).
+
+At `bf1616c`, nine focused Storybook browser tests and three real Otis tests pass without retries. The five-child route fits all three desktop widths; connectors stay on their anchors through resizing, and both narrow-screen outer headings can be reached. Strict types, 151 unit/native checks (781 assertions), lint, site/plugin checks, production and Storybook builds pass. The UI-only Otis update preserves backend/collector revisions and retains prior assets privately. Served HTML and asset hashes match the candidate build. [Width verification facts](evidence/width-verification.json) record this follow-up separately from the original recovery.
