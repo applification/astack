@@ -97,13 +97,18 @@ async function timelineStep(
     )
     .unique();
   const ends: Doc<"events">[][] = [];
-  for (const order of ["asc", "desc"] as const) {
+  for (const [kind, order] of [
+    ["user_prompt", "asc"],
+    ["assistant_output", "desc"],
+  ] as const) {
     const rows = [];
     let bytes = 0;
     if (budget.bytes < 256 * 1024) {
       for await (const row of ctx.db
         .query("events")
-        .withIndex("by_runId_and_sequence", (q) => q.eq("runId", run.id))
+        .withIndex("by_runId_and_kind_and_sequence", (q) =>
+          q.eq("runId", run.id).eq("kind", kind),
+        )
         .order(order)) {
         const size = new TextEncoder().encode(row.data).byteLength;
         rows.push(row);

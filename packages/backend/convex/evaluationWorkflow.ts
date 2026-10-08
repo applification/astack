@@ -66,6 +66,9 @@ export async function evaluationWorkflow(
     (a, b) => a.run.startedAt - b.run.startedAt,
   );
   const branches: WorkflowBranch[] = [];
+  // Parent observations do not require a collected child trace. A known child
+  // access restriction still blocks them; missing capture is a coverage gap.
+  const resultBranches = new Set<WorkflowBranch>();
   let children = 0;
   const visited = new Set<string>();
   const tasks = new Set<string>();
@@ -91,6 +94,7 @@ export async function evaluationWorkflow(
       branches.push(branch);
       const childReference = delegation.child;
       if (!childReference) {
+        resultBranches.add(branch);
         branch.reason =
           "The host did not expose a child conversation identity.";
         continue;
@@ -118,6 +122,10 @@ export async function evaluationWorkflow(
         .order("asc")
         .take(21);
       if (matches.length > 20) branch.truncated = truncated = true;
+      if (!matches.length) {
+        resultBranches.add(branch);
+        branch.reason = "Child capture has not been collected.";
+      }
       for (const match of matches.slice(0, 20)) {
         if (children >= 20) {
           branch.truncated = truncated = true;
@@ -148,6 +156,7 @@ export async function evaluationWorkflow(
         if (child.run.delegations.length) branch.truncated = truncated = true;
       }
       if (branch.runs.length) {
+        resultBranches.add(branch);
         branch.state = "available";
         branch.reason = null;
       } else if (truncated)
@@ -323,7 +332,7 @@ export async function evaluationWorkflow(
           entry.parentRunId === run.id &&
           entry.delegation.id === result.delegationId &&
           entry.delegation.source === "t3" &&
-          entry.state === "available" &&
+          resultBranches.has(entry) &&
           JSON.stringify(entry.delegation.child) ===
             JSON.stringify(result.child),
       );

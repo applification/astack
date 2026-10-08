@@ -3,6 +3,7 @@ import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import {
   eventCapabilities,
+  isCanonicalEvent,
   runSchema,
   type AgentSnapshot,
   type AgentAdapter,
@@ -121,9 +122,7 @@ export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
     }
     store.put({ kind: "event", value: event });
   }
-  const events = store
-    .events(snapshot.run.id)
-    .filter((event) => event.kind !== "delegation_result");
+  const events = store.events(snapshot.run.id).filter(isCanonicalEvent);
   const previous = store.getRecord(`run:${snapshot.run.id}`);
   const run = snapshot.run;
   if (previous?.kind === "run") {
@@ -284,7 +283,10 @@ export async function collect(
       for (const run of store.runsForSession()) {
         if (!resolveProject(projects, run)) continue;
         if (run.completedAt !== null) continue;
-        const findings = detectProblems(run, store.events(run.id));
+        const findings = detectProblems(
+          run,
+          store.events(run.id).filter(isCanonicalEvent),
+        );
         if (JSON.stringify(findings) !== JSON.stringify(run.findings))
           store.put({ kind: "run", value: { ...run, findings } });
       }

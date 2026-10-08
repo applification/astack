@@ -1568,6 +1568,86 @@ test("acknowledgment with nullable result and host run supplies no presence or d
   ).toEqual([{ state: "acknowledged", resultId: null, observedByRunId: null }]);
 });
 
+test("supplemental observations cannot crowd the final response out of bounded timeline reads", async () => {
+  const { t, fixture, event, read } = await resultCaptureFixture();
+  const response = eventSchema.parse({
+    ...evaluationPrompt(),
+    id: fixture.parent.id + ":final-response",
+    runId: fixture.parent.id,
+    sequence: 10,
+    kind: "assistant_output",
+    data: { content: "Parent integrated the reviewed changes." },
+  });
+  await ingestWorkflow(t, [{ kind: "event", value: response }]);
+  const before = (await read()).timeline;
+  await ingestWorkflow(
+    t,
+    Array.from({ length: 18 }, (_, index) => ({
+      kind: "event" as const,
+      value: {
+        ...event(
+          { state: "present", resultId: "revision-" + index },
+          "tail-" + index,
+        ),
+        sequence: 900_000_000 + index,
+      },
+    })),
+  );
+  const after = await read();
+  expect(after.timeline).toEqual(before);
+  expect(
+    after.timeline.find((step) => step.runId === fixture.parent.id)?.response
+      ?.text,
+  ).toBe("Parent integrated the reviewed changes.");
+  expect(after.workflow.results).toHaveLength(18);
+});
+
+test("approved parent observations remain available before child traces are collected", async () => {
+  const { t, fixture, event, read } = await resultCaptureFixture();
+  const observations: DelegationResult["observation"][] = [
+    { state: "present", resultId: "revision-1" },
+    { state: "delivered", resultId: "revision-1" },
+    { state: "acknowledged", resultId: "revision-1", observedByRunId: null },
+  ];
+  await ingestWorkflow(
+    t,
+    observations.map((observation) => ({
+      kind: "event" as const,
+      value: event(observation),
+    })),
+  );
+  await t.run(async (ctx) => {
+    for (const child of fixture.children.filter(
+      (run) => run.sessionId === "child-ui",
+    )) {
+      const row = await ctx.db
+        .query("runs")
+        .withIndex("by_runId", (q) => q.eq("runId", child.id))
+        .unique();
+      if (row) await ctx.db.delete(row._id);
+      const sessions = await ctx.db
+        .query("runSessions")
+        .withIndex("by_runId", (q) => q.eq("runId", child.id))
+        .collect();
+      for (const session of sessions) await ctx.db.delete(session._id);
+    }
+  });
+  const capture = await read();
+  expect(capture.workflow.results.map((result) => result.observation)).toEqual(
+    observations,
+  );
+  expect(
+    capture.workflow.branches.find(
+      (branch) => branch.delegation.id === "delegate-ui",
+    ),
+  ).toMatchObject({
+    state: "unavailable",
+    runs: [],
+    reason: "Child capture has not been collected.",
+  });
+  expect(capture.workflow.truncated).toBe(false);
+});
+
 test.each([
   "foreign-child-project",
   "foreign-child-machine",

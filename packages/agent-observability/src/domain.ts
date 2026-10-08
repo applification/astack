@@ -200,6 +200,11 @@ export function eventCapabilities(event: AgentEvent): SkillUse[] {
   ];
 }
 export type AgentEvent = z.infer<typeof eventSchema>;
+// Host result observations supplement the owning trace. They are uploaded and
+// inspectable, but do not change its event count, skills, tools or findings.
+export function isCanonicalEvent(event: AgentEvent): boolean {
+  return event.kind !== "delegation_result";
+}
 export type AgentRun = z.infer<typeof runSchema>;
 export type Finding = z.infer<typeof findingSchema>;
 export type TelemetryRecord = z.infer<typeof recordSchema>;

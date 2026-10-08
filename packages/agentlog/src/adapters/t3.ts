@@ -5,6 +5,7 @@ import {
   eventSchema,
   runSchema,
   launchContextSchema,
+  isCanonicalEvent,
   type AgentEvent,
   type AgentSnapshot,
 } from "@astack/agent-observability";
@@ -990,14 +991,13 @@ export async function normalizeT3Turn(options: {
       250,
     ),
     findings: [],
-    eventCount: events.filter((event) => event.kind !== "delegation_result")
-      .length,
+    eventCount: events.filter(isCanonicalEvent).length,
     contentCapture: config.captureContent,
     coverage,
   });
   run.findings = detectProblems(
     run,
-    events.filter((event) => event.kind !== "delegation_result"),
+    events.filter(isCanonicalEvent),
     observedAt,
   );
   return {

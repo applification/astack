@@ -1177,6 +1177,18 @@ test("upload progress distinguishes waiting, partial, paginated and complete tra
     "5 of 5 events uploaded. Trace up to date.",
   );
   await app.open(
+    "/iframe.html?id=observatory-trace--host-observations-uploaded&viewMode=story",
+  );
+  await expect(screen.getByRole("status")).toHaveText(
+    "1 of 1 events uploaded. Trace up to date. 2 host observations loaded separately.",
+  );
+  await expect(
+    screen.getByText("Host result present", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Host result delivered", { exact: true }),
+  ).toBeVisible();
+  await app.open(
     "/iframe.html?id=observatory-trace--checking-upload&viewMode=story",
   );
   await expect(screen.getByRole("status")).toHaveText(

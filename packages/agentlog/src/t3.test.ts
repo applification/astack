@@ -24,6 +24,7 @@ import {
 } from "./config";
 import { LocalStore } from "./store";
 import { persistSnapshot, collect, health } from "./collector";
+import { refreshRun } from "./context";
 import { envelopeSchema } from "@astack/agent-observability";
 import { projectSchema } from "@astack/agent-observability/projects";
 import {
@@ -821,6 +822,15 @@ test.each(["native-first", "t3-first"])(
       .filter((event) => event.kind !== "delegation_result");
     const canonicalRun = f.store.getRecord(`run:${host.run.id}`);
     if (canonicalRun?.kind !== "run") throw new Error("missing assessed owner");
+    refreshRun(f.store, canonicalRun.value);
+    expect(f.store.getRecord(`run:${host.run.id}`)).toMatchObject({
+      kind: "run",
+      value: {
+        eventCount: canonical.length,
+        findings: canonicalRun.value.findings,
+        outcome: "success",
+      },
+    });
     persistSnapshot(f.store, native);
     const repeat = await snapshot(f, raw);
     if (!repeat) throw new Error("missing repeat");
