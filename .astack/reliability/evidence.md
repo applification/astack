@@ -22,7 +22,7 @@ The parent confirmed both findings: G1 needed a predeclared reviewer qualificati
 
 ## Runner and fresh-repo observations
 
-Pending integration and execution. Do not use this intermediate record as completed proof.
+Before integration, the draft CLI created `/private/tmp/notebook-maintainer-seed-20261009` as its own Git repository. The parent opened its actual loopback app through T3 preview, created two Alice notes, clicked Done on the first, reloaded and restarted the owned service. The first record remained `done: false`, and the adjacent note remained unchanged. [The retained initial screenshot](evidence/seed-done-rejected.png) shows the still-open note; disk inspection confirmed the persisted value. The fixture is deliberately defective, so this is an expected baseline failure, not a harness completion claim. The final integrated checker and real-agent comparison are still pending.
 
 ## Owner acceptance still to run
 

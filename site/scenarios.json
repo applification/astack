@@ -590,8 +590,8 @@
     "route": "investigation"
   },
   {
-    "request": "Design a retryable export API before implementing it",
-    "decision": "Feature route for the implementation request; compose architect for caller usage, operation identity, state ownership and cancellation/recovery. Return a design sketch for a design-only request. A settled small interface needs no added phase.",
+    "request": "Implement a retryable export API with cancellation and duplicate-call handling",
+    "decision": "Feature route; compose architect for caller usage, operation identity, state ownership and cancellation/recovery. Return a design sketch for a design-only request. A settled small interface needs no added phase.",
     "route": "feature"
   },
   {
