@@ -13,7 +13,7 @@ Use this skill directly or during astack delivery for a feature or fix that chan
 
 Use **Pencil** when the change needs a visual direction, layout or state comparison, or an update to an existing agreed design. Use **Storybook** when isolated component states or interactions would make the intended behavior clearer or expose a regression. Use both when comparing a component to a selected design frame matters. A new product's first substantial web UI normally benefits from both. A project without either tool can still adopt astack's work method; add a tool when the task earns its setup cost. If a selected check is unavailable, name the blocker and the claim left unverified.
 
-Pencil is now Pen (pen.dev); use its available MCP guidance and tools. For a new product's substantial UI, establish a visual specification before implementation. No existing design is a reason to choose a direction, not by itself a reason to skip design. The foundation's portable `.astack/design/` demonstrates this with tokens, component instances, selected web/MCP frames and corresponding stories. A design reconstructed from completed code cannot establish that it guided generation.
+Pencil is now Pen (pen.dev); use its available MCP guidance and tools. For a new product's substantial UI, establish a visual specification before implementation. No existing design is a reason to choose a direction, not by itself a reason to skip design. A design reconstructed from completed code cannot establish that it guided generation.
 
 ## Choose the stack
 

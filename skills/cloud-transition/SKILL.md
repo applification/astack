@@ -31,7 +31,7 @@ Use installed CLI help and current [deployment selection](https://docs.convex.de
 | --- | --- |
 | Convex | Set server variables, build identifier and actual resource URL; push schema/functions and check indexes and migration results. Remove local proof issuer, JWKS and token settings; explicitly disable proof mode where the auth configuration requires a mode value. |
 | Frontend | Set the chosen cloud client URL in the platform's public build variable, configure hosted origin/router, build and deploy through the chosen host. Preserve local values separately. A backend deployment alone does not host a Vite frontend. |
-| WorkOS | Select the intended environment; register hosted redirects, logout and CORS origins. Configure the deployed authentication API domain and supported production session settings. Preserve local callbacks. Follow [web and MCP identity guidance](https://github.com/applification/astack/blob/main/examples/foundation/docs/engineering-profile.md#identity-across-web-and-mcp). |
+| WorkOS | Select the intended environment; register hosted redirects, logout and CORS origins. Configure the deployed authentication API domain and supported production session settings. Preserve local callbacks. Follow [WorkOS identity guidance](../workos-auth/SKILL.md). |
 | MCP | Set exact HTTPS resource URL, issuer and audience; update discovery and WorkOS Connect resource/client settings. Refresh the real host's connection/consent. Preserve distinct web/MCP credentials and backend ownership enforcement. |
 | CI/integrations | Scope secrets, build variables, webhook URLs and release permissions to this target; keep local startup independent of cloud release credentials. |
 

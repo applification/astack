@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@fixture/ui": ["./packages/ui/src/index.tsx"],
+      "@fixture/backend/api": ["./packages/backend/convex/api.ts"],
+      "@private-backend": ["./packages/backend/convex/workItems.ts"]
+    }
+  },
+  "include": ["packages"]
+}

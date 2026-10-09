@@ -40,8 +40,6 @@ Record plugin identity, resource version, server revision, connection identity, 
 
 OpenAI Developers can provide current implementation guidance when available. plugin-creator can help package and register a marketplace, but its current compatibility scaffold must be converted to root plugin.json and mcp.json before keeping it. Use OpenAI's Bits & Bolts for extension examples; generic MCP skills need a ChatGPT-specific capability and dependency check.
 
-The repository's [reference example](https://github.com/applification/astack/tree/main/examples/chatgpt-plugin) exercises two isolated SDK profiles. It is a development fixture, not a hosted service or evidence of ChatGPT support.
-
 Sources checked 2026-09-30: [plugin architecture](https://developers.openai.com/plugins/concepts/plugins), [extensions](https://developers.openai.com/plugins/build/extensions), [UI](https://developers.openai.com/plugins/build/chatgpt-ui), [testing](https://developers.openai.com/plugins/deploy/connect-chatgpt).
 
 ## Finish the requested job

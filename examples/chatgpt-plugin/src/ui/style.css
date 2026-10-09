@@ -1,6 +1,0 @@
-:root { color-scheme: light dark; font-family: var(--font-sans, system-ui, sans-serif); color: var(--color-text-primary, CanvasText); background: var(--color-background-primary, Canvas); }
-body { margin: 0; padding: 20px; } h1 { font-size: 1.4rem; } ul { padding: 0; list-style: none; }
-button, textarea { font: inherit; color: inherit; } button { cursor: pointer; border: 1px solid var(--color-border-primary, GrayText); border-radius: 8px; background: var(--color-background-secondary, Canvas); padding: 12px; }
-li { margin-block: 10px; } li button { width: 100%; text-align: left; } button[aria-pressed=true] { outline: 2px solid var(--color-text-primary, CanvasText); }
-strong, span { display: block; } span { margin-top: 6px; } textarea { display: block; box-sizing: border-box; width: 100%; min-height: 150px; margin-block: 12px; }
-.actions { display: flex; gap: 12px; flex-wrap: wrap; } [role=alert] { color: var(--color-text-danger, #b3261e); }

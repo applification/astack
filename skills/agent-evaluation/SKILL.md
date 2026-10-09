@@ -18,7 +18,7 @@ Judge craftsmanship separately using [the code-review rubric](../code-review/ref
 
 Report task-level outcomes, explicit denominators, variability, interventions, observed usage and timing, and grader/fixture/version provenance. Unknown cost is unknown. A small smoke run supports its cases; it cannot establish a general reliability improvement. Capture and workflow correlations do not establish causality.
 
-The [repository validation guide](../../docs/agent-validation.md) provides a small local fixture and commands for controlled runs and owner manual tests in a new repository. Resolve and record the recipe's source revision; keep one evaluator checkout fixed across plugin conditions. Use the project's established runner when it supplies the same boundaries. Do not install another host, run broad paid trials, or schedule recurring experiments solely because this skill is loaded.
+Resolve and record the recipe's source revision; keep one evaluator checkout fixed across plugin conditions. Use the project's established runner when it has one. Do not install another host, run broad paid trials, or schedule recurring experiments solely because this skill is loaded.
 
 Return the experiment design or observed results requested by the caller, unresolved controls, and an evidence-based promotion recommendation. The caller retains delivery and publication ownership.
 

@@ -24,4 +24,4 @@ After server metadata changes, restart/deploy, refresh the connection, confirm n
 
 Validate both portable schemas and extension paths/assets, ensure no fallback manifests remain, inspect a relocated build and prove stdio or HTTP tools. Then test skill activation and the installed UI/events in the real host. A valid manifest doesn't prove the client loaded the package.
 
-Sources checked 2026-09-30: [packaging](https://developers.openai.com/plugins/build/plugins), [connection testing](https://developers.openai.com/plugins/deploy/connect-chatgpt), [Secure MCP Tunnel](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels). astack's project adoption instructions remain in [project-install](https://github.com/applification/astack/blob/main/docs/project-install.md).
+Sources checked 2026-09-30: [packaging](https://developers.openai.com/plugins/build/plugins), [connection testing](https://developers.openai.com/plugins/deploy/connect-chatgpt), [Secure MCP Tunnel](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels).

@@ -1,6 +1,0 @@
-interface:
-  display_name: "Reference Setup"
-  short_description: "Explain the local UI and MCP reference profiles"
-  default_prompt: "Use $setup to explain and exercise the installed reference profiles within this host's supported capabilities."
-policy:
-  allow_implicit_invocation: true

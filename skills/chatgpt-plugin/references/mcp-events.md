@@ -28,4 +28,4 @@ Directly exercise list, canonical identity, repeat subscribe, wrong-owner denial
 
 In ChatGPT separately observe discovery, user-authorized subscribe, callback verification, matching event, intended agent response, independent read of any mutation and stop monitoring. Exercise nonmatching events and access revocation. Record host/model/account, subscription identity without secrets, server revision and result. Do not infer task completion from webhook acceptance.
 
-Source checked 2026-09-30: [MCP Events integration](https://developers.openai.com/plugins/build/mcp-events). The [reference example](https://github.com/applification/astack/tree/main/examples/chatgpt-plugin) is a single-process fixture; production needs the project's transactional storage, authorization and queue.
+Source checked 2026-09-30: [MCP Events integration](https://developers.openai.com/plugins/build/mcp-events). Production needs the project's transactional storage, authorization and queue.

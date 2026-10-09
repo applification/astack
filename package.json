@@ -3,29 +3,30 @@
   "private": true,
   "type": "module",
   "packageManager": "bun@1.4.0",
+  "exports": {
+    "./eslint": "./lint/eslint.mjs",
+    "./tsconfig": "./lint/tsconfig.json"
+  },
   "scripts": {
-    "check": "node site/check.mjs && bun scripts/check-plugins.ts",
-    "check:plugins": "bun scripts/check-plugins.ts",
-    "agent-evals": "bun examples/foundation/scripts/agent-evals.ts",
-    "agent-evals:check": "bun run --cwd examples/foundation typecheck && bun test examples/foundation/tests/agent-evals.test.ts examples/foundation/tests/trials.test.ts examples/foundation/evals/notebook/server.test.ts"
+    "check": "bun scripts/check-plugins.ts && bun test"
+  },
+  "dependencies": {
+    "@eslint/js": "9.39.4",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "typescript-eslint": "8.71.0"
+  },
+  "peerDependencies": {
+    "eslint": "^9.39.0",
+    "typescript": ">=5.9"
   },
   "devDependencies": {
     "@cfworker/json-schema": "4.1.1",
-    "@e2e-dev/web": "0.11.1",
-    "@eslint/js": "9.39.4",
-    "@shadcn/lint": "0.2.0",
     "@types/bun": "1.4.2",
     "@types/react": "19.3.0",
-    "@types/react-dom": "19.3.0",
-    "convex-test": "0.0.60",
-    "e2e": "0.15.1",
     "eslint": "9.39.4",
-    "jose": "6.2.12",
-    "playwright": "1.63.0",
     "prettier": "3.9.9",
-    "turbo": "2.11.7",
-    "typescript": "npm:@typescript/typescript6@6.0.2",
-    "typescript-eslint": "8.71.0",
-    "zod": "4.6.5"
+    "typescript": "npm:@typescript/typescript6@6.0.2"
   }
 }

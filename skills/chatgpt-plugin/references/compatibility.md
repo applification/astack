@@ -8,6 +8,4 @@ Fetch the exact chosen SDK's package metadata and source for registration, auth,
 
 Record resolved versions, protocol, runtime, source date, target host/account and observed checks in the project profile. Verify forms/events/extensions in the actual target host; local round trips and compiling types establish only those checks. Feature-detect optional host APIs and retain unavailable coverage as a gap.
 
-The [worked compatibility ledger](https://github.com/applification/astack/blob/main/examples/chatgpt-plugin/docs/compatibility.md) records the reference's fixed 2026-09-30 SDK experiment and historical constraints; it is not a latest-version install recipe.
-
 Primary sources: [SDK peers](https://github.com/openai/mcp-extensions/blob/main/typescript/package.json), [SDK README](https://github.com/openai/mcp-extensions/blob/main/typescript/README.md), [extension spec](https://github.com/openai/mcp-extensions/blob/main/docs/spec.md), [MCP SDK](https://ts.sdk.modelcontextprotocol.io/v2/), [MRTR](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr).

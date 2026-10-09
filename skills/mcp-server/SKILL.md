@@ -15,7 +15,7 @@ Use this skill directly or during astack delivery when building or changing an M
 
 For ChatGPT MCP Apps, OpenAI extensions, portable packaging or events, also use [ChatGPT plugin engineering](../chatgpt-plugin/SKILL.md). Its [compatibility ledger](../chatgpt-plugin/references/compatibility.md) overrides the generic v2 default when using the released OpenAI helper; do not mix incompatible SDK majors.
 
-The [foundation profile](https://github.com/applification/astack/blob/main/examples/foundation/docs/engineering-profile.md) serves authenticated HTTP MCP directly from a Convex HTTP action and uses WorkOS Connect for OAuth. Share authorized backend operations with web; keep transport details at the MCP adapter and the host bridge out of portable UI. This profile needs no separate `apps/mcp` service. A separate server remains appropriate for other runtimes, deployment boundaries, or stdio tools. Apply the profile's identity rules before choosing token validation or delegation.
+The astack default serves authenticated HTTP MCP directly from a Convex HTTP action and uses WorkOS Connect for OAuth. Share authorized backend operations with web; keep transport details at the MCP adapter and the host bridge out of portable UI. This default needs no separate `apps/mcp` service. A separate server remains appropriate for other runtimes, deployment boundaries, or stdio tools. Apply [WorkOS identity guidance](../workos-auth/SKILL.md) before choosing token validation or delegation.
 
 ## Choose the serving boundary
 
