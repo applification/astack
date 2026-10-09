@@ -177,11 +177,15 @@ export function WorkflowEvidence({
       }
       aria-label="Work evidence"
       onKeyDown={(event) => {
+        const inDialog =
+          event.target instanceof Element &&
+          !!event.target.closest('[role="dialog"], [role="alertdialog"]');
         if (
           event.key === "Escape" &&
-          !event.defaultPrevented &&
+          !inDialog &&
           mode === "graph"
         ) {
+          // A tooltip finishing dismissal can prevent this key first.
           event.preventDefault();
           back();
         }
