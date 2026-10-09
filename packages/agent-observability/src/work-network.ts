@@ -53,7 +53,7 @@ export const networkEdgeLabels = {
   delegation: "Delegated task",
   capture: "Captured child conversation",
   contains: "Contains captured turn",
-  records: "Turn recorded activity",
+  records: "Recorded activity",
   observed_read: "Observed skill reference",
   declared_skill: "Agent declared skill",
   references: "Declaration references evidence",

@@ -8,8 +8,19 @@ import {
 import { WorkEvidenceDetails } from "./work-evidence-details";
 import { WorkGraph } from "./work-graph";
 import { WorkCard } from "./work-card";
-import { buildWorkNetwork } from "@astack/agent-observability/work-network";
-import { WorkNetworkDetails } from "./work-network-details";
+import { X } from "lucide-react";
+import {
+  networkItemLabels,
+  type NetworkSelection,
+} from "./work-network-presentation";
+import {
+  buildWorkNetwork,
+  networkEdgeLabels,
+} from "@astack/agent-observability/work-network";
+import {
+  WorkNetworkDetails,
+  WorkRelationshipDetails,
+} from "./work-network-details";
 import { branchOwnsRun } from "@astack/agent-observability/workflow-view";
 
 function WorkStory({
@@ -99,7 +110,9 @@ export function WorkflowEvidence({
   initialMode?: "story" | "graph";
 }) {
   const [mode, setMode] = useState<"story" | "graph">(initialMode);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selection, setSelection] = useState<NetworkSelection | null>(null);
+  const [panelOpen, setPanelOpen] = useState(false);
+  const selectedId = selection?.kind === "node" ? selection.id : null;
   const [expanded, setExpanded] = useState(new Set<string>());
   const heading = useRef<HTMLHeadingElement>(null);
   const content = useRef<HTMLDivElement>(null);
@@ -122,23 +135,124 @@ export function WorkflowEvidence({
   const selected = view.nodes.find(
     (node) => node.id === selectedId || node.id === networkSelected?.storyId,
   );
-  const select = (nodeId: string) => {
-    setSelectedId(nodeId);
+  const edge =
+    selection?.kind === "edge"
+      ? network.edges.find((edge) => edge.id === selection.id)
+      : null;
+  const graphSelection: NetworkSelection | null = networkSelected
+    ? { kind: "node", id: networkSelected.id }
+    : selection;
+  const select = (next: NetworkSelection) => {
+    setSelection(next);
+    setPanelOpen(true);
     requestAnimationFrame(() => heading.current?.focus());
   };
+  const selectNode = (id: string) => select({ kind: "node", id });
+  const selectEdge = (id: string) => select({ kind: "edge", id });
   const back = () => {
-    const target = [
-      ...(content.current?.querySelectorAll<HTMLButtonElement | SVGElement>(
-        "[data-work-id]",
-      ) ?? []),
-    ].find(
-      (button) =>
-        button.dataset.workId ===
-          (mode === "graph" ? networkSelected?.id : selected?.id) &&
-        !button.closest("[hidden]"),
-    );
-    target?.focus();
+    if (mode === "graph") setPanelOpen(false);
+    requestAnimationFrame(() => {
+      const target = [
+        ...(content.current?.querySelectorAll<HTMLButtonElement | SVGElement>(
+          "[data-work-id], [data-edge-id]",
+        ) ?? []),
+      ].find(
+        (element) =>
+          !element.closest("[hidden]") &&
+          (selection?.kind === "edge"
+            ? element.dataset.edgeId === selection.id
+            : element.dataset.workId ===
+              (mode === "graph" ? networkSelected?.id : selected?.id)),
+      );
+      if (target) target.focus();
+      else if (mode === "graph")
+        content.current?.querySelector<SVGSVGElement>(".work-network")?.focus();
+      else content.current?.focus();
+    });
   };
+  const inspector = (
+    <aside
+      className={
+        mode === "graph" ? "work-inspector graph-inspector" : "work-inspector"
+      }
+      aria-label="Work evidence"
+      onKeyDown={(event) => {
+        if (
+          event.key === "Escape" &&
+          !event.defaultPrevented &&
+          mode === "graph"
+        ) {
+          event.preventDefault();
+          back();
+        }
+      }}
+    >
+      <div className="work-inspector-heading">
+        <div className="graph-inspector-topline">
+          <span className="work-node-kind">
+            {edge
+              ? "Relationship"
+              : networkSelected
+                ? networkItemLabels[networkSelected.item.kind]
+                : "Evidence"}
+          </span>
+          {mode === "graph" && (
+            <Button
+              variant="graphIcon"
+              aria-label="Close inspection"
+              onClick={back}
+            >
+              <X size={16} aria-hidden="true" />
+            </Button>
+          )}
+        </div>
+        <h3 tabIndex={-1} ref={heading}>
+          {edge
+            ? networkEdgeLabels[edge.kind]
+            : mode === "story" && selected
+              ? selected.title
+              : (networkSelected?.title ?? selected?.title ?? "Inspect a step")}
+        </h3>
+        {mode === "story" && (selected || networkSelected || edge) && (
+          <Button
+            variant="ghost"
+            onClick={back}
+          >
+            Back to selected step
+          </Button>
+        )}
+      </div>
+      {edge ? (
+        <WorkRelationshipDetails
+          edge={edge}
+          network={network}
+          detail={detail}
+          onSelect={selectNode}
+          onSelectEdge={selectEdge}
+          expanded={expanded}
+          onExpanded={setExpanded}
+        />
+      ) : networkSelected && (mode === "graph" || !selected) ? (
+        <WorkNetworkDetails
+          node={networkSelected}
+          network={network}
+          detail={detail}
+          onSelect={selectNode}
+          onSelectEdge={selectEdge}
+          expanded={expanded}
+          onExpanded={setExpanded}
+        />
+      ) : selected ? (
+        <WorkEvidenceDetails node={selected} detail={detail} />
+      ) : (
+        <p className="secondary">
+          {selection
+            ? "This selection is no longer available in the current bounded capture. Select another item."
+            : "Select a parent step or child contribution to see its status, declarations and linked trace evidence."}
+        </p>
+      )}
+    </aside>
+  );
   const phases = detail.workflow.records.some(
     (record) => record.annotation.action === "phase",
   );
@@ -191,8 +305,8 @@ export function WorkflowEvidence({
             " Phase declarations are shown below; route selection is unavailable."}
         </p>
       )}
-      <div className="work-layout">
-        <div ref={content} id={id} className="work-content">
+      <div className="work-layout" data-view={mode}>
+        <div ref={content} id={id} className="work-content" tabIndex={-1}>
           <div className="work-root" data-map-root="">
             {mode === "graph"
               ? "Captured relationships"
@@ -202,14 +316,15 @@ export function WorkflowEvidence({
             <WorkStory
               view={view}
               selected={selected?.id ?? null}
-              onSelect={select}
+              onSelect={selectNode}
             />
           </div>
           <div hidden={mode !== "graph"}>
             <WorkGraph
               network={network}
-              selected={networkSelected?.id ?? null}
+              selected={graphSelection}
               onSelect={select}
+              inspector={mode === "graph" && panelOpen ? inspector : null}
               expanded={expanded}
               onExpanded={setExpanded}
             />
@@ -219,37 +334,7 @@ export function WorkflowEvidence({
             Completion, result receipt and declared use are separate facts.
           </p>
         </div>
-        <aside className="work-inspector" aria-label="Work evidence">
-          <div className="work-inspector-heading">
-            <h3 tabIndex={-1} ref={heading}>
-              {(mode === "graph" ? networkSelected?.title : selected?.title) ??
-                "Inspect a step"}
-            </h3>
-            {(selected || networkSelected) && (
-              <Button variant="ghost" onClick={back}>
-                Back to selected step
-              </Button>
-            )}
-          </div>
-          {mode === "graph" && networkSelected ? (
-            <WorkNetworkDetails
-              node={networkSelected}
-              network={network}
-              detail={detail}
-              onSelect={select}
-              expanded={expanded}
-              onExpanded={setExpanded}
-            />
-          ) : selected ? (
-            <WorkEvidenceDetails node={selected} detail={detail} />
-          ) : (
-            <p className="secondary">
-              {selectedId
-                ? "This step is no longer available in the current bounded capture. Select another step."
-                : "Select a parent step or child contribution to see its status, declarations and linked trace evidence."}
-            </p>
-          )}
-        </aside>
+        {mode === "story" && inspector}
       </div>
       {detail.workflow.truncated && (
         <p role="status" className="notice">

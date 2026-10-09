@@ -1780,9 +1780,7 @@ test("network layouts, expansion, filters and keyboard inspection preserve captu
   const canvas = screen.getByRole("group", "Captured work graph", {
     exact: true,
   });
-  await expect(
-    screen.getByRole("button", "Force", { exact: true }),
-  ).toHaveAttribute("aria-pressed", "true");
+  await expect(screen.getByLabel("Graph layout")).toHaveValue("force");
   expect(
     await browser.evaluate(
       () =>
@@ -1809,15 +1807,17 @@ test("network layouts, expansion, filters and keyboard inspection preserve captu
       ),
     );
   const before = await endpoints();
-  await screen.getByRole("button", "Communities", { exact: true }).tap();
+  await screen
+    .getByLabel("Graph layout")
+    .selectOption({ value: "communities" });
   await expect(
     screen.getByText("Colors group visible connectivity", { exact: false }),
   ).toBeVisible();
   expect(await endpoints()).toEqual(before);
   await app.screenshot("work-network-communities");
-  await screen.getByRole("button", "Layered", { exact: true }).tap();
+  await screen.getByLabel("Graph layout").selectOption({ value: "layered" });
   expect(await endpoints()).toEqual(before);
-  await screen.getByRole("button", "Force", { exact: true }).tap();
+  await screen.getByLabel("Graph layout").selectOption({ value: "force" });
   const test = screen
     .getByRole("button", "Inspect Captured child test result", { exact: true })
     .first();
@@ -1833,16 +1833,20 @@ test("network layouts, expansion, filters and keyboard inspection preserve captu
   const trace = await inspector
     .getByRole("link", "Event in full trace", { exact: true })
     .getAttribute("href");
-  await screen.getByRole("button", "Activity", { exact: true }).tap();
+  await screen.getByRole("button", "Filters", { exact: true }).tap();
+  await screen.getByRole("checkbox", "Activity", { exact: true }).uncheck();
   await expect(
-    screen.getByText("The selected node is hidden", { exact: false }),
+    screen.getByText("The selected item is hidden", { exact: false }),
   ).toBeVisible();
   await expect(
     inspector.getByRole("link", "Event in full trace", { exact: true }),
   ).toHaveAttribute("href", trace ?? "");
-  await screen.getByRole("button", "Activity", { exact: true }).tap();
+  await screen.getByRole("checkbox", "Activity", { exact: true }).check();
+  await screen
+    .getByRole("checkbox", "Activity", { exact: true })
+    .press("Escape");
   await inspector
-    .getByRole("button", "Back to selected step", { exact: true })
+    .getByRole("button", "Close inspection", { exact: true })
     .tap();
   await expect(test).toBeFocused();
   const initial = await canvas.getAttribute("viewBox");
@@ -1871,6 +1875,7 @@ test("network layouts, expansion, filters and keyboard inspection preserve captu
           .length,
     ),
   ).toBe(2);
+  await screen.getByRole("button", "Filters", { exact: true }).tap();
   await screen
     .getByLabel("Graph relationships")
     .selectOption({ value: "delegation" });
@@ -1882,9 +1887,206 @@ test("network layouts, expansion, filters and keyboard inspection preserve captu
     ),
   ).toEqual(["delegation", "capture", "delegation", "capture"]);
   await screen.getByLabel("Graph relationships").selectOption({ value: "all" });
+  await screen.getByLabel("Graph relationships").press("Escape");
   await screen.getByRole("button", "Expand all", { exact: true }).tap();
   await screen.getByLabel("Color theme").selectOption({ value: "dark" });
   await app.screenshot("work-network-force-dark");
+});
+
+test("graph previews stay separate from selection and inspection preserves the viewport", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await browser.setViewport({ width: 1440, height: 1000 });
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--network-explorer&viewMode=story",
+  );
+  const inspector = screen.getByRole("complementary", "Work evidence");
+  const canvas = screen.getByRole("group", "Captured work graph");
+  await expect(inspector).toHaveCount(0);
+  expect(
+    await browser.evaluate(() => {
+      const canvas = document.querySelector(".work-network");
+      const workspace = document.querySelector(".work-content");
+      return canvas && workspace
+        ? canvas.getBoundingClientRect().width /
+            workspace.getBoundingClientRect().width
+        : 0;
+    }),
+  ).toBeGreaterThan(0.95);
+  const node = screen.getByRole("button", "Inspect UI checks", { exact: true });
+  await node.scrollIntoView();
+  await node.hover();
+  await expect(screen.getByRole("tooltip")).toContainText("DELEGATED TASK");
+  await expect(screen.getByRole("tooltip")).toContainText("UI checks");
+  await expect(node).toHaveAttribute("aria-describedby", /.+/);
+  await screen.getByRole("tooltip").hover();
+  await expect(screen.getByRole("tooltip")).toBeVisible();
+  await expect(inspector).toHaveCount(0);
+  await node.press("Escape");
+  await expect(screen.getByRole("tooltip")).toHaveCount(0);
+  await browser.mouse.move(0, 0);
+  await canvas.focus();
+  await node.focus();
+  await expect(screen.getByRole("tooltip")).toContainText("Select to inspect");
+  const before = await canvas.getAttribute("viewBox");
+  await node.press("Enter");
+  await expect(inspector.getByRole("heading", "UI checks")).toBeFocused();
+  await expect(canvas).toHaveAttribute("viewBox", before ?? "");
+  await inspector.getByRole("button", "Close inspection").tap();
+  await expect(inspector).toHaveCount(0);
+  await expect(node).toBeFocused();
+  await node.press("Enter");
+  await inspector.getByRole("heading", "UI checks").press("Escape");
+  await expect(inspector).toHaveCount(0);
+  await expect(node).toBeFocused();
+  await expect(canvas).toHaveAttribute("viewBox", before ?? "");
+});
+
+test("graph relationships expose supporting capture and endpoint navigation across views", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--network-explorer&viewMode=story",
+  );
+  await screen.getByRole("button", "Expand all").tap();
+  const node = screen
+    .getByRole("button", "Inspect Captured child test result", { exact: true })
+    .first();
+  const nodeId = await node.getAttribute("data-work-id");
+  const edge = browser.locator(
+    `.work-network [data-work-edge="records"][data-work-to=${JSON.stringify(nodeId)}]`,
+  );
+  await edge.focus();
+  await expect(screen.getByRole("tooltip")).toContainText(
+    "Captured child test result",
+  );
+  await expect(screen.getByRole("tooltip")).toContainText("→");
+  await expect(edge).toHaveAttribute("aria-describedby", /.+/);
+  await edge.press("Space");
+  const inspector = screen.getByRole("complementary", "Work evidence");
+  await expect(
+    inspector.getByRole("heading", "Recorded activity"),
+  ).toBeFocused();
+  await expect(inspector).toContainText("does not establish an event time");
+  await expect(inspector).toContainText("Occurrence time unavailable");
+  const trace = await inspector
+    .getByRole("link", "Event in full trace")
+    .getAttribute("href");
+  await screen.getByRole("button", "Work story", { exact: true }).tap();
+  await expect(
+    inspector.getByRole("link", "Event in full trace"),
+  ).toHaveAttribute("href", trace ?? "");
+  await expect(inspector).not.toContainText(
+    "unavailable in the current work capture",
+  );
+  await screen.getByRole("button", "Graph", { exact: true }).tap();
+  await inspector.getByRole("button", "Close inspection").tap();
+  await expect(edge).toBeFocused();
+  await edge.press("Enter");
+  await inspector
+    .getByRole("button", "Inspect destination node: Captured child test result")
+    .tap();
+  await expect(
+    inspector.getByRole("heading", "Captured child test result"),
+  ).toBeFocused();
+  await screen.getByRole("button", "Work story", { exact: true }).tap();
+  await expect(inspector).toContainText("Occurrence time unavailable");
+  await screen.getByRole("button", "Graph", { exact: true }).tap();
+  await screen.getByRole("button", "Filters", { exact: true }).tap();
+  await screen.getByRole("checkbox", "Activity").uncheck();
+  await screen.getByRole("checkbox", "Activity").press("Escape");
+  await expect(
+    screen.getByText("The selected item is hidden", { exact: false }),
+  ).toBeVisible();
+  await expect(
+    inspector.getByRole("link", "Event in full trace"),
+  ).toHaveAttribute("href", trace ?? "");
+  await inspector.getByRole("button", "Close inspection").tap();
+  await expect(screen.getByRole("group", "Captured work graph")).toBeFocused();
+  await browser
+    .locator('.work-network [data-work-edge="capture"] .work-network-hit')
+    .first()
+    .tap();
+  await expect(
+    inspector.getByRole("heading", "Captured child conversation"),
+  ).toBeFocused();
+  await expect(inspector).toContainText("Task completion");
+});
+
+test("graph filters are grouped, dismissible and resettable on a narrow screen", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await browser.setViewport({ width: 390, height: 844 });
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--network-explorer&viewMode=story",
+  );
+  const filters = screen.getByRole("button", "Filters", { exact: true });
+  await filters.focus();
+  await filters.press("Enter");
+  await expect(screen.getByLabel("Graph relationships")).toBeFocused();
+  const panel = screen.getByRole("region", "Graph filters");
+  await expect(panel).toBeVisible();
+  expect(
+    await browser.evaluate(() => {
+      const bounds = document
+        .querySelector(".graph-disclosure-panel")
+        ?.getBoundingClientRect();
+      return !!bounds && bounds.left >= 0 && bounds.right <= innerWidth;
+    }),
+  ).toBe(true);
+  await screen.getByRole("checkbox", "Activity").uncheck();
+  await screen.getByRole("checkbox", "Supporting evidence").uncheck();
+  const restricted = screen.getByRole("button", "Filters · 2 active", {
+    exact: true,
+  });
+  await expect(restricted).toHaveAttribute("aria-expanded", "true");
+  await screen.getByRole("button", "Reset filters").tap();
+  await expect(screen.getByRole("checkbox", "Activity")).toBeChecked();
+  await expect(
+    screen.getByRole("checkbox", "Supporting evidence"),
+  ).toBeChecked();
+  await screen.getByRole("checkbox", "Supporting evidence").press("Escape");
+  await expect(panel).toHaveCount(0);
+  await expect(filters).toBeFocused();
+  await filters.tap();
+  await screen.getByLabel("Graph layout").focus();
+  await expect(panel).toHaveCount(0);
+  await filters.tap();
+  await screen.getByRole("button", "Expand all").tap();
+  await expect(panel).toHaveCount(0);
+  await screen
+    .getByRole("button", "Inspect Captured child test result", { exact: true })
+    .first()
+    .focus();
+  await browser.keyboard.press("Enter");
+  const inspector = screen.getByRole("complementary", "Work evidence");
+  await expect(inspector).toContainText("Occurrence time unavailable");
+  expect(
+    await browser.evaluate(() => {
+      const canvas = document
+        .querySelector(".work-network")
+        ?.getBoundingClientRect();
+      const inspector = document
+        .querySelector(".graph-inspector")
+        ?.getBoundingClientRect();
+      return (
+        !!canvas &&
+        !!inspector &&
+        inspector.top >= canvas.bottom &&
+        document.documentElement.scrollWidth <= innerWidth
+      );
+    }),
+  ).toBe(true);
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  await app.screenshot("work-network-inspection-narrow");
+  await inspector.getByRole("button", "Close inspection").tap();
+  await expect(inspector).toHaveCount(0);
 });
 
 test("graph connects separate dispatches and explicit use without inventing result receipt", async ({
