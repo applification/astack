@@ -104,11 +104,28 @@ Exit 0 means the selected behavioral acceptance passed; 1 means a product assert
 
 Use a new initialized repository for an independent feature measurement. For a sequential owner exploration, you may instead continue the corrected bug repository, but record that it has inherited changes and is not the same controlled fixture.
 
+For the independent feature task, initialize/start another app (the existing pinned candidate installation can be reused):
+
+```sh
+bun run agent-evals init /tmp/notebook-feature-pilot
+NOTEBOOK_PORT=3174 bun run --cwd /tmp/notebook-feature-pilot dev
+```
+
+Open `http://127.0.0.1:3174` and start a fresh Codex session with `-C /tmp/notebook-feature-pilot` and the same explicit candidate configuration. For sequential exploration, use the corrected bug repository and its port instead; use that same path in the external check.
+
 ```text
-$applification:astack Add title editing to an existing note in the browser and HTTP API. Keep non-empty titles and ownership checks. Saved titles must survive reload and restart. Preserve status and other notes. Keep this exercise local; no publishing or PR is needed.
+$applification:astack Add title editing to an existing note in the browser and HTTP API. PATCH /api/notes/:id must accept exactly {title: string} as an alternative to {done: boolean}, returning {note}. Trim titles, accept 1–120 characters and reject malformed, empty, extra or mixed fields with 400. Saved titles must survive reload and restart. Preserve ownership, status, other notes and create retry behavior: the original normalized create input must still return the same note after editing and restart, while a different create input on that operation remains a conflict. Keep existing disk records compatible. Keep this exercise local; no publishing or PR is needed.
 ```
 
 Observe whether the agent settles the caller/API shape and ownership before wiring a consequential change. A small implementation needs a small sketch. After delivery, edit a title, reload, restart and verify the persisted value. Submit an empty or malformed title and confirm rejection with the previous value preserved. Repeat a valid update and confirm it does not create another note. Check the second actor cannot edit the first actor's note. Exercise keyboard access to the edit/save interaction, including the error state.
+
+Edit both an open and a completed note; each must retain its status through reload and restart. The independent feature seed has an unrelated status bug, so use HTTP `PATCH {done:false}` to obtain a completed control there, or use the successful bug repository for sequential exploration. Record this fixture limitation.
+
+Create a note using the request below before editing it. Rename it in the browser, restart the app, then repeat the exact request. Expect 200 with the same ID and current edited title, with no duplicate. Change only the create title while keeping the operation ID: expect 409. Repeat on a note created before the agent changed the persisted format.
+
+```sh
+curl -i -X POST http://127.0.0.1:3174/api/notes -H 'x-actor: alice' -H 'Content-Type: application/json' -d '{"title":"Before title edit","operationId":"manual-title-retry"}'
+```
 
 ```sh
 bun run agent-evals check --project /tmp/notebook-feature-pilot --task feature --output /tmp/notebook-feature-proof
@@ -121,7 +138,7 @@ The generated fixture README and runner help are the authoritative API/command r
 Start a new session with the successful feature repository and ask:
 
 ```text
-$applification:astack Add archive and restore for notes. Archived notes should be hidden from the ordinary list and reachable through an archived view. Restore must retain the edited title and status. Preserve ownership and make repeat requests safe. Keep this exercise local; no publishing or PR is needed.
+$applification:astack Add archive and restore for notes in the browser and API. PATCH /api/notes/:id must accept exactly {archived: boolean} as an alternative to its existing patch, returning {note}. GET /api/notes hides archived notes by default; GET /api/notes?includeArchived=true includes them for the archived view. Restore must retain the edited title and status. Preserve ownership, validation and create retry behavior, and make repeat requests safe. Keep this exercise local; no publishing or PR is needed.
 ```
 
 Track its elapsed time, regressions, clarification and corrective prompts. Archive, reload/restart, inspect archived notes and restore. The original title/status must remain. The other actor must not gain access. Run the `followup` check in a new external output directory. This is evidence of changeability on this example, not a grade based on line count.

@@ -141,6 +141,15 @@ const noteSchema = z
   })
   .strict();
 const mutationSchema = z.object({ note: noteSchema }).strict();
+// Internal metadata may extend the persisted format; every documented field
+// and record still participates in comparisons. Raw bytes remain in evidence.
+const diskSchema = z
+  .object({
+    notes: z.array(
+      noteSchema.extend({ actor: z.string(), operationId: z.string() }).strip(),
+    ),
+  })
+  .strip();
 class ProductFailure extends Error {}
 
 /** The oracle is this runner's source; no delivered test, script or report is trusted. */
@@ -317,9 +326,9 @@ export async function checkNotebook(options: {
       const bytes = await readFile(dataFile, 'utf8');
       observations.disk.push({ phase, bytes, sha256: sha256(bytes) });
       try {
-        return JSON.parse(bytes) as unknown;
+        return diskSchema.parse(JSON.parse(bytes));
       } catch {
-        throw new ProductFailure('Service wrote invalid disk JSON');
+        throw new ProductFailure('Service wrote invalid required disk fields');
       }
     };
     const publicNotes = (entries: typeof seedNotes) =>
@@ -421,6 +430,24 @@ export async function checkNotebook(options: {
       note.id === 'own-seeded' ? { ...note, ...firstNote } : note,
     );
     expect('disk-change', await disk('after-change'), { notes: changedSeed });
+    if (options.task === 'feature') {
+      expect(
+        'edited-legacy-create-retry',
+        await request('alice', 'POST', '/api/notes', {
+          title: '  Plan the weekend  ',
+          operationId: 'seed-alice',
+        }),
+        { status: 200, body: { note: firstNote } },
+      );
+      expect(
+        'edited-title-is-not-original-create',
+        await request('alice', 'POST', '/api/notes', {
+          title: firstNote.title,
+          operationId: 'seed-alice',
+        }),
+        { status: 409, body: { error: 'operation conflict' } },
+      );
+    }
     await stop();
     await start('restart-after-change');
     expect(
@@ -442,6 +469,16 @@ export async function checkNotebook(options: {
       done: false,
       archived: false,
     };
+    if (options.task === 'feature') {
+      expect(
+        'edited-legacy-create-retry-restart',
+        await request('alice', 'POST', '/api/notes', {
+          title: 'Plan the weekend',
+          operationId: 'seed-alice',
+        }),
+        { status: 200, body: { note: firstNote } },
+      );
+    }
     expect(
       'second-change-boundary',
       await request('alice', 'PATCH', target, {
@@ -449,6 +486,72 @@ export async function checkNotebook(options: {
       }),
       { status: 200, body: { note: finalNote } },
     );
+    if (options.task === 'feature') {
+      const completedNote = {
+        id: 'adjacent-seeded',
+        title: 'Renamed completed note',
+        done: true,
+        archived: false,
+      };
+      const completedDisk = {
+        notes: seedNotes.map((note) =>
+          note.id === 'own-seeded'
+            ? { ...note, ...finalNote }
+            : note.id === 'adjacent-seeded'
+              ? { ...note, ...completedNote }
+              : note,
+        ),
+      };
+      expect(
+        'completed-title-preserves-status',
+        await request('alice', 'PATCH', '/api/notes/adjacent-seeded', {
+          title: completedNote.title,
+        }),
+        { status: 200, body: { note: completedNote } },
+      );
+      expect(
+        'completed-title-fresh-read',
+        await request('alice', 'GET', '/api/notes'),
+        {
+          status: 200,
+          body: { notes: [finalNote, completedNote] },
+        },
+      );
+      expect(
+        'completed-title-disk',
+        await disk('completed-title'),
+        completedDisk,
+      );
+      await stop();
+      await start('restart-after-completed-title');
+      expect(
+        'completed-title-restart',
+        await request('alice', 'GET', '/api/notes'),
+        {
+          status: 200,
+          body: { notes: [finalNote, completedNote] },
+        },
+      );
+      expect(
+        'completed-title-create-retry-restart',
+        await request('alice', 'POST', '/api/notes', {
+          title: 'Keep this note',
+          operationId: 'seed-adjacent',
+        }),
+        { status: 200, body: { note: completedNote } },
+      );
+      // Restore the neighboring title so later checks retain their original expectations.
+      expect(
+        'completed-title-restore',
+        await request('alice', 'PATCH', '/api/notes/adjacent-seeded', {
+          title: 'Keep this note',
+        }),
+        {
+          status: 200,
+          body: { note: { ...completedNote, title: 'Keep this note' } },
+        },
+      );
+    }
     for (const [index, body] of [
       { title: '', operationId: 'bad' },
       { title: '  ', operationId: 'bad' },
@@ -507,6 +610,35 @@ export async function checkNotebook(options: {
       }),
       { status: 409, body: { error: 'operation conflict' } },
     );
+    const finalNewNote =
+      options.task === 'feature'
+        ? { ...newNote, title: 'Edited created note' }
+        : newNote;
+    if (options.task === 'feature') {
+      expect(
+        'new-note-title-edit',
+        await request('alice', 'PATCH', `/api/notes/${id}`, {
+          title: finalNewNote.title,
+        }),
+        { status: 200, body: { note: finalNewNote } },
+      );
+      expect(
+        'edited-new-create-retry',
+        await request('alice', 'POST', '/api/notes', {
+          title: 'Durable new note',
+          operationId: 'oracle-operation',
+        }),
+        { status: 200, body: { note: finalNewNote } },
+      );
+      expect(
+        'edited-new-create-conflict',
+        await request('alice', 'POST', '/api/notes', {
+          title: finalNewNote.title,
+          operationId: 'oracle-operation',
+        }),
+        { status: 409, body: { error: 'operation conflict' } },
+      );
+    }
     // Same operation ID belongs to a different actor's separate identity.
     const bobCreated = await request('bob', 'POST', '/api/notes', {
       title: 'Bob second note',
@@ -534,7 +666,7 @@ export async function checkNotebook(options: {
         ...seedNotes.map((note) =>
           note.id === 'own-seeded' ? { ...note, ...finalNote } : note,
         ),
-        { ...newNote, actor: 'alice', operationId: 'oracle-operation' },
+        { ...finalNewNote, actor: 'alice', operationId: 'oracle-operation' },
         { ...bobNote, actor: 'bob', operationId: 'oracle-operation' },
       ],
     };
@@ -544,7 +676,7 @@ export async function checkNotebook(options: {
     expect('final-alice-restart', await request('alice', 'GET', '/api/notes'), {
       status: 200,
       body: {
-        notes: [finalNote, ...publicNotes(seedNotes.slice(1, 2)), newNote],
+        notes: [finalNote, ...publicNotes(seedNotes.slice(1, 2)), finalNewNote],
       },
     });
     expect('final-bob-restart', await request('bob', 'GET', '/api/notes'), {
@@ -552,6 +684,29 @@ export async function checkNotebook(options: {
       body: { notes: [...publicNotes(seedNotes.slice(2)), bobNote] },
     });
     expect('final-disk-restart', await disk('final-restart'), finalDisk);
+    if (options.task === 'feature') {
+      expect(
+        'edited-new-create-retry-restart',
+        await request('alice', 'POST', '/api/notes', {
+          title: 'Durable new note',
+          operationId: 'oracle-operation',
+        }),
+        { status: 200, body: { note: finalNewNote } },
+      );
+      expect(
+        'edited-new-create-conflict-restart',
+        await request('alice', 'POST', '/api/notes', {
+          title: finalNewNote.title,
+          operationId: 'oracle-operation',
+        }),
+        { status: 409, body: { error: 'operation conflict' } },
+      );
+      expect(
+        'retry-after-edit-preserves-disk',
+        await disk('after-edited-retries'),
+        finalDisk,
+      );
+    }
     result = observations.checks.every((check) => check.outcome === 'pass')
       ? 'pass'
       : 'fail';
@@ -597,7 +752,7 @@ export async function checkNotebook(options: {
     error,
     cleanup: 'owned service and disposable data only; evidence retained',
     coverage:
-      'HTTP service, fresh reads, restart and disk. Browser interaction remains manual acceptance.',
+      'HTTP service, fresh reads, restart and required persisted fields (compatible internal metadata allowed; raw bytes retained). Feature checks include completed-note edits and original create retries after edits/restarts. Browser interaction remains manual acceptance.',
   };
   await writeJson(join(output, 'report.json'), report);
   const verified = await verifyEvidence(output, report);

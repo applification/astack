@@ -76,14 +76,28 @@ async function rejection(action: () => Promise<unknown>): Promise<string> {
   }
 }
 const titleBranch = `if (Object.keys(body).join(',') === 'title' && title(body.title)) {
+        note.originalCreateTitle ??= note.title;
         note.title = body.title.trim(); saveNotes(notes); return response({ note: publicNote(note) });
       }
       `;
 const addTitle = (source: string) =>
-  source.replace(
-    /if\s*\(\s*Object\.keys\(body\)\.join\(','\) !== 'done'/,
-    titleBranch + "if (Object.keys(body).join(',') !== 'done'",
-  );
+  source
+    .replace(
+      'operationId: string;',
+      'operationId: string; originalCreateTitle?: string;',
+    )
+    .replace(
+      "typeof value.operationId === 'string'",
+      "typeof value.operationId === 'string' && (value.originalCreateTitle === undefined || typeof value.originalCreateTitle === 'string')",
+    )
+    .replace(
+      'previous.title === body.title.trim()',
+      '(previous.originalCreateTitle ?? previous.title) === body.title.trim()',
+    )
+    .replace(
+      /if\s*\(\s*Object\.keys\(body\)\.join\(','\) !== 'done'/,
+      titleBranch + "if (Object.keys(body).join(',') !== 'done'",
+    );
 const fixBug = (source: string) =>
   source.replace('note.done = !body.done;', 'note.done = body.done;');
 const addArchive = (source: string) =>
@@ -169,6 +183,114 @@ test('missing feature fails; title-only correction passes while seeded bug remai
     (await checkNotebook({ project: repo, task: 'bug', output: output() }))
       .outcome,
   ).toBe('fail');
+}, 15000);
+
+test('title edits preserve completed status and reject a reassuring status-reset repair', async () => {
+  const repo = await project();
+  await edit(repo, (source) =>
+    addTitle(source).replace(
+      'note.title = body.title.trim();',
+      'note.done = false; note.title = body.title.trim();',
+    ),
+  );
+  const badOutput = output();
+  expect(
+    (await checkNotebook({ project: repo, task: 'feature', output: badOutput }))
+      .outcome,
+  ).toBe('fail');
+  const observed = observationReport.parse(
+    JSON.parse(await readFile(join(badOutput, 'observations.json'), 'utf8')),
+  );
+  expect(
+    observed.checks.find(
+      (check) => check.id === 'completed-title-preserves-status',
+    )?.outcome,
+  ).toBe('fail');
+  expect(
+    observed.checks.find((check) => check.id === 'completed-title-restart')
+      ?.outcome,
+  ).toBe('fail');
+  await edit(repo, (source) =>
+    source.replace(
+      'note.done = false; note.title = body.title.trim();',
+      'note.title = body.title.trim();',
+    ),
+  );
+  expect(
+    (await checkNotebook({ project: repo, task: 'feature', output: output() }))
+      .outcome,
+  ).toBe('pass');
+});
+
+test('title edits preserve original create identity across restart with compatible metadata', async () => {
+  const repo = await project();
+  await edit(repo, (source) =>
+    addTitle(source).replace(
+      '(previous.originalCreateTitle ?? previous.title) === body.title.trim()',
+      'previous.title === body.title.trim()',
+    ),
+  );
+  const badOutput = output();
+  expect(
+    (await checkNotebook({ project: repo, task: 'feature', output: badOutput }))
+      .outcome,
+  ).toBe('fail');
+  const bad = observationReport.parse(
+    JSON.parse(await readFile(join(badOutput, 'observations.json'), 'utf8')),
+  );
+  for (const id of [
+    'edited-legacy-create-retry-restart',
+    'edited-new-create-retry-restart',
+    'edited-new-create-conflict-restart',
+  ])
+    expect(bad.checks.find((check) => check.id === id)?.outcome).toBe('fail');
+  await edit(repo, (source) =>
+    source.replace(
+      'previous.title === body.title.trim()',
+      '(previous.originalCreateTitle ?? previous.title) === body.title.trim()',
+    ),
+  );
+  const goodOutput = output();
+  const goodReport = await checkNotebook({
+    project: repo,
+    task: 'feature',
+    output: goodOutput,
+  });
+  expect(goodReport.outcome).toBe('pass');
+  expect(await verifyEvidence(goodOutput, goodReport)).toBe('pass');
+  const persisted = z
+    .object({
+      disk: z.array(z.object({ phase: z.string(), bytes: z.string() })),
+    })
+    .parse(
+      JSON.parse(await readFile(join(goodOutput, 'observations.json'), 'utf8')),
+    );
+  const disk = z
+    .object({
+      notes: z.array(
+        z.object({
+          id: z.string(),
+          originalCreateTitle: z.string().optional(),
+        }),
+      ),
+    })
+    .parse(
+      JSON.parse(
+        z
+          .string()
+          .parse(
+            persisted.disk.find((entry) => entry.phase === 'final-restart')
+              ?.bytes,
+          ),
+      ),
+    );
+  expect(
+    disk.notes.find((note) => note.id === 'own-seeded')?.originalCreateTitle,
+  ).toBe('Plan the weekend');
+  expect(
+    disk.notes.find((note) => note.id === 'adjacent-seeded')
+      ?.originalCreateTitle,
+  ).toBe('Keep this note');
 }, 15000);
 
 test('maintenance archive/restore requires list hiding, restart and preserved neighbors', async () => {
@@ -511,11 +633,14 @@ test('a commit baseline explicitly invokes the same skill as candidate and pins 
       join(options.output, 'craftsmanship-rubric.md'),
       'utf8',
     );
-    expect(rubric).toContain('| Types and boundaries |');
-    expect(rubric).toContain('| Ownership and effects |');
-    expect(rubric).toContain('| Simplicity and readability |');
-    expect(rubric).toContain('| Test strength |');
-    expect(rubric).toContain('| Scope and changeability |');
+    for (const dimension of [
+      'Types and boundaries',
+      'Ownership and effects',
+      'Simplicity and readability',
+      'Test strength',
+      'Scope and changeability',
+    ])
+      expect(rubric).toMatch(new RegExp(`\\|\\s+${dimension}\\s+\\|`));
     expect(report.taskInterpretation).toContain('independent archive task');
   });
 }, 15000);

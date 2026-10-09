@@ -2,13 +2,13 @@
 
 Assess applicable dimensions separately from functional acceptance. Use the original request and project constraints; exclude inapplicable dimensions with a reason.
 
-| Dimension | Evidence to seek |
-| --- | --- |
-| Types and boundaries | Invalid states excluded; external data parsed into domain values; cases exhaustive; transport details contained. |
-| Ownership and effects | One authoritative owner for state; updates atomic where required; lifetime and cancellation explicit; consumers consistent. |
-| Simplicity and readability | A direct path from user intent to implementation; needless branches, duplicate representations and forwarding layers removed. |
-| Test strength | A real consumer seam, literal expected effects, meaningful rejected cases and a regression that rejects the original or a plausible wrong implementation. |
-| Scope and changeability | Required callers migrate together; obsolete paths are removed; a future small change can be made without learning hidden rules. |
+| Dimension                  | Evidence to seek                                                                                                                                          |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Types and boundaries       | Invalid states excluded; external data parsed into domain values; cases exhaustive; transport details contained.                                          |
+| Ownership and effects      | One authoritative owner for state; updates atomic where required; lifetime and cancellation explicit; consumers consistent.                               |
+| Simplicity and readability | A direct path from user intent to implementation; needless branches, duplicate representations and forwarding layers removed.                             |
+| Test strength              | A real consumer seam, literal expected effects, meaningful rejected cases and a regression that rejects the original or a plausible wrong implementation. |
+| Scope and changeability    | Required callers migrate together; obsolete paths are removed; a future small change can be made without learning hidden rules.                           |
 
 For a controlled evaluation use 0 = incorrect/absent, 1 = material gap, 2 = adequate, 3 = strong with concrete evidence. Cite code and checks for each score. A single combined average hides the distinction between a correct but costly design and a clean implementation with a critical defect.
 
