@@ -19,6 +19,8 @@
     "./evaluation-fixtures": "./src/evaluation-fixtures.ts",
     "./workflow": "./src/workflow.ts",
     "./workflow-view": "./src/workflow-view.ts",
+    "./work-view": "./src/work-view.ts",
+    "./work-network": "./src/work-network.ts",
     "./workflow-fixtures": "./src/workflow-fixtures.ts",
     "./delegation": "./src/delegation.ts",
     "./conversations": "./src/conversations.ts",

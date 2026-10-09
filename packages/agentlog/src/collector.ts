@@ -3,6 +3,7 @@ import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import {
   eventCapabilities,
+  isCanonicalEvent,
   runSchema,
   type AgentSnapshot,
   type AgentAdapter,
@@ -25,6 +26,10 @@ import {
 import type { Project } from "@astack/agent-observability/projects";
 import { mergeAutomation } from "@astack/agent-observability/automations";
 import { mergeConversations } from "@astack/agent-observability/conversations";
+import {
+  isHostObservation,
+  observationAnchorKey,
+} from "./adapters/t3-observations";
 
 type CaptureAdapter = AgentAdapter & {
   setProjects(projects: readonly Project[]): void;
@@ -47,6 +52,13 @@ export async function readSecretFile(path: string) {
 
 export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
   const owner = store.getRecord(`run:${snapshot.run.id}`);
+  function persistObservation(event: AgentSnapshot["events"][number]) {
+    store.put({ kind: "event", value: event });
+    if (event.delegationResult) {
+      const key = observationAnchorKey(event.delegationResult);
+      if (!store.getMeta(key)) store.setMeta(key, event.runId);
+    }
+  }
   // A native Codex turn can be visible through both APIs. Its first source owns
   // its event set, so a later overlap never duplicates events or rewrites history.
   if (
@@ -66,25 +78,29 @@ export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
       owner.value.conversation,
       snapshot.run.conversation,
     );
-    store.put({
-      kind: "run",
-      value: runSchema.parse({
-        ...owner.value,
-        ...(conversation !== undefined ? { conversation } : {}),
-        ...(automation ? { automation } : {}),
-        sessionReferences: mergeSessionReferences(
-          owner.value.sessionReferences,
-          snapshot.run.sessionReferences,
-        ),
-        delegations: mergeDelegations(
-          owner.value.delegations,
-          snapshot.run.delegations,
-        ),
-      }),
+    const merged = runSchema.parse({
+      ...owner.value,
+      ...(conversation !== undefined ? { conversation } : {}),
+      ...(automation ? { automation } : {}),
+      sessionReferences: mergeSessionReferences(
+        owner.value.sessionReferences,
+        snapshot.run.sessionReferences,
+      ),
+      delegations: mergeDelegations(
+        owner.value.delegations,
+        snapshot.run.delegations,
+      ),
     });
+    store.put({ kind: "run", value: merged });
+    for (const event of snapshot.events)
+      if (isHostObservation(event, merged)) persistObservation(event);
     return;
   }
   for (const event of snapshot.events) {
+    if (event.kind === "delegation_result") {
+      if (isHostObservation(event, snapshot.run)) persistObservation(event);
+      continue;
+    }
     const previous = store.getRecord(`event:${event.id}`);
     if (event.skill && previous?.kind === "event" && previous.value.skill)
       event.skill = previous.value.skill;
@@ -106,7 +122,7 @@ export function persistSnapshot(store: LocalStore, snapshot: AgentSnapshot) {
     }
     store.put({ kind: "event", value: event });
   }
-  const events = store.events(snapshot.run.id);
+  const events = store.events(snapshot.run.id).filter(isCanonicalEvent);
   const previous = store.getRecord(`run:${snapshot.run.id}`);
   const run = snapshot.run;
   if (previous?.kind === "run") {
@@ -267,7 +283,10 @@ export async function collect(
       for (const run of store.runsForSession()) {
         if (!resolveProject(projects, run)) continue;
         if (run.completedAt !== null) continue;
-        const findings = detectProblems(run, store.events(run.id));
+        const findings = detectProblems(
+          run,
+          store.events(run.id).filter(isCanonicalEvent),
+        );
         if (JSON.stringify(findings) !== JSON.stringify(run.findings))
           store.put({ kind: "run", value: { ...run, findings } });
       }

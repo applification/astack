@@ -97,26 +97,35 @@ async function timelineStep(
     )
     .unique();
   const ends: Doc<"events">[][] = [];
-  for (const order of ["asc", "desc"] as const) {
+  for (const [kind, order] of [
+    ["user_prompt", "asc"],
+    ["assistant_output", "desc"],
+  ] as const) {
     const rows = [];
     let bytes = 0;
-    if (budget.bytes < 256 * 1024) {
+    // Older events have no kind projection. Read their own bounded index slice
+    // as well, so mixed capture can retain an earlier prompt or later response.
+    // Modern host observations never consume either request/response slice.
+    for (const projection of [kind, undefined]) {
+      if (bytes >= 32 * 1024 || budget.bytes >= 256 * 1024) break;
+      let count = 0;
       for await (const row of ctx.db
         .query("events")
-        .withIndex("by_runId_and_sequence", (q) => q.eq("runId", run.id))
+        .withIndex("by_runId_and_kind_and_sequence", (q) =>
+          q.eq("runId", run.id).eq("kind", projection),
+        )
         .order(order)) {
         const size = new TextEncoder().encode(row.data).byteLength;
         rows.push(row);
         bytes += size;
         budget.bytes += size;
-        if (
-          rows.length >= 12 ||
-          bytes >= 32 * 1024 ||
-          budget.bytes >= 256 * 1024
-        )
+        if (++count >= 12 || bytes >= 32 * 1024 || budget.bytes >= 256 * 1024)
           break;
       }
     }
+    rows.sort((a, b) =>
+      order === "asc" ? a.sequence - b.sequence : b.sequence - a.sequence,
+    );
     ends.push(rows);
   }
   const excerpt = (

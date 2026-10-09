@@ -3,6 +3,8 @@ import { evaluationRun } from "./evaluation-fixtures";
 import { workflowFixture, workflowViewFixture } from "./workflow-fixtures";
 import { workflowCaptureSchema, type WorkflowRecord } from "./workflow-view";
 import type { WorkflowAnnotation } from "./workflow";
+import { runConversation } from "./conversations";
+import { workflowActivitySchema } from "./workflow-view";
 
 // Synthetic only: shared by browser and backend boundary regressions.
 export function journeyFixture(joined = true) {
@@ -81,6 +83,21 @@ export function journeyFixture(joined = true) {
       },
     });
     events.push(read, result);
+    events.push(
+      eventSchema.parse({
+        id: child.id + ":test",
+        runId: child.id,
+        sequence: 3,
+        kind: "test_result",
+        timestamp: null,
+        observedAt: 1345,
+        timing: "unavailable",
+        title: "Captured child test result",
+        failed: child.status === "failed",
+        tool: "bun test",
+        data: { content: "Synthetic result detail" },
+      }),
+    );
     const add = (annotation: WorkflowAnnotation, time: number) => {
       const event = eventSchema.parse({
         id: child.id + ":workflow:" + events.length,
@@ -270,6 +287,27 @@ export function journeyFixture(joined = true) {
       ...workflowFixture().annotations,
       ...events,
     ],
-    workflow: workflowCaptureSchema.parse({ ...root, branches }),
+    workflow: workflowCaptureSchema.parse({
+      ...root,
+      branches,
+      runs: [evaluationRun("reproduce"), parent, ...children].map((run) => ({
+        runId: run.id,
+        machineId: run.machineId,
+        projectId: run.projectId,
+        title: run.title,
+        status: run.status,
+        revision: 1,
+        conversation: runConversation(run),
+        activityLimited: false,
+      })),
+      activities: events.flatMap((event) => {
+        const preview = workflowActivitySchema.safeParse({
+          reference: { runId: event.runId, eventId: event.id },
+          revision: 1,
+          ...event,
+        });
+        return preview.success ? [preview.data] : [];
+      }),
+    }),
   };
 }

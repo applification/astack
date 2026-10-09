@@ -1,7 +1,11 @@
 import { z } from "zod";
 import { evaluationSchema } from "./evaluations";
 import { workflowAnnotationSchema } from "./workflow";
-import { delegationSchema, sessionReferenceSchema } from "./delegation";
+import {
+  delegationSchema,
+  delegationResultSchema,
+  sessionReferenceSchema,
+} from "./delegation";
 import { deliveryEvidenceSchema } from "./delivery-evidence";
 import { automationSchema } from "./automations";
 import { conversationSchema } from "./conversations";
@@ -51,6 +55,7 @@ export const eventKinds = [
   "delivery_recorded",
   "subagent_start",
   "subagent_result",
+  "delegation_result",
   "intervention",
   "error",
   "run_complete",
@@ -72,6 +77,7 @@ export const eventSchema = z
     durationMs: time.optional(),
     skill: skillUseSchema.optional(),
     workflow: workflowAnnotationSchema.optional(),
+    delegationResult: delegationResultSchema.optional(),
     delivery: deliveryEvidenceSchema.optional(),
     data: z.record(z.string().max(128), z.json()).default({}),
   })
@@ -79,6 +85,14 @@ export const eventSchema = z
   .refine((event) => !event.workflow || event.kind === "workflow_step", {
     message: "Workflow annotations require a workflow_step event",
   })
+  .refine(
+    (event) =>
+      (event.kind === "delegation_result") === !!event.delegationResult,
+    {
+      message:
+        "Delegation result observations require a delegation_result event",
+    },
+  )
   .refine(
     (event) => (event.kind === "delivery_recorded") === !!event.delivery,
     {
@@ -186,6 +200,11 @@ export function eventCapabilities(event: AgentEvent): SkillUse[] {
   ];
 }
 export type AgentEvent = z.infer<typeof eventSchema>;
+// Host result observations supplement the owning trace. They are uploaded and
+// inspectable, but do not change its event count, skills, tools or findings.
+export function isCanonicalEvent(event: AgentEvent): boolean {
+  return event.kind !== "delegation_result";
+}
 export type AgentRun = z.infer<typeof runSchema>;
 export type Finding = z.infer<typeof findingSchema>;
 export type TelemetryRecord = z.infer<typeof recordSchema>;

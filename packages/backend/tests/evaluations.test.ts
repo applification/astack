@@ -22,6 +22,236 @@ import { eventSchema } from "@astack/agent-observability";
 import { capturedEvaluationLimits } from "@astack/agent-observability/evaluations";
 import type { TelemetryRecord } from "@astack/agent-observability";
 import { workflowFixture } from "@astack/agent-observability/workflow-fixtures";
+import { journeyFixture } from "@astack/agent-observability/journey-fixtures";
+import type { DelegationResult } from "@astack/agent-observability/delegation";
+import { buildWorkNetwork } from "@astack/agent-observability/work-network";
+
+test("one host task across provider turns has one contribution and retains observations from either owner turn", async () => {
+  const { t, owner, evaluation } = await setup("inconclusive");
+  const fixture = journeyFixture(false);
+  const self = {
+    kind: "t3",
+    environmentId: "fixture-host",
+    threadId: "parent",
+  } as const;
+  const conversation = {
+    self,
+    root: self,
+    hostRun: { id: "same-host-app-run" },
+  };
+  const first = { ...fixture.parent, conversation, sessionReferences: [self] };
+  const second = {
+    ...evaluationRun("reproduce"),
+    conversation,
+    sessionReferences: [self],
+    delegations: first.delegations,
+  };
+  await ingestWorkflow(
+    t,
+    [first, second, ...fixture.children].map((value) => ({
+      kind: "run",
+      value,
+    })),
+  );
+  await ingestWorkflow(
+    t,
+    fixture.events.map((value) => ({ kind: "event", value })),
+  );
+  const task = first.delegations[0];
+  if (!task) throw new Error("missing task");
+  await ingestWorkflow(t, [
+    {
+      kind: "event",
+      value: eventSchema.parse({
+        id: second.id + ":receipt",
+        runId: second.id,
+        sequence: 10000,
+        kind: "delegation_result",
+        timestamp: null,
+        observedAt: 3000,
+        timing: "unavailable",
+        title: "Delivered result",
+        delegationResult: {
+          delegationId: task.id,
+          child: task.child,
+          source: "parent_capture",
+          host: {
+            environmentId: "fixture-host",
+            threadId: "parent",
+            runId: "same-host-app-run",
+            origin: "app_owned",
+          },
+          observation: { state: "delivered", resultId: null },
+          sourceUpdatedAt: 2900,
+          occurredAt: null,
+        },
+      }),
+    },
+  ]);
+  const detail = evaluationDetailSchema.parse(
+    JSON.parse(
+      (await owner.query(api.evaluations.detail, {
+        evaluationId: evaluation.id,
+        projectId: fixtureProject,
+      })) ?? "null",
+    ),
+  );
+  expect(detail.workflow.branches).toHaveLength(2);
+  expect(
+    detail.workflow.branches.every(
+      (branch) =>
+        branch.parentRunIds?.includes(first.id) &&
+        branch.parentRunIds.includes(second.id) &&
+        branch.state === "available",
+    ),
+  ).toBe(true);
+  expect(
+    detail.workflow.results.map((result) => result.reference.runId),
+  ).toEqual([second.id]);
+  const network = buildWorkNetwork(detail.workflow, detail.runs);
+  expect(
+    network.nodes.filter((node) => node.item.kind === "contribution"),
+  ).toHaveLength(2);
+  expect(
+    network.edges.filter((edge) => edge.kind === "delivered"),
+  ).toHaveLength(1);
+});
+
+test("network previews retain current conversation identity and legacy activity, redact metadata and preserve frozen evidence", async () => {
+  const { t, owner, evaluation } = await setup("inconclusive");
+  const run = evaluationRun();
+  const self = {
+    kind: "t3",
+    environmentId: "network-host",
+    threadId: "root",
+  } as const;
+  const before = await t.run((ctx) => ctx.db.query("evaluations").first());
+  await ingestWorkflow(t, [
+    { kind: "run", value: { ...run, conversation: { self, root: self } } },
+    {
+      kind: "event",
+      value: eventSchema.parse({
+        id: run.id + ":network-tool",
+        runId: run.id,
+        sequence: 3,
+        kind: "shell_result",
+        timestamp: null,
+        observedAt: 3000,
+        timing: "unavailable",
+        title: "Command failed: TOKEN=private-network-secret",
+        tool: "shell",
+        signature: "not-an-invocation",
+        failed: true,
+        data: {
+          content: "Private output is excluded from the activity preview",
+        },
+      }),
+    },
+  ]);
+  // Historical event rows may lack the newer indexed kind projection.
+  await t.run(async (ctx) => {
+    const row = await ctx.db
+      .query("events")
+      .withIndex("by_eventId", (q) => q.eq("eventId", run.id + ":network-tool"))
+      .unique();
+    if (row) await ctx.db.patch(row._id, { kind: undefined });
+  });
+  const read = async () =>
+    evaluationDetailSchema.parse(
+      JSON.parse(
+        (await owner.query(api.evaluations.detail, {
+          evaluationId: evaluation.id,
+          projectId: fixtureProject,
+        })) ?? "null",
+      ),
+    );
+  const detail = await read();
+  expect(
+    detail.workflow.runs.find((summary) => summary.runId === run.id)
+      ?.conversation?.self,
+  ).toEqual(self);
+  const activity = detail.workflow.activities.find(
+    (event) => event.reference.eventId === run.id + ":network-tool",
+  );
+  expect(activity).toMatchObject({
+    kind: "shell_result",
+    timestamp: null,
+    timing: "unavailable",
+    failed: true,
+    tool: "shell",
+  });
+  expect(JSON.stringify(activity)).not.toContain("private-network-secret");
+  expect(activity).not.toHaveProperty("data");
+  expect(activity).not.toHaveProperty("signature");
+  const after = await t.run((ctx) => ctx.db.query("evaluations").first());
+  expect(after?.data).toBe(before?.data);
+  expect(after?.snapshot).toBe(before?.snapshot);
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries(
+      [{ kind: "run", value: { ...run, contentCapture: false } }],
+      1000,
+    ),
+  });
+  expect(
+    (await read()).workflow.activities.some(
+      (event) => event.reference.runId === run.id,
+    ),
+  ).toBe(false);
+  expect(
+    (await read()).workflow.runs.some((summary) => summary.runId === run.id),
+  ).toBe(false);
+});
+
+test("network activity prefix is bounded and paused projects expose neither current summaries nor activity", async () => {
+  const { t, owner, evaluation } = await setup("inconclusive");
+  const run = evaluationRun();
+  await ingestWorkflow(
+    t,
+    Array.from({ length: 70 }, (_, index) => ({
+      kind: "event" as const,
+      value: eventSchema.parse({
+        id: run.id + ":activity:" + index,
+        runId: run.id,
+        sequence: 100 + index,
+        kind: "test_result",
+        timestamp: null,
+        observedAt: 3000,
+        timing: "unavailable",
+        title: "Test result " + index,
+      }),
+    })),
+  );
+  const read = async () =>
+    evaluationDetailSchema.parse(
+      JSON.parse(
+        (await owner.query(api.evaluations.detail, {
+          evaluationId: evaluation.id,
+          projectId: fixtureProject,
+        })) ?? "null",
+      ),
+    );
+  const capture = (await read()).workflow;
+  expect(capture.activities.length).toBeLessThanOrEqual(48);
+  expect(capture.activities.length).toBeGreaterThan(0);
+  expect(
+    capture.activities.some((event) => event.reference.eventId.endsWith(":69")),
+  ).toBe(false);
+  expect(
+    capture.runs.find((summary) => summary.runId === run.id)?.activityLimited,
+  ).toBe(true);
+  expect(capture.truncated).toBe(true);
+  await owner.mutation(api.projects.save, {
+    project: {
+      projectId: fixtureProject,
+      name: "Paused",
+      enabled: false,
+      repositories: [],
+      folders: [{ machineId: fixtureMachine, path: "/fixture" }],
+    },
+  });
+  expect((await read()).workflow).toMatchObject({ runs: [], activities: [] });
+});
 
 const modules = {
   "../convex/_generated/server.ts": () => import("../convex/_generated/server"),
@@ -1232,6 +1462,68 @@ test("timeline excerpts use real captured content and names, exclude context and
   ).toBeNull();
 });
 
+test.each(["legacy", "mixed"])(
+  "timeline retains the first prompt and last response in %s indexed capture",
+  async (mode) => {
+    const { t, owner, evaluation } = await setup();
+    const run = evaluationRun("repair");
+    const prompt = {
+      ...evaluationPrompt(),
+      id: run.id + ":old-prompt",
+      runId: run.id,
+      sequence: 0,
+      data: { content: "Original request in legacy capture." },
+    };
+    const response = {
+      ...prompt,
+      id: run.id + ":old-response",
+      sequence: 20,
+      kind: "assistant_output" as const,
+      data: { content: "Final response in legacy capture." },
+    };
+    const records = [prompt, response];
+    if (mode === "mixed")
+      records.push(
+        {
+          ...prompt,
+          id: run.id + ":new-prompt",
+          sequence: 2,
+          data: { content: "Later indexed prompt." },
+        },
+        {
+          ...response,
+          id: run.id + ":new-response",
+          sequence: 10,
+          data: { content: "Earlier indexed response." },
+        },
+      );
+    await ingestWorkflow(
+      t,
+      records.map((value) => ({ kind: "event", value })),
+    );
+    await t.run(async (ctx) => {
+      for (const event of [prompt, response]) {
+        const row = await ctx.db
+          .query("events")
+          .withIndex("by_eventId", (q) => q.eq("eventId", event.id))
+          .unique();
+        if (!row) throw new Error("Missing legacy fixture event");
+        await ctx.db.patch(row._id, { kind: undefined });
+      }
+    });
+    const detail = evaluationDetailSchema.parse(
+      JSON.parse(
+        (await owner.query(api.evaluations.detail, {
+          evaluationId: evaluation.id,
+        })) ?? "null",
+      ),
+    );
+    const step = detail.timeline.find((step) => step.runId === run.id);
+    expect(step?.request?.text).toBe("Original request in legacy capture.");
+    expect(step?.response?.text).toBe("Final response in legacy capture.");
+  },
+);
+
 test("current delegated journeys resolve indexed child turns and explicit joins without changing immutable evaluation runs", async () => {
   const { journeyFixture } =
     await import("@astack/agent-observability/journey-fixtures");
@@ -1404,6 +1696,407 @@ test("delegated lookup rejects stale foreign projections and cycles and bounds l
     true,
   );
 });
+
+async function resultCaptureFixture() {
+  const state = await setup("inconclusive");
+  const fixture = journeyFixture();
+  const self = {
+    kind: "t3",
+    environmentId: "fixture-host",
+    threadId: "parent-thread",
+  } as const;
+  fixture.parent.sessionReferences = [self];
+  fixture.parent.conversation = {
+    self,
+    root: self,
+    hostRun: { id: "parent-host-run" },
+  };
+  const frozen = await state.t.run(
+    async (ctx) => (await ctx.db.query("evaluations").first())?.snapshot,
+  );
+  await ingestWorkflow(
+    state.t,
+    [fixture.parent, ...fixture.children].map((value) => ({
+      kind: "run",
+      value,
+    })),
+  );
+  await ingestWorkflow(
+    state.t,
+    fixture.events.map((value) => ({ kind: "event", value })),
+  );
+  const task = fixture.parent.delegations[0];
+  if (!task) throw new Error("missing direct task");
+  const event = (
+    observation: DelegationResult["observation"],
+    suffix: string = observation.state,
+    content = "Scoped child result",
+  ) =>
+    eventSchema.parse({
+      id: fixture.parent.id + ":host-observation:" + suffix,
+      runId: fixture.parent.id,
+      sequence: 500 + Number(suffix.replace(/\D/g, "") || 0),
+      kind: "delegation_result",
+      title: "Explicit " + observation.state + " observation",
+      timestamp: null,
+      timing: "unavailable",
+      observedAt: 3000,
+      delegationResult: {
+        delegationId: task.id,
+        child: task.child,
+        source: "parent_capture",
+        host: {
+          environmentId: self.environmentId,
+          threadId: self.threadId,
+          runId: "parent-host-run",
+          origin: "app_owned",
+        },
+        observation,
+        sourceUpdatedAt: 1700,
+        occurredAt: null,
+      },
+      data: { result: content },
+    });
+  const read = async () =>
+    evaluationDetailSchema.parse(
+      JSON.parse(
+        (await state.owner.query(api.evaluations.detail, {
+          evaluationId: state.evaluation.id,
+          projectId: fixtureProject,
+        })) ?? "null",
+      ),
+    );
+  return { ...state, fixture, frozen, event, read };
+}
+
+test("independent host facts appear in current work capture without altering frozen evaluation evidence or outcome", async () => {
+  const { t, event, read, frozen, fixture, evaluation } =
+    await resultCaptureFixture();
+  const before = await read();
+  const present = event({ state: "present", resultId: "revision-1" });
+  await ingestWorkflow(t, [{ kind: "event", value: present }]);
+  expect(
+    (await read()).workflow.results.map((result) => result.observation.state),
+  ).toEqual(["present"]);
+  await ingestWorkflow(
+    t,
+    [
+      event({ state: "delivered", resultId: "revision-1" }),
+      event({
+        state: "acknowledged",
+        resultId: "revision-1",
+        observedByRunId: null,
+      }),
+    ].map((value) => ({ kind: "event", value })),
+  );
+  const current = await read();
+  expect(
+    current.workflow.results.map((result) => result.observation.state).sort(),
+  ).toEqual(["acknowledged", "delivered", "present"]);
+  expect(
+    current.workflow.results.find(
+      (result) => result.observation.state === "acknowledged",
+    ),
+  ).toMatchObject({
+    source: "parent_capture",
+    observedAt: 3000,
+    sourceUpdatedAt: 1700,
+    occurredAt: null,
+    observation: { state: "acknowledged", observedByRunId: null },
+  });
+  expect(current.runs).toEqual(before.runs);
+  expect(current.assessments).toEqual(before.assessments);
+  expect(current.timeline).toEqual(before.timeline);
+  expect(
+    await t.run(
+      async (ctx) => (await ctx.db.query("evaluations").first())?.snapshot,
+    ),
+  ).toBe(frozen);
+  const parent = await t.run(async (ctx) =>
+    ctx.db
+      .query("runs")
+      .withIndex("by_runId", (q) => q.eq("runId", fixture.parent.id))
+      .unique(),
+  );
+  expect(JSON.parse(parent?.data ?? "null").outcome).toBe(
+    fixture.parent.outcome,
+  );
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries(
+      [
+        {
+          kind: "event",
+          value: { ...present, observedAt: 9999, title: "stale rewrite" },
+        },
+      ],
+      1,
+    ),
+  });
+  expect(
+    (await read()).workflow.results.find(
+      (result) => result.observation.state === "present",
+    )?.title,
+  ).toBe("Explicit present observation");
+  await expect(
+    t.query(api.evaluations.detail, { evaluationId: evaluation.id }),
+  ).rejects.toThrow("Unauthorized");
+});
+
+test("acknowledgment with nullable result and host run supplies no presence or delivery fact", async () => {
+  const { t, event, read } = await resultCaptureFixture();
+  const acknowledged = event({
+    state: "acknowledged",
+    resultId: null,
+    observedByRunId: null,
+  });
+  if (!acknowledged.delegationResult) throw new Error("missing observation");
+  acknowledged.delegationResult.host.runId = null;
+  await ingestWorkflow(t, [{ kind: "event", value: acknowledged }]);
+  expect(
+    (await read()).workflow.results.map((result) => result.observation),
+  ).toEqual([{ state: "acknowledged", resultId: null, observedByRunId: null }]);
+});
+
+test("supplemental observations cannot crowd the final response out of bounded timeline reads", async () => {
+  const { t, fixture, event, read } = await resultCaptureFixture();
+  const response = eventSchema.parse({
+    ...evaluationPrompt(),
+    id: fixture.parent.id + ":final-response",
+    runId: fixture.parent.id,
+    sequence: 10,
+    kind: "assistant_output",
+    data: { content: "Parent integrated the reviewed changes." },
+  });
+  await ingestWorkflow(t, [{ kind: "event", value: response }]);
+  const before = (await read()).timeline;
+  await ingestWorkflow(
+    t,
+    Array.from({ length: 18 }, (_, index) => ({
+      kind: "event" as const,
+      value: {
+        ...event(
+          { state: "present", resultId: "revision-" + index },
+          "tail-" + index,
+        ),
+        sequence: 900_000_000 + index,
+      },
+    })),
+  );
+  const after = await read();
+  expect(after.timeline).toEqual(before);
+  expect(
+    after.timeline.find((step) => step.runId === fixture.parent.id)?.response
+      ?.text,
+  ).toBe("Parent integrated the reviewed changes.");
+  expect(after.workflow.results).toHaveLength(18);
+});
+
+test("approved parent observations remain available before child traces are collected", async () => {
+  const { t, fixture, event, read } = await resultCaptureFixture();
+  const observations: DelegationResult["observation"][] = [
+    { state: "present", resultId: "revision-1" },
+    { state: "delivered", resultId: "revision-1" },
+    { state: "acknowledged", resultId: "revision-1", observedByRunId: null },
+  ];
+  await ingestWorkflow(
+    t,
+    observations.map((observation) => ({
+      kind: "event" as const,
+      value: event(observation),
+    })),
+  );
+  await t.run(async (ctx) => {
+    for (const child of fixture.children.filter(
+      (run) => run.sessionId === "child-ui",
+    )) {
+      const row = await ctx.db
+        .query("runs")
+        .withIndex("by_runId", (q) => q.eq("runId", child.id))
+        .unique();
+      if (row) await ctx.db.delete(row._id);
+      const sessions = await ctx.db
+        .query("runSessions")
+        .withIndex("by_runId", (q) => q.eq("runId", child.id))
+        .collect();
+      for (const session of sessions) await ctx.db.delete(session._id);
+    }
+  });
+  const capture = await read();
+  expect(capture.workflow.results.map((result) => result.observation)).toEqual(
+    observations,
+  );
+  expect(
+    capture.workflow.branches.find(
+      (branch) => branch.delegation.id === "delegate-ui",
+    ),
+  ).toMatchObject({
+    state: "unavailable",
+    runs: [],
+    reason: "Child capture has not been collected.",
+  });
+  expect(capture.workflow.truncated).toBe(false);
+});
+
+test.each([
+  "foreign-child-project",
+  "foreign-child-machine",
+  "child-content-off",
+  "parent-content-off",
+  "paused-project",
+  "removed-folder",
+])(
+  "result capture rechecks %s policy rather than trusting frozen or session-index rows",
+  async (policy) => {
+    const { t, event, read, fixture, owner } = await resultCaptureFixture();
+    await ingestWorkflow(t, [
+      {
+        kind: "event",
+        value: event({ state: "present", resultId: "revision-1" }),
+      },
+    ]);
+    expect(
+      (await read()).workflow.results.map((result) => result.observation.state),
+    ).toEqual(["present"]);
+    if (policy === "paused-project" || policy === "removed-folder") {
+      await owner.mutation(api.projects.save, {
+        project: {
+          projectId: fixtureProject,
+          name: "Fixture",
+          enabled: policy !== "paused-project",
+          repositories: [],
+          folders: [
+            {
+              machineId: fixtureMachine,
+              path: policy === "removed-folder" ? "/elsewhere" : "/fixture",
+            },
+          ],
+        },
+      });
+    } else {
+      const ids =
+        policy === "parent-content-off"
+          ? [fixture.parent.id]
+          : fixture.children
+              .filter((child) => child.sessionId === "child-ui")
+              .map((child) => child.id);
+      await t.run(async (ctx) => {
+        for (const id of ids) {
+          const row = await ctx.db
+            .query("runs")
+            .withIndex("by_runId", (q) => q.eq("runId", id))
+            .unique();
+          if (!row) throw new Error("missing policy fixture run");
+          if (policy === "foreign-child-project")
+            await ctx.db.patch(row._id, { projectId: "foreign-project" });
+          else if (policy === "foreign-child-machine")
+            await ctx.db.patch(row._id, { machineId: "foreign-machine" });
+          else
+            await ctx.db.patch(row._id, {
+              data: JSON.stringify({
+                ...JSON.parse(row.data),
+                contentCapture: false,
+              }),
+            });
+        }
+      });
+    }
+    const capture = await read();
+    expect(capture.workflow.results).toEqual([]);
+    if (policy.startsWith("foreign-child") || policy === "child-content-off")
+      expect(
+        capture.workflow.branches.find(
+          (branch) => branch.delegation.id === "delegate-ui",
+        ),
+      ).toMatchObject({
+        state: "unavailable",
+        runs: [],
+        records: [],
+        reads: [],
+      });
+  },
+);
+
+test("result capture rejects mismatched host, task, child and event-machine identities", async () => {
+  const { t, event, read } = await resultCaptureFixture();
+  const valid = event({ state: "present", resultId: "revision-1" });
+  await ingestWorkflow(t, [{ kind: "event", value: valid }]);
+  if (!valid.delegationResult) throw new Error("missing observation");
+  const result = valid.delegationResult;
+  const invalid = [
+    { ...result, delegationId: "undeclared-task" },
+    { ...result, host: { ...result.host, environmentId: "other-host" } },
+    { ...result, host: { ...result.host, threadId: "other-thread" } },
+    { ...result, host: { ...result.host, runId: "other-run" } },
+    {
+      ...result,
+      child: {
+        kind: "t3",
+        environmentId: "fixture-host",
+        threadId: "not-this-child",
+      },
+    },
+  ];
+  await ingestWorkflow(
+    t,
+    invalid.map((delegationResult, index) => ({
+      kind: "event",
+      value: eventSchema.parse({
+        ...valid,
+        id: valid.id + ":invalid:" + index,
+        delegationResult,
+      }),
+    })),
+  );
+  const foreign = { ...valid, id: valid.id + ":foreign-machine" };
+  await t.run(async (ctx) => {
+    await ctx.db.insert("events", {
+      eventId: foreign.id,
+      runId: foreign.runId,
+      machineId: "other-machine",
+      revision: 100,
+      sequence: foreign.sequence,
+      kind: foreign.kind,
+      data: JSON.stringify(foreign),
+    });
+  });
+  expect(
+    (await read()).workflow.results.map((item) => item.reference.eventId),
+  ).toEqual([valid.id]);
+});
+
+test.each(["count", "bytes"])(
+  "indexed result reads expose the shared %s bound",
+  async (limit) => {
+    const { t, event, read } = await resultCaptureFixture();
+    const events = Array.from({ length: 100 }, (_, index) =>
+      event(
+        { state: "present", resultId: "revision-" + index },
+        "revision-" + index,
+        limit === "bytes" ? "🧪".repeat(4000) : "Scoped result",
+      ),
+    );
+    await ingestWorkflow(
+      t,
+      events.map((value) => ({ kind: "event", value })),
+    );
+    const current = await read();
+    expect(current.workflow.truncated).toBe(true);
+    if (limit === "count") expect(current.workflow.results).toHaveLength(96);
+    else {
+      expect(current.workflow.results.length).toBeLessThan(20);
+      expect(current.workflow.results[0]?.observation).toEqual({
+        state: "present",
+        resultId: "revision-0",
+      });
+    }
+    expect(
+      current.workflow.results.some(
+        (result) => result.observation.resultId === "revision-99",
+      ),
+    ).toBe(false);
+  },
+);
 
 test("PR delivery has owner/readable policy, immutable capture and separate current observations", async () => {
   const { t, evaluation, owner } = await setup();

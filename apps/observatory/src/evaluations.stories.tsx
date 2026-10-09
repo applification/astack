@@ -25,6 +25,7 @@ import {
 } from "@astack/agent-observability/workflow-fixtures";
 import { journeyFixture } from "@astack/agent-observability/journey-fixtures";
 import { generateEvaluation } from "@astack/agent-observability/evaluation-generation";
+import { WorkflowEvidence } from "./workflow-evidence";
 
 function detail(status: "pass" | "fail" | "inconclusive", assessed = false) {
   const evaluation = evaluationFixture(status);
@@ -210,8 +211,11 @@ export const MissingFlowSelection: Story = {
       ...detail("pass"),
       workflow: {
         records: workflowViewFixture().records.slice(1, 4),
+        runs: [],
+        activities: [],
         reads: [],
         branches: [],
+        results: [],
         truncated: true,
       },
     },
@@ -350,6 +354,17 @@ export const ParallelJourneys: Story = {
   args: {
     detail: { ...detail("inconclusive"), workflow: journeyFixture().workflow },
   },
+};
+export const NetworkExplorer: Story = {
+  render: () => (
+    <WorkflowEvidence
+      detail={{
+        ...detail("inconclusive"),
+        workflow: journeyFixture().workflow,
+      }}
+      initialMode="graph"
+    />
+  ),
 };
 const revisionJourney = journeyFixture().workflow;
 export const RevisionSummaries: Story = {
@@ -558,5 +573,74 @@ export const PrivateDelivery: Story = {
         },
       },
     },
+  },
+};
+
+export const UnresolvedParentUse: Story = {
+  args: {
+    detail: {
+      ...detail("inconclusive"),
+      workflow: {
+        ...journeyFixture().workflow,
+        records: journeyFixture().workflow.records.map((record) => ({
+          ...record,
+          evidence:
+            record.annotation.action === "join"
+              ? record.evidence.map((item) => ({
+                  state: "unavailable" as const,
+                  reference: item.reference,
+                  reason: "Referenced child result has not been captured.",
+                }))
+              : record.evidence,
+        })),
+      },
+    },
+  },
+};
+
+export const HostResultObservations: Story = {
+  args: {
+    detail: (() => {
+      const workflow = journeyFixture(false).workflow;
+      return {
+        ...detail("inconclusive"),
+        workflow: {
+          ...workflow,
+          results: workflow.branches.flatMap((branch, index) =>
+            (index === 0
+              ? (["present", "delivered"] as const)
+              : (["acknowledged"] as const)
+            ).map((state) => ({
+              delegationId: branch.delegation.id,
+              reference: {
+                runId: branch.parentRunId,
+                eventId: "synthetic-result-" + index + "-" + state,
+              },
+              revision: 1,
+              observedAt: 1500,
+              title:
+                state === "present"
+                  ? "Result present in parent capture"
+                  : state === "delivered"
+                    ? "Host marked result delivered"
+                    : "Host recorded result acknowledgement",
+              source: "parent_capture" as const,
+              host: {
+                environmentId: "fixture-host",
+                threadId: "parent",
+                runId: null,
+                origin: "app_owned" as const,
+              },
+              observation:
+                state === "acknowledged"
+                  ? { state, resultId: null, observedByRunId: null }
+                  : { state, resultId: "synthetic-result-" + index },
+              sourceUpdatedAt: 1490,
+              occurredAt: null,
+            })),
+          ),
+        },
+      };
+    })(),
   },
 };

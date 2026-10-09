@@ -1,13 +1,14 @@
 import {
   launchContextSchema,
   eventCapabilities,
+  isCanonicalEvent,
   type AgentRun,
 } from "@astack/agent-observability";
 import { detectProblems } from "@astack/agent-observability/analysis";
 import type { LocalStore } from "./store";
 
 export function refreshRun(store: LocalStore, run: AgentRun) {
-  const events = store.events(run.id);
+  const events = store.events(run.id).filter(isCanonicalEvent);
   run.skills = [
     ...new Map(
       events.flatMap((event) =>

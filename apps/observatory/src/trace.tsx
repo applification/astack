@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Badge } from "@astack/ui";
-import type { AgentEvent } from "@astack/agent-observability";
+import { isCanonicalEvent, type AgentEvent } from "@astack/agent-observability";
 import {
   AlertCircle,
   BookOpen,
@@ -113,9 +113,11 @@ type UploadProgress = {
 };
 function UploadStatus({
   events,
+  observations,
   upload,
 }: {
   events: number;
+  observations: number;
   upload: UploadProgress;
 }) {
   const more = upload.pageState !== "exhausted";
@@ -134,6 +136,8 @@ function UploadStatus({
           : !more && events === upload.capturedCount
             ? " Trace up to date."
             : ""}
+      {observations > 0 &&
+        ` ${observations} host ${observations === 1 ? "observation" : "observations"} loaded separately.`}
     </p>
   );
 }
@@ -146,6 +150,7 @@ export function Trace({
 }) {
   const [problemsOnly, setProblemsOnly] = useState(false);
   const [showContent, setShowContent] = useState(initialShowContent);
+  const canonicalCount = events.filter(isCanonicalEvent).length;
   const visible = events.filter(
     (event) =>
       !problemsOnly ||
@@ -188,7 +193,13 @@ export function Trace({
           </span>
         </label>
       </div>
-      {upload && <UploadStatus events={events.length} upload={upload} />}
+      {upload && (
+        <UploadStatus
+          events={canonicalCount}
+          observations={events.length - canonicalCount}
+          upload={upload}
+        />
+      )}
       <p className="subtitle">
         Recorded item order. Agent timestamps and hook observation times are
         labelled.{" "}

@@ -16,6 +16,14 @@ const buttonVariants = cva(
         badge:
           "max-w-full rounded-lg border border-border bg-card px-3 text-left text-foreground hover:bg-muted aria-expanded:border-link aria-expanded:bg-muted",
         ghost: "text-link hover:bg-muted",
+        workCard:
+          "work-card grid items-start justify-start self-start w-full h-auto rounded-lg border border-border bg-card text-foreground text-left whitespace-normal gap-1 px-4 py-3",
+        workGraph:
+          "work-graph-node flex items-stretch justify-start w-full h-full rounded-lg border border-border bg-card text-foreground text-left whitespace-normal gap-1 px-4 py-3",
+        graphTool:
+          "graph-tool min-h-9 rounded-md border border-border bg-card px-3 py-2 text-xs text-foreground hover:bg-muted",
+        graphIcon:
+          "graph-tool min-h-9 h-9 w-9 rounded-md border border-border bg-card px-0 text-foreground hover:bg-muted",
       },
     },
     defaultVariants: { variant: "default" },
@@ -34,6 +42,50 @@ export function Button({
       className={cn(buttonVariants({ variant, className }))}
       {...props}
     />
+  );
+}
+
+export function PreviewProvider({ children }: { children: ReactNode }) {
+  return <Tooltip.Provider delayDuration={220}>{children}</Tooltip.Provider>;
+}
+
+export function PreviewCard({
+  children,
+  content,
+  side = "top",
+}: {
+  children: ReactNode;
+  content: ReactNode;
+  side?: ComponentProps<typeof Tooltip.Content>["side"];
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Tooltip.Root open={open} onOpenChange={setOpen}>
+      <Tooltip.Trigger
+        asChild
+        onFocus={(event) => {
+          const target = event.currentTarget;
+          event.preventDefault();
+          // Open after keyboard focus has brought the graph item into view.
+          requestAnimationFrame(() => {
+            if (document.activeElement === target) setOpen(true);
+          });
+        }}
+      >
+        {children}
+      </Tooltip.Trigger>
+      <Tooltip.Portal>
+        <Tooltip.Content
+          className="graph-preview-card"
+          side={side}
+          sideOffset={10}
+          collisionPadding={16}
+        >
+          {content}
+          <Tooltip.Arrow className="help-card-arrow" />
+        </Tooltip.Content>
+      </Tooltip.Portal>
+    </Tooltip.Root>
   );
 }
 export function Input({ className, ...props }: ComponentProps<"input">) {

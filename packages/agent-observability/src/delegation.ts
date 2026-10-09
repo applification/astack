@@ -33,6 +33,39 @@ export const delegationSchema = z
   .strict();
 export type Delegation = z.infer<typeof delegationSchema>;
 
+// These facts are independent. An acknowledged result need never have been
+// delivered automatically. Host updatedAt is not the time the fact occurred.
+export const delegationObservationSchema = z.discriminatedUnion("state", [
+  z.object({ state: z.literal("present"), resultId: id }).strict(),
+  z.object({ state: z.literal("delivered"), resultId: id.nullable() }).strict(),
+  z
+    .object({
+      state: z.literal("acknowledged"),
+      resultId: id.nullable(),
+      observedByRunId: id.nullable(),
+    })
+    .strict(),
+]);
+export const delegationResultSchema = z
+  .object({
+    delegationId: id,
+    child: sessionReferenceSchema.nullable(),
+    source: z.literal("parent_capture"),
+    host: z
+      .object({
+        environmentId: id,
+        threadId: id,
+        runId: id.nullable(),
+        origin: z.enum(["provider_native", "app_owned"]).nullable(),
+      })
+      .strict(),
+    observation: delegationObservationSchema,
+    sourceUpdatedAt: time,
+    occurredAt: time,
+  })
+  .strict();
+export type DelegationResult = z.infer<typeof delegationResultSchema>;
+
 export function mergeSessionReferences(
   before: SessionReference[],
   after: SessionReference[],

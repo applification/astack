@@ -1,0 +1,33 @@
+{
+  "revision": "202af8b240903fcfe486a1153226e60dd6b1e809",
+  "reviewer": "Native read-only graph_capture_contract_audit child",
+  "skill": "convex:convex-reviewer",
+  "materialFindingsRemaining": [],
+  "clearedFindings": [
+    "F1 Canonical result and declaration event roles survive evidence references.",
+    "F2 Parent-scoped contribution use and result ownership are shared across projections and inspector.",
+    "F3 Trusted host task identity deduplicates provider turns while retaining owning run references.",
+    "F4 Streaming activity scan stops at the shared byte threshold.",
+    "F5 Shared branch IDs preserve distinct story, dispatch, graph and selection identities.",
+    "F6 Frozen fallback retains the supplied snapshot revision."
+  ],
+  "checks": {
+    "command": "bun test packages/agent-observability/src/work-network.test.ts packages/agent-observability/src/work-view.test.ts packages/agent-observability/src/workflow.test.ts packages/backend/tests/evaluations.test.ts",
+    "passed": 69,
+    "failed": 0,
+    "assertions": 304
+  },
+  "scanProbe": {
+    "source": "Instrumented Convex-test query iterator; not deployed read-limit proof",
+    "availableRows": 49,
+    "outputBytesPerEvent": 200000,
+    "rowsYielded": 2,
+    "bytesYielded": 400600,
+    "metadataPreviews": 1,
+    "truncated": true
+  },
+  "limits": [
+    "No production behavior or installed collector upgrade established.",
+    "Child did not run browser checks; parent completed the 49-test suite."
+  ]
+}

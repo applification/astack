@@ -97,6 +97,39 @@ export const MoreUploadedEvents: Story = {
 export const UploadComplete: Story = {
   args: { upload: { capturedCount: events.length, pageState: "exhausted" } },
 };
+export const HostObservationsUploaded: Story = {
+  args: {
+    events: [
+      events[0]!,
+      ...(["present", "delivered"] as const).map((state, index) =>
+        eventSchema.parse({
+          ...events[0],
+          id: "fixture:host-observation:" + state,
+          sequence: 900_000_000 + index,
+          kind: "delegation_result",
+          title: "Host result " + state,
+          timestamp: null,
+          timing: "unavailable",
+          delegationResult: {
+            delegationId: "fixture-task",
+            child: null,
+            source: "parent_capture",
+            host: {
+              environmentId: "fixture",
+              threadId: "fixture-thread",
+              runId: null,
+              origin: "app_owned",
+            },
+            observation: { state, resultId: "fixture-result" },
+            sourceUpdatedAt: null,
+            occurredAt: null,
+          },
+        }),
+      ),
+    ],
+    upload: { capturedCount: 1, pageState: "exhausted" },
+  },
+};
 export const CheckingUpload: Story = {
   args: { events: [], upload: { capturedCount: 169, pageState: "loading" } },
 };

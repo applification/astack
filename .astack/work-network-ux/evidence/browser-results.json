@@ -1,0 +1,296 @@
+{
+  "id": "01a11ffd-1512-78dd-9cda-b3d9a242acf3",
+  "status": "passed",
+  "exitCode": 0,
+  "startedAt": "2026-10-09T09:27:22.431Z",
+  "finishedAt": "2026-10-09T09:28:17.205Z",
+  "environment": {
+    "ci": false,
+    "trustNoticeShown": false,
+    "os": "darwin 27.0.0",
+    "arch": "arm64",
+    "runtime": "node v24.21.0"
+  },
+  "vcs": {
+    "commit": "84378da403d4f0d649685c1fedc9d028c65833a9",
+    "branch": "t3/improve-orchestration-work-visualization",
+    "dirty": false
+  },
+  "sourceBinding": {
+    "productRevision": "84378da403d4f0d649685c1fedc9d028c65833a9",
+    "sourceDigest": "70ef6f01f037cde81e10ee9462905ecd51e6767d03e03e79c09caeb172455075",
+    "note": "Tracked product files are unchanged from this pin. Untracked retained evidence is excluded."
+  },
+  "results": [
+    {
+      "name": "generation button shows capture requirements, locks pending work and retains a retry after failure",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "generation displays an application budget error with a retry",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "a long captured request renders fully once with a reference criterion",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "scheduled task rows group history by machine and project with explicit schedule snapshots",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "scheduled run badges and detail metadata identify automation activity without labelling interactive rows",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "scheduled run filters expose the task name and reset through clear filters",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "work views preserve original intent and its connection through scope and resize",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "work story retains retries and scoped skill evidence with keyboard return",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "phase details retain recorded skill names, omissions, unfinished phases and icon evidence",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "work views retain route changes, missing route selection and unavailable phase evidence",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "owner flow judgments select captured evidence and remain separate from outcome feedback",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "evaluation awaiting-review explains checks and keeps technical grading separate",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "evaluation passing explains checks and keeps technical grading separate",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "evaluation failed explains checks and keeps technical grading separate",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "evaluation inconclusive explains checks and keeps technical grading separate",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "evaluation missing-proof explains checks and keeps technical grading separate",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "outcome review needs only a choice, retains failed-write answers and shows saved history",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "detailed owner assessment remains available with explicit evidence",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "missing captured content has an honest fallback and responsive review choices",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "empty evaluation scope is explicit",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "successful owner login remembers the trimmed key and obtains a fresh session after reload",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "offline sessions preserve the saved key, while rejected keys are removed and can be replaced",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "unavailable browser storage still permits in-memory login",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "run rows display Claude CLI versions independently of model names, retaining unknown and Codex versions",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "compact metadata preserves full identifiers and reports clipboard success and failure",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "provider marks load and problem-rate help works by hover, focus and tap beyond table clipping",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "reactive naming subscriptions render pending fallbacks and survive fresh run objects",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "Work and activities use readable cached names with source fallbacks and explicit label precedence",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "upload progress distinguishes waiting, partial, paginated and complete traces",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "categorical menus keep choices available after selection and clear categories and dates",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "filter loading, empty and unavailable URL selections remain usable",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "trace expands failure evidence, preserves unknown times and filters failures",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "readable trace content defaults on, hides completely and remembers the choice after reload",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "empty and privacy stories render without inventing data",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "runs design renders readable status, work links and machine context",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "theme choice survives reload and system mode follows the browser",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "project management adds/edits/pauses a project and keeps the selector readable on narrow screens",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "project empty/loading/failed-save states keep unsaved input and do not claim persistence",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "work views preserve child selection, separate attempts and the same evidence links",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "map descriptions compact revisions without losing the full value",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "network layouts, expansion, filters and keyboard inspection preserve captured identities",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "graph previews stay separate from selection and inspection preserves the viewport",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "keyboard graph navigation reveals covered targets at fit scale",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "keyboard graph navigation reveals covered targets at increased zoom",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "graph relationships expose supporting capture and endpoint navigation across views",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "graph filters are grouped, dismissible and resettable on a narrow screen",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "graph connects separate dispatches and explicit use without inventing result receipt",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "completed, unresolved-use and unavailable children keep independent unknown states",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "five child contributions stay reachable in both views without document overflow",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "delivery evidence connects to the last main stop and keeps captured checks separate from current PR state",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "failed private delivery and missing image previews retain honest evidence links",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "observed reads stay compact and preserve repeated skill links separately from phases",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "orchestration hierarchy retains provider changes, nested children, review rounds and capture gaps",
+      "status": "passed",
+      "attempts": 1
+    },
+    {
+      "name": "host presence, delivery and acknowledgement remain independent and return edges need receipt evidence",
+      "status": "passed",
+      "attempts": 1
+    }
+  ]
+}

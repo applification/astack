@@ -4,6 +4,7 @@ import {
   type AgentRun,
 } from "@astack/agent-observability";
 import { sessionReferenceKey } from "@astack/agent-observability/delegation";
+import { runConversation } from "@astack/agent-observability/conversations";
 import { resolveProject } from "@astack/agent-observability/projects";
 import { redact } from "@astack/agent-observability/redaction";
 import {
@@ -11,6 +12,12 @@ import {
   type WorkflowRecord,
   type WorkflowBranch,
   type WorkflowRead,
+  type WorkflowResult,
+  workflowActivitySchema,
+  workflowBranchIdentity,
+  branchOwnsRun,
+  type WorkflowActivity,
+  type WorkflowRun,
 } from "@astack/agent-observability/workflow-view";
 import type { EvaluationDetail } from "@astack/agent-observability/evaluation-view";
 import type { QueryCtx } from "./_generated/server";
@@ -65,19 +72,29 @@ export async function evaluationWorkflow(
     (a, b) => a.run.startedAt - b.run.startedAt,
   );
   const branches: WorkflowBranch[] = [];
+  // Parent observations do not require a collected child trace. A known child
+  // access restriction still blocks them; missing capture is a coverage gap.
+  const resultBranches = new Set<WorkflowBranch>();
   let children = 0;
   const visited = new Set<string>();
-  const tasks = new Set<string>();
+  const tasks = new Map<string, WorkflowBranch>();
   for (const { run: parent } of roots) {
     for (const delegation of parent.delegations) {
-      if (tasks.has(delegation.id)) continue;
-      tasks.add(delegation.id);
+      const taskKey = workflowBranchIdentity(parent, delegation);
+      const existing = tasks.get(taskKey);
+      if (existing) {
+        if (!existing.parentRunIds?.includes(parent.id))
+          existing.parentRunIds?.push(parent.id);
+        continue;
+      }
       if (branches.length >= 32) {
         truncated = true;
         break;
       }
       const branch: WorkflowBranch = {
         parentRunId: parent.id,
+        parentRunIds: [parent.id],
+        identity: taskKey,
         delegation,
         state: "unavailable",
         reason:
@@ -88,8 +105,10 @@ export async function evaluationWorkflow(
         truncated: false,
       };
       branches.push(branch);
+      tasks.set(taskKey, branch);
       const childReference = delegation.child;
       if (!childReference) {
+        resultBranches.add(branch);
         branch.reason =
           "The host did not expose a child conversation identity.";
         continue;
@@ -117,6 +136,10 @@ export async function evaluationWorkflow(
         .order("asc")
         .take(21);
       if (matches.length > 20) branch.truncated = truncated = true;
+      if (!matches.length) {
+        resultBranches.add(branch);
+        branch.reason = "Child capture has not been collected.";
+      }
       for (const match of matches.slice(0, 20)) {
         if (children >= 20) {
           branch.truncated = truncated = true;
@@ -147,6 +170,7 @@ export async function evaluationWorkflow(
         if (child.run.delegations.length) branch.truncated = truncated = true;
       }
       if (branch.runs.length) {
+        resultBranches.add(branch);
         branch.state = "available";
         branch.reason = null;
       } else if (truncated)
@@ -297,6 +321,62 @@ export async function evaluationWorkflow(
     return { reads, limited };
   }
   const reads: WorkflowRead[] = [];
+  const results: WorkflowResult[] = [];
+  let resultCount = 0;
+  // Three independent observations per direct task fit the branch budget. The
+  // shared byte budget still covers every event, run and evidence preview.
+  for (const { run } of parentRuns) {
+    for await (const row of ctx.db
+      .query("events")
+      .withIndex("by_runId_and_kind_and_sequence", (q) =>
+        q.eq("runId", run.id).eq("kind", "delegation_result"),
+      )) {
+      bytes += bytesOf(row.data);
+      if (++resultCount > 96 || bytes > 256 * 1024) {
+        truncated = true;
+        break;
+      }
+      if (row.machineId !== run.machineId) continue;
+      const event = eventSchema.parse(redact(JSON.parse(row.data)));
+      const result = event.delegationResult;
+      if (!result || event.runId !== run.id || event.id !== row.eventId)
+        continue;
+      const branch = branches.find(
+        (entry) =>
+          branchOwnsRun(entry, run.id) &&
+          entry.delegation.id === result.delegationId &&
+          entry.delegation.source === "t3" &&
+          resultBranches.has(entry) &&
+          JSON.stringify(entry.delegation.child) ===
+            JSON.stringify(result.child),
+      );
+      if (
+        !branch ||
+        !run.sessionReferences.some(
+          (ref) =>
+            ref.kind === "t3" &&
+            ref.environmentId === result.host.environmentId &&
+            ref.threadId === result.host.threadId,
+        ) ||
+        (result.host.runId !== null &&
+          run.conversation?.hostRun?.id !== result.host.runId)
+      )
+        continue;
+      results.push({
+        delegationId: result.delegationId,
+        reference: { runId: event.runId, eventId: event.id },
+        revision: row.revision,
+        observedAt: event.observedAt,
+        title: event.title.slice(0, 240),
+        source: result.source,
+        host: result.host,
+        observation: result.observation,
+        sourceUpdatedAt: result.sourceUpdatedAt,
+        occurredAt: result.occurredAt,
+      });
+    }
+    if (resultCount > 96 || bytes > 256 * 1024) break;
+  }
   const parentBudget = { count: 0, limit: 64 };
   for (const { run } of parentRuns)
     reads.push(...(await readsFor(run, parentBudget)).reads);
@@ -309,5 +389,65 @@ export async function evaluationWorkflow(
       branch.reads.push(...capture.reads);
       if (capture.limited) branch.truncated = true;
     }
-  return workflowCaptureSchema.parse({ records, reads, branches, truncated });
+  const summaries: WorkflowRun[] = [];
+  const activities: WorkflowActivity[] = [];
+  for (const { run, revision } of eligible.values()) {
+    let activityLimited = false;
+    if (activities.length >= 192 || bytes >= 256 * 1024) {
+      activityLimited = truncated = true;
+    } else {
+      // A prefix scan also supports legacy rows whose indexed kind is absent.
+      // Arbitrary event data and command signatures never cross this boundary.
+      let scanned = 0;
+      for await (const row of ctx.db
+        .query("events")
+        .withIndex("by_runId_and_sequence", (q) => q.eq("runId", run.id))) {
+        if (++scanned > 48) {
+          activityLimited = truncated = true;
+          break;
+        }
+        bytes += bytesOf(row.data);
+        if (activities.length >= 192 || bytes > 256 * 1024) {
+          activityLimited = truncated = true;
+          break;
+        }
+        if (row.machineId !== run.machineId) continue;
+        const event = eventSchema.parse(redact(JSON.parse(row.data)));
+        if (event.runId !== run.id || event.id !== row.eventId) continue;
+        const preview = workflowActivitySchema.safeParse({
+          reference: { runId: event.runId, eventId: event.id },
+          revision: row.revision,
+          kind: event.kind,
+          title: event.title.slice(0, 240),
+          sequence: event.sequence,
+          timestamp: event.timestamp,
+          observedAt: event.observedAt,
+          timing: event.timing,
+          tool: event.tool,
+          failed: event.failed,
+          durationMs: event.durationMs,
+        });
+        if (preview.success) activities.push(preview.data);
+      }
+    }
+    summaries.push({
+      runId: run.id,
+      machineId: run.machineId,
+      projectId: project.projectId,
+      title: run.title.slice(0, 240),
+      status: run.status,
+      revision,
+      conversation: runConversation(run),
+      activityLimited,
+    });
+  }
+  return workflowCaptureSchema.parse({
+    records,
+    reads,
+    branches,
+    results,
+    runs: summaries,
+    activities,
+    truncated,
+  });
 }

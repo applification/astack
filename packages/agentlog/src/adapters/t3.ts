@@ -5,6 +5,7 @@ import {
   eventSchema,
   runSchema,
   launchContextSchema,
+  isCanonicalEvent,
   type AgentEvent,
   type AgentSnapshot,
 } from "@astack/agent-observability";
@@ -24,11 +25,13 @@ import {
   mergeDelegations,
   mergeSessionReferences,
   type SessionReference,
+  type DelegationResult,
 } from "@astack/agent-observability/delegation";
 import { T3Reader } from "./t3-rpc";
 import { claudeVersion } from "./claude-version";
 import { commandReadPaths } from "./command-reads";
 import { conversationSchema } from "@astack/agent-observability/conversations";
+import { observationAnchorKey } from "./t3-observations";
 
 const id = z.string().min(1).max(512);
 const date = z.iso
@@ -145,12 +148,27 @@ export const t3ProjectionSchema = z.object({
     .array(
       z.object({
         id,
-        runId: id,
+        runId: id.nullable(),
         childThreadId: id.nullable(),
         title: z.string().nullable().optional(),
         status: z.string(),
         startedAt: date.nullable(),
         completedAt: date.nullable(),
+        result: z.string().nullable().optional(),
+        origin: z.enum(["provider_native", "app_owned"]).optional(),
+        updatedAt: date.optional(),
+        completionDelivery: z
+          .object({
+            state: z.enum([
+              "pending",
+              "claimed",
+              "acknowledged",
+              "delivered",
+              "disposed",
+            ]),
+            observedByRunId: id.nullable(),
+          })
+          .optional(),
       }),
     )
     .default([]),
@@ -333,7 +351,11 @@ export async function normalizeT3Turn(options: {
   const delegations = mergeDelegations(
     previous?.kind === "run" ? previous.value.delegations : [],
     projection.subagents
-      .filter((task) => task.runId === appRun.id)
+      .filter(
+        (task) =>
+          task.runId === appRun.id ||
+          (task.runId === null && taskAnchor(task) === runId),
+      )
       .slice(0, 32)
       .map((task) =>
         delegationSchema.parse({
@@ -365,6 +387,166 @@ export async function normalizeT3Turn(options: {
         }),
       ),
   );
+  function taskAnchor(task: Projection["subagents"][number]) {
+    const key = observationAnchorKey({
+      delegationId: task.id,
+      host: {
+        environmentId: source.environmentId,
+        threadId: projection.thread.id,
+        runId: task.runId,
+        origin: task.origin ?? null,
+      },
+    });
+    const retained = store.getMeta(key);
+    if (retained) return retained;
+    const candidates = projection.providerTurns.flatMap((candidate) => {
+      const candidateAttempt = projection.attempts.find(
+        (entry) => entry.id === candidate.runAttemptId,
+      );
+      const candidateRun = projection.runs.find(
+        (entry) => entry.id === candidateAttempt?.runId,
+      );
+      const candidateProvider = projection.providerThreads.find(
+        (entry) => entry.id === candidate.providerThreadId,
+      );
+      if (
+        !candidateRun ||
+        !candidateProvider ||
+        (task.runId !== null && candidateRun.id !== task.runId)
+      )
+        return [];
+      const identity = codexIdentity(
+        candidateProvider,
+        candidateAttempt,
+        candidate,
+      );
+      if (candidateProvider.driver === "codex" && !identity) return [];
+      const candidateScope = createHash("sha256")
+        .update(
+          `${source.environmentId}:${candidateProvider.providerInstanceId}:${projection.thread.id}`,
+        )
+        .digest("hex")
+        .slice(0, 24);
+      return [
+        {
+          id: identity
+            ? runIdentity(config.machineId, identity.session, identity.turn)
+            : `${config.machineId}:t3:${candidateScope}:${candidate.id}`,
+          requestedAt: candidateRun.requestedAt,
+          attempt: candidateAttempt?.attemptOrdinal ?? 0,
+          ordinal: candidate.ordinal,
+        },
+      ];
+    });
+    candidates.sort(
+      (a, b) =>
+        a.requestedAt - b.requestedAt ||
+        a.attempt - b.attempt ||
+        a.ordinal - b.ordinal ||
+        a.id.localeCompare(b.id),
+    );
+    return candidates[0]?.id;
+  }
+  const observations: AgentEvent[] = [];
+  for (const [index, task] of projection.subagents.entries()) {
+    if (
+      taskAnchor(task) !== runId ||
+      !delegations.some(
+        (entry) => entry.id === task.id && entry.source === "t3",
+      )
+    )
+      continue;
+    const resultId =
+      task.result == null
+        ? null
+        : createHmac("sha256", options.signatureKey)
+            .update(
+              JSON.stringify([
+                source.environmentId,
+                projection.thread.id,
+                task.id,
+                task.result,
+              ]),
+            )
+            .digest("hex");
+    const states: DelegationResult["observation"][] = [];
+    if (resultId !== null) states.push({ state: "present", resultId });
+    // Only the installed host's explicit classifications establish these facts.
+    // Transfers, terminal statuses and updatedAt never establish receipt.
+    if (task.origin === "app_owned") {
+      if (task.completionDelivery?.state === "delivered")
+        states.push({ state: "delivered", resultId });
+      if (task.completionDelivery?.state === "acknowledged")
+        states.push({
+          state: "acknowledged",
+          resultId,
+          observedByRunId: task.completionDelivery.observedByRunId,
+        });
+    }
+    for (const [variant, observation] of states.entries()) {
+      const eventId = `${runId}:t3-observation:${createHash("sha256")
+        .update(
+          JSON.stringify([
+            source.environmentId,
+            projection.thread.id,
+            task.id,
+            resultId,
+            observation.state,
+          ]),
+        )
+        .digest("hex")}`;
+      const retained = store.getRecord(`event:${eventId}`);
+      const event = eventSchema.parse({
+        id: eventId,
+        runId,
+        sequence: 900_000_000 + index * 3 + variant,
+        kind: "delegation_result",
+        title:
+          observation.state === "present"
+            ? "Result present in parent capture"
+            : observation.state === "delivered"
+              ? "Host classified result as delivered"
+              : "Host acknowledged terminal result read",
+        timestamp: null,
+        timing: "unavailable",
+        observedAt,
+        delegationResult: {
+          delegationId: task.id,
+          child:
+            task.childThreadId === null
+              ? null
+              : t3Reference(task.childThreadId),
+          source: "parent_capture",
+          host: {
+            environmentId: source.environmentId,
+            threadId: projection.thread.id,
+            runId: task.runId,
+            origin: task.origin ?? null,
+          },
+          observation,
+          sourceUpdatedAt: task.updatedAt ?? null,
+          occurredAt: null,
+        },
+        data: {
+          result: config.captureContent
+            ? redactText(task.result ?? "", options.secrets)
+            : "[WITHHELD]",
+        },
+      });
+      // Once observed, the observation does not move to a later provider turn or
+      // acquire a newer source timestamp. Content withholding still takes effect.
+      observations.push(
+        retained?.kind === "event" && retained.value.delegationResult
+          ? {
+              ...retained.value,
+              data: config.captureContent
+                ? event.data
+                : { result: "[WITHHELD]" },
+            }
+          : event,
+      );
+    }
+  }
   // The original collector still owns the trace. Supplement only host identities
   // and delegation lifecycle; never replace native events or assessed outcomes.
   if (previous?.kind === "run" && previous.value.source !== origin)
@@ -373,6 +555,7 @@ export async function normalizeT3Turn(options: {
         redact(
           {
             ...previous.value,
+            source: origin,
             sessionReferences,
             delegations,
             conversation: conversation ?? null,
@@ -380,7 +563,7 @@ export async function normalizeT3Turn(options: {
           options.secrets,
         ),
       ),
-      events: [],
+      events: observations,
     };
   const sessionId =
     previous?.kind === "run"
@@ -394,7 +577,7 @@ export async function normalizeT3Turn(options: {
   const data = (value: unknown) => redact(value, options.secrets);
   const signature = (value: string) =>
     createHmac("sha256", options.signatureKey).update(value).digest("hex");
-  const events: AgentEvent[] = [];
+  const events: AgentEvent[] = [...observations];
   const coverage = [
     "T3 provider-turn capture; T3 run and native turn are separate identities",
     "Times are recorded by T3; unavailable native facts remain unknown",
@@ -808,11 +991,15 @@ export async function normalizeT3Turn(options: {
       250,
     ),
     findings: [],
-    eventCount: events.length,
+    eventCount: events.filter(isCanonicalEvent).length,
     contentCapture: config.captureContent,
     coverage,
   });
-  run.findings = detectProblems(run, events, observedAt);
+  run.findings = detectProblems(
+    run,
+    events.filter(isCanonicalEvent),
+    observedAt,
+  );
   return {
     run: runSchema.parse(data(run)),
     events: events.map((event) => eventSchema.parse(data(event))),
@@ -895,7 +1082,7 @@ export class T3Adapter {
       if (!project) continue;
       const checkpoint = `t3:${this.source.environmentId}:${thread.id}:updated`;
       const fingerprint = createHash("sha256")
-        .update(JSON.stringify({ captureVersion: 7, thread }))
+        .update(JSON.stringify({ captureVersion: 8, thread }))
         .digest("hex");
       if (
         !["running", "starting", "waiting", "preparing"].includes(

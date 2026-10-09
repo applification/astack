@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "revision": "202af8b240903fcfe486a1153226e60dd6b1e809",
+  "dirty": false,
+  "sourceDigest": "20d30297cf1367e54d6bc026f590d4dae385a7d329c313f00bd2ebec89784f23",
+  "target": "Synthetic Storybook and disposable anonymous local Convex, macOS arm64",
+  "actor": "Owning agent with deterministic browser checks and independent read-only Convex/code review",
+  "fixture": "Synthetic parent, UI retry, data child, missing child capture, host observation states, duplicate task IDs and frozen revisions. No production capture session tested.",
+  "command": "bun run observatory:check; bun run observatory:test:e2e; isolated anonymous Convex codegen/push and authenticated network-smoke.ts readback",
+  "cases": [
+    {
+      "caseId": "C1",
+      "attempts": [
+        {
+          "status": "pass",
+          "observed": "Graph overview and expansion use actual conversation/task/event/reference identities with typed relationships. Completion and unknown timing create no return or process-order edges. Persisted local capture produces 85 nodes and 100 links from 5 current summaries and 11 activity previews.",
+          "artifacts": [
+            {
+              "label": "Retained network verification and artifact hashes",
+              "path": ".astack/work-network/evidence/verification.json",
+              "sha256": "a37b11a1ffa3e670de0797f0171f8fb5f1c36324eabe7647a353107e81c32600"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "C2",
+      "attempts": [
+        {
+          "status": "pass",
+          "observed": "Expansion, activity/skill/evidence filters and inspector preserve source identity and full-trace links. Missing evidence, bounded capture and 360-node display limit remain explicit. Current metadata obeys owner/project/machine/content policy and preserves immutable snapshots; historical fallback retains revision 7.",
+          "artifacts": [
+            {
+              "label": "Retained network verification and artifact hashes",
+              "path": ".astack/work-network/evidence/verification.json",
+              "sha256": "a37b11a1ffa3e670de0797f0171f8fb5f1c36324eabe7647a353107e81c32600"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "C3",
+      "attempts": [
+        {
+          "status": "pass",
+          "observed": "Force, community and layered layouts retain identical typed topology. The 49-test browser suite verifies expansion, lens/filter changes, zoom/fit, keyboard node selection, return focus, inspector continuity and narrow-screen behavior.",
+          "artifacts": [
+            {
+              "label": "Retained network verification and artifact hashes",
+              "path": ".astack/work-network/evidence/verification.json",
+              "sha256": "a37b11a1ffa3e670de0797f0171f8fb5f1c36324eabe7647a353107e81c32600"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "caseId": "C4",
+      "attempts": [
+        {
+          "status": "pass",
+          "observed": "Work story remains the default with the shared inspector. Completion, presence, delivery, acknowledgement and declared use remain separate. Authenticated anonymous-local Convex ingestion/query persisted all three host observation kinds, denied anonymous and paused-project reads, preserved the final response and frozen evaluation runs.",
+          "artifacts": [
+            {
+              "label": "Retained network verification and artifact hashes",
+              "path": ".astack/work-network/evidence/verification.json",
+              "sha256": "a37b11a1ffa3e670de0797f0171f8fb5f1c36324eabe7647a353107e81c32600"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

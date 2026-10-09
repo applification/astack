@@ -26,9 +26,27 @@ Keep previously retained unmatched history for recovery, outside enrolled report
 
 Add a separate optional T3 history reader alongside the native Codex reader. T3's protocol-v2 projection is a shared source for Claude, Codex and other providers; provider-specific translation belongs inside that adapter. A T3 orchestration run can span multiple provider turns, so Observatory maps one provider turn to one run and retains T3's enclosing identities as trace metadata. Non-Codex identities include the environment and provider instance. T3 sessions use the environment and app-thread identity; Codex retains its native session/turn identities.
 
-The same Codex turn can be visible through both sources. Prefer its existing canonical run ID and retain the first collector's complete event set rather than merging incompatible item identities. Existing native history and its annotations remain intact. Native capture is polled first, but a T3-owned Codex turn stays T3-owned on subsequent polls. The tradeoff is that the second source cannot supplement the first source's coverage. Missing or weak native Codex identities defer capture instead of creating provisional duplicate runs, and deferred threads are retried with a visible partial-health count.
+The same Codex turn can be visible through both sources. Prefer its existing canonical run ID and retain the first collector's complete event set rather than merging incompatible item identities. Existing native history and its annotations remain intact. Native capture is polled first, but a T3-owned Codex turn stays T3-owned on subsequent polls. The second source cannot add ordinary trace events to the first source's coverage; the narrowly scoped result-observation exception below supplements host facts. Missing or weak native Codex identities defer capture instead of creating provisional duplicate runs, and deferred threads are retried with a visible partial-health count.
 
 Authenticate with an owner-issued read grant, pin the environment identity and protocol before sending bearer credentials, and keep credentials in restricted local files. T3 sources run on the computer that owns their workspace paths so existing project enrollment and local Git matching apply. T3 history is observed through supported HTTP reads and two read-only RPC methods; no direct T3 database collector, execution changes or provider-control commands are introduced.
+
+### Delegated result observation amendment, 2026-10-08
+
+Permit strict, separately identified parent observations of delegated result
+presence, explicit host delivery and explicit terminal-result acknowledgement
+alongside a native-owned trace. Match the approved parent's host, task and child
+identities before retaining them. These observations cannot replace canonical
+events, alter canonical event counts or findings, or enlarge immutable evaluation evidence.
+Keep their first observation time separate from host update time; missing
+occurrence time stays unknown. Passive capture cannot recover missed states.
+
+A child conversation remains separate. Task completion does not establish
+receipt, and receipt does not establish parent integration: the latter needs an
+explicit workflow join. A missing child trace is a coverage gap and does not
+invalidate a correctly scoped fact captured in the approved parent. Known child
+access restrictions continue to block the result projection, and no child
+content is fetched through this exception. Current work views use bounded
+direct-child capture while frozen evaluation evidence remains unchanged.
 
 ## Consequences
 
