@@ -293,6 +293,41 @@ test('title edits preserve original create identity across restart with compatib
   ).toBe('Keep this note');
 }, 15000);
 
+test('repeated title edits never replace original create identity', async () => {
+  const repo = await project();
+  await edit(repo, (source) =>
+    addTitle(source).replace(
+      'note.originalCreateTitle ??= note.title;',
+      'note.originalCreateTitle = note.title;',
+    ),
+  );
+  const directory = output();
+  expect(
+    (await checkNotebook({ project: repo, task: 'feature', output: directory }))
+      .outcome,
+  ).toBe('fail');
+  const observed = observationReport.parse(
+    JSON.parse(await readFile(join(directory, 'observations.json'), 'utf8')),
+  );
+  for (const id of [
+    'final-legacy-create-retry-restart',
+    'restored-completed-create-retry-restart',
+  ])
+    expect(observed.checks.find((check) => check.id === id)?.outcome).toBe(
+      'fail',
+    );
+  await edit(repo, (source) =>
+    source.replace(
+      'note.originalCreateTitle = note.title;',
+      'note.originalCreateTitle ??= note.title;',
+    ),
+  );
+  expect(
+    (await checkNotebook({ project: repo, task: 'feature', output: output() }))
+      .outcome,
+  ).toBe('pass');
+}, 15000);
+
 test('maintenance archive/restore requires list hiding, restart and preserved neighbors', async () => {
   const repo = await project();
   expect(

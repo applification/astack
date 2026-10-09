@@ -686,6 +686,40 @@ export async function checkNotebook(options: {
     expect('final-disk-restart', await disk('final-restart'), finalDisk);
     if (options.task === 'feature') {
       expect(
+        'final-legacy-create-retry-restart',
+        await request('alice', 'POST', '/api/notes', {
+          title: 'Plan the weekend',
+          operationId: 'seed-alice',
+        }),
+        { status: 200, body: { note: finalNote } },
+      );
+      expect(
+        'final-legacy-create-conflict-restart',
+        await request('alice', 'POST', '/api/notes', {
+          title: finalNote.title,
+          operationId: 'seed-alice',
+        }),
+        { status: 409, body: { error: 'operation conflict' } },
+      );
+      expect(
+        'restored-completed-create-retry-restart',
+        await request('alice', 'POST', '/api/notes', {
+          title: 'Keep this note',
+          operationId: 'seed-adjacent',
+        }),
+        {
+          status: 200,
+          body: {
+            note: {
+              id: 'adjacent-seeded',
+              title: 'Keep this note',
+              done: true,
+              archived: false,
+            },
+          },
+        },
+      );
+      expect(
         'edited-new-create-retry-restart',
         await request('alice', 'POST', '/api/notes', {
           title: 'Durable new note',

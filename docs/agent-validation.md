@@ -121,7 +121,7 @@ Observe whether the agent settles the caller/API shape and ownership before wiri
 
 Edit both an open and a completed note; each must retain its status through reload and restart. The independent feature seed has an unrelated status bug, so use HTTP `PATCH {done:false}` to obtain a completed control there, or use the successful bug repository for sequential exploration. Record this fixture limitation.
 
-Create a note using the request below before editing it. Rename it in the browser, restart the app, then repeat the exact request. Expect 200 with the same ID and current edited title, with no duplicate. Change only the create title while keeping the operation ID: expect 409. Repeat on a note created before the agent changed the persisted format.
+Create a note using the request below before editing it. Rename it in the browser, restart the app, then repeat the exact request. Expect 200 with the same ID and current edited title, with no duplicate. Change only the create title while keeping the operation ID: expect 409. Rename it a second time and repeat the original create request after restart; original request identity must stay fixed across multiple edits. Repeat on a note created before the agent changed the persisted format.
 
 ```sh
 curl -i -X POST http://127.0.0.1:3174/api/notes -H 'x-actor: alice' -H 'Content-Type: application/json' -d '{"title":"Before title edit","operationId":"manual-title-retry"}'
