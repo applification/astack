@@ -4,7 +4,7 @@ Specialists contribute within the existing delivery route; they are not addition
 
 These briefs apply when assigning or reporting a contribution. Ordinary direct work selects the owning skill without creating a role record.
 
-Apply [main-thread orchestration](orchestration.md) for host selection and child lifecycle. The parent owns the task evaluation; contributions return evidence and its supplied evaluation task ID, preserving external work identity. A child does not begin or finish a duplicate owner evaluation.
+Apply [main-thread orchestration](orchestration.md) for host selection and child lifecycle.
 
 ## Select by behavior and risk
 

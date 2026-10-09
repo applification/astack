@@ -7,8 +7,6 @@ metadata:
 
 # PR and review
 
-When owning substantive work with agentlog readable capture, use the [automatic evaluation handoff](../astack/references/observatory.md#automatic-task-evaluations) at task start and delivery. Reuse an enclosing task ID rather than starting a second review record for its PR phase; keep telemetry failures from blocking the work.
-
 Read `.astack/project.md` when present for the project's runtime, control and verification commands; use the requested scope without requiring the astack coordinator or a setup pass.
 
 Use this skill directly for a review or PR, or when astack delivery reaches review. Read the request, current diff, project PR rules and available proof first. Repository changes meant to be kept finish in a PR, whether they came from a feature, bug fix, refactor, performance change, or project setup. Carry the owner-selected PR through later additions and revisions. Continue it when it covers the task; coherent slices can be separate commits within it. A new capability or skill does not by itself authorize a second PR. A read-only investigation or review needs no new PR. If required design or proof is blocked after independent work is complete, open a draft PR that names the blocker and unverified claims; do not describe the change as finished. A missing remote or base branch must be resolved before a PR can exist.
@@ -35,8 +33,6 @@ Use [$applification:show-me](../show-me/SKILL.md) when a view will clarify the c
 Explain what changed and why the boundary or order matters. Link source locations or acceptance cases where useful, label proposals or unknowns, and refresh the view when the diff changes. An explanatory diagram, sketch or HTML illustration does not establish that the depicted behavior ran. Keep actual observations and gaps in the proof summary.
 
 Before marking a PR ready, select the screenshots or recordings that help a reviewer assess the result and attach them to the PR, or link committed media accessible from it. Keep redundant captures with the raw runner artifacts; a proof index can map multiple observations to one byte-identical image. If media is unnecessary for review, state why briefly. Video is optional; use it when motion, timing, or a journey needs to be seen. Follow [proportional evidence retention](../verify/references/proof-policy.md#keep-review-evidence-proportional) rather than committing a full run directory.
-
-When the project already uses agentlog/Observatory and this task has readable capture enabled, record the task's existing PR as delivery evidence after updating its description and media: `agentlog delivery capture --run <captured-parent-run-id> --pr <full-PR-url>`. Use a parent run belonging to the task's evaluation; never attach an unrelated PR or child result. The command saves PR metadata, checks and supported screenshots at their captured revisions. Repeating capture for the same PR head preserves its original snapshot. Use `agentlog delivery refresh --event <returned-event-id>` to update the separately timestamped PR observation; recapture a new head only when recording new delivery evidence. Respect the project's existing repository/readable-capture policy. Private or unavailable images remain links. If capture is unavailable, report that evidence gap without implying PR completion, CI success or owner approval. Do not install or enable capture solely to satisfy this handoff.
 
 Keep the PR description brief and useful to a reviewer:
 

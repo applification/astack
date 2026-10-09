@@ -7,7 +7,7 @@ metadata:
 
 # Set up the project
 
-Apply [main-thread orchestration](../astack/references/orchestration.md) and install that default in project-owned host instructions for new setup and upgrades. When owning substantive work with agentlog readable capture, use the [automatic evaluation handoff](../astack/references/observatory.md#automatic-task-evaluations) at task start and delivery. Reuse its evaluation task ID across active follow-ups; children return evidence to the owner. Keep telemetry failures from blocking the work.
+Apply [main-thread orchestration](../astack/references/orchestration.md) and install that default in project-owned host instructions for new setup and upgrades.
 
 For integration and upgrades, apply [sequence verifiable units](../principle-sequence-verifiable-units/SKILL.md) and [prove it works](../principle-prove-it-works/SKILL.md) to the resulting runtime loop.
 

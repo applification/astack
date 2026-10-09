@@ -71,9 +71,7 @@ the available host; T3 is optional. Give complete briefs and retain host child
 handles. Keep one writer per worktree. Review and integrate child results,
 resolve findings, and verify the combined result before claiming completion.
 Keep the parent informed of progress, proof and gaps. Preserve supplied work
-identity. With readable capture, the owner begins/finishes evaluations; children
-return evidence under the owner's evaluation task ID. Reuse that ID for active
-follow-ups; materially revised proof after immutable delivery needs a fresh ID.
+identity.
 
 Read `.astack/project.md` for runtime, control and verification commands.
 Use `$applification:astack` to route work or invoke a focused skill directly.

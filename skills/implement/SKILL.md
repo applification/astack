@@ -7,8 +7,6 @@ metadata:
 
 # Feature
 
-When owning substantive work with agentlog readable capture, use the [automatic evaluation handoff](../astack/references/observatory.md#automatic-task-evaluations) at task start and delivery. Reuse its task ID across follow-ups and keep telemetry failures from blocking the work.
-
 For multi-step delivery, apply [sequence verifiable units](../principle-sequence-verifiable-units/SKILL.md).
 
 Use this skill directly for the requested outcome, or as the selected astack delivery route. Read relevant project instructions, `.astack/project.md` when present and working commands; user scope and project constraints take precedence.

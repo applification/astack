@@ -7,8 +7,6 @@ metadata:
 
 # Move an app to cloud
 
-When owning substantive work with agentlog readable capture, use the [automatic evaluation handoff](../astack/references/observatory.md#automatic-task-evaluations) at task start and delivery. Reuse its task ID across follow-ups and keep telemetry failures from blocking the work.
-
 Read `.astack/project.md` when present for the project's runtime, control and verification commands; use the requested scope without requiring the astack coordinator or a setup pass.
 
 New astack apps start with local development. A user request such as “move this app to cloud” initiates this delivery workflow; building an app, provisioning an auth sandbox or finding an integration that needs a public URL does not initiate it. Preserve an existing app's accepted deployment until its user requests a transition. Cloud delivery belongs inside astack, including configuration, data decisions, deployment, actual hosted proof and recovery.

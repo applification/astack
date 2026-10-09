@@ -8,8 +8,6 @@ Carry one `work_id` from assignment through briefs, contributions, PR and consol
 
 Stable field names below are a text convention, versioned as `astack-handoff/v1`. They are not a validated schema. Fields can contain prose or links to authoritative project records. A small direct fix can keep a short assignment and result in the conversation/PR; it needs no ceremonial file, role roster or duplicate behavior contract. Unavailable external fields may be omitted for direct requests. For material missing context, write `unknown` with an owner/next action; missing authority grants nothing. A COS brief that lacks durable identity must be clarified before autonomous dispatch or external result delivery; independent read-only investigation can continue.
 
-Keep the external `work_id`, owner's evaluation `taskID`, workflow `flowId`, and T3 delegation `taskId` or native child handle distinct. Carry supplied values with their issuer/purpose; none substitutes for another. The main owner controls evaluation begin/finish, while children return evidence and that owner's evaluation ID. Active follow-ups reuse it; materially revised proof after immutable delivery needs a fresh evaluation ID with the external work identity preserved. Use [orchestration](orchestration.md) for ownership/lifecycle and [Observatory context](observatory.md) for trusted captured root/child relationships and joins; text handoff fields alone do not establish those relationships.
-
 ## Assignment
 
 | Field | Meaning |
@@ -28,13 +26,13 @@ The lead selects the existing route and proportionate [specialist contributions]
 
 ## Specialist brief
 
-Carry `contract_version`, `work_id` and available assignment/attempt IDs, plus the owner's evaluation task ID when supplied. Add `contribution_id`, `role`, `question`, scoped acceptance/risk IDs, required context/source links, pinned revision/environment, allowed actions, writer/worktree ownership and bounded limits. State how to return the result and when to escalate. A read-only review must say read-only; an implementation assignment must name its writer and integration owner. Do not delegate permissions beyond the parent assignment. Keep conflicting writers stopped until ownership is resolved.
+Carry `contract_version`, `work_id` and available assignment/attempt IDs. Add `contribution_id`, `role`, `question`, scoped acceptance/risk IDs, required context/source links, pinned revision/environment, allowed actions, writer/worktree ownership and bounded limits. State how to return the result and when to escalate. A read-only review must say read-only; an implementation assignment must name its writer and integration owner. Do not delegate permissions beyond the parent assignment. Keep conflicting writers stopped until ownership is resolved.
 
 ## Specialist contribution
 
 | Field | Meaning |
 | --- | --- |
-| `contract_version`, `work_id`, `contribution_id` | Parent identity and contribution identity, plus assignment/attempt IDs and owner's evaluation task ID where supplied; retain their distinct purposes. |
+| `contract_version`, `work_id`, `contribution_id` | Parent identity and contribution identity, plus assignment/attempt IDs where present. |
 | `role`, `actor`, `independence`, `scope` | Expertise applied, contributor identity, fresh independent contributor versus lead self-review, and the agreed question/cases/risks. |
 | `status`, `changes` | `completed`, `partial` or `blocked` for this bounded contribution; concrete changes or investigation result, artifacts and commit/diff identity. A completed review may find a blocking defect; it does not complete the parent work. |
 | `revision`, `environment` | Exact revision reviewed or delivered, dirty patch identity if relevant, runtime/host/surface, actor/fixture and target. |

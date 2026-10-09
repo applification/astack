@@ -27,9 +27,3 @@ Keep one active writer per worktree, including the parent. Parallel implementati
 Inspect returned changes and evidence before integration, resolve material findings, and run checks appropriate to the integrated revision and affected behavior. Required child work or proof still outstanding keeps the parent result incomplete. Preserve the owner-selected PR and external work identity; a child returns its commits/evidence to the owner rather than creating a competing delivery.
 
 Explain the plan and assignments in the parent conversation. Report meaningful findings, what is complete/running, blockers and what comes next; finish with the outcome, observed verification and material gaps. Continue within scope, asking only when a missing decision or authority prevents the dependent step, while progressing independent work.
-
-## Evaluation and capture ownership
-
-The owning main agent begins and finishes the task evaluation when readable capture is available. Children return evidence and the supplied owner's evaluation `taskID`; they do not begin or finish duplicate parent evaluations. Active follow-ups reuse that ID. Once delivery creates an immutable evaluation, materially revised proof or intent needs a fresh ID; retain the earlier evaluation and the same external work identity. See [Observatory context](observatory.md#automatic-task-evaluations) for commands and capture limits.
-
-Keep evaluation `taskID`, T3 delegation `taskId` or native agent handle, external `work_id`, and workflow `flowId` distinct. Root/child conversation correlation must come from typed host/capture relationships with their provenance; matching work IDs, phase names, fork lineage or a spawn's completion cannot establish a parent join. Record a join only when the parent actually uses the result and trusted captured delegation/result references are available. Missing capture is an evidence gap; this guidance does not establish runtime grouping or installed-host proof.

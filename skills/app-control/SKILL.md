@@ -7,8 +7,6 @@ metadata:
 
 # Make the app controllable
 
-When owning substantive work with agentlog readable capture, use the [automatic evaluation handoff](../astack/references/observatory.md#automatic-task-evaluations) at task start and delivery. Reuse its task ID across follow-ups and keep telemetry failures from blocking the work.
-
 Apply [prove it works](../principle-prove-it-works/SKILL.md) to the control route itself before handing it over.
 
 Read `.astack/project.md` when present for the project's runtime, control and verification commands; use the requested scope without requiring the astack coordinator or a setup pass.
