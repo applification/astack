@@ -14,8 +14,11 @@
     "@astack/agent-observability": "workspace:*",
     "@astack/observatory-backend": "workspace:*",
     "@astack/ui": "workspace:*",
+    "@dagrejs/dagre": "3.0.0",
+    "@statelyai/graph": "2.5.1",
     "@tanstack/react-form": "1.33.5",
     "convex": "1.46.0",
+    "d3-force": "3.0.0",
     "lucide-react": "1.52.0",
     "react": "19.3.0",
     "react-dom": "19.3.0"

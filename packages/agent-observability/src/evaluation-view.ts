@@ -39,6 +39,8 @@ export const evaluationDetailSchema = z
     feedback: z.array(outcomeFeedbackSchema).max(20).default([]),
     moreFeedback: z.boolean().default(false),
     workflow: workflowCaptureSchema.default({
+      runs: [],
+      activities: [],
       records: [],
       reads: [],
       branches: [],

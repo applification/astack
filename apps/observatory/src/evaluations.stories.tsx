@@ -25,6 +25,7 @@ import {
 } from "@astack/agent-observability/workflow-fixtures";
 import { journeyFixture } from "@astack/agent-observability/journey-fixtures";
 import { generateEvaluation } from "@astack/agent-observability/evaluation-generation";
+import { WorkflowEvidence } from "./workflow-evidence";
 
 function detail(status: "pass" | "fail" | "inconclusive", assessed = false) {
   const evaluation = evaluationFixture(status);
@@ -210,6 +211,8 @@ export const MissingFlowSelection: Story = {
       ...detail("pass"),
       workflow: {
         records: workflowViewFixture().records.slice(1, 4),
+        runs: [],
+        activities: [],
         reads: [],
         branches: [],
         results: [],
@@ -351,6 +354,17 @@ export const ParallelJourneys: Story = {
   args: {
     detail: { ...detail("inconclusive"), workflow: journeyFixture().workflow },
   },
+};
+export const NetworkExplorer: Story = {
+  render: () => (
+    <WorkflowEvidence
+      detail={{
+        ...detail("inconclusive"),
+        workflow: journeyFixture().workflow,
+      }}
+      initialMode="graph"
+    />
+  ),
 };
 const revisionJourney = journeyFixture().workflow;
 export const RevisionSummaries: Story = {

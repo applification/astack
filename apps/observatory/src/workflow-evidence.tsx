@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 import { Badge, Button } from "@astack/ui";
 import type { EvaluationDetail } from "@astack/agent-observability/evaluation-view";
 import {
@@ -8,6 +8,9 @@ import {
 import { WorkEvidenceDetails } from "./work-evidence-details";
 import { WorkGraph } from "./work-graph";
 import { WorkCard } from "./work-card";
+import { buildWorkNetwork } from "@astack/agent-observability/work-network";
+import { WorkNetworkDetails } from "./work-network-details";
+import { branchOwnsRun } from "@astack/agent-observability/workflow-view";
 
 function WorkStory({
   view,
@@ -30,10 +33,8 @@ function WorkStory({
             (edge) => edge.from === id && edge.kind === "delegation",
           );
           const child = childEdge ? nodes.get(childEdge.to) : null;
-          const branchId =
-            child?.item.kind === "contribution"
-              ? child.item.branch.delegation.id
-              : null;
+          const branch =
+            child?.item.kind === "contribution" ? child.item.branch : null;
           return (
             <li
               key={id}
@@ -57,7 +58,10 @@ function WorkStory({
                     .filter(
                       (item) =>
                         item.item.kind === "result" &&
-                        item.item.result.delegationId === branchId,
+                        branch &&
+                        item.item.result.delegationId ===
+                          branch.delegation.id &&
+                        branchOwnsRun(branch, item.item.result.reference.runId),
                     )
                     .map((result) => (
                       <Button
@@ -87,27 +91,52 @@ function WorkStory({
   );
 }
 
-export function WorkflowEvidence({ detail }: { detail: EvaluationDetail }) {
-  const [mode, setMode] = useState<"story" | "graph">("story");
+export function WorkflowEvidence({
+  detail,
+  initialMode = "story",
+}: {
+  detail: EvaluationDetail;
+  initialMode?: "story" | "graph";
+}) {
+  const [mode, setMode] = useState<"story" | "graph">(initialMode);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(new Set<string>());
   const heading = useRef<HTMLHeadingElement>(null);
   const content = useRef<HTMLDivElement>(null);
   const id = useId();
-  const view = buildWorkView(
-    detail.workflow,
-    detail.runs.map(({ run }) => run),
+  const view = useMemo(
+    () =>
+      buildWorkView(
+        detail.workflow,
+        detail.runs.map(({ run }) => run),
+      ),
+    [detail.workflow, detail.runs],
   );
-  const selected = view.nodes.find((node) => node.id === selectedId);
+  const network = useMemo(
+    () => buildWorkNetwork(detail.workflow, detail.runs),
+    [detail.workflow, detail.runs],
+  );
+  const networkSelected = network.nodes.find(
+    (node) => node.id === selectedId || node.storyId === selectedId,
+  );
+  const selected = view.nodes.find(
+    (node) => node.id === selectedId || node.id === networkSelected?.storyId,
+  );
   const select = (nodeId: string) => {
     setSelectedId(nodeId);
     requestAnimationFrame(() => heading.current?.focus());
   };
   const back = () => {
     const target = [
-      ...(content.current?.querySelectorAll<HTMLButtonElement>(
+      ...(content.current?.querySelectorAll<HTMLButtonElement | SVGElement>(
         "[data-work-id]",
       ) ?? []),
-    ].find((button) => button.dataset.workId === selectedId);
+    ].find(
+      (button) =>
+        button.dataset.workId ===
+          (mode === "graph" ? networkSelected?.id : selected?.id) &&
+        !button.closest("[hidden]"),
+    );
     target?.focus();
   };
   const phases = detail.workflow.records.some(
@@ -119,7 +148,7 @@ export function WorkflowEvidence({ detail }: { detail: EvaluationDetail }) {
         <div>
           <h2>Captured work</h2>
           <p className="secondary">
-            Follow the work, then inspect the evidence behind each step.
+            Read the work story or explore captured relationships and evidence.
           </p>
         </div>
         <div className="work-view-toggle" role="group" aria-label="Work view">
@@ -144,7 +173,14 @@ export function WorkflowEvidence({ detail }: { detail: EvaluationDetail }) {
       <div className="work-overview">
         <Badge>{detail.workflow.branches.length} delegated tasks</Badge>
         <Badge>{detail.workflow.results.length} result observations</Badge>
-        <Badge>{detail.workflow.reads.length} skill reads</Badge>
+        <Badge>
+          {detail.workflow.reads.length +
+            detail.workflow.branches.reduce(
+              (count, branch) => count + branch.reads.length,
+              0,
+            )}{" "}
+          skill reads
+        </Badge>
       </div>
       {!detail.workflow.records.some(
         (record) => record.annotation.action === "select",
@@ -158,13 +194,26 @@ export function WorkflowEvidence({ detail }: { detail: EvaluationDetail }) {
       <div className="work-layout">
         <div ref={content} id={id} className="work-content">
           <div className="work-root" data-map-root="">
-            Parent conversation
+            {mode === "graph"
+              ? "Captured relationships"
+              : "Parent conversation"}
           </div>
-          {mode === "story" ? (
-            <WorkStory view={view} selected={selectedId} onSelect={select} />
-          ) : (
-            <WorkGraph view={view} selected={selectedId} onSelect={select} />
-          )}
+          <div hidden={mode !== "story"}>
+            <WorkStory
+              view={view}
+              selected={selected?.id ?? null}
+              onSelect={select}
+            />
+          </div>
+          <div hidden={mode !== "graph"}>
+            <WorkGraph
+              network={network}
+              selected={networkSelected?.id ?? null}
+              onSelect={select}
+              expanded={expanded}
+              onExpanded={setExpanded}
+            />
+          </div>
           <p className="secondary">
             Position groups captured activity; spacing is not elapsed time.
             Completion, result receipt and declared use are separate facts.
@@ -173,15 +222,25 @@ export function WorkflowEvidence({ detail }: { detail: EvaluationDetail }) {
         <aside className="work-inspector" aria-label="Work evidence">
           <div className="work-inspector-heading">
             <h3 tabIndex={-1} ref={heading}>
-              {selected?.title ?? "Inspect a step"}
+              {(mode === "graph" ? networkSelected?.title : selected?.title) ??
+                "Inspect a step"}
             </h3>
-            {selected && (
+            {(selected || networkSelected) && (
               <Button variant="ghost" onClick={back}>
                 Back to selected step
               </Button>
             )}
           </div>
-          {selected ? (
+          {mode === "graph" && networkSelected ? (
+            <WorkNetworkDetails
+              node={networkSelected}
+              network={network}
+              detail={detail}
+              onSelect={select}
+              expanded={expanded}
+              onExpanded={setExpanded}
+            />
+          ) : selected ? (
             <WorkEvidenceDetails node={selected} detail={detail} />
           ) : (
             <p className="secondary">

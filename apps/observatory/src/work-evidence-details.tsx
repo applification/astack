@@ -4,9 +4,11 @@ import type { WorkNode } from "@astack/agent-observability/work-view";
 import {
   contributionUse,
   contributionUseLabel,
+  contributionRecords,
 } from "@astack/agent-observability/work-view";
 import {
   workflowFlows,
+  branchOwnsRun,
   type WorkflowRecord,
   type WorkflowNode,
   type WorkflowRead,
@@ -235,9 +237,14 @@ function ContributionDetails({
   detail: EvaluationDetail;
 }) {
   const projectId = detail.evaluation.projectId;
-  const use = contributionUse(branch, detail.workflow.records);
+  const use = contributionUse(
+    branch,
+    contributionRecords(branch, detail.workflow),
+  );
   const results = detail.workflow.results.filter(
-    (result) => result.delegationId === branch.delegation.id,
+    (result) =>
+      result.delegationId === branch.delegation.id &&
+      branchOwnsRun(branch, result.reference.runId),
   );
   return (
     <>

@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { journeyFixture } from "./journey-fixtures";
-import { buildWorkView, contributionUse } from "./work-view";
+import { buildWorkView, contributionUse, branchNodeId } from "./work-view";
 
 test("completed child tasks have delegation edges but no inferred returns or use", () => {
   const fixture = journeyFixture(false);
@@ -38,7 +38,7 @@ test("each declared join retains its own evidence availability", () => {
     view.edges
       .filter(
         (edge) =>
-          edge.from === `child:${branch.delegation.id}` &&
+          edge.from === branchNodeId(branch) &&
           (edge.kind === "use" || edge.kind === "unresolved_use"),
       )
       .map((edge) => [edge.to, edge.kind]),
@@ -82,7 +82,7 @@ test.each(["delivered", "acknowledged"] as const)(
       view.edges
         .filter((edge) => edge.kind === "result")
         .map((edge) => [edge.from, edge.to]),
-    ).toEqual([[`child:${branch.delegation.id}`, state]]);
+    ).toEqual([[branchNodeId(branch), state]]);
     expect(
       view.edges.some(
         (edge) => edge.kind === "use" || edge.kind === "unresolved_use",
@@ -98,7 +98,7 @@ test("unknown dispatch timing never becomes a workflow sequence claim", () => {
   if (!branch) throw new Error("missing branch fixture");
   branch.delegation.startedAt = null;
   const view = buildWorkView(fixture.workflow, [fixture.parent]);
-  const id = `dispatch:${branch.delegation.id}`;
+  const id = branchNodeId(branch, "dispatch");
   expect(view.nodes.find((node) => node.id === id)?.summary).toContain(
     "Dispatch time unavailable",
   );

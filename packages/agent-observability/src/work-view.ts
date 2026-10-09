@@ -1,6 +1,8 @@
 import type { AgentRun } from "./domain";
 import { routeDefinitions } from "./workflow";
+import { sessionReferenceKey } from "./delegation";
 import {
+  branchOwnsRun,
   workflowFlows,
   type WorkflowCapture,
   type WorkflowRecord,
@@ -32,6 +34,19 @@ export type WorkEdge = {
 };
 export type WorkView = { nodes: WorkNode[]; main: string[]; edges: WorkEdge[] };
 
+export const branchNodeId = (
+  branch: WorkflowBranch,
+  kind: "task" | "dispatch" = "task",
+) =>
+  kind +
+  ":" +
+  (branch.identity ??
+    JSON.stringify([
+      branch.parentRunId,
+      branch.delegation.source,
+      branch.delegation.id,
+    ]));
+
 export type ContributionUse =
   | { state: "not_recorded" }
   | {
@@ -39,6 +54,30 @@ export type ContributionUse =
       records: WorkflowRecord[];
       joins: { record: WorkflowRecord; state: "available" | "unavailable" }[];
     };
+
+export function contributionRecords(
+  branch: WorkflowBranch,
+  capture: WorkflowCapture,
+): WorkflowRecord[] {
+  const parent = capture.runs.find((run) => run.runId === branch.parentRunId);
+  const self = parent?.conversation?.self;
+  const peers = new Set(
+    capture.runs
+      .filter(
+        (run) =>
+          self &&
+          run.conversation?.self &&
+          run.projectId === parent?.projectId &&
+          run.machineId === parent?.machineId &&
+          sessionReferenceKey(run.conversation.self) ===
+            sessionReferenceKey(self),
+      )
+      .map((run) => run.runId),
+  );
+  return capture.records.filter(
+    (record) => branchOwnsRun(branch, record.runId) || peers.has(record.runId),
+  );
+}
 
 export function contributionUse(
   branch: WorkflowBranch,
@@ -166,9 +205,9 @@ export function buildWorkView(
   const connect = (from: string, to: string, kind: WorkEdge["kind"]) =>
     edges.push({ id: `${kind}:${from}:${to}`, from, to, kind });
   for (const branch of capture.branches) {
-    const childId = `child:${branch.delegation.id}`,
-      dispatchId = `dispatch:${branch.delegation.id}`;
-    const use = contributionUse(branch, capture.records);
+    const childId = branchNodeId(branch),
+      dispatchId = branchNodeId(branch, "dispatch");
+    const use = contributionUse(branch, contributionRecords(branch, capture));
     entries.push({
       at: branch.delegation.startedAt ?? Infinity,
       order: order++,
@@ -203,7 +242,7 @@ export function buildWorkView(
     const branch = capture.branches.find(
       (branch) =>
         branch.delegation.id === result.delegationId &&
-        branch.parentRunId === result.reference.runId,
+        branchOwnsRun(branch, result.reference.runId),
     );
     if (!branch) continue;
     // Observation arrival is not a parent workflow step. Keep these inspectable
@@ -226,11 +265,7 @@ export function buildWorkView(
       item: { kind: "result", result },
     });
     if (result.observation.state !== "present")
-      connect(
-        `child:${result.delegationId}`,
-        result.reference.eventId,
-        "result",
-      );
+      connect(branchNodeId(branch), result.reference.eventId, "result");
   }
   entries.sort((a, b) => a.at - b.at || a.order - b.order);
   const main = entries.map((entry) => entry.node.id);

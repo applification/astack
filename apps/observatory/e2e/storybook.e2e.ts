@@ -1768,6 +1768,125 @@ test("map descriptions compact revisions without losing the full value", async (
   await expect(screen.getByRole("alert")).toHaveCount(0);
 });
 
+test("network layouts, expansion, filters and keyboard inspection preserve captured identities", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await browser.setViewport({ width: 1500, height: 1050 });
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--network-explorer&viewMode=story",
+  );
+  const canvas = screen.getByRole("group", "Captured work graph", {
+    exact: true,
+  });
+  await expect(
+    screen.getByRole("button", "Force", { exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  expect(
+    await browser.evaluate(
+      () =>
+        document.querySelectorAll('.work-network [data-work-kind="turn"]')
+          .length,
+    ),
+  ).toBe(0);
+  await screen.getByRole("button", "Expand all", { exact: true }).tap();
+  expect(
+    await browser.evaluate(
+      () =>
+        document.querySelectorAll('.work-network [data-work-kind="turn"]')
+          .length,
+    ),
+  ).toBe(5);
+  const endpoints = () =>
+    browser.evaluate(() =>
+      [...document.querySelectorAll(".work-network [data-work-edge]")].map(
+        (edge) => [
+          edge.getAttribute("data-work-edge"),
+          edge.getAttribute("data-work-from"),
+          edge.getAttribute("data-work-to"),
+        ],
+      ),
+    );
+  const before = await endpoints();
+  await screen.getByRole("button", "Communities", { exact: true }).tap();
+  await expect(
+    screen.getByText("Colors group visible connectivity", { exact: false }),
+  ).toBeVisible();
+  expect(await endpoints()).toEqual(before);
+  await app.screenshot("work-network-communities");
+  await screen.getByRole("button", "Layered", { exact: true }).tap();
+  expect(await endpoints()).toEqual(before);
+  await screen.getByRole("button", "Force", { exact: true }).tap();
+  const test = screen
+    .getByRole("button", "Inspect Captured child test result", { exact: true })
+    .first();
+  await test.focus();
+  await browser.keyboard.press("Enter");
+  const inspector = screen.getByRole("complementary", "Work evidence");
+  await expect(
+    inspector.getByRole("heading", "Captured child test result", {
+      exact: true,
+    }),
+  ).toBeFocused();
+  await expect(inspector).toContainText("Occurrence time unavailable");
+  const trace = await inspector
+    .getByRole("link", "Event in full trace", { exact: true })
+    .getAttribute("href");
+  await screen.getByRole("button", "Activity", { exact: true }).tap();
+  await expect(
+    screen.getByText("The selected node is hidden", { exact: false }),
+  ).toBeVisible();
+  await expect(
+    inspector.getByRole("link", "Event in full trace", { exact: true }),
+  ).toHaveAttribute("href", trace ?? "");
+  await screen.getByRole("button", "Activity", { exact: true }).tap();
+  await inspector
+    .getByRole("button", "Back to selected step", { exact: true })
+    .tap();
+  await expect(test).toBeFocused();
+  const initial = await canvas.getAttribute("viewBox");
+  await screen.getByRole("button", "Zoom in", { exact: true }).tap();
+  expect(await canvas.getAttribute("viewBox")).not.toBe(initial);
+  await screen.getByRole("button", "Fit graph", { exact: true }).tap();
+  await expect(canvas).toHaveAttribute("viewBox", initial ?? "");
+  await screen.getByRole("button", "Overview", { exact: true }).tap();
+  expect(
+    await browser.evaluate(
+      () =>
+        document.querySelectorAll('.work-network [data-work-kind="turn"]')
+          .length,
+    ),
+  ).toBe(0);
+  await screen
+    .getByRole("button", "Inspect Parent conversation", { exact: true })
+    .tap();
+  await inspector
+    .getByRole("button", "Show captured activity", { exact: true })
+    .tap();
+  expect(
+    await browser.evaluate(
+      () =>
+        document.querySelectorAll('.work-network [data-work-kind="turn"]')
+          .length,
+    ),
+  ).toBe(2);
+  await screen
+    .getByLabel("Graph relationships")
+    .selectOption({ value: "delegation" });
+  expect(
+    await browser.evaluate(() =>
+      [...document.querySelectorAll(".work-network [data-work-edge]")].map(
+        (edge) => edge.getAttribute("data-work-edge"),
+      ),
+    ),
+  ).toEqual(["delegation", "capture", "delegation", "capture"]);
+  await screen.getByLabel("Graph relationships").selectOption({ value: "all" });
+  await screen.getByRole("button", "Expand all", { exact: true }).tap();
+  await screen.getByLabel("Color theme").selectOption({ value: "dark" });
+  await app.screenshot("work-network-force-dark");
+});
+
 test("graph connects separate dispatches and explicit use without inventing result receipt", async ({
   app,
   screen,
@@ -1781,17 +1900,24 @@ test("graph connects separate dispatches and explicit use without inventing resu
     await browser.evaluate(() => ({
       dispatch: document.querySelectorAll('[data-work-edge="delegation"]')
         .length,
-      use: document.querySelectorAll('[data-work-edge="use"]').length,
+      use: document.querySelectorAll('[data-work-edge="declared_use"]').length,
       result: document.querySelectorAll('[data-work-edge="result"]').length,
     })),
   ).toEqual({ dispatch: 2, use: 2, result: 0 });
   expect(
     await browser.evaluate(() =>
       [...document.querySelectorAll('[data-work-edge="delegation"]')].map(
-        (path) => path.getAttribute("data-from"),
+        (path) =>
+          document
+            .querySelector(
+              '[data-work-id="' +
+                CSS.escape(path.getAttribute("data-work-from") ?? "") +
+                '"]',
+            )
+            ?.getAttribute("data-work-kind") ?? null,
       ),
     ),
-  ).toEqual(["dispatch:delegate-ui", "dispatch:delegate-data"]);
+  ).toEqual(["conversation", "conversation"]);
   expect(
     await browser.evaluate(() =>
       [...document.querySelectorAll("[data-work-edge]")].every((path) =>
@@ -1799,7 +1925,7 @@ test("graph connects separate dispatches and explicit use without inventing resu
           [...document.querySelectorAll("[data-work-id]")].some(
             (node) =>
               node.getAttribute("data-work-id") ===
-              path.getAttribute("data-" + end),
+              path.getAttribute("data-work-" + end),
           ),
         ),
       ),
@@ -1827,7 +1953,7 @@ test("completed, unresolved-use and unavailable children keep independent unknow
     await browser.evaluate(
       () =>
         document.querySelectorAll(
-          '[data-work-edge="use"], [data-work-edge="result"]',
+          '[data-work-edge="declared_use"], [data-work-edge="delivered"], [data-work-edge="acknowledged"]',
         ).length,
     ),
   ).toBe(0);
@@ -1842,7 +1968,7 @@ test("completed, unresolved-use and unavailable children keep independent unknow
   await screen.getByRole("button", "Graph", { exact: true }).tap();
   expect(
     await browser.evaluate(() => ({
-      use: document.querySelectorAll('[data-work-edge="use"]').length,
+      use: document.querySelectorAll('[data-work-edge="declared_use"]').length,
       unresolved: document.querySelectorAll('[data-work-edge="unresolved_use"]')
         .length,
     })),
@@ -1893,19 +2019,24 @@ test("five child contributions stay reachable in both views without document ove
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
-  const graph = screen.getByRole("region", "Work graph", { exact: true });
+  const graph = screen.getByRole("group", "Captured work graph", {
+    exact: true,
+  });
   await graph.focus();
   const before = await browser.evaluate(
-    () => document.querySelector(".work-graph-scroll")?.scrollLeft ?? 0,
+    () =>
+      document.querySelector(".work-network")?.getAttribute("viewBox") ?? "",
   );
   await browser.keyboard.press("ArrowRight");
   await expect
     .poll(() =>
       browser.evaluate(
-        () => document.querySelector(".work-graph-scroll")?.scrollLeft ?? 0,
+        () =>
+          document.querySelector(".work-network")?.getAttribute("viewBox") ??
+          "",
       ),
     )
-    .toBeGreaterThan(before);
+    .not.toBe(before);
   await screen
     .getByRole("button", "Inspect Security review", { exact: true })
     .last()
@@ -2216,11 +2347,17 @@ test("host presence, delivery and acknowledgement remain independent and return 
   ).toHaveAttribute("href", href ?? "");
   expect(
     await browser.evaluate(() => ({
-      returns: document.querySelectorAll('[data-work-edge="result"]').length,
-      uses: document.querySelectorAll('[data-work-edge="use"]').length,
+      returns: document.querySelectorAll(
+        '[data-work-edge="delivered"], [data-work-edge="acknowledged"]',
+      ).length,
+      uses: document.querySelectorAll('[data-work-edge="declared_use"]').length,
       presenceReturn: [
-        ...document.querySelectorAll('[data-work-edge="result"]'),
-      ].some((node) => node.getAttribute("data-to")?.endsWith("-present")),
+        ...document.querySelectorAll(
+          '[data-work-edge="delivered"], [data-work-edge="acknowledged"]',
+        ),
+      ].some((node) =>
+        node.getAttribute("data-work-from")?.includes("-present"),
+      ),
     })),
   ).toEqual({ returns: 2, uses: 0, presenceReturn: false });
   await app.screenshot("work-graph-result-observations");

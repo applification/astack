@@ -24,6 +24,234 @@ import type { TelemetryRecord } from "@astack/agent-observability";
 import { workflowFixture } from "@astack/agent-observability/workflow-fixtures";
 import { journeyFixture } from "@astack/agent-observability/journey-fixtures";
 import type { DelegationResult } from "@astack/agent-observability/delegation";
+import { buildWorkNetwork } from "@astack/agent-observability/work-network";
+
+test("one host task across provider turns has one contribution and retains observations from either owner turn", async () => {
+  const { t, owner, evaluation } = await setup("inconclusive");
+  const fixture = journeyFixture(false);
+  const self = {
+    kind: "t3",
+    environmentId: "fixture-host",
+    threadId: "parent",
+  } as const;
+  const conversation = {
+    self,
+    root: self,
+    hostRun: { id: "same-host-app-run" },
+  };
+  const first = { ...fixture.parent, conversation, sessionReferences: [self] };
+  const second = {
+    ...evaluationRun("reproduce"),
+    conversation,
+    sessionReferences: [self],
+    delegations: first.delegations,
+  };
+  await ingestWorkflow(
+    t,
+    [first, second, ...fixture.children].map((value) => ({
+      kind: "run",
+      value,
+    })),
+  );
+  await ingestWorkflow(
+    t,
+    fixture.events.map((value) => ({ kind: "event", value })),
+  );
+  const task = first.delegations[0];
+  if (!task) throw new Error("missing task");
+  await ingestWorkflow(t, [
+    {
+      kind: "event",
+      value: eventSchema.parse({
+        id: second.id + ":receipt",
+        runId: second.id,
+        sequence: 10000,
+        kind: "delegation_result",
+        timestamp: null,
+        observedAt: 3000,
+        timing: "unavailable",
+        title: "Delivered result",
+        delegationResult: {
+          delegationId: task.id,
+          child: task.child,
+          source: "parent_capture",
+          host: {
+            environmentId: "fixture-host",
+            threadId: "parent",
+            runId: "same-host-app-run",
+            origin: "app_owned",
+          },
+          observation: { state: "delivered", resultId: null },
+          sourceUpdatedAt: 2900,
+          occurredAt: null,
+        },
+      }),
+    },
+  ]);
+  const detail = evaluationDetailSchema.parse(
+    JSON.parse(
+      (await owner.query(api.evaluations.detail, {
+        evaluationId: evaluation.id,
+        projectId: fixtureProject,
+      })) ?? "null",
+    ),
+  );
+  expect(detail.workflow.branches).toHaveLength(2);
+  expect(
+    detail.workflow.branches.every(
+      (branch) =>
+        branch.parentRunIds?.includes(first.id) &&
+        branch.parentRunIds.includes(second.id) &&
+        branch.state === "available",
+    ),
+  ).toBe(true);
+  expect(
+    detail.workflow.results.map((result) => result.reference.runId),
+  ).toEqual([second.id]);
+  const network = buildWorkNetwork(detail.workflow, detail.runs);
+  expect(
+    network.nodes.filter((node) => node.item.kind === "contribution"),
+  ).toHaveLength(2);
+  expect(
+    network.edges.filter((edge) => edge.kind === "delivered"),
+  ).toHaveLength(1);
+});
+
+test("network previews retain current conversation identity and legacy activity, redact metadata and preserve frozen evidence", async () => {
+  const { t, owner, evaluation } = await setup("inconclusive");
+  const run = evaluationRun();
+  const self = {
+    kind: "t3",
+    environmentId: "network-host",
+    threadId: "root",
+  } as const;
+  const before = await t.run((ctx) => ctx.db.query("evaluations").first());
+  await ingestWorkflow(t, [
+    { kind: "run", value: { ...run, conversation: { self, root: self } } },
+    {
+      kind: "event",
+      value: eventSchema.parse({
+        id: run.id + ":network-tool",
+        runId: run.id,
+        sequence: 3,
+        kind: "shell_result",
+        timestamp: null,
+        observedAt: 3000,
+        timing: "unavailable",
+        title: "Command failed: TOKEN=private-network-secret",
+        tool: "shell",
+        signature: "not-an-invocation",
+        failed: true,
+        data: {
+          content: "Private output is excluded from the activity preview",
+        },
+      }),
+    },
+  ]);
+  // Historical event rows may lack the newer indexed kind projection.
+  await t.run(async (ctx) => {
+    const row = await ctx.db
+      .query("events")
+      .withIndex("by_eventId", (q) => q.eq("eventId", run.id + ":network-tool"))
+      .unique();
+    if (row) await ctx.db.patch(row._id, { kind: undefined });
+  });
+  const read = async () =>
+    evaluationDetailSchema.parse(
+      JSON.parse(
+        (await owner.query(api.evaluations.detail, {
+          evaluationId: evaluation.id,
+          projectId: fixtureProject,
+        })) ?? "null",
+      ),
+    );
+  const detail = await read();
+  expect(
+    detail.workflow.runs.find((summary) => summary.runId === run.id)
+      ?.conversation?.self,
+  ).toEqual(self);
+  const activity = detail.workflow.activities.find(
+    (event) => event.reference.eventId === run.id + ":network-tool",
+  );
+  expect(activity).toMatchObject({
+    kind: "shell_result",
+    timestamp: null,
+    timing: "unavailable",
+    failed: true,
+    tool: "shell",
+  });
+  expect(JSON.stringify(activity)).not.toContain("private-network-secret");
+  expect(activity).not.toHaveProperty("data");
+  expect(activity).not.toHaveProperty("signature");
+  const after = await t.run((ctx) => ctx.db.query("evaluations").first());
+  expect(after?.data).toBe(before?.data);
+  expect(after?.snapshot).toBe(before?.snapshot);
+  await t.mutation(internal.ingestion.ingest, {
+    machineId: fixtureMachine,
+    records: entries(
+      [{ kind: "run", value: { ...run, contentCapture: false } }],
+      1000,
+    ),
+  });
+  expect(
+    (await read()).workflow.activities.some(
+      (event) => event.reference.runId === run.id,
+    ),
+  ).toBe(false);
+  expect(
+    (await read()).workflow.runs.some((summary) => summary.runId === run.id),
+  ).toBe(false);
+});
+
+test("network activity prefix is bounded and paused projects expose neither current summaries nor activity", async () => {
+  const { t, owner, evaluation } = await setup("inconclusive");
+  const run = evaluationRun();
+  await ingestWorkflow(
+    t,
+    Array.from({ length: 70 }, (_, index) => ({
+      kind: "event" as const,
+      value: eventSchema.parse({
+        id: run.id + ":activity:" + index,
+        runId: run.id,
+        sequence: 100 + index,
+        kind: "test_result",
+        timestamp: null,
+        observedAt: 3000,
+        timing: "unavailable",
+        title: "Test result " + index,
+      }),
+    })),
+  );
+  const read = async () =>
+    evaluationDetailSchema.parse(
+      JSON.parse(
+        (await owner.query(api.evaluations.detail, {
+          evaluationId: evaluation.id,
+          projectId: fixtureProject,
+        })) ?? "null",
+      ),
+    );
+  const capture = (await read()).workflow;
+  expect(capture.activities.length).toBeLessThanOrEqual(48);
+  expect(capture.activities.length).toBeGreaterThan(0);
+  expect(
+    capture.activities.some((event) => event.reference.eventId.endsWith(":69")),
+  ).toBe(false);
+  expect(
+    capture.runs.find((summary) => summary.runId === run.id)?.activityLimited,
+  ).toBe(true);
+  expect(capture.truncated).toBe(true);
+  await owner.mutation(api.projects.save, {
+    project: {
+      projectId: fixtureProject,
+      name: "Paused",
+      enabled: false,
+      repositories: [],
+      folders: [{ machineId: fixtureMachine, path: "/fixture" }],
+    },
+  });
+  expect((await read()).workflow).toMatchObject({ runs: [], activities: [] });
+});
 
 const modules = {
   "../convex/_generated/server.ts": () => import("../convex/_generated/server"),

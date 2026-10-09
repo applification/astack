@@ -1,7 +1,13 @@
 import { z } from "zod";
 import { workflowAnnotationSchema, type AstackRoute } from "./workflow";
-import { delegationSchema, delegationResultSchema } from "./delegation";
-import { skillUseSchema } from "./domain";
+import {
+  delegationSchema,
+  delegationResultSchema,
+  sessionReferenceKey,
+  type Delegation,
+} from "./delegation";
+import { skillUseSchema, type AgentRun } from "./domain";
+import { conversationSchema, runConversation } from "./conversations";
 
 const reference = z.object({ runId: z.string(), eventId: z.string() });
 export const workflowResultSchema = z.object({
@@ -44,6 +50,8 @@ export const workflowReadSchema = z.object({
 export type WorkflowRead = z.infer<typeof workflowReadSchema>;
 export const workflowBranchSchema = z.object({
   parentRunId: z.string(),
+  parentRunIds: z.array(z.string()).max(20).optional(),
+  identity: z.string().optional(),
   delegation: delegationSchema,
   state: z.enum(["available", "unavailable"]),
   reason: z.string().nullable(),
@@ -63,11 +71,73 @@ export const workflowBranchSchema = z.object({
   truncated: z.boolean(),
 });
 export type WorkflowBranch = z.infer<typeof workflowBranchSchema>;
+export function workflowBranchIdentity(
+  run: AgentRun,
+  delegation: Delegation,
+): string {
+  const self = runConversation(run)?.self;
+  return JSON.stringify(
+    delegation.source === "t3" && self?.kind === "t3"
+      ? [
+          "t3-task",
+          run.projectId,
+          run.machineId,
+          sessionReferenceKey(self),
+          delegation.id,
+        ]
+      : ["task", run.id, delegation.source, delegation.id],
+  );
+}
+export const branchOwnsRun = (branch: WorkflowBranch, runId: string) =>
+  branch.parentRunId === runId || !!branch.parentRunIds?.includes(runId);
+// Current readable capture, independent of the frozen evaluation run snapshots.
+export const workflowRunSchema = z.object({
+  runId: z.string(),
+  machineId: z.string(),
+  projectId: z.string(),
+  title: z.string(),
+  status: z.string(),
+  revision: z.number(),
+  conversation: conversationSchema.nullable(),
+  activityLimited: z.boolean(),
+});
+export type WorkflowRun = z.infer<typeof workflowRunSchema>;
+export const workflowActivityKinds = [
+  "tool_call",
+  "tool_result",
+  "mcp_call",
+  "mcp_result",
+  "shell_command",
+  "shell_result",
+  "file_read",
+  "file_edit",
+  "test_run",
+  "test_result",
+  "assistant_output",
+  "error",
+  "intervention",
+] as const;
+export const workflowActivitySchema = z.object({
+  reference,
+  revision: z.number(),
+  kind: z.enum(workflowActivityKinds),
+  title: z.string(),
+  sequence: z.number().int().nonnegative(),
+  timestamp: z.number().nullable(),
+  observedAt: z.number(),
+  timing: z.enum(["agent", "hook", "unavailable"]),
+  tool: z.string().optional(),
+  failed: z.boolean(),
+  durationMs: z.number().optional(),
+});
+export type WorkflowActivity = z.infer<typeof workflowActivitySchema>;
 export const workflowCaptureSchema = z.object({
   records: z.array(workflowRecordSchema).max(80),
   reads: z.array(workflowReadSchema).max(64).default([]),
   branches: z.array(workflowBranchSchema).max(32).default([]),
   results: z.array(workflowResultSchema).max(96).default([]),
+  runs: z.array(workflowRunSchema).max(40).default([]),
+  activities: z.array(workflowActivitySchema).max(192).default([]),
   truncated: z.boolean(),
 });
 export type WorkflowCapture = z.infer<typeof workflowCaptureSchema>;
