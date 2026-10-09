@@ -52,7 +52,7 @@ for (const folder of readdirSync(path.join(root, 'skills')).filter((name) => nam
 }
 
 const guideFiles = readdirSync(path.join(root, 'docs/guide')).filter((name) => name.endsWith('.md'));
-for (const file of ['README.md', 'docs/project-install.md', ...guideFiles.map((name) => `docs/guide/${name}`)]) {
+for (const file of ['README.md', 'docs/project-install.md', 'docs/agent-validation.md', 'evals/agent-quality/calibration.md', ...guideFiles.map((name) => `docs/guide/${name}`)]) {
   const source = read(file).replace(/^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1\s*$/gm, '');
   for (const match of source.matchAll(/!?\[[^\]]*\]\(([^)]+)\)/g)) {
     const url = match[1];

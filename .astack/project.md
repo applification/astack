@@ -11,6 +11,7 @@ Bun 1.4.0 workspaces, React 19.3/Vite 8.3, Convex 1.46, Zod 4.6, Tailwind 4.3 an
 | Command | Claim |
 | --- | --- |
 | `bun run check` | Existing site and plugin integrity |
+| `bun run agent-evals:check` | Foundation strict types, controlled notebook/evaluator regressions and shared agent-process limits; no model calls |
 | `bun run observatory:check` | Strict affected types and domain/collector/native-function regressions |
 | `bun run observatory:lint` | Six shadcn design rules on app, primitives and stories |
 | `bun run observatory:build` | Production browser bundle |
@@ -21,3 +22,5 @@ Bun 1.4.0 workspaces, React 19.3/Vite 8.3, Convex 1.46, Zod 4.6, Tailwind 4.3 an
 The e2e runner/skill are project owned, deterministic tests need no AI model. `.astack/agent-observatory/e2e-mcp.example.json` supplies a project MCP sample; active Codex installed-host loading is a separate unverified layer. No global host config was changed. Editor save diagnostics were unavailable on this headless worktree; CLI lint covered all UI/story files.
 
 The original visual direction was explored in Pen before production wiring, but the connection references a removed foundation worktree and did not persist this feature's file. Pen screenshot/design comparison remains unavailable. Actual Storybook pixels and private runtime behavior are separate observed proof; keep that distinction in the draft PR.
+
+The independent notebook comparison tooling is documented in [fresh-repo agent validation](../docs/agent-validation.md). `bun run agent-evals init` creates a separate local repository; `check` uses a fixed evaluator outside its mutable tests; `run` is an opt-in paid comparison with an explicit model and budget. Craftsmanship review and owner observations stay separate from behavioral acceptance. It does not change Observatory's supplied-proof interpretation or certify live authentication.

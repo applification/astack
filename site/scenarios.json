@@ -241,12 +241,12 @@
   },
   {
     "request": "Add OpenAI plugin extensions for a ChatGPT sidebar and conversation panel",
-    "decision": "Feature route → ChatGPT plugin engineering → OpenAI extensions and MCP App UI guidance. Check SDK compatibility, define entrypoints with empty launch inputs, and share the UI through a versioned MCP App resource. Choose useful component states in Storybook, then prove the sidebar and conversation panel in the supported ChatGPT host.",
+    "decision": "Feature route \u2192 ChatGPT plugin engineering \u2192 OpenAI extensions and MCP App UI guidance. Check SDK compatibility, define entrypoints with empty launch inputs, and share the UI through a versioned MCP App resource. Choose useful component states in Storybook, then prove the sidebar and conversation panel in the supported ChatGPT host.",
     "route": "feature"
   },
   {
     "request": "Build an MCP App using our shared React UI components",
-    "decision": "Feature route → MCP server and web feature paths → ChatGPT plugin engineering and MCP App UI guidance. Keep presentation components in the UI package and host APIs in an adapter. Bundle a versioned HTML resource, register the UI tool/resource metadata, choose Storybook states, and prove bridge initialization, tool input/results and teardown in the target host.",
+    "decision": "Feature route \u2192 MCP server and web feature paths \u2192 ChatGPT plugin engineering and MCP App UI guidance. Keep presentation components in the UI package and host APIs in an adapter. Bundle a versioned HTML resource, register the UI tool/resource metadata, choose Storybook states, and prove bridge initialization, tool input/results and teardown in the target host.",
     "route": "feature"
   },
   {
@@ -587,6 +587,26 @@
   {
     "request": "New task: explain retry ownership without changing code",
     "decision": "Rematch the explicit new outcome to investigate instead of continuing an earlier implementation route. Read current source and decision history, separate evidence from inference, and return a read-only answer.",
+    "route": "investigation"
+  },
+  {
+    "request": "Design a retryable export API before implementing it",
+    "decision": "Feature route for the implementation request; compose architect for caller usage, operation identity, state ownership and cancellation/recovery. Return a design sketch for a design-only request. A settled small interface needs no added phase.",
+    "route": "feature"
+  },
+  {
+    "request": "Review the quality of a persisted mutation without changing it",
+    "decision": "Pull request review route; compose code-review, pin the reviewed source and trace ownership, types, effects and consumers. Use a fresh read-only reviewer for material permission or persistence risks and adjudicate its findings; report proof gaps without unrequested repairs.",
+    "route": "pr"
+  },
+  {
+    "request": "The same lost-save mistake keeps returning after reviews",
+    "decision": "Bug fix route; reproduce the persisted failure and compose correct to place the strongest proportionate safeguard at its owning boundary. Preserve the bad case, prove rejection and accept the correction; another reminder alone does not establish prevention.",
+    "route": "bug"
+  },
+  {
+    "request": "Compare astack with the previous plugin and plain agents on coding tasks",
+    "decision": "Investigation route with agent-evaluation; fix host, model, fixtures, limits and evaluator-owned acceptance independently of candidate revisions. Retain every planned attempt and activation failure; assess blinded quality only after calibration and do not infer reliability from a smoke run.",
     "route": "investigation"
   }
 ]

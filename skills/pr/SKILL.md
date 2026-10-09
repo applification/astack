@@ -26,6 +26,8 @@ When the PR changes Convex schema, functions, configuration, or client integrati
 
 Use an additional independent reviewer or subagent only when the change's risk or breadth justifies the extra pass and the project permits it. This is separate from the required Convex reviewer skill. Independent review remains advisory; the lead assesses each finding against actual code and intent.
 
+Apply [code-review](../code-review/SKILL.md) for the quality contribution. Changed authorization/identity, persisted compatibility, concurrency and shared lifecycles normally justify a fresh read-only reviewer; local presentation edits stay lightweight. Pin its revision, adjudicate confirmed and dismissed findings against source/behavior, and invalidate affected review evidence after material changes. Assess types/boundaries, ownership, structural simplicity and test strength separately from functional acceptance. Repeated confirmed mistakes can use [correct](../correct/SKILL.md) to establish a demonstrated safeguard within scope.
+
 ## Show the change
 
 Use [$applification:show-me](../show-me/SKILL.md) when a view will clarify the completed change. Give it the relevant diff, actual source and the reviewer's question; place its focused output beside the explanation it supports. A simple label correction can stay with a sentence and relevant evidence. Follow [PR artifact delivery](references/explanation-delivery.md) to make an HTML illustration or retained capture accessible at the PR destination.

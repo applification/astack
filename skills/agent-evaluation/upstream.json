@@ -1,0 +1,18 @@
+{
+  "repository": "https://github.com/cursor/plugins",
+  "revision": "df581122cde17e6e27686b5a448bde23e4ad4318",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Lauren Tan",
+  "files": [
+    {
+      "source_path": "pstack/skills/poteto-mode/playbooks/eval.md",
+      "source_sha256": "b862bfa2fae2399abf047a8e80d3e3dddb64003af96fb1cebb625216131e36bb",
+      "local_path": "SKILL.md"
+    }
+  ],
+  "adaptations": [
+    "Adapt the referenced method into concise project-independent Codex guidance; these local files are adaptations rather than verbatim imports.",
+    "Use available host delegation and inherited model choices instead of Cursor-specific tools or fixed model defaults.",
+    "Preserve caller scope, proportional work, project-owned proof and publication boundaries."
+  ]
+}

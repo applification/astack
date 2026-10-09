@@ -162,4 +162,15 @@ These cases check routing intent. Actual instruction-following requires observed
 | "Continue the migration from the retained task record; do not repeat completed work" | Read the current checkout, scope, decisions and existing PR, verify inherited claims that still matter, and resume the next incomplete phase. Apply principle-sequence-verifiable-units to dependent slices and preserve the original finish condition. |
 | "New task: explain retry ownership without changing code" | Rematch the explicit new outcome to investigate instead of continuing an earlier implementation route. Read current source and decision history, separate evidence from inference, and return a read-only answer. |
 
+## Design, review and comparative evaluation
+
+These examples check declared routing, not executed agent behavior.
+
+| Request | Expected decision |
+| --- | --- |
+| "Design a retryable export API before implementing it" | Feature route for the implementation request; compose architect for caller usage, operation identity, state ownership and cancellation/recovery. Return a design sketch for a design-only request. A settled small interface needs no added phase. |
+| "Review the quality of a persisted mutation without changing it" | Pull request review route; compose code-review, pin the reviewed source and trace ownership, types, effects and consumers. Use a fresh read-only reviewer for material permission or persistence risks and adjudicate its findings; report proof gaps without unrequested repairs. |
+| "The same lost-save mistake keeps returning after reviews" | Bug fix route; reproduce the persisted failure and compose correct to place the strongest proportionate safeguard at its owning boundary. Preserve the bad case, prove rejection and accept the correction; another reminder alone does not establish prevention. |
+| "Compare astack with the previous plugin and plain agents on coding tasks" | Investigation route with agent-evaluation; fix host, model, fixtures, limits and evaluator-owned acceptance independently of candidate revisions. Retain every planned attempt and activation failure; assess blinded quality only after calibration and do not infer reliability from a smoke run. |
+
 After a trial, record whether astack chose the right route, found an important missing decision, selected checks proportionately, and reported proof honestly. Fix an observed failure narrowly rather than adding more universal gates.

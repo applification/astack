@@ -19,6 +19,7 @@ Choose the seam that owns the rule: pure functions for deterministic domain tran
 
 - Encode distinguishing outcomes, not implementation text or private call order. Include a meaningful rejected/boundary case when it exposes a plausible wrong implementation. Use stable IDs and explicit fixtures instead of depending on other tests' writes or wall-clock luck.
 - For a bug, retain the original failing observation before changing source, then rerun the same case. A passing new assertion alone cannot show that it caught the old defect. Where useful, retain the regression with the passing suite.
+- For a material authorization, persistence or recovery check, challenge a plausible incorrect implementation or the original failing revision when practical. Retain the failing counterexample and the passing corrected case. This focused discrimination check need not become a mutation-testing framework or apply to low-impact edits.
 - Make async assertions wait for the effect they claim, with a bounded condition. Avoid arbitrary sleeps and success-toasts as persistence proof; perform a fresh authoritative read for a material write. Distinguish request failure from an empty valid result.
 - Scope each test's actor/state and cleanup. Stop only owned processes, preserve first failures and attempts, and keep raw reports ignored. Do not weaken an expectation, suppress a relevant test or move it to advisory status to obtain green output.
 - Confirm that the intended tests ran: inspect selection, body assertions and report format. Setup/locator/provider/budget failures are inconclusive for the product case. A retry pass retains its first failure as flaky.
@@ -26,3 +27,5 @@ Choose the seam that owns the rule: pure functions for deterministic domain tran
 For new web projects Tester Army e2e is the default; read [the e2e loop](references/e2e.md) for its actual inspection, cache, charter, reproduction and report rules. Use its version-matched project skill when installed rather than copying its manual. Existing projects keep their proven runner. [WorkOS auth testing](../workos-auth/references/testing.md) owns provider/host layers.
 
 Return the tested claim, fixtures, original failure when relevant, actual observations and remaining gaps. Do not add ceremonial tests for a reversible low-impact edit. Use [pr](../pr/SKILL.md) when the requested job retains code/test changes; test work alone does not authorize external effects or a broader repair.
+
+Use [agent-evaluation](../agent-evaluation/SKILL.md) when the question is whether a model, skill or harness improves delivery. Application tests alone do not establish that comparative claim.

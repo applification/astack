@@ -1,0 +1,6 @@
+interface:
+  display_name: "Code review"
+  short_description: "Challenge correctness, ownership and code quality"
+  default_prompt: "Use $applification:code-review for the requested code assessment within the agreed scope."
+policy:
+  allow_implicit_invocation: true
