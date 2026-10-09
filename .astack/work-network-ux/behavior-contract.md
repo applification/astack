@@ -21,7 +21,8 @@ are inspected as recorded relationships, with their own identity, rather than
 silently selecting an endpoint. Opening a panel must preserve canvas scale and
 position so the selected target stays recognizable. When keyboard navigation
 subsequently reaches an item covered by the desktop inspector, the canvas pans
-only enough to reveal it; zoom remains unchanged. Narrow inspection does not
+only enough to reveal it below sticky navigation and inside the viewport; zoom
+remains unchanged. Narrow inspection does not
 cover the canvas. Hidden-selection wording reflects whether the panel is open.
 
 Pen was selected for the workspace states. It initially lacked a desktop

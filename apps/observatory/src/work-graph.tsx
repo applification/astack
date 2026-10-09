@@ -219,10 +219,15 @@ export function WorkGraph({
         bottom: center.y + 12,
       };
     } else return;
-    const left = bounds.left + 16,
-      right = panel.left - 16,
-      top = bounds.top + 16,
-      bottom = bounds.bottom - 16;
+    const header = canvas.ownerDocument
+      .querySelector(".app-header")
+      ?.getBoundingClientRect();
+    const viewportWindow = canvas.ownerDocument.defaultView;
+    const left = Math.max(0, bounds.left) + 16,
+      right = Math.min(panel.left, viewportWindow?.innerWidth ?? panel.left) - 16,
+      top = Math.max(0, bounds.top, header?.bottom ?? 0) + 16,
+      bottom =
+        Math.min(bounds.bottom, viewportWindow?.innerHeight ?? bounds.bottom) - 16;
     const dx =
       item.right > right
         ? item.right - right
