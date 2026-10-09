@@ -16,7 +16,7 @@ Keep full traces and source snapshots in an ignored output directory; retain con
 
 ## Review and compare
 
-Give reviewers anonymized source/diff, task intent and the same rubric. Keep candidate mappings, model labels, author claims and acceptance scores separate from initial code assessment. Calibrate on deliberately good and defective examples with human ground truth; measure false passes and useful finding precision. A reviewer declaring itself independent does not establish independence.
+Give reviewers anonymized source/diff, task intent and the same rubric. Keep candidate mappings, model labels, author claims and acceptance scores separate from initial code assessment. Calibrate on deliberately good and defective examples with human ground truth; measure false passes and useful finding precision. Predeclare the sample/coverage and reviewer qualification rule before seeing candidate grades, including disqualifying missed critical defects/false passes and acceptable useful-finding precision. Insufficient or failed calibration keeps quality unassessed. A reviewer declaring itself independent does not establish independence.
 
 Keep behavioral acceptance, craftsmanship, owner usefulness and delivery effort separate. Require correctness and authorization hard gates. Follow a successful deliverable with a fresh-agent change when maintainability is part of the claim. Record its regression rate and corrective intervention; raw line count is not the grade.
 

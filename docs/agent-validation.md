@@ -54,7 +54,13 @@ Expected focused capabilities include `architect`, `code-review`, `correct` and 
 
 ## Manual bug task
 
-Start the local app in the new repository using its documented `dev` command. Use the displayed loopback URL. In the browser:
+Keep the app in one terminal and run checks from the pinned astack checkout in another:
+
+```sh
+NOTEBOOK_PORT=3173 bun run --cwd /tmp/notebook-pilot dev
+```
+
+Open `http://127.0.0.1:3173`. Stop with Ctrl-C and repeat that command to check persistence across restart. Use a different port for another app. In the browser:
 
 1. Choose the first disposable actor, create two notes and record their titles.
 2. Mark the first note done. Reload the page, stop/restart the server, and reopen the list. The seed intentionally persists the opposite status; retain this original failure.
@@ -67,12 +73,26 @@ bun run agent-evals check --project /tmp/notebook-pilot --task bug --output /tmp
 The seeded persisted-status case must fail (exit 1). A setup error (exit 2) requires fixing the test environment first. Start a fresh agent session in this repository with this request:
 
 ```text
-$applification:astack Marking a note done leaves it open, and reopening can leave it done. Reproduce this in the running app, fix the persisted state change, and retain a regression. Preserve ownership, input validation and the other note.
+$applification:astack Marking a note done leaves it open, and reopening can leave it done. Reproduce this in the running app, fix the persisted state change, and retain a regression. Preserve ownership, input validation and the other note. Keep this exercise local; no publishing or PR is needed.
 ```
 
 4. Repeat the same browser path after delivery. Done must survive reload and restart; reopen must persist open. The other note must retain its title and state.
 5. Switch to the second actor. The first actor's notes must be absent. Try a direct update of the first actor's note through the documented HTTP API as the second actor; it must be rejected without changing the original record. The fixture README describes the exact headers and payloads.
-6. Run the external check from the pinned astack source, with a new output directory:
+6. Use a known Alice note ID from the first request below (replace `ALICE_NOTE_ID`). Bob's update must return 404, and Alice's fresh read must retain the record:
+
+```sh
+curl -s -H 'x-actor: alice' http://127.0.0.1:3173/api/notes
+curl -i -X PATCH http://127.0.0.1:3173/api/notes/ALICE_NOTE_ID -H 'x-actor: bob' -H 'Content-Type: application/json' -d '{"done":true}'
+curl -s -H 'x-actor: alice' http://127.0.0.1:3173/api/notes
+```
+
+Repeat this create twice as Alice. Expect 201 then 200 with the same note ID; reload/restart must still show exactly one new note:
+
+```sh
+curl -i -X POST http://127.0.0.1:3173/api/notes -H 'x-actor: alice' -H 'Content-Type: application/json' -d '{"title":"Retry check","operationId":"manual-retry-1"}'
+```
+
+7. Run the external check from the pinned astack source, with a new output directory:
 
 ```sh
 bun run agent-evals check --project /tmp/notebook-pilot --task bug --output /tmp/notebook-bug-proof
@@ -85,7 +105,7 @@ Exit 0 means the selected behavioral acceptance passed; 1 means a product assert
 Use a new initialized repository for an independent feature measurement. For a sequential owner exploration, you may instead continue the corrected bug repository, but record that it has inherited changes and is not the same controlled fixture.
 
 ```text
-$applification:astack Add title editing to an existing note in the browser and HTTP API. Keep non-empty titles and ownership checks. Saved titles must survive reload and restart. Preserve status and other notes.
+$applification:astack Add title editing to an existing note in the browser and HTTP API. Keep non-empty titles and ownership checks. Saved titles must survive reload and restart. Preserve status and other notes. Keep this exercise local; no publishing or PR is needed.
 ```
 
 Observe whether the agent settles the caller/API shape and ownership before wiring a consequential change. A small implementation needs a small sketch. After delivery, edit a title, reload, restart and verify the persisted value. Submit an empty or malformed title and confirm rejection with the previous value preserved. Repeat a valid update and confirm it does not create another note. Check the second actor cannot edit the first actor's note. Exercise keyboard access to the edit/save interaction, including the error state.
@@ -101,7 +121,7 @@ The generated fixture README and runner help are the authoritative API/command r
 Start a new session with the successful feature repository and ask:
 
 ```text
-$applification:astack Add archive and restore for notes. Archived notes should be hidden from the ordinary list and reachable through an archived view. Restore must retain the edited title and status. Preserve ownership and make repeat requests safe.
+$applification:astack Add archive and restore for notes. Archived notes should be hidden from the ordinary list and reachable through an archived view. Restore must retain the edited title and status. Preserve ownership and make repeat requests safe. Keep this exercise local; no publishing or PR is needed.
 ```
 
 Track its elapsed time, regressions, clarification and corrective prompts. Archive, reload/restart, inspect archived notes and restore. The original title/status must remain. The other actor must not gain access. Run the `followup` check in a new external output directory. This is evidence of changeability on this example, not a grade based on line count.
@@ -120,11 +140,13 @@ bun run agent-evals run --candidate CANDIDATE_COMMIT --baseline plain --model CO
 
 Replace the uppercase values with the actual full commit SHA and configured model ID. The same command accepts a previous plugin commit as `--baseline`. Add the same explicit reasoning option to both conditions when used. The intentional treatment is loading/invoking astack; the user goal, fixture and acceptance oracle stay the same. Inspect recorded configuration and residual managed/global instructions before calling a plain condition skill-free.
 
+The optional standalone `followup` comparison starts from a fresh seed and measures archive-task behavior. It does not measure changeability of an earlier agent delivery; use the sequential fresh-session manual task above for that question.
+
 Start with one smoke repeat. After correcting harness/setup issues, use matching repeated tasks to estimate outcome variability. Preserve old outcomes and increment the experiment version for a changed fixture, oracle, rubric or intervention. Report pass/planned, failed, inconclusive and not-run counts, plus observed tokens, elapsed time and interventions. Missing cost stays unknown. Wider trials require an explicit useful budget; no model calls run in deterministic CI.
 
 ## Blinded craftsmanship review
 
-Give a fresh reviewer the exported anonymized source/diff packet and the [quality rubric](../skills/code-review/references/quality-rubric.md). Keep the mapping to candidates/models private until it has recorded its assessment. Do not supply author scores or behavioral acceptance results before its initial code assessment. Calibrate the reviewer using [the calibration controls](../evals/agent-quality/calibration.md); those controls require owner adjudication before a grade is trusted.
+Give a fresh reviewer the exported anonymized source/diff packet and the [quality rubric](../skills/code-review/references/quality-rubric.md). Keep the mapping to candidates/models private until it has recorded its assessment. Do not supply author scores or behavioral acceptance results before its initial code assessment. Predeclare the reviewer qualification rule and minimum calibration coverage before seeing candidate grades. Failed or insufficient calibration keeps quality unassessed. Calibrate the reviewer using [the calibration controls](../evals/agent-quality/calibration.md); those controls require owner adjudication before a grade is trusted.
 
 Score types/boundaries, ownership/effects, simplicity/readability, test strength and changeability separately, with source/check evidence and justified not-applicable dimensions. Correctness and permissions remain hard gates. Record usefulness and your interventions separately. Quality stays unassessed until a calibrated independent review exists.
 

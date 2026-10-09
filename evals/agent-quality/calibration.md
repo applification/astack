@@ -52,3 +52,7 @@ assert result != null
 Expected: this assertion cannot distinguish an acknowledged but discarded write. Require a literal title comparison from a fresh read, plus the rejected-owner operation when it is part of acceptance.
 
 Record detected/missed material defects, unsupported findings and evidence quality. False passes matter independently of average scores. Keep findings that require a runtime prerequisite marked unverified. Use the same rubric for every candidate and preserve its version. A different model family may add perspective; it is not itself a calibration certificate.
+
+## Qualification before candidate grading
+
+Predeclare a task-appropriate minimum corpus and pass rule before reading candidate results. For this starter exercise, the owner first confirms all four labels. A provisional reviewer must find the discarded write and weak assertion, treat transaction semantics as unproven, avoid claiming runtime or permission proof from the good sketch, and make no unsupported critical finding or false pass. Any miss or invented critical claim leaves quality unassessed until corrected calibration succeeds. Record useful-finding precision and the owner's adjudication; four authored controls only qualify this initial review exercise. They do not establish general grader accuracy. Expand coverage with independently checked real diffs before a broad improvement claim.
