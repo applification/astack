@@ -4,6 +4,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type FocusEvent,
   type PointerEvent,
   type ReactNode,
 } from "react";
@@ -184,6 +185,60 @@ export function WorkGraph({
       y: start.box.y - (event.clientY - start.y) * scale,
     });
   };
+  const revealFocusedItem = (event: FocusEvent<SVGSVGElement>) => {
+    const target = event.target;
+    if (
+      !(target instanceof SVGGElement) ||
+      !target.matches("[data-work-id], [data-edge-id]") ||
+      !target.matches(":focus-visible")
+    )
+      return;
+    const canvas = event.currentTarget;
+    const bounds = canvas.getBoundingClientRect();
+    const panel = canvas.parentElement
+      ?.querySelector(".graph-inspector")
+      ?.getBoundingClientRect();
+    // Narrow inspection stacks below the graph and does not cover its targets.
+    if (!panel || panel.top >= bounds.bottom || panel.left >= bounds.right)
+      return;
+    const circle = target.querySelector("circle");
+    const path = target.querySelector<SVGPathElement>(".work-network-edge");
+    const matrix = canvas.getScreenCTM();
+    if (!matrix) return;
+    let item: { left: number; right: number; top: number; bottom: number };
+    if (circle) item = circle.getBoundingClientRect();
+    else if (path) {
+      const point = path.getPointAtLength(path.getTotalLength() / 2);
+      const pathMatrix = path.getScreenCTM();
+      if (!pathMatrix) return;
+      const center = new DOMPoint(point.x, point.y).matrixTransform(pathMatrix);
+      item = {
+        left: center.x - 12,
+        right: center.x + 12,
+        top: center.y - 12,
+        bottom: center.y + 12,
+      };
+    } else return;
+    const left = bounds.left + 16,
+      right = panel.left - 16,
+      top = bounds.top + 16,
+      bottom = bounds.bottom - 16;
+    const dx =
+      item.right > right
+        ? item.right - right
+        : item.left < left
+          ? item.left - left
+          : 0;
+    const dy =
+      item.bottom > bottom
+        ? item.bottom - bottom
+        : item.top < top
+          ? item.top - top
+          : 0;
+    // Move the focused target into the exposed canvas without changing zoom.
+    if (dx || dy)
+      updateBox({ ...box, x: box.x + dx / matrix.a, y: box.y + dy / matrix.d });
+  };
   const groups = network.nodes.filter(
     (node) => node.item.kind === "conversation",
   );
@@ -236,6 +291,7 @@ export function WorkGraph({
             role="group"
             tabIndex={0}
             aria-describedby={id + "-help"}
+            onFocusCapture={revealFocusedItem}
             onPointerDown={startPan}
             onPointerMove={pan}
             onPointerUp={() => {
@@ -563,7 +619,10 @@ export function WorkGraph({
         {selected && !selectedVisible && (
           <p role="status" className="notice">
             The selected item is hidden by the current filters, overview or
-            graph limit. Its evidence remains in the inspector.
+            graph limit.{" "}
+            {inspector
+              ? "Its evidence remains in the inspector."
+              : "Show it again to reopen its evidence."}
           </p>
         )}
       </div>

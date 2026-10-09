@@ -1944,6 +1944,64 @@ test("graph previews stay separate from selection and inspection preserves the v
   await expect(canvas).toHaveAttribute("viewBox", before ?? "");
 });
 
+test("keyboard graph navigation reveals targets covered by the open inspector without changing zoom", async ({
+  app,
+  screen,
+  browser,
+}) => {
+  await browser.setViewport({ width: 1280, height: 800 });
+  await app.open(
+    "/iframe.html?id=observatory-evaluations--network-explorer&viewMode=story",
+  );
+  const canvas = screen.getByRole("group", "Captured work graph");
+  const parent = screen.getByRole("button", "Inspect Parent conversation", {
+    exact: true,
+  });
+  await parent.focus();
+  const before = (await canvas.getAttribute("viewBox"))?.split(" ").map(Number);
+  await parent.press("Enter");
+  const inspector = screen.getByRole("complementary", "Work evidence");
+  await expect(
+    inspector.getByRole("heading", "Parent conversation", { exact: true }),
+  ).toBeFocused();
+  for (let step = 0; step < 11; step++)
+    await browser.keyboard.press("Shift+Tab");
+  const node = screen.getByRole("button", "Inspect UI checks · conversation", {
+    exact: true,
+  });
+  await expect(node).toBeFocused();
+  expect(
+    await browser.evaluate(() => {
+      const focused = document.activeElement;
+      const circle = focused?.querySelector("circle")?.getBoundingClientRect();
+      const panel = document
+        .querySelector(".graph-inspector")
+        ?.getBoundingClientRect();
+      const graph = document
+        .querySelector(".work-network")
+        ?.getBoundingClientRect();
+      return (
+        !!circle &&
+        !!panel &&
+        !!graph &&
+        !!focused?.matches(":focus-visible") &&
+        circle.right < panel.left &&
+        circle.left >= graph.left &&
+        circle.top >= graph.top &&
+        circle.bottom <= graph.bottom
+      );
+    }),
+  ).toBe(true);
+  const after = (await canvas.getAttribute("viewBox"))?.split(" ").map(Number);
+  expect(after?.slice(2)).toEqual(before?.slice(2));
+  await node.press("Enter");
+  await expect(
+    inspector.getByRole("heading", "UI checks · conversation", { exact: true }),
+  ).toBeFocused();
+  await inspector.getByRole("button", "Close inspection").tap();
+  await expect(node).toBeFocused();
+});
+
 test("graph relationships expose supporting capture and endpoint navigation across views", async ({
   app,
   screen,
@@ -2007,6 +2065,12 @@ test("graph relationships expose supporting capture and endpoint navigation acro
   ).toHaveAttribute("href", trace ?? "");
   await inspector.getByRole("button", "Close inspection").tap();
   await expect(screen.getByRole("group", "Captured work graph")).toBeFocused();
+  await expect(
+    screen.getByText("Show it again to reopen its evidence.", { exact: false }),
+  ).toBeVisible();
+  await expect(
+    screen.getByText("Its evidence remains in the inspector.", { exact: false }),
+  ).toHaveCount(0);
   await browser
     .locator('.work-network [data-work-edge="capture"] .work-network-hit')
     .first()
