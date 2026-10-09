@@ -7,7 +7,7 @@ let path: string;
 beforeEach(() => {
   path = mkdtempSync(join(tmpdir(), 'astack-portable-'));
   const root = resolve(import.meta.dir, '..');
-  for (const entry of ['plugin.json', 'mcp.json', 'LICENSE', 'NOTICE.md', 'assets', 'skills']) {
+  for (const entry of ['plugin.json', 'mcp.json', 'LICENSE', 'NOTICE.md', 'assets', 'skills', 'docs']) {
     cpSync(join(root, entry), join(path, entry), { recursive: true });
   }
 });
@@ -30,6 +30,12 @@ test('a callable skill must have its own matching identity', () => {
 test('relocated skill composition cannot point at missing instructions', () => {
   const file = join(path, 'skills/pr/SKILL.md');
   writeFileSync(file, readFileSync(file, 'utf8') + '\n[missing skill](../missing/SKILL.md)\n');
+  expect(() => checkPlugin(path)).toThrow('Missing skill link');
+});
+test('the relocated evaluation skill retains its local validation recipe', () => {
+  const recipe = join(path, 'docs/agent-validation.md');
+  expect(readFileSync(recipe, 'utf8')).toContain('bun run agent-evals init /tmp/notebook-pilot');
+  rmSync(recipe);
   expect(() => checkPlugin(path)).toThrow('Missing skill link');
 });
 test('skill references must remain inside the portable package', () => {

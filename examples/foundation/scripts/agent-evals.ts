@@ -56,6 +56,10 @@ export async function main(argv = process.argv) {
     )
     .requiredOption('--candidate <commit>')
     .option(
+      '--plugin-repo <path>',
+      'Git repository containing plugin revisions (defaults to evaluator checkout)',
+    )
+    .option(
       '--baseline <plain|commit>',
       'Baseline plugin revision or empty explicit plugin configuration',
       'plain',
@@ -75,6 +79,7 @@ export async function main(argv = process.argv) {
       const options = z
         .object({
           candidate: z.string().min(1),
+          pluginRepo: z.string().min(1).optional(),
           baseline: z.string().min(1),
           model: z.string().min(1),
           tasks: z
@@ -100,6 +105,10 @@ export async function main(argv = process.argv) {
         .parse(raw);
       const report = await runComparison({
         ...options,
+        pluginRepo:
+          options.pluginRepo === undefined
+            ? undefined
+            : resolve(options.pluginRepo),
         output: resolve(options.output),
       });
       process.stdout.write(

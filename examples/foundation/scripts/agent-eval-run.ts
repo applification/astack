@@ -197,6 +197,7 @@ async function skillEvidence(directory: string, installedPath: string | null) {
 
 export async function runComparison(options: {
   candidate: string;
+  pluginRepo?: string | undefined;
   baseline: string;
   model: string;
   tasks: Task[];
@@ -343,8 +344,12 @@ export async function runComparison(options: {
       'Ephemeral sessions, workspace-write with default temp writable roots excluded, --ignore-user-config, explicit plugin maps, same user goals/settings/budgets, explicit skill invocation only for plugin conditions, separate neutral Git repositories. Evaluator and retained artifacts are outside the agent workspace. System/managed/personal skills are not proven excluded.';
     temporary = await mkdtemp(join(tmpdir(), 'notebook-comparison-'));
     const repo = (
-      await command(['git', 'rev-parse', '--show-toplevel'], import.meta.dir)
+      await command(
+        ['git', 'rev-parse', '--show-toplevel'],
+        options.pluginRepo ?? import.meta.dir,
+      )
     ).trim();
+    manifest.pluginRepository = repo;
     const plugin = async (ref: string, condition: Condition) => {
       const revision = (
         await command(

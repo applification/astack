@@ -157,6 +157,8 @@ bun run agent-evals run --candidate CANDIDATE_COMMIT --baseline plain --model CO
 
 Replace the uppercase values with the actual full commit SHA and configured model ID. The same command accepts a previous plugin commit as `--baseline`. Add the same explicit reasoning option to both conditions when used. The intentional treatment is loading/invoking astack; the user goal, fixture and acceptance oracle stay the same. Inspect recorded configuration and residual managed/global instructions before calling a plain condition skill-free.
 
+Plugin revisions resolve in the evaluator's Git checkout by default. If the tooling is relocated, supply `--plugin-repo /absolute/path/to/astack` with the same pinned candidate/baseline commits. The manifest records the resolved repository; the evaluator and task fixtures remain fixed independently of those plugin revisions.
+
 The optional standalone `followup` comparison starts from a fresh seed and measures archive-task behavior. It does not measure changeability of an earlier agent delivery; use the sequential fresh-session manual task above for that question.
 
 Start with one smoke repeat. After correcting harness/setup issues, use matching repeated tasks to estimate outcome variability. Preserve old outcomes and increment the experiment version for a changed fixture, oracle, rubric or intervention. Report pass/planned, failed, inconclusive and not-run counts, plus observed tokens, elapsed time and interventions. Missing cost stays unknown. Wider trials require an explicit useful budget; no model calls run in deterministic CI.

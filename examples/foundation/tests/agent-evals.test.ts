@@ -11,6 +11,7 @@ import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { z } from 'zod';
+import { command } from '../scripts/runtime';
 import { checkNotebook, verifyEvidence } from '../scripts/agent-eval-check';
 import { initNotebook, json, type Task } from '../scripts/agent-eval-fixture';
 import {
@@ -20,6 +21,38 @@ import {
 } from '../scripts/agent-eval-run';
 
 const root = await mkdtemp(join(tmpdir(), 'agent-evals-tests-'));
+// The subprocess contract needs committed plugin bytes, not this checkout's
+// history. This fixture also runs in shallow checkouts and relocated profiles.
+const pluginRepo = join(root, 'plugin-source');
+await mkdir(join(pluginRepo, '.agents/plugins'), { recursive: true });
+await mkdir(join(pluginRepo, 'skills/astack'), { recursive: true });
+await writeFile(
+  join(pluginRepo, 'plugin.json'),
+  json({ name: 'applification', version: 'test' }),
+);
+await writeFile(
+  join(pluginRepo, '.agents/plugins/marketplace.json'),
+  json({ name: 'fixture', plugins: [] }),
+);
+await writeFile(
+  join(pluginRepo, 'skills/astack/SKILL.md'),
+  'Test-only plugin bytes for the fake CLI transport.\n',
+);
+await command(['git', 'init', '--initial-branch=main'], pluginRepo);
+await command(['git', 'add', '.'], pluginRepo);
+await command(
+  [
+    'git',
+    '-c',
+    'user.name=Agent eval test',
+    '-c',
+    'user.email=test@example.invalid',
+    'commit',
+    '-m',
+    'Transport fixture',
+  ],
+  pluginRepo,
+);
 const observationReport = z.object({
   checks: z.array(
     z.object({
@@ -518,7 +551,8 @@ console.log(JSON.stringify({type:'turn.completed',usage:{input_tokens:1,output_t
   }
 }
 const runOptions = () => ({
-  candidate: '0ff54b0a15ab58fe5353f55175d5a9a62a28bbc5',
+  candidate: 'HEAD',
+  pluginRepo,
   baseline: 'plain',
   model: 'test-model-only',
   tasks: ['bug'] satisfies Task[],
@@ -713,6 +747,8 @@ test('interrupted parent leaves running and planned attempts in the persisted de
       [
         join(import.meta.dir, '../scripts/agent-evals.ts'),
         'run',
+        '--plugin-repo',
+        pluginRepo,
         '--candidate',
         options.candidate,
         '--baseline',
