@@ -1,0 +1,48 @@
+{
+  "revision": "202af8b240903fcfe486a1153226e60dd6b1e809",
+  "sourceDigest": "20d30297cf1367e54d6bc026f590d4dae385a7d329c313f00bd2ebec89784f23",
+  "environment": {
+    "os": "macOS arm64",
+    "bun": "1.4.0",
+    "typescript": "6.0.2",
+    "storybook": "10.6.1",
+    "e2e": "0.15.1"
+  },
+  "checks": {
+    "strictTypes": "pass",
+    "dataTests": {
+      "passed": 222,
+      "failed": 0,
+      "assertions": 1107
+    },
+    "browserTests": {
+      "discovered": 49,
+      "selected": 49,
+      "executed": 49,
+      "passed": 49,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 0
+    },
+    "uiLint": "pass",
+    "productionBuild": "pass",
+    "storybookBuild": "pass",
+    "siteAndPluginCheck": "pass",
+    "anonymousLocalConvexCompileAndPush": "pass",
+    "persistedReadback": "pass",
+    "independentReview": "No remaining material P1/P2 findings at the pinned product revision"
+  },
+  "artifacts": {
+    "force.png": "f7fb15203c002adb64fbff59b231d79aace383ea296747759de55835e5b1de6e",
+    "communities.png": "d2f89f288ff339710fdbdb05f48378a13e4e8c574439bd191c0709004167b317",
+    "narrow.png": "ec206464e765941d6ff58d00d79897a377a208d431f08eef3425d33d263e8f0d",
+    "browser-results.json": "2f423f5164909db3065d6a58baba83f5f26c06c91592f073b9f6b09cf602aafd",
+    "local-readback.json": "b850aa8b9157e4ad16bca55e1aa3860a2e6b725706773217a63a1bd2873cfa47",
+    "review.json": "6144d4772c283958a3c25dd805399f2009b07bb8483606b520ebe8cf24649f3e"
+  },
+  "limits": [
+    "Fixtures are synthetic.",
+    "No Otis deployment, deployed user-data UI session or installed collector upgrade.",
+    "Layout/community grouping does not establish causality, quality or temporal order."
+  ]
+}
