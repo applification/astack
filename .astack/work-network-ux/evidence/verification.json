@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "productRevision": "84378da403d4f0d649685c1fedc9d028c65833a9",
+  "sourceDigest": "70ef6f01f037cde81e10ee9462905ecd51e6767d03e03e79c09caeb172455075",
+  "environment": "macOS arm64, Chromium, synthetic Storybook and owned anonymous local Convex fixture",
+  "results": {
+    "dataTests": 222,
+    "assertions": 1107,
+    "componentBrowserTests": 54,
+    "localBrowserTests": 1,
+    "failedFinalChecks": 0,
+    "independentFinalReview": "pass"
+  },
+  "checks": [
+    {
+      "label": "Types and data tests",
+      "command": "bun run observatory:check",
+      "observedExitCode": 0,
+      "localLog": "/tmp/astack-work-network-ux-delivery-check.log",
+      "logSha256": "dfce6204290bd8a5a523553f36ec31602135ea84e466e4e71e6e0cdad5bb3258",
+      "outputTail": [
+        "(pass) ambiguous command does not establish reads: cat skills/{astack,react}/SKILL.md",
+        "(pass) ambiguous command does not establish reads: /bin/zsh -lc 'cat skills/{astack,react}/SKILL.md'",
+        "(pass) command read extraction bounds input size and path count [0.18ms]",
+        "",
+        " 222 pass",
+        " 0 fail",
+        " 1107 expect() calls",
+        "Ran 222 tests across 27 files. [12.15s]"
+      ]
+    },
+    {
+      "label": "Lint",
+      "command": "bun run observatory:lint",
+      "observedExitCode": 0,
+      "localLog": "/tmp/astack-work-network-ux-delivery-lint.log",
+      "logSha256": "f14ec0628680a156989b69fa7a3092cfd3dc313dcef26ac8b2cae2f3f53a09b4",
+      "outputTail": [
+        "$ eslint apps/observatory/src packages/ui/src"
+      ]
+    },
+    {
+      "label": "Production build",
+      "command": "bun run observatory:build",
+      "observedExitCode": 0,
+      "localLog": "/tmp/astack-work-network-ux-delivery-build.log",
+      "logSha256": "0eeeafa88eb1c6af35e0127769872c73663511f1f42bfb312b5fd0a3e20ed99d",
+      "outputTail": [
+        "dist/assets/newsreader-vietnamese-standard-normal-BjhtXyW2.woff2   27.24 kB",
+        "dist/assets/geist-latin-wght-normal-BgDaEnEv.woff2                 29.40 kB",
+        "dist/assets/newsreader-latin-ext-standard-normal-BQn1nviT.woff2    86.60 kB",
+        "dist/assets/newsreader-latin-standard-normal-s-izfB6B.woff2       132.00 kB",
+        "dist/assets/index-BI7c-XKg.css                                     45.65 kB \u2502 gzip:   9.98 kB",
+        "dist/assets/index-BxgEL4O7.js                                     336.38 kB \u2502 gzip: 102.65 kB",
+        "",
+        "\u2713 built in 265ms"
+      ]
+    },
+    {
+      "label": "Storybook build",
+      "command": "bun run observatory:build:storybook",
+      "observedExitCode": 0,
+      "localLog": "/tmp/astack-work-network-ux-header-storybook.log",
+      "logSha256": "5adff982cac3496d5eb602ca8099b5f6e30fd4e8700de3c659500825e9b7820e",
+      "outputTail": [
+        "\u2502  build.chunkSizeWarningLimit.",
+        "\u2502  Vite \u2713 built in 1.60s",
+        "\u2502",
+        "\u25c7  Output directory:",
+        "\u2502  /Users/rufus/.t3/worktrees/astack/t3-bfe8f653/apps/observatory/storybook-static",
+        "\u2502",
+        "\u2514  Storybook build completed successfully",
+        ""
+      ]
+    },
+    {
+      "label": "Site and plugin checks",
+      "command": "bun run check",
+      "observedExitCode": 0,
+      "localLog": "/tmp/astack-work-network-ux-final-repository.log",
+      "logSha256": "128d7a77b10f577bd0933f6bb1ab5a7cfb12b50a08366cecc1bf668a1a62d012",
+      "outputTail": [
+        "$ node site/check.mjs && bun scripts/check-plugins.ts",
+        "Site routes, 118 eval examples, principle indexes and guide links match this checkout.",
+        "Portable plugin schemas, package assets, skills and marketplace identities pass."
+      ]
+    },
+    {
+      "label": "Component browser suite",
+      "command": "bun run observatory:test:e2e --output .e2e/work-network-ux-delivery",
+      "observedExitCode": 0,
+      "localLog": "/tmp/astack-work-network-ux-delivery.log",
+      "logSha256": "9e46eeb21ad7807fddd2a5ca6e8e942e82b5013f9fc7206698cf260d39b25948",
+      "outputTail": [
+        "   \u2713 host presence, delivery and acknowledgement remain independent and return edges need receipt evidence 936ms",
+        "",
+        " Test Files  1 passed (1)",
+        "      Tests  54 passed (54)",
+        "   Start at  10:27:22",
+        "   Duration  54.78s (startup 442ms)",
+        "     Report  .e2e/work-network-ux-delivery/report.json",
+        ""
+      ]
+    },
+    {
+      "label": "Local Convex application",
+      "command": "E2E_TELEMETRY_DISABLED=1 bun x --no-install e2e run --config .e2e/work-network-ux-live.config.ts --output work-network-ux-live-delivery",
+      "observedExitCode": 0,
+      "localLog": "/tmp/astack-work-network-ux-live-delivery.log",
+      "logSha256": "94b91aac3638e7ca45efe7084a7f26e1ef40b7a6a2d07746b7d8a1bdc46a1947",
+      "outputTail": [
+        "   \u2713 owned local Convex capture supports the graph workspace and evidence navigation 2.29s",
+        "",
+        " Test Files  1 passed (1)",
+        "      Tests  1 passed (1)",
+        "   Start at  10:36:26",
+        "   Duration  2.69s",
+        "     Report  work-network-ux-live-delivery/report.json",
+        ""
+      ]
+    }
+  ],
+  "inlinePreview": {
+    "component": "WorkflowEvidence",
+    "fixture": "journeyFixture (synthetic)",
+    "checkedWidths": [
+      728,
+      1100
+    ],
+    "consoleErrors": 0,
+    "sourceTraceNavigation": "Requires running Observatory router"
+  },
+  "design": {
+    "file": "/Users/rufus/Apps/astack/design/astack.pen",
+    "directionNode": "nGcY7",
+    "browserNode": "KEJOr",
+    "observedInspectionNode": "X7ZkJ",
+    "role": "Comparison and refinement after initial HTML specification; final observed shared component capture"
+  },
+  "limits": [
+    "No production deployment or installed collector upgrade",
+    "No screen-reader, physical touch-device or other-browser proof",
+    "Local browser read uses the existing persisted synthetic fixture; no backend or capture writes in this iteration"
+  ],
+  "artifacts": [
+    {
+      "path": ".astack/work-network-ux/evidence/browser-results.json",
+      "sha256": "c1bd52b42da4f95da8674b00b2d04d4eadc4c29c610c7faecf3ae8150acbe2c1"
+    },
+    {
+      "path": ".astack/work-network-ux/evidence/local-browser-results.json",
+      "sha256": "3ae97cbf5eb806d077529f470cf0075a43d10966e7df1f1b31ab41aa2faf59bb"
+    },
+    {
+      "path": ".astack/work-network-ux/evidence/narrow-inspector.png",
+      "sha256": "8ebc3003bcf09127a0a985ccccd2a32327c110b6a5c4489283fc8b2ed21bcebb"
+    },
+    {
+      "path": ".astack/work-network-ux/evidence/pen-direction.png",
+      "sha256": "78ca3893b33b21672993919b4fc29afbd9b9f051e5ab3d2ecb2c7c7dbb5ac2da"
+    },
+    {
+      "path": ".astack/work-network-ux/evidence/relationship-inspector.jpg",
+      "sha256": "7f76ded1b5019b3449f7cc8eb44645ed595157b8347adc9a9837187e08774c5c"
+    },
+    {
+      "path": ".astack/work-network-ux/evidence/report.md",
+      "sha256": "d8eab038c1d7946111e3862f3272af4b46194ed1c9a72aa7fdbf91af33385649"
+    },
+    {
+      "path": ".astack/work-network-ux/evidence/review.json",
+      "sha256": "a80fb34953a6d478002b12ccc53755829468c2e6b319aafe9e90c513bb4161dc"
+    },
+    {
+      "path": ".astack/work-network-ux/evidence/source.json",
+      "sha256": "0b219f5e69e2600e741e5816c7445841ddf03347801aa734d312d056280b5703"
+    }
+  ]
+}
