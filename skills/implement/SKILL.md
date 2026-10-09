@@ -17,4 +17,6 @@ Clarify the observable outcome through a [behavior contract](references/behavior
 
 Return the delivered outcome, changed boundaries, acceptance results and remaining choices. Use domain-modeling when concepts need sharpening, and show-me when a shape or alternative needs explaining.
 
+Use [architect](../architect/SKILL.md) when the change makes a consequential interface, ownership, persisted-shape or lifecycle decision. Retain a caller usage sketch, types/boundaries, invariants and the reason for the chosen shape; compare an alternative when the tradeoff matters. For retries, migrations or background writes, include interruption, compatibility and recovery in acceptance before dependent wiring. Keep routine edits using settled interfaces lightweight.
+
 Read and apply linked skills when needed. Skill composition is sequential instruction use unless delegation is available, permitted and useful; it does not require a new agent. Keep one writer per worktree and return unresolved decisions to the caller.

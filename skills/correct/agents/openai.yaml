@@ -1,0 +1,6 @@
+interface:
+  display_name: "Correct"
+  short_description: "Prevent repeated mistakes with proven safeguards"
+  default_prompt: "Use $applification:correct for the requested recurring correction within the agreed scope."
+policy:
+  allow_implicit_invocation: true

@@ -36,6 +36,10 @@ The plugin has one coordinating entry, [`astack`](skills/astack/SKILL.md), plus 
 | [`convex`](skills/convex/SKILL.md) | Data, ownership, functions and reactive integration |
 | [`workos-auth`](skills/workos-auth/SKILL.md) | AuthKit/Connect identity, tokens and auth proof layers |
 | [`testing`](skills/testing/SKILL.md) | Meaningful regressions, integration/browser checks and candidate confirmation |
+| [`architect`](skills/architect/SKILL.md) | Design from caller usage, ownership, invariants and consequential tradeoffs |
+| [`code-review`](skills/code-review/SKILL.md) | Independent correctness and craftsmanship review at affected boundaries |
+| [`correct`](skills/correct/SKILL.md) | Close recurring corrections with demonstrated project safeguards |
+| [`agent-evaluation`](skills/agent-evaluation/SKILL.md) | Controlled comparisons, independent acceptance and blinded quality assessment |
 | `implement` | Deliver an agreed feature or behavior change |
 | `bug-fix` | Reproduce and repair a supported defect |
 | `refactor` | Improve structure while preserving behavior |
@@ -137,6 +141,8 @@ For MCP servers, astack has a separate [server and proof path](skills/mcp-server
 
 ## Development
 
+The [agent validation guide](docs/agent-validation.md) provides a local notebook fixture in a new Git repository, exact owner manual tests, and controlled comparisons using the foundation's bounded agent runner. Behavior acceptance, calibrated craftsmanship review, owner usefulness and effort remain separate. Use a pinned candidate and the same fixed oracle for each condition; a smoke pass does not establish a general reliability gain. The [implementation contract](.astack/reliability/behavior-contract.md) and its retained evidence identify what was actually exercised.
+
 Validate the skill with Codex's bundled `skill-creator` validator and the portable manifests with `bun scripts/check-plugins.ts`. The latter checks the published Agent Plugins schemas, packaged paths and marketplace discovery. See [evaluation cases](evals/routing.md) for behavior to exercise when changing routing or proof selection. Run `bun run typecheck`, `bun test src`, and `bun run verify` from `examples/e2e-proof` for report policy and the real Chromium repro loop; its README covers pinned installation. CI exercises the same reference without a model provider.
 
 The site is plain HTML, CSS, and JavaScript in [`site/`](site/). Preview it with `python3 -m http.server 8000 --directory site`. Run `node site/check.mjs` to catch route, eval, or source-link drift. GitHub Pages publishes the folder after a merge to `main` at `astack.applification.net`. When changing astack behavior, update the site and README in the same PR; the Pages workflow checks that routes, eval copy, and source links stay current.
@@ -151,6 +157,6 @@ MIT. See [LICENSE](LICENSE).
 
 ## Agent Observatory
 
-[Evaluations](docs/observatory-evaluations.md) connect original intent, acceptance cases, skill criteria and structured verification reports across captured turns. The owner separately assesses intent, skill application and outcome. The first slice supports immutable manifest import, retained evidence snapshots and a disposable saved-edit proof; automated model grading and controlled agent trials follow later.
+[Evaluations](docs/observatory-evaluations.md) connect original intent, acceptance cases, skill criteria and structured verification reports across captured turns. The owner separately assesses intent, skill application and outcome. Observatory preserves reported evidence; the [separate controlled trial toolkit](docs/agent-validation.md) executes independent acceptance. Automated semantic grading and a deployed comparison UI remain separate work.
 
 [Agent Observatory](docs/agent-observatory.md) adds Astack’s private agent feedback loop: automatic persisted Codex capture, a portable metadata-only collector with offline buffering, private self-hosted Convex on Otis, and Work → Runs → Trace plus skill-version/problem views. External COS work remains optional parent context. [MacBook setup](docs/agent-observatory-macbook.md) installs only the collector on another machine; [evidence](.astack/agent-observatory/evidence.md) distinguishes live deployment, synthetic tests and remaining gaps.

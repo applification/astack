@@ -1,0 +1,367 @@
+{
+  "format": "reliability-smoke-summary/v1",
+  "date": "2026-10-09",
+  "experiment": "smoke-r1",
+  "options": {
+    "candidate": "542f8e19c1e2551d067de54f9c7849ee1ecbd194",
+    "baseline": "plain",
+    "model": "gpt-6.1-sol",
+    "tasks": ["bug", "feature"],
+    "repeats": 1,
+    "timeoutMs": 300000,
+    "actionLimit": 40,
+    "reasoning": "xhigh"
+  },
+  "stats": {
+    "planned": 4,
+    "pass": 1,
+    "fail": 0,
+    "inconclusive": 3,
+    "notRun": 0,
+    "unfinished": 0
+  },
+  "environment": {
+    "bun": "1.4.0",
+    "nodeCompatibility": "v26.3.0",
+    "platform": "darwin",
+    "architecture": "arm64"
+  },
+  "codexVersion": "codex-cli 0.161.0",
+  "fixedSuiteDigest": "d1ebffec72190eb875bf6b1454d7d4c3aa7d72e81dc20ea5cffa78fba4fe44bd",
+  "fixtureDigest": "0ebccdf11be26fb8ed26e1af1b4fa86a13ca0d36471e56e24c6a2018dd071709",
+  "installedCandidateDigest": "cc591f128fd16b3b49d060951ff331e86d897ec036fcee2a14fb2a7844910919",
+  "cleanup": "complete",
+  "originalManifestSha256": "12a6ab77e1a453ecbf1aafb51e7fbae6ddd99bb3dc48a5bfd6e975e1c991e5d6",
+  "isolation": "Ephemeral sessions, workspace-write with default temp writable roots excluded, --ignore-user-config, explicit plugin maps, same user goals/settings/budgets, explicit skill invocation only for plugin conditions, separate neutral Git repositories. Evaluator and retained artifacts are outside the agent workspace. System/managed/personal skills are not proven excluded.",
+  "quality": "unassessed; no human-qualified calibrated blinded review or sequential fresh-agent maintenance",
+  "interpretation": "One completed baseline bug pass; three wall-clock timeouts remain inconclusive. No demonstrated astack improvement; no monetary cost estimate substituted. HTTP acceptance is independent of agent completion.",
+  "attempts": [
+    {
+      "id": "1-bug-baseline",
+      "condition": "baseline",
+      "task": "bug",
+      "outcome": "pass",
+      "agentOutcome": "completed",
+      "termination": "normal",
+      "durationMs": 250097,
+      "actionCount": 15,
+      "observedUsage": [
+        {
+          "input_tokens": 214535,
+          "cached_input_tokens": 179968,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 8952,
+          "reasoning_output_tokens": 2827
+        }
+      ],
+      "usageReason": "Observed turn.completed JSONL usage.",
+      "cost": null,
+      "httpOutcome": "pass",
+      "httpFailedChecks": [],
+      "observationsSha256": "c39319f86f5411bd0055cd62134595c9a04389f9b0a93ec9a45e030774567d63",
+      "sourceDigest": "30d60680e9d4ac865b471c1e922e17778e76aeed73f1ca714ad932be30c50f34",
+      "sourceFileHashes": {
+        ".gitignore": "6480f7fe160f230fc566261475255150f6f92a03d5164b4b6b404aa099180af3",
+        "AGENTS.md": "b97dc52ad1417a89a8c25382da6e3ebe436074c2670ad1322de6fdd134d43758",
+        "index.html": "d6c6fcc3db1476d7ba82eafe1f8d324683358a7e01d256d29b6e8f52cd296afd",
+        "package.json": "62f0ee4d7d7ce615849e54513a2cb5b6b652d1901d4de54aef6d527fbcfaf357",
+        "README.md": "3639c650fedf583a3096c3363a2f42cf9d4748f2ccee26edcc3cfa0b80b742b1",
+        "server.test.ts": "7229b2d42bce3890e1a7c31fde525967914853e548b1f7e4f4b351aaca2f4c8f",
+        "server.ts": "af91db9854998cd329420ba8472b555533684a9336f0c91fdead934ecff28a45",
+        "tsconfig.json": "5e03fc0ac93dd5f6c046450e06f71464d4a8be6670fb8cbb90a54678e6afd5fc"
+      },
+      "deliverableSha256": "c18a6f8bec8707f824f85c5f70e6a828b2c6188be83eaef702a7dfabd4d3009a",
+      "diffSha256": "ff1c163beca5fb78bc606ec93a25a7c9a6cb3af299fe4feea71398f1cceaf50d",
+      "streamHashes": {
+        "events": {
+          "originalSha256": "89723facf682022488e9e5d242ec923de55b3c65d24cac46dfd615d92643e904",
+          "retainedSha256": "89723facf682022488e9e5d242ec923de55b3c65d24cac46dfd615d92643e904"
+        },
+        "stderr": {
+          "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "final": {
+          "originalSha256": "e4fb06336ab124466e05772c5a7875b8b65b2368e373008d686d784ee5a0cd0f",
+          "retainedSha256": "e4fb06336ab124466e05772c5a7875b8b65b2368e373008d686d784ee5a0cd0f"
+        }
+      },
+      "activation": {
+        "requestedInvocation": null,
+        "installation": "plain explicit empty plugin map",
+        "nativeSkillSelection": "not established by the CLI event schema",
+        "skillReadCommandCount": 0,
+        "interpretation": "Installation and configuration do not prove native skill selection. Recorded command text only establishes an attempted skill-file read, not successful selection or use."
+      }
+    },
+    {
+      "id": "1-bug-candidate",
+      "condition": "candidate",
+      "task": "bug",
+      "outcome": "inconclusive",
+      "agentOutcome": "inconclusive",
+      "termination": "wall-clock limit",
+      "durationMs": 300065,
+      "actionCount": 24,
+      "observedUsage": [],
+      "usageReason": "CLI emitted no turn.completed usage; unavailable, not zero.",
+      "cost": null,
+      "httpOutcome": "pass",
+      "httpFailedChecks": [],
+      "observationsSha256": "e62374c37d4200c8b457813daafdfc6fe18e17ceac5eba283901becce5a6f666",
+      "sourceDigest": "ce3f72b1e9265d2dde81810becba9eca4d752ae4f7e1762f100fa90cb6ea1fd2",
+      "sourceFileHashes": {
+        ".gitignore": "6480f7fe160f230fc566261475255150f6f92a03d5164b4b6b404aa099180af3",
+        "AGENTS.md": "b97dc52ad1417a89a8c25382da6e3ebe436074c2670ad1322de6fdd134d43758",
+        "index.html": "d6c6fcc3db1476d7ba82eafe1f8d324683358a7e01d256d29b6e8f52cd296afd",
+        "package.json": "62f0ee4d7d7ce615849e54513a2cb5b6b652d1901d4de54aef6d527fbcfaf357",
+        "README.md": "3639c650fedf583a3096c3363a2f42cf9d4748f2ccee26edcc3cfa0b80b742b1",
+        "server.test.ts": "2e9f104df2a9ef4f2a793ca62ce451a0a2a47f2dda18e3f94fc44ddb2dd0ec56",
+        "server.ts": "af91db9854998cd329420ba8472b555533684a9336f0c91fdead934ecff28a45",
+        "tsconfig.json": "5e03fc0ac93dd5f6c046450e06f71464d4a8be6670fb8cbb90a54678e6afd5fc"
+      },
+      "deliverableSha256": "b25174f9ab9ee6064c08126e1dda9071e83c6edf56fee1228cdde72e8050a318",
+      "diffSha256": "3c5700b2278b836a8ca5d5d5864f229cbe0573ae51085f0edced22015969e4c6",
+      "streamHashes": {
+        "events": {
+          "originalSha256": "b9a35121653bb67e3b5f822a5f17e2586cc259a856917868bd9517848a0b7f5d",
+          "retainedSha256": "b9a35121653bb67e3b5f822a5f17e2586cc259a856917868bd9517848a0b7f5d"
+        },
+        "stderr": {
+          "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "final": null
+      },
+      "activation": {
+        "requestedInvocation": "$applification:astack",
+        "installation": "verified exact installed bytes",
+        "nativeSkillSelection": "not established by the CLI event schema",
+        "skillReadCommandCount": 4,
+        "interpretation": "Installation and configuration do not prove native skill selection. Recorded command text only establishes an attempted skill-file read, not successful selection or use."
+      }
+    },
+    {
+      "id": "1-feature-baseline",
+      "condition": "baseline",
+      "task": "feature",
+      "outcome": "inconclusive",
+      "agentOutcome": "inconclusive",
+      "termination": "wall-clock limit",
+      "durationMs": 300053,
+      "actionCount": 21,
+      "observedUsage": [],
+      "usageReason": "CLI emitted no turn.completed usage; unavailable, not zero.",
+      "cost": null,
+      "httpOutcome": "fail",
+      "httpFailedChecks": ["disk-change", "final-disk", "final-disk-restart"],
+      "observationsSha256": "84d8ee1c93bc5212ba0f2fbc448ea30ee2b9fdaaa9a6cfca435d57ff188ce5e4",
+      "sourceDigest": "9c61658e37cba2e4bfdbf3d39f8b1fa7e1c6636cdbb8a8ee460aac53fde43fbb",
+      "sourceFileHashes": {
+        ".gitignore": "6480f7fe160f230fc566261475255150f6f92a03d5164b4b6b404aa099180af3",
+        "AGENTS.md": "b97dc52ad1417a89a8c25382da6e3ebe436074c2670ad1322de6fdd134d43758",
+        "index.html": "3eb3ce97dd45789422961a7c00bd78aa1c81191588bed2a08da03445203406cc",
+        "package.json": "62f0ee4d7d7ce615849e54513a2cb5b6b652d1901d4de54aef6d527fbcfaf357",
+        "README.md": "71b0e0e688fdaf0e872e1b6fed6691a79d6642d39c90e4fad66672477a0850ee",
+        "server.test.ts": "ffe00b31c54b7dcd7ccfaf65e6e5ebcba4c538cdbee1f5f3e585c2221439b283",
+        "server.ts": "6fac3eb56cc165a9f9b03312551ee2cb3a3fb03f80d0d8f0cb216009683e6314",
+        "tsconfig.json": "5e03fc0ac93dd5f6c046450e06f71464d4a8be6670fb8cbb90a54678e6afd5fc"
+      },
+      "deliverableSha256": "b42cb3e7a2e919bc4bdb1856b66498b83cf48c1fa760e426eebc40e7126ab86f",
+      "diffSha256": "d5c8d444723f65b0e542aa53bc555d9df94163b39794edd1467c4c3594cacd80",
+      "streamHashes": {
+        "events": {
+          "originalSha256": "a8e3bba73d11f6a4b4aa950fdc5ce413b588d2008d359f75895b43112fed7315",
+          "retainedSha256": "a8e3bba73d11f6a4b4aa950fdc5ce413b588d2008d359f75895b43112fed7315"
+        },
+        "stderr": {
+          "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "final": null
+      },
+      "activation": {
+        "requestedInvocation": null,
+        "installation": "plain explicit empty plugin map",
+        "nativeSkillSelection": "not established by the CLI event schema",
+        "skillReadCommandCount": 0,
+        "interpretation": "Installation and configuration do not prove native skill selection. Recorded command text only establishes an attempted skill-file read, not successful selection or use."
+      }
+    },
+    {
+      "id": "1-feature-candidate",
+      "condition": "candidate",
+      "task": "feature",
+      "outcome": "inconclusive",
+      "agentOutcome": "inconclusive",
+      "termination": "wall-clock limit",
+      "durationMs": 300053,
+      "actionCount": 18,
+      "observedUsage": [],
+      "usageReason": "CLI emitted no turn.completed usage; unavailable, not zero.",
+      "cost": null,
+      "httpOutcome": "fail",
+      "httpFailedChecks": ["disk-change", "final-disk", "final-disk-restart"],
+      "observationsSha256": "3ad158392f036af3ff1d0575d89c68589925ed9d5e9e3e5cd44260177cd93fc2",
+      "sourceDigest": "21cfbec56c9a047ad90ffb532680c62cc7794451b12e0e754f5021cbf7ccd1d1",
+      "sourceFileHashes": {
+        ".gitignore": "6480f7fe160f230fc566261475255150f6f92a03d5164b4b6b404aa099180af3",
+        "AGENTS.md": "b97dc52ad1417a89a8c25382da6e3ebe436074c2670ad1322de6fdd134d43758",
+        "index.html": "4fef6a3401d4ce7e060f4f60b051747abf3446b1a974616aa23cfd276ba2a575",
+        "package.json": "62f0ee4d7d7ce615849e54513a2cb5b6b652d1901d4de54aef6d527fbcfaf357",
+        "README.md": "77ef7e4fe835bc438f206344b47b00422d77ba6e1231a745d27a341d78ba199a",
+        "server.test.ts": "bb1649860e1d7352ec8b97183fa011f10adc313388d54e7eb4cbdc047feb053a",
+        "server.title.test.ts": "b0b076cbd7ef21af4d53a8fce42b95e9b4bd6bed99355e84adc84e1544d21654",
+        "server.ts": "dbf26e2d351220e4a770a13bea0ca5edd4201866c756db9900224f03ffc187d5",
+        "tsconfig.json": "5e03fc0ac93dd5f6c046450e06f71464d4a8be6670fb8cbb90a54678e6afd5fc"
+      },
+      "deliverableSha256": "489fc202c7b591462a2e6e914be4e525fdd74c92d0cc5788c54425e2e4566f93",
+      "diffSha256": "9ec757f5563ea2aa8d80dab1ec3f80142fd02cc24fe12b0ba263ddefd87b91c7",
+      "streamHashes": {
+        "events": {
+          "originalSha256": "6abefd61d1fe82697a3df4bff673b69c0fc9911f81c7a1d621387fb09646f5ce",
+          "retainedSha256": "6abefd61d1fe82697a3df4bff673b69c0fc9911f81c7a1d621387fb09646f5ce"
+        },
+        "stderr": {
+          "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "retainedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "final": null
+      },
+      "activation": {
+        "requestedInvocation": "$applification:astack",
+        "installation": "verified exact installed bytes",
+        "nativeSkillSelection": "not established by the CLI event schema",
+        "skillReadCommandCount": 5,
+        "interpretation": "Installation and configuration do not prove native skill selection. Recorded command text only establishes an attempted skill-file read, not successful selection or use."
+      }
+    }
+  ],
+  "diagnosticReplay": {
+    "version": "v3",
+    "fixedSuitePin": "15205678043fa1883128a329480dd53faff415bc",
+    "interpretation": "No new agent calls. Original smoke outcomes, time limits and denominator remain unchanged. Only saved code bytes replayed; Git base/workspace identities differ.",
+    "fixedSuiteDigest": "60137a9b767554aaa2932b8047ae1cb1e16aea5c5d62af31cf4c168c42715fdd",
+    "records": [
+      {
+        "id": "1-bug-baseline",
+        "sourceBytesVerifiedAgainstOriginal": true,
+        "deliverableSha256": "c18a6f8bec8707f824f85c5f70e6a828b2c6188be83eaef702a7dfabd4d3009a",
+        "originalAttemptOutcome": "pass",
+        "originalHttpOutcome": "pass",
+        "diagnosticHttpOutcome": "pass",
+        "diagnosticExit": 0,
+        "checks": 41,
+        "failedChecks": [],
+        "diagnosticSuiteDigest": "60137a9b767554aaa2932b8047ae1cb1e16aea5c5d62af31cf4c168c42715fdd",
+        "observationsSha256": "d063717d6169707c020af4c0226c706bfa881799a9afb43070a77b226e0ebdee"
+      },
+      {
+        "id": "1-bug-candidate",
+        "sourceBytesVerifiedAgainstOriginal": true,
+        "deliverableSha256": "b25174f9ab9ee6064c08126e1dda9071e83c6edf56fee1228cdde72e8050a318",
+        "originalAttemptOutcome": "inconclusive",
+        "originalHttpOutcome": "pass",
+        "diagnosticHttpOutcome": "pass",
+        "diagnosticExit": 0,
+        "checks": 41,
+        "failedChecks": [],
+        "diagnosticSuiteDigest": "60137a9b767554aaa2932b8047ae1cb1e16aea5c5d62af31cf4c168c42715fdd",
+        "observationsSha256": "dc316af1f1537d83a27c5ed4799b013602b5a367446140c8662881230b4d545e"
+      },
+      {
+        "id": "1-feature-baseline",
+        "sourceBytesVerifiedAgainstOriginal": true,
+        "deliverableSha256": "b42cb3e7a2e919bc4bdb1856b66498b83cf48c1fa760e426eebc40e7126ab86f",
+        "originalAttemptOutcome": "inconclusive",
+        "originalHttpOutcome": "fail",
+        "diagnosticHttpOutcome": "pass",
+        "diagnosticExit": 0,
+        "checks": 62,
+        "failedChecks": [],
+        "diagnosticSuiteDigest": "60137a9b767554aaa2932b8047ae1cb1e16aea5c5d62af31cf4c168c42715fdd",
+        "observationsSha256": "9b54373bd3bc9a32c5b6f402224c29e40abaa40dc4210f3372133a1b6e1935e4"
+      },
+      {
+        "id": "1-feature-candidate",
+        "sourceBytesVerifiedAgainstOriginal": true,
+        "deliverableSha256": "489fc202c7b591462a2e6e914be4e525fdd74c92d0cc5788c54425e2e4566f93",
+        "originalAttemptOutcome": "inconclusive",
+        "originalHttpOutcome": "fail",
+        "diagnosticHttpOutcome": "pass",
+        "diagnosticExit": 0,
+        "checks": 62,
+        "failedChecks": [],
+        "diagnosticSuiteDigest": "60137a9b767554aaa2932b8047ae1cb1e16aea5c5d62af31cf4c168c42715fdd",
+        "observationsSha256": "96af6df9b501d46d164c5be814f50993c323bc17b2ef7e864628fbd1684153ed"
+      }
+    ]
+  },
+  "rawEvidencePaths": {
+    "original": "/tmp/astack-notebook-real-smoke-20261009-r1",
+    "diagnosticV2": "/tmp/astack-notebook-replay-20261009-v2",
+    "diagnosticV3": "/tmp/astack-notebook-replay-20261009-v3"
+  },
+  "diagnosticHistory": [
+    {
+      "version": "v2",
+      "fixedSuitePin": "4278d372ce56410024c95bfab8a743331c36bad9",
+      "interpretation": "No new agent calls. Original smoke outcomes, time limits and denominator remain unchanged. Only saved code bytes replayed; Git base/workspace identities differ.",
+      "fixedSuiteDigest": "f6dfa9cfe9e5ae32dd25c2d64053486dcb57f38971a127ae1d201a4dfb6d47b7",
+      "records": [
+        {
+          "id": "1-bug-baseline",
+          "sourceBytesVerifiedAgainstOriginal": true,
+          "deliverableSha256": "c18a6f8bec8707f824f85c5f70e6a828b2c6188be83eaef702a7dfabd4d3009a",
+          "originalAttemptOutcome": "pass",
+          "originalHttpOutcome": "pass",
+          "diagnosticHttpOutcome": "pass",
+          "diagnosticExit": 0,
+          "checks": 41,
+          "failedChecks": [],
+          "diagnosticSuiteDigest": "f6dfa9cfe9e5ae32dd25c2d64053486dcb57f38971a127ae1d201a4dfb6d47b7",
+          "observationsSha256": "9312ec7f53a890f9476a772ce3a60d26534b99cf1c7e7b0f3469f2a1406e25e7"
+        },
+        {
+          "id": "1-bug-candidate",
+          "sourceBytesVerifiedAgainstOriginal": true,
+          "deliverableSha256": "b25174f9ab9ee6064c08126e1dda9071e83c6edf56fee1228cdde72e8050a318",
+          "originalAttemptOutcome": "inconclusive",
+          "originalHttpOutcome": "pass",
+          "diagnosticHttpOutcome": "pass",
+          "diagnosticExit": 0,
+          "checks": 41,
+          "failedChecks": [],
+          "diagnosticSuiteDigest": "f6dfa9cfe9e5ae32dd25c2d64053486dcb57f38971a127ae1d201a4dfb6d47b7",
+          "observationsSha256": "a0b22e59b31c1094cf8c8a11103e972eee2d90e41b77fd5819e1df6e7e4ebb3a"
+        },
+        {
+          "id": "1-feature-baseline",
+          "sourceBytesVerifiedAgainstOriginal": true,
+          "deliverableSha256": "b42cb3e7a2e919bc4bdb1856b66498b83cf48c1fa760e426eebc40e7126ab86f",
+          "originalAttemptOutcome": "inconclusive",
+          "originalHttpOutcome": "fail",
+          "diagnosticHttpOutcome": "pass",
+          "diagnosticExit": 0,
+          "checks": 59,
+          "failedChecks": [],
+          "diagnosticSuiteDigest": "f6dfa9cfe9e5ae32dd25c2d64053486dcb57f38971a127ae1d201a4dfb6d47b7",
+          "observationsSha256": "6551c18a9cdecc4c770da57b6b494cbd45170d0d7f2be1bf2a9ffb27140334fc"
+        },
+        {
+          "id": "1-feature-candidate",
+          "sourceBytesVerifiedAgainstOriginal": true,
+          "deliverableSha256": "489fc202c7b591462a2e6e914be4e525fdd74c92d0cc5788c54425e2e4566f93",
+          "originalAttemptOutcome": "inconclusive",
+          "originalHttpOutcome": "fail",
+          "diagnosticHttpOutcome": "pass",
+          "diagnosticExit": 0,
+          "checks": 59,
+          "failedChecks": [],
+          "diagnosticSuiteDigest": "f6dfa9cfe9e5ae32dd25c2d64053486dcb57f38971a127ae1d201a4dfb6d47b7",
+          "observationsSha256": "bc6cbca6478751763c9651b08954ed033436a2424dae1c2ec3d9550709c0f311"
+        }
+      ]
+    }
+  ]
+}

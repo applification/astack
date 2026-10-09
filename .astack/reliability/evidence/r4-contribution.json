@@ -1,0 +1,347 @@
+{
+  "role": "Fresh independent read-only delivery review",
+  "evaluationTaskId": "72efecbb-37fd-43a8-89bc-266379fa7981",
+  "reviewedCodePin": "15205678043fa1883128a329480dd53faff415bc",
+  "environment": {
+    "bun": "1.4.0",
+    "platform": "darwin",
+    "architecture": "arm64"
+  },
+  "suiteDigest": "60137a9b767554aaa2932b8047ae1cb1e16aea5c5d62af31cf4c168c42715fdd",
+  "r3a": "resolved for preserved overwrite-every-edit defect",
+  "savedCandidateBytesVerified": true,
+  "commands": [
+    "bun test examples/foundation/tests/agent-evals.test.ts --test-name-pattern \"repeated title edits never replace original create identity\"",
+    "bun /var/folders/tf/fmjsy8z90630z_b91s19yvhw0000gp/T/astack-r3a-readonly-s3q53o2l/probe.mjs"
+  ],
+  "targetedRegression": {
+    "pass": 1,
+    "fail": 0,
+    "expectations": 4
+  },
+  "probes": [
+    {
+      "label": "correct-saved-candidate",
+      "outcome": "pass",
+      "exit": 0,
+      "checks": 62,
+      "failed": [],
+      "suiteDigest": "60137a9b767554aaa2932b8047ae1cb1e16aea5c5d62af31cf4c168c42715fdd",
+      "sourceDigest": "c58d198c5fdfce285db9716065aa93f3479c85c30b53987c9132417fa2b3cf31",
+      "observationsSha256": "19a16dae5100be3d86f7763943090c9bce63ff48e2b9973ce2fd1cefcbeb5a69",
+      "verified": true,
+      "decisiveHttpChecks": [
+        {
+          "id": "final-legacy-create-retry-restart",
+          "actual": {
+            "status": 200,
+            "body": {
+              "note": {
+                "id": "own-seeded",
+                "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+                "done": false,
+                "archived": false
+              }
+            }
+          },
+          "expected": {
+            "status": 200,
+            "body": {
+              "note": {
+                "id": "own-seeded",
+                "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+                "done": false,
+                "archived": false
+              }
+            }
+          },
+          "outcome": "pass"
+        },
+        {
+          "id": "final-legacy-create-conflict-restart",
+          "actual": {
+            "status": 409,
+            "body": {
+              "error": "operation conflict"
+            }
+          },
+          "expected": {
+            "status": 409,
+            "body": {
+              "error": "operation conflict"
+            }
+          },
+          "outcome": "pass"
+        },
+        {
+          "id": "restored-completed-create-retry-restart",
+          "actual": {
+            "status": 200,
+            "body": {
+              "note": {
+                "id": "adjacent-seeded",
+                "title": "Keep this note",
+                "done": true,
+                "archived": false
+              }
+            }
+          },
+          "expected": {
+            "status": 200,
+            "body": {
+              "note": {
+                "id": "adjacent-seeded",
+                "title": "Keep this note",
+                "done": true,
+                "archived": false
+              }
+            }
+          },
+          "outcome": "pass"
+        }
+      ]
+    },
+    {
+      "label": "overwrite-every-edit",
+      "outcome": "fail",
+      "exit": 1,
+      "checks": 62,
+      "failed": [
+        "final-legacy-create-retry-restart",
+        "restored-completed-create-retry-restart"
+      ],
+      "suiteDigest": "60137a9b767554aaa2932b8047ae1cb1e16aea5c5d62af31cf4c168c42715fdd",
+      "sourceDigest": "d11073ee5455507f25a92898ff49b43210aa777e08fb1ee242e4e020b7eaa857",
+      "observationsSha256": "a042869abd4eb16a31a69a5bba44a04eaff0fce6b84cb060225fa1a6c3382efc",
+      "verified": true,
+      "decisiveHttpChecks": [
+        {
+          "id": "final-legacy-create-retry-restart",
+          "actual": {
+            "status": 409,
+            "body": {
+              "error": "operation conflict"
+            }
+          },
+          "expected": {
+            "status": 200,
+            "body": {
+              "note": {
+                "id": "own-seeded",
+                "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+                "done": false,
+                "archived": false
+              }
+            }
+          },
+          "outcome": "fail"
+        },
+        {
+          "id": "final-legacy-create-conflict-restart",
+          "actual": {
+            "status": 409,
+            "body": {
+              "error": "operation conflict"
+            }
+          },
+          "expected": {
+            "status": 409,
+            "body": {
+              "error": "operation conflict"
+            }
+          },
+          "outcome": "pass"
+        },
+        {
+          "id": "restored-completed-create-retry-restart",
+          "actual": {
+            "status": 409,
+            "body": {
+              "error": "operation conflict"
+            }
+          },
+          "expected": {
+            "status": 200,
+            "body": {
+              "note": {
+                "id": "adjacent-seeded",
+                "title": "Keep this note",
+                "done": true,
+                "archived": false
+              }
+            }
+          },
+          "outcome": "fail"
+        }
+      ]
+    },
+    {
+      "label": "restored-correction",
+      "outcome": "pass",
+      "exit": 0,
+      "checks": 62,
+      "failed": [],
+      "suiteDigest": "60137a9b767554aaa2932b8047ae1cb1e16aea5c5d62af31cf4c168c42715fdd",
+      "sourceDigest": "c58d198c5fdfce285db9716065aa93f3479c85c30b53987c9132417fa2b3cf31",
+      "observationsSha256": "2cb1eb8a76a30cf132435140fca195dd54079542ea9140c011608231a27ac500",
+      "verified": true,
+      "decisiveHttpChecks": [
+        {
+          "id": "final-legacy-create-retry-restart",
+          "actual": {
+            "status": 200,
+            "body": {
+              "note": {
+                "id": "own-seeded",
+                "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+                "done": false,
+                "archived": false
+              }
+            }
+          },
+          "expected": {
+            "status": 200,
+            "body": {
+              "note": {
+                "id": "own-seeded",
+                "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+                "done": false,
+                "archived": false
+              }
+            }
+          },
+          "outcome": "pass"
+        },
+        {
+          "id": "final-legacy-create-conflict-restart",
+          "actual": {
+            "status": 409,
+            "body": {
+              "error": "operation conflict"
+            }
+          },
+          "expected": {
+            "status": 409,
+            "body": {
+              "error": "operation conflict"
+            }
+          },
+          "outcome": "pass"
+        },
+        {
+          "id": "restored-completed-create-retry-restart",
+          "actual": {
+            "status": 200,
+            "body": {
+              "note": {
+                "id": "adjacent-seeded",
+                "title": "Keep this note",
+                "done": true,
+                "archived": false
+              }
+            }
+          },
+          "expected": {
+            "status": 200,
+            "body": {
+              "note": {
+                "id": "adjacent-seeded",
+                "title": "Keep this note",
+                "done": true,
+                "archived": false
+              }
+            }
+          },
+          "outcome": "pass"
+        }
+      ]
+    },
+    {
+      "label": "alternative-metadata-name",
+      "outcome": "pass",
+      "exit": 0,
+      "checks": 62,
+      "failed": [],
+      "suiteDigest": "60137a9b767554aaa2932b8047ae1cb1e16aea5c5d62af31cf4c168c42715fdd",
+      "sourceDigest": "e6c38b25afe97c59e089cf32fac02bdb3c1a513ea16203e0242ba1f1ac63b812",
+      "observationsSha256": "8a6ce02af7f1872c73ceadb8d33aa7081ece55acd427809885a1f8bfaf6eac8c",
+      "verified": true,
+      "decisiveHttpChecks": [
+        {
+          "id": "final-legacy-create-retry-restart",
+          "actual": {
+            "status": 200,
+            "body": {
+              "note": {
+                "id": "own-seeded",
+                "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+                "done": false,
+                "archived": false
+              }
+            }
+          },
+          "expected": {
+            "status": 200,
+            "body": {
+              "note": {
+                "id": "own-seeded",
+                "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+                "done": false,
+                "archived": false
+              }
+            }
+          },
+          "outcome": "pass"
+        },
+        {
+          "id": "final-legacy-create-conflict-restart",
+          "actual": {
+            "status": 409,
+            "body": {
+              "error": "operation conflict"
+            }
+          },
+          "expected": {
+            "status": 409,
+            "body": {
+              "error": "operation conflict"
+            }
+          },
+          "outcome": "pass"
+        },
+        {
+          "id": "restored-completed-create-retry-restart",
+          "actual": {
+            "status": 200,
+            "body": {
+              "note": {
+                "id": "adjacent-seeded",
+                "title": "Keep this note",
+                "done": true,
+                "archived": false
+              }
+            }
+          },
+          "expected": {
+            "status": 200,
+            "body": {
+              "note": {
+                "id": "adjacent-seeded",
+                "title": "Keep this note",
+                "done": true,
+                "archived": false
+              }
+            }
+          },
+          "outcome": "pass"
+        }
+      ]
+    }
+  ],
+  "cleanup": "Disposable repository removed; checker owned services/data cleaned; evidence retained outside source.",
+  "limits": [
+    "No model calls, cloud or remote writes; no source repository edits",
+    "No numeric craftsmanship or delivery grade; calibration absent",
+    "Browser/owner acceptance/sequential fresh-agent maintenance and repeated comparisons remain separate"
+  ]
+}

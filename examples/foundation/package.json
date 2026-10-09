@@ -25,6 +25,7 @@
     "check:ci": "bun scripts/check.ts ci",
     "readiness": "bun scripts/readiness.ts",
     "trials": "bun scripts/trials.ts",
+    "agent-evals": "bun scripts/agent-evals.ts",
     "storybook": "bun run --cwd packages/ui storybook",
     "design:verify": "bun scripts/design-proof.ts",
     "format": "prettier --write .",

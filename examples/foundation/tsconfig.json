@@ -4,6 +4,11 @@
     "types": ["bun", "node"],
     "skipLibCheck": true
   },
-  "include": ["scripts/**/*.ts", "tests/**/*.ts", ".codex/**/*.ts"],
+  "include": [
+    "scripts/**/*.ts",
+    "tests/**/*.ts",
+    ".codex/**/*.ts",
+    "evals/**/*.ts"
+  ],
   "exclude": ["node_modules", "**/generated/**"]
 }

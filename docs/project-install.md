@@ -71,6 +71,10 @@ Prove direct CLI invocation and one safe real user path; retain evidence through
 $applification:astack Fix edits disappearing after save and reopen
 $applification:bug-fix Fix edits disappearing after save and reopen
 $applification:verify Check this change without repairing it
+$applification:architect Sketch the retry and ownership API for this export
+$applification:code-review Review this change for correctness and code quality
+$applification:correct Prevent this demonstrated recurring startup failure
+$applification:agent-evaluation Compare this plugin revision on fresh coding tasks
 $applification:principle-boundary-discipline Review this adapter's validation boundary
 ```
 
@@ -83,6 +87,8 @@ For a project that uses Convex, also install and enable `convex@openai-curated-r
 ```sh
 codex plugin add convex@openai-curated-remote
 ```
+
+For a disposable adoption experiment with manual browser/HTTP cases and an independent checker, follow [validation in a new repository](agent-validation.md). It distinguishes product acceptance, calibrated quality review and owner usefulness from installation alone.
 
 ## Portable package
 

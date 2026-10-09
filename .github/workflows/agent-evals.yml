@@ -1,0 +1,44 @@
+name: agent evaluation harness
+on:
+  pull_request:
+    paths:
+      - "examples/foundation/**"
+      - "skills/**"
+      - "evals/**"
+      - "docs/agent-validation.md"
+      - "scripts/check-plugins*"
+      - "package.json"
+      - "bun.lock"
+      - ".github/workflows/agent-evals.yml"
+  push:
+    branches: [main]
+    paths:
+      - "examples/foundation/**"
+      - "skills/**"
+      - "evals/**"
+      - "docs/agent-validation.md"
+      - "scripts/check-plugins*"
+      - "package.json"
+      - "bun.lock"
+      - ".github/workflows/agent-evals.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deterministic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76
+        with:
+          bun-version: 1.4.0
+      - name: Install pinned dependencies
+        run: |
+          bun install --frozen-lockfile
+          bun install --cwd examples/foundation --frozen-lockfile
+      - name: Plugin integrity and deterministic evaluator controls
+        # The run command is intentionally absent: CI never calls a model.
+        run: |
+          bun run check
+          bun run agent-evals:check

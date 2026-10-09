@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Local notebook</title>
+  <style>
+    body {
+      font: 17px system-ui;
+      max-width: 640px;
+      margin: 60px auto;
+      padding: 0 20px;
+      color: #233;
+    }
+    input,
+    select,
+    button {
+      font: inherit;
+      padding: 8px;
+      margin: 4px;
+    }
+    li {
+      padding: 12px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .done {
+      text-decoration: line-through;
+      color: #667;
+    }
+    #error {
+      color: #a22;
+    }
+  </style>
+  <h1>Local notebook</h1>
+  <label
+    >Local actor
+    <select id="actor">
+      <option value="alice">Alice</option>
+      <option value="bob">Bob</option>
+    </select></label
+  >
+  <p>Identity here is simulated for local use.</p>
+  <form id="create">
+    <label>Note title <input id="title" required maxlength="120" /></label
+    ><button>Add note</button>
+  </form>
+  <p id="error" role="alert"></p>
+  <ul id="notes"></ul>
+  <script>
+    const actor = document.querySelector('#actor'),
+      list = document.querySelector('#notes'),
+      error = document.querySelector('#error');
+    async function api(path, method = 'GET', body) {
+      const response = await fetch(path, {
+        method,
+        headers: { 'x-actor': actor.value, 'content-type': 'application/json' },
+        ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Request failed');
+      return result;
+    }
+    async function reload() {
+      error.textContent = '';
+      try {
+        const { notes } = await api('/api/notes');
+        list.replaceChildren();
+        for (const note of notes) {
+          const row = document.createElement('li'),
+            text = document.createElement('span'),
+            toggle = document.createElement('button');
+          text.textContent = note.title;
+          text.className = note.done ? 'done' : '';
+          toggle.textContent = note.done ? 'Reopen' : 'Done';
+          toggle.onclick = async () => {
+            try {
+              await api('/api/notes/' + note.id, 'PATCH', { done: !note.done });
+              await reload();
+            } catch (e) {
+              error.textContent = e.message;
+            }
+          };
+          row.append(text, toggle);
+          list.append(row);
+        }
+      } catch (e) {
+        error.textContent = e.message;
+      }
+    }
+    document.querySelector('#create').onsubmit = async (event) => {
+      event.preventDefault();
+      try {
+        await api('/api/notes', 'POST', {
+          title: document.querySelector('#title').value,
+          operationId: crypto.randomUUID(),
+        });
+        document.querySelector('#title').value = '';
+        await reload();
+      } catch (e) {
+        error.textContent = e.message;
+      }
+    };
+    actor.onchange = reload;
+    reload();
+  </script>
+</html>

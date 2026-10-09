@@ -12,6 +12,7 @@ Keep the contract short enough to read during implementation and review. It shou
 - How will each material case be validated? Give it a stable ID and link its test or check, target, actor, fixture, expected observation and independent read when side effects matter. Record the result on the exact revision and environment once checked.
 - Which exploration charters can expose missing cases, and why were they selected or skipped? Keep candidates, confirmation/rejection evidence, fixes and retained regressions distinct from acceptance results. A charter with no findings does not establish that its acceptance cases passed.
 - Which product choices remain open, and what is outside this change?
+- For changed persisted shapes, retries, migrations or background effects, what happens after interruption, duplicate delivery or restart? Name compatibility and recovery cases when they materially affect success.
 
 Given/When/Then is optional shorthand for a case, not an executable specification. Include cancellation, authorization, persistence, errors, or accessibility when they materially change the outcome. Do not turn every visual state into another requirement.
 

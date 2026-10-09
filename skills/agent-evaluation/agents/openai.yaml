@@ -1,0 +1,6 @@
+interface:
+  display_name: "Agent evaluation"
+  short_description: "Compare coding agents with independent acceptance"
+  default_prompt: "Use $applification:agent-evaluation for the requested agent comparison within the agreed scope."
+policy:
+  allow_implicit_invocation: true

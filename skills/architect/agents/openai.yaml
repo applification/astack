@@ -1,0 +1,6 @@
+interface:
+  display_name: "Architect"
+  short_description: "Design APIs and ownership from the caller's usage"
+  default_prompt: "Use $applification:architect for the requested design within the agreed scope."
+policy:
+  allow_implicit_invocation: true

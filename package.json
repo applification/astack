@@ -18,7 +18,9 @@
     "observatory:lint": "eslint apps/observatory/src packages/ui/src",
     "observatory:test:e2e": "E2E_TELEMETRY_DISABLED=1 e2e run",
     "observatory:test:live": "E2E_TELEMETRY_DISABLED=1 e2e run --config e2e.live.config.ts",
-    "observatory:build:storybook": "bun run --cwd apps/observatory build:storybook"
+    "observatory:build:storybook": "bun run --cwd apps/observatory build:storybook",
+    "agent-evals": "bun examples/foundation/scripts/agent-evals.ts",
+    "agent-evals:check": "bun run --cwd examples/foundation typecheck && bun test examples/foundation/tests/agent-evals.test.ts examples/foundation/tests/trials.test.ts examples/foundation/evals/notebook/server.test.ts"
   },
   "devDependencies": {
     "@cfworker/json-schema": "4.1.1",
