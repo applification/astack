@@ -1,0 +1,1613 @@
+{
+  "format": "notebook-observations/v1",
+  "checks": [
+    {
+      "id": "initial-alice",
+      "actual": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "Plan the weekend",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Keep this note",
+              "done": true,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "Plan the weekend",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Keep this note",
+              "done": true,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "initial-bob",
+      "actual": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "other-seeded",
+              "title": "Bob private note",
+              "done": false,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "other-seeded",
+              "title": "Bob private note",
+              "done": false,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "missing-actor",
+      "actual": {
+        "status": 401,
+        "body": {
+          "error": "unauthorized"
+        }
+      },
+      "expected": {
+        "status": 401,
+        "body": {
+          "error": "unauthorized"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "unknown-actor",
+      "actual": {
+        "status": 401,
+        "body": {
+          "error": "unauthorized"
+        }
+      },
+      "expected": {
+        "status": 401,
+        "body": {
+          "error": "unauthorized"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "cross-owner",
+      "actual": {
+        "status": 404,
+        "body": {
+          "error": "not found"
+        }
+      },
+      "expected": {
+        "status": 404,
+        "body": {
+          "error": "not found"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "unknown-row",
+      "actual": {
+        "status": 404,
+        "body": {
+          "error": "not found"
+        }
+      },
+      "expected": {
+        "status": 404,
+        "body": {
+          "error": "not found"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "missing-actor-write",
+      "actual": {
+        "status": 401,
+        "body": {
+          "error": "unauthorized"
+        }
+      },
+      "expected": {
+        "status": 401,
+        "body": {
+          "error": "unauthorized"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-patch-0",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-patch-1",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-patch-2",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-patch-3",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-patch-4",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-patch-5",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-patch-6",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-json",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "rejections-preserve-disk",
+      "actual": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "Plan the weekend",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "seed-bob"
+          }
+        ]
+      },
+      "expected": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "actor": "alice",
+            "title": "Plan the weekend",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "actor": "alice",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "actor": "bob",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-bob"
+          }
+        ]
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "requested-change",
+      "actual": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "own-seeded",
+            "title": "Plan the weekend",
+            "done": true,
+            "archived": false
+          }
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "own-seeded",
+            "title": "Plan the weekend",
+            "done": true,
+            "archived": false
+          }
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "fresh-read-change",
+      "actual": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "Plan the weekend",
+              "done": true,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Keep this note",
+              "done": true,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "Plan the weekend",
+              "done": true,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Keep this note",
+              "done": true,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "disk-change",
+      "actual": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "Plan the weekend",
+            "done": true,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "seed-bob"
+          }
+        ]
+      },
+      "expected": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "actor": "alice",
+            "title": "Plan the weekend",
+            "done": true,
+            "archived": false,
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "actor": "alice",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "actor": "bob",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-bob"
+          }
+        ]
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "restart-change",
+      "actual": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "Plan the weekend",
+              "done": true,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Keep this note",
+              "done": true,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "Plan the weekend",
+              "done": true,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Keep this note",
+              "done": true,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "second-change-boundary",
+      "actual": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "own-seeded",
+            "title": "Plan the weekend",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "own-seeded",
+            "title": "Plan the weekend",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-create-0",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-create-1",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-create-2",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-create-3",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-create-4",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-create-5",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-create-6",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-create-7",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "create-status",
+      "actual": 201,
+      "expected": 201,
+      "outcome": "pass"
+    },
+    {
+      "id": "create-id",
+      "actual": true,
+      "expected": true,
+      "outcome": "pass"
+    },
+    {
+      "id": "create-note",
+      "actual": {
+        "note": {
+          "id": "a05e5c8b-f67f-41de-8d62-78b0da8739b5",
+          "title": "Durable new note",
+          "done": false,
+          "archived": false
+        }
+      },
+      "expected": {
+        "note": {
+          "id": "a05e5c8b-f67f-41de-8d62-78b0da8739b5",
+          "title": "Durable new note",
+          "done": false,
+          "archived": false
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "repeated-operation",
+      "actual": [
+        {
+          "status": 200,
+          "body": {
+            "note": {
+              "id": "a05e5c8b-f67f-41de-8d62-78b0da8739b5",
+              "title": "Durable new note",
+              "done": false,
+              "archived": false
+            }
+          }
+        },
+        {
+          "status": 200,
+          "body": {
+            "note": {
+              "id": "a05e5c8b-f67f-41de-8d62-78b0da8739b5",
+              "title": "Durable new note",
+              "done": false,
+              "archived": false
+            }
+          }
+        }
+      ],
+      "expected": [
+        {
+          "status": 200,
+          "body": {
+            "note": {
+              "id": "a05e5c8b-f67f-41de-8d62-78b0da8739b5",
+              "title": "Durable new note",
+              "done": false,
+              "archived": false
+            }
+          }
+        },
+        {
+          "status": 200,
+          "body": {
+            "note": {
+              "id": "a05e5c8b-f67f-41de-8d62-78b0da8739b5",
+              "title": "Durable new note",
+              "done": false,
+              "archived": false
+            }
+          }
+        }
+      ],
+      "outcome": "pass"
+    },
+    {
+      "id": "operation-conflict",
+      "actual": {
+        "status": 409,
+        "body": {
+          "error": "operation conflict"
+        }
+      },
+      "expected": {
+        "status": 409,
+        "body": {
+          "error": "operation conflict"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "actor-operation-status",
+      "actual": 201,
+      "expected": 201,
+      "outcome": "pass"
+    },
+    {
+      "id": "actor-operation-distinct",
+      "actual": true,
+      "expected": true,
+      "outcome": "pass"
+    },
+    {
+      "id": "actor-operation-note",
+      "actual": {
+        "note": {
+          "id": "a6d53841-ba71-4d09-bd5e-e85331a069e8",
+          "title": "Bob second note",
+          "done": false,
+          "archived": false
+        }
+      },
+      "expected": {
+        "note": {
+          "id": "a6d53841-ba71-4d09-bd5e-e85331a069e8",
+          "title": "Bob second note",
+          "done": false,
+          "archived": false
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "final-disk",
+      "actual": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "Plan the weekend",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "seed-bob"
+          },
+          {
+            "id": "a05e5c8b-f67f-41de-8d62-78b0da8739b5",
+            "title": "Durable new note",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "oracle-operation"
+          },
+          {
+            "id": "a6d53841-ba71-4d09-bd5e-e85331a069e8",
+            "title": "Bob second note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "oracle-operation"
+          }
+        ]
+      },
+      "expected": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "actor": "alice",
+            "title": "Plan the weekend",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "actor": "alice",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "actor": "bob",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-bob"
+          },
+          {
+            "id": "a05e5c8b-f67f-41de-8d62-78b0da8739b5",
+            "title": "Durable new note",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "oracle-operation"
+          },
+          {
+            "id": "a6d53841-ba71-4d09-bd5e-e85331a069e8",
+            "title": "Bob second note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "oracle-operation"
+          }
+        ]
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "final-alice-restart",
+      "actual": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "Plan the weekend",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Keep this note",
+              "done": true,
+              "archived": false
+            },
+            {
+              "id": "a05e5c8b-f67f-41de-8d62-78b0da8739b5",
+              "title": "Durable new note",
+              "done": false,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "Plan the weekend",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Keep this note",
+              "done": true,
+              "archived": false
+            },
+            {
+              "id": "a05e5c8b-f67f-41de-8d62-78b0da8739b5",
+              "title": "Durable new note",
+              "done": false,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "final-bob-restart",
+      "actual": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "other-seeded",
+              "title": "Bob private note",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "a6d53841-ba71-4d09-bd5e-e85331a069e8",
+              "title": "Bob second note",
+              "done": false,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "other-seeded",
+              "title": "Bob private note",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "a6d53841-ba71-4d09-bd5e-e85331a069e8",
+              "title": "Bob second note",
+              "done": false,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "final-disk-restart",
+      "actual": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "Plan the weekend",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "seed-bob"
+          },
+          {
+            "id": "a05e5c8b-f67f-41de-8d62-78b0da8739b5",
+            "title": "Durable new note",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "oracle-operation"
+          },
+          {
+            "id": "a6d53841-ba71-4d09-bd5e-e85331a069e8",
+            "title": "Bob second note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "oracle-operation"
+          }
+        ]
+      },
+      "expected": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "actor": "alice",
+            "title": "Plan the weekend",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "actor": "alice",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "actor": "bob",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-bob"
+          },
+          {
+            "id": "a05e5c8b-f67f-41de-8d62-78b0da8739b5",
+            "title": "Durable new note",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "oracle-operation"
+          },
+          {
+            "id": "a6d53841-ba71-4d09-bd5e-e85331a069e8",
+            "title": "Bob second note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "oracle-operation"
+          }
+        ]
+      },
+      "outcome": "pass"
+    }
+  ],
+  "requests": [
+    {
+      "actor": "alice",
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 200,
+      "response": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "Plan the weekend",
+            "done": false,
+            "archived": false
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false
+          }
+        ]
+      }
+    },
+    {
+      "actor": "bob",
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 200,
+      "response": {
+        "notes": [
+          {
+            "id": "other-seeded",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false
+          }
+        ]
+      }
+    },
+    {
+      "actor": null,
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 401,
+      "response": {
+        "error": "unauthorized"
+      }
+    },
+    {
+      "actor": "mallory",
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 401,
+      "response": {
+        "error": "unauthorized"
+      }
+    },
+    {
+      "actor": "bob",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "done": true
+      },
+      "status": 404,
+      "response": {
+        "error": "not found"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/absent",
+      "body": {
+        "done": true
+      },
+      "status": 404,
+      "response": {
+        "error": "not found"
+      }
+    },
+    {
+      "actor": null,
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "done": true
+      },
+      "status": 401,
+      "response": {
+        "error": "unauthorized"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": null,
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": [],
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {},
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "done": 1
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "done": null
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "done": true,
+        "extra": true
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "done": false,
+        "title": "Mixed"
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": "{",
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "done": true
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "own-seeded",
+          "title": "Plan the weekend",
+          "done": true,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 200,
+      "response": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "Plan the weekend",
+            "done": true,
+            "archived": false
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false
+          }
+        ]
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 200,
+      "response": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "Plan the weekend",
+            "done": true,
+            "archived": false
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false
+          }
+        ]
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "done": false
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "own-seeded",
+          "title": "Plan the weekend",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "",
+        "operationId": "bad"
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "  ",
+        "operationId": "bad"
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "operationId": "bad"
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": 3,
+        "operationId": "bad"
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Valid",
+        "operationId": ""
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Valid",
+        "operationId": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Valid",
+        "operationId": "bad space"
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Valid",
+        "operationId": "bad",
+        "extra": true
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "  Durable new note  ",
+        "operationId": "oracle-operation"
+      },
+      "status": 201,
+      "response": {
+        "note": {
+          "id": "a05e5c8b-f67f-41de-8d62-78b0da8739b5",
+          "title": "Durable new note",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Durable new note",
+        "operationId": "oracle-operation"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "a05e5c8b-f67f-41de-8d62-78b0da8739b5",
+          "title": "Durable new note",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Durable new note",
+        "operationId": "oracle-operation"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "a05e5c8b-f67f-41de-8d62-78b0da8739b5",
+          "title": "Durable new note",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Different",
+        "operationId": "oracle-operation"
+      },
+      "status": 409,
+      "response": {
+        "error": "operation conflict"
+      }
+    },
+    {
+      "actor": "bob",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Bob second note",
+        "operationId": "oracle-operation"
+      },
+      "status": 201,
+      "response": {
+        "note": {
+          "id": "a6d53841-ba71-4d09-bd5e-e85331a069e8",
+          "title": "Bob second note",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 200,
+      "response": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "Plan the weekend",
+            "done": false,
+            "archived": false
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false
+          },
+          {
+            "id": "a05e5c8b-f67f-41de-8d62-78b0da8739b5",
+            "title": "Durable new note",
+            "done": false,
+            "archived": false
+          }
+        ]
+      }
+    },
+    {
+      "actor": "bob",
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 200,
+      "response": {
+        "notes": [
+          {
+            "id": "other-seeded",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false
+          },
+          {
+            "id": "a6d53841-ba71-4d09-bd5e-e85331a069e8",
+            "title": "Bob second note",
+            "done": false,
+            "archived": false
+          }
+        ]
+      }
+    }
+  ],
+  "disk": [
+    {
+      "phase": "after-rejections",
+      "bytes": "{\n  \"notes\": [\n    {\n      \"id\": \"own-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"Plan the weekend\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-alice\"\n    },\n    {\n      \"id\": \"adjacent-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"Keep this note\",\n      \"done\": true,\n      \"archived\": false,\n      \"operationId\": \"seed-adjacent\"\n    },\n    {\n      \"id\": \"other-seeded\",\n      \"actor\": \"bob\",\n      \"title\": \"Bob private note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-bob\"\n    }\n  ]\n}\n",
+      "sha256": "f33e949da2684cc8e86fee28257d9f9296dcc8f197cf12f396cc54207e6b82c1"
+    },
+    {
+      "phase": "after-change",
+      "bytes": "{\n  \"notes\": [\n    {\n      \"id\": \"own-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"Plan the weekend\",\n      \"done\": true,\n      \"archived\": false,\n      \"operationId\": \"seed-alice\"\n    },\n    {\n      \"id\": \"adjacent-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"Keep this note\",\n      \"done\": true,\n      \"archived\": false,\n      \"operationId\": \"seed-adjacent\"\n    },\n    {\n      \"id\": \"other-seeded\",\n      \"actor\": \"bob\",\n      \"title\": \"Bob private note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-bob\"\n    }\n  ]\n}",
+      "sha256": "52de1698e8287d07c6bb58ca562591c3c4ac65bbfc93adf880ffda7e76b96a74"
+    },
+    {
+      "phase": "final",
+      "bytes": "{\n  \"notes\": [\n    {\n      \"id\": \"own-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"Plan the weekend\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-alice\"\n    },\n    {\n      \"id\": \"adjacent-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"Keep this note\",\n      \"done\": true,\n      \"archived\": false,\n      \"operationId\": \"seed-adjacent\"\n    },\n    {\n      \"id\": \"other-seeded\",\n      \"actor\": \"bob\",\n      \"title\": \"Bob private note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-bob\"\n    },\n    {\n      \"id\": \"a05e5c8b-f67f-41de-8d62-78b0da8739b5\",\n      \"actor\": \"alice\",\n      \"title\": \"Durable new note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"oracle-operation\"\n    },\n    {\n      \"id\": \"a6d53841-ba71-4d09-bd5e-e85331a069e8\",\n      \"actor\": \"bob\",\n      \"title\": \"Bob second note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"oracle-operation\"\n    }\n  ]\n}",
+      "sha256": "37698d4305ebfcf37a6503f5a4f2fc9055f6ba005ba1c4e67130df1f8f8e8778"
+    },
+    {
+      "phase": "final-restart",
+      "bytes": "{\n  \"notes\": [\n    {\n      \"id\": \"own-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"Plan the weekend\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-alice\"\n    },\n    {\n      \"id\": \"adjacent-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"Keep this note\",\n      \"done\": true,\n      \"archived\": false,\n      \"operationId\": \"seed-adjacent\"\n    },\n    {\n      \"id\": \"other-seeded\",\n      \"actor\": \"bob\",\n      \"title\": \"Bob private note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-bob\"\n    },\n    {\n      \"id\": \"a05e5c8b-f67f-41de-8d62-78b0da8739b5\",\n      \"actor\": \"alice\",\n      \"title\": \"Durable new note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"oracle-operation\"\n    },\n    {\n      \"id\": \"a6d53841-ba71-4d09-bd5e-e85331a069e8\",\n      \"actor\": \"bob\",\n      \"title\": \"Bob second note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"oracle-operation\"\n    }\n  ]\n}",
+      "sha256": "37698d4305ebfcf37a6503f5a4f2fc9055f6ba005ba1c4e67130df1f8f8e8778"
+    }
+  ]
+}

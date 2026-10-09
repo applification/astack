@@ -1,0 +1,150 @@
+{
+  "name": "overwritten-create-identity",
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/api/notes",
+      "input": {
+        "title": "New original",
+        "operationId": "new-op"
+      },
+      "status": 201,
+      "response": {
+        "note": {
+          "id": "3dccadfc-8660-4fa7-b589-daed9b8693b0",
+          "title": "New original",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/notes/legacy-note",
+      "input": {
+        "title": "First edit"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "legacy-note",
+          "title": "First edit",
+          "done": true,
+          "archived": false
+        }
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/notes/legacy-note",
+      "input": {
+        "title": "Second edit"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "legacy-note",
+          "title": "Second edit",
+          "done": true,
+          "archived": false
+        }
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/notes/3dccadfc-8660-4fa7-b589-daed9b8693b0",
+      "input": {
+        "title": "First edit"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "3dccadfc-8660-4fa7-b589-daed9b8693b0",
+          "title": "First edit",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/notes/3dccadfc-8660-4fa7-b589-daed9b8693b0",
+      "input": {
+        "title": "Second edit"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "3dccadfc-8660-4fa7-b589-daed9b8693b0",
+          "title": "Second edit",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/notes",
+      "input": {
+        "title": "Original title",
+        "operationId": "legacy-op"
+      },
+      "status": 409,
+      "response": {
+        "error": "operation conflict"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/notes",
+      "input": {
+        "title": "First edit",
+        "operationId": "legacy-op"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "legacy-note",
+          "title": "Second edit",
+          "done": true,
+          "archived": false
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/notes",
+      "input": {
+        "title": "New original",
+        "operationId": "new-op"
+      },
+      "status": 409,
+      "response": {
+        "error": "operation conflict"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/notes",
+      "input": null,
+      "status": 200,
+      "response": {
+        "notes": [
+          {
+            "id": "legacy-note",
+            "title": "Second edit",
+            "done": true,
+            "archived": false
+          },
+          {
+            "id": "3dccadfc-8660-4fa7-b589-daed9b8693b0",
+            "title": "Second edit",
+            "done": false,
+            "archived": false
+          }
+        ]
+      }
+    }
+  ],
+  "disk": "{\n  \"notes\": [\n    {\n      \"id\": \"legacy-note\",\n      \"actor\": \"alice\",\n      \"title\": \"Second edit\",\n      \"done\": true,\n      \"archived\": false,\n      \"operationId\": \"legacy-op\",\n      \"originalCreateTitle\": \"First edit\"\n    },\n    {\n      \"id\": \"3dccadfc-8660-4fa7-b589-daed9b8693b0\",\n      \"actor\": \"alice\",\n      \"title\": \"Second edit\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"new-op\",\n      \"originalCreateTitle\": \"First edit\"\n    }\n  ]\n}"
+}

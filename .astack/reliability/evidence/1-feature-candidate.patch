@@ -1,0 +1,123 @@
+diff --git a/index.html b/index.html
+index 59c58f5..2d9dbc2 100644
+--- a/index.html
++++ b/index.html
+@@ -67,7 +67,8 @@
+         for (const note of notes) {
+           const row = document.createElement('li'),
+             text = document.createElement('span'),
+-            toggle = document.createElement('button');
++            toggle = document.createElement('button'),
++            edit = document.createElement('button');
+           text.textContent = note.title;
+           text.className = note.done ? 'done' : '';
+           toggle.textContent = note.done ? 'Reopen' : 'Done';
+@@ -79,7 +80,56 @@
+               error.textContent = e.message;
+             }
+           };
+-          row.append(text, toggle);
++          edit.textContent = 'Edit';
++          edit.onclick = () => {
++            error.textContent = '';
++            const form = document.createElement('form'),
++              label = document.createElement('label'),
++              input = document.createElement('input'),
++              save = document.createElement('button'),
++              cancel = document.createElement('button');
++            label.textContent = 'Note title ';
++            input.value = note.title;
++            input.required = true;
++            input.maxLength = 120;
++            input.oninput = () => input.setCustomValidity('');
++            label.append(input);
++            save.textContent = 'Save';
++            save.type = 'submit';
++            cancel.textContent = 'Cancel';
++            cancel.type = 'button';
++            cancel.onclick = () => {
++              error.textContent = '';
++              row.replaceChildren(text, toggle, edit);
++              edit.focus();
++            };
++            form.onsubmit = async (event) => {
++              event.preventDefault();
++              const title = input.value.trim();
++              if (title.length < 1 || title.length > 120) {
++                const message = 'Title must contain 1–120 characters.';
++                input.setCustomValidity(message);
++                error.textContent = message;
++                input.reportValidity();
++                return;
++              }
++              error.textContent = '';
++              input.disabled = save.disabled = cancel.disabled = true;
++              try {
++                await api('/api/notes/' + note.id, 'PATCH', { title });
++                await reload();
++              } catch (e) {
++                error.textContent = e.message;
++              } finally {
++                input.disabled = save.disabled = cancel.disabled = false;
++              }
++            };
++            form.append(label, save, cancel);
++            row.replaceChildren(form);
++            input.focus();
++            input.select();
++          };
++          row.append(text, toggle, edit);
+           list.append(row);
+         }
+       } catch (e) {
+diff --git a/server.ts b/server.ts
+index 80fa57f..5424ed4 100644
+--- a/server.ts
++++ b/server.ts
+@@ -15,6 +15,7 @@ type Note = {
+   done: boolean;
+   archived: boolean;
+   operationId: string;
++  creationTitle?: string;
+ };
+ const dataFile = resolve(
+   process.env.NOTEBOOK_DATA_FILE ?? '.notebook/notes.json',
+@@ -40,7 +41,8 @@ function isNote(value: unknown): value is Note {
+     typeof value.title === 'string' &&
+     typeof value.done === 'boolean' &&
+     typeof value.archived === 'boolean' &&
+-    typeof value.operationId === 'string'
++    typeof value.operationId === 'string' &&
++    (value.creationTitle === undefined || typeof value.creationTitle === 'string')
+   );
+ }
+ function saveNotes(notes: Note[]): void {
+@@ -106,7 +108,7 @@ Bun.serve({
+         (note) => note.actor === actor && note.operationId === body.operationId,
+       );
+       if (previous)
+-        return previous.title === body.title.trim()
++        return (previous.creationTitle ?? previous.title) === body.title.trim()
+           ? response({ note: publicNote(previous) })
+           : response({ error: 'operation conflict' }, 409);
+       const note: Note = {
+@@ -129,12 +131,14 @@ Bun.serve({
+           entry.actor === actor,
+       );
+       if (!note) return response({ error: 'not found' }, 404);
+-      if (
+-        Object.keys(body).join(',') !== 'done' ||
+-        typeof body.done !== 'boolean'
+-      )
++      if (Object.keys(body).join(',') === 'done' && typeof body.done === 'boolean') {
++        note.done = !body.done;
++      } else if (Object.keys(body).join(',') === 'title' && title(body.title)) {
++        note.creationTitle ??= note.title;
++        note.title = body.title.trim();
++      } else {
+         return invalid();
+-      note.done = !body.done;
++      }
+       saveNotes(notes);
+       return response({ note: publicNote(note) });
+     }

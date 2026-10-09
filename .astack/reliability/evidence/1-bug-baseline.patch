@@ -1,0 +1,307 @@
+diff --git a/server.test.ts b/server.test.ts
+index ceca639..49bd700 100644
+--- a/server.test.ts
++++ b/server.test.ts
+@@ -1,12 +1,38 @@
+ import { expect, test } from 'bun:test';
+-import { mkdir, mkdtemp, rm } from 'node:fs/promises';
++import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+ import { join } from 'node:path';
+ import { createServer } from 'node:net';
+ 
+-test('creates, lists and retains a note across a restart', async () => {
++type DiskNote = {
++  id: string;
++  actor: string;
++  title: string;
++  done: boolean;
++  archived: boolean;
++  operationId: string;
++};
++type Notebook = {
++  url: string;
++  dataFile: string;
++  request: (
++    method?: string,
++    body?: unknown,
++    actor?: string | null,
++    suffix?: string,
++  ) => Promise<Response>;
++  restart: () => Promise<void>;
++};
++
++async function withNotebook(
++  run: (notebook: Notebook) => Promise<void>,
++  initialNotes: DiskNote[] = [],
++) {
+   const scratch = join(import.meta.dir, '.notebook');
+   await mkdir(scratch, { recursive: true });
+   const directory = await mkdtemp(join(scratch, 'dev-test-'));
++  const dataFile = join(directory, 'notes.json');
++  if (initialNotes.length > 0)
++    await writeFile(dataFile, JSON.stringify({ notes: initialNotes }));
+   const listener = createServer();
+   await new Promise<void>((resolve) =>
+     listener.listen(0, '127.0.0.1', resolve),
+@@ -25,7 +51,7 @@ test('creates, lists and retains a note across a restart', async () => {
+       env: {
+         ...process.env,
+         NOTEBOOK_PORT: String(port),
+-        NOTEBOOK_DATA_FILE: join(directory, 'notes.json'),
++        NOTEBOOK_DATA_FILE: dataFile,
+       },
+       stdout: 'ignore',
+       stderr: 'pipe',
+@@ -44,10 +70,37 @@ test('creates, lists and retains a note across a restart', async () => {
+   };
+   try {
+     await ready();
+-    const created = await fetch(url, {
+-      method: 'POST',
+-      headers,
+-      body: JSON.stringify({ title: 'Read a book', operationId: 'dev-1' }),
++    await run({
++      url,
++      dataFile,
++      request: (method = 'GET', body, actor = 'alice', suffix = '') =>
++        fetch(url + suffix, {
++          method,
++          headers: {
++            'content-type': 'application/json',
++            ...(actor === null ? {} : { 'x-actor': actor }),
++          },
++          ...(body === undefined ? {} : { body: JSON.stringify(body) }),
++        }),
++      restart: async () => {
++        child.kill();
++        await child.exited;
++        child = start();
++        await ready();
++      },
++    });
++  } finally {
++    child.kill();
++    await child.exited;
++    await rm(directory, { recursive: true, force: true });
++  }
++}
++
++test('creates, lists and retains a note across a restart', async () => {
++  await withNotebook(async ({ request, restart }) => {
++    const created = await request('POST', {
++      title: 'Read a book',
++      operationId: 'dev-1',
+     });
+     expect(created.status).toBe(201);
+     const value: unknown = await created.json();
+@@ -62,19 +115,185 @@ test('creates, lists and retains a note across a restart', async () => {
+       throw new Error('Invalid create response');
+     const note = value.note;
+     expect(note.title).toBe('Read a book');
+-    child.kill();
+-    await child.exited;
+-    child = start();
+-    await ready();
+-    expect(await (await fetch(url, { headers })).json()).toEqual({
++    await restart();
++    expect(await (await request()).json()).toEqual({
+       notes: [note],
+     });
++    expect(await (await request('GET', undefined, 'bob')).json()).toEqual({
++      notes: [],
++    });
++  });
++});
++
++test('persists the exact requested done boolean and preserves other notes', async () => {
++  const target: DiskNote = {
++    id: 'alice-target',
++    actor: 'alice',
++    title: 'Read a book',
++    done: false,
++    archived: false,
++    operationId: 'alice-create',
++  };
++  const otherAlice = {
++    ...target,
++    id: 'alice-other',
++    title: 'Archived note',
++    done: true,
++    archived: true,
++    operationId: 'alice-other-create',
++  };
++  const bob = {
++    ...target,
++    id: 'bob-note',
++    actor: 'bob',
++    title: 'Bob note',
++    operationId: 'bob-create',
++  };
++  await withNotebook(
++    async ({ request, restart, dataFile }) => {
++      const publicNote = ({ id, title, done, archived }: DiskNote) => ({
++        id,
++        title,
++        done,
++        archived,
++      });
++      for (const done of [true, true, false, false]) {
++        const expected = { ...target, done };
++        const updated = await request('PATCH', { done }, 'alice', '/' + target.id);
++        expect(updated.status).toBe(200);
++        expect(await updated.json()).toEqual({ note: publicNote(expected) });
++        expect(JSON.parse(await readFile(dataFile, 'utf8'))).toEqual({
++          notes: [expected, otherAlice, bob],
++        });
++        for (const afterRestart of [false, true]) {
++          if (afterRestart) await restart();
++          expect(await (await request()).json()).toEqual({
++            notes: [publicNote(expected), publicNote(otherAlice)],
++          });
++          expect(await (await request('GET', undefined, 'bob')).json()).toEqual({
++            notes: [publicNote(bob)],
++          });
++        }
++      }
++    },
++    [target, otherAlice, bob],
++  );
++});
++
++test('rejects invalid updates and unauthorized actors without changing disk data', async () => {
++  await withNotebook(async ({ request, url, dataFile }) => {
++    const created = await request('POST', {
++      title: 'Alice note',
++      operationId: 'a',
++    });
++    expect(created.status).toBe(201);
++    const { note } = await created.json();
++    const suffix = '/' + note.id;
++    const before = await readFile(dataFile, 'utf8');
++    const invalidBodies = [
++      {},
++      null,
++      [],
++      true,
++      { done: 'true' },
++      { done: 'false' },
++      { done: 0 },
++      { done: 1 },
++      { done: null },
++      { done: [] },
++      { done: {} },
++      { done: true, archived: true },
++      { done: false, actor: 'bob' },
++      { done: true, title: 'Changed' },
++      { done: false, operationId: 'other' },
++    ];
++    for (const body of invalidBodies) {
++      const rejected = await request('PATCH', body, 'alice', suffix);
++      expect(rejected.status).toBe(400);
++      expect(await readFile(dataFile, 'utf8')).toBe(before);
++    }
++    const malformed = await fetch(url + suffix, {
++      method: 'PATCH',
++      headers: { 'x-actor': 'alice', 'content-type': 'application/json' },
++      body: '{',
++    });
++    expect(malformed.status).toBe(400);
++    for (const actor of [null, '', 'charlie']) {
++      expect((await request('GET', undefined, actor)).status).toBe(401);
++      expect((await request('PATCH', { done: true }, actor, suffix)).status).toBe(
++        401,
++      );
++    }
++    expect((await request('PATCH', { done: true }, 'bob', suffix)).status).toBe(404);
+     expect(
+-      await (await fetch(url, { headers: { 'x-actor': 'bob' } })).json(),
+-    ).toEqual({ notes: [] });
+-  } finally {
+-    child.kill();
+-    await child.exited;
+-    await rm(directory, { recursive: true, force: true });
+-  }
++      (await request('PATCH', { done: true }, 'alice', '/unknown')).status,
++    ).toBe(404);
++    expect(await readFile(dataFile, 'utf8')).toBe(before);
++    expect(await (await request()).json()).toEqual({ notes: [note] });
++    expect(await (await request('GET', undefined, 'bob')).json()).toEqual({
++      notes: [],
++    });
++  });
++});
++
++test('preserves create validation and actor-scoped retries after updates and restart', async () => {
++  await withNotebook(async ({ request, restart, url, dataFile }) => {
++    const operationId = 'same-operation';
++    const created = await request('POST', { title: '  Alice note  ', operationId });
++    expect(created.status).toBe(201);
++    const { note } = await created.json();
++    expect(note.title).toBe('Alice note');
++    expect(note.done).toBe(false);
++    expect(note.archived).toBe(false);
++    const bob = await request('POST', { title: 'Bob note', operationId }, 'bob');
++    expect(bob.status).toBe(201);
++    const { note: bobNote } = await bob.json();
++    expect(bobNote.id).not.toBe(note.id);
++    expect(
++      (await request('PATCH', { done: true }, 'alice', '/' + note.id)).status,
++    ).toBe(200);
++    await restart();
++    const before = await readFile(dataFile, 'utf8');
++    const retry = await request('POST', { title: ' Alice note ', operationId });
++    expect(retry.status).toBe(200);
++    expect(await retry.json()).toEqual({ note: { ...note, done: true } });
++    expect((await request('POST', { title: 'Different', operationId })).status).toBe(
++      409,
++    );
++    const bobRetry = await request('POST', { title: 'Bob note', operationId }, 'bob');
++    expect(bobRetry.status).toBe(200);
++    expect(await bobRetry.json()).toEqual({ note: bobNote });
++    const invalidBodies = [
++      {},
++      null,
++      [],
++      { title: '', operationId },
++      { title: '   ', operationId },
++      { title: 'x'.repeat(121), operationId },
++      { title: 1, operationId },
++      { title: 'New', operationId: '' },
++      { title: 'New', operationId: 'x'.repeat(65) },
++      { title: 'New', operationId: 'bad id' },
++      { title: 'New', operationId: 'é' },
++      { title: 'New', operationId: 1 },
++      { title: 'New', operationId, done: true },
++      { title: 'New', operationId, actor: 'bob' },
++    ];
++    for (const body of invalidBodies) {
++      expect((await request('POST', body)).status).toBe(400);
++    }
++    const malformed = await fetch(url, {
++      method: 'POST',
++      headers: { 'x-actor': 'alice', 'content-type': 'application/json' },
++      body: '{',
++    });
++    expect(malformed.status).toBe(400);
++    expect(await readFile(dataFile, 'utf8')).toBe(before);
++    expect(await (await request()).json()).toEqual({
++      notes: [{ ...note, done: true }],
++    });
++    expect(await (await request('GET', undefined, 'bob')).json()).toEqual({
++      notes: [bobNote],
++    });
++  });
+ });
+diff --git a/server.ts b/server.ts
+index 80fa57f..e0485f2 100644
+--- a/server.ts
++++ b/server.ts
+@@ -134,7 +134,7 @@ Bun.serve({
+         typeof body.done !== 'boolean'
+       )
+         return invalid();
+-      note.done = !body.done;
++      note.done = body.done;
+       saveNotes(notes);
+       return response({ note: publicNote(note) });
+     }

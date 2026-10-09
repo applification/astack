@@ -1,0 +1,98 @@
+{
+  "format": "notebook-check/v1",
+  "outcome": "pass",
+  "task": "feature",
+  "observationsSha256": "96af6df9b501d46d164c5be814f50993c323bc17b2ef7e864628fbd1684153ed",
+  "sourceDigest": "21cfbec56c9a047ad90ffb532680c62cc7794451b12e0e754f5021cbf7ccd1d1",
+  "suiteDigest": "60137a9b767554aaa2932b8047ae1cb1e16aea5c5d62af31cf4c168c42715fdd",
+  "suite": {
+    "digest": "60137a9b767554aaa2932b8047ae1cb1e16aea5c5d62af31cf4c168c42715fdd",
+    "files": {
+      "scripts/agent-evals.ts": "18c1ee09d6e505815e567d65ba2d78da3a37deca975cd1ee98046207b8b2ed27",
+      "scripts/agent-eval-fixture.ts": "c145c4acb1f27123ba36b8aaafead3780627e062ec49678fcb14cf2a7da3191c",
+      "scripts/agent-eval-check.ts": "be9ac8610992240f599ef607e0692335654186bf97db7db58ea913148a09d278",
+      "scripts/agent-eval-run.ts": "5327ee308fbad0301358e69e9b66b3c32e9813ad6d29e84525c0855c4b7f590b",
+      "scripts/trials.ts": "c8819b357c3fec69240cbe06f45feb8062860a5f90b80529667bd5caca943968",
+      "scripts/runtime.ts": "e2ebee4339478832e196272eb621ea43e388786b3ef4f3e7017b69e2b49cdb57",
+      "scripts/source-identity.ts": "75923592fe9c3ba688baa33a018c11a191115cefb3870213834c28a2b129c17d",
+      "scripts/agent-eval-quality-rubric.md": "26793b730eaf933ba44f20f1c08c51f0ab6d3641a21dc19f758f16583fb00742"
+    },
+    "fixtureDigest": "9fe2e2e842be2f1c921289e2bfd0e268d913ebec5a2e9cb35d66c96b2e2687c7",
+    "fixtureFiles": {
+      ".gitignore": "6480f7fe160f230fc566261475255150f6f92a03d5164b4b6b404aa099180af3",
+      "AGENTS.md": "b97dc52ad1417a89a8c25382da6e3ebe436074c2670ad1322de6fdd134d43758",
+      "index.html": "d6c6fcc3db1476d7ba82eafe1f8d324683358a7e01d256d29b6e8f52cd296afd",
+      "package.json": "62f0ee4d7d7ce615849e54513a2cb5b6b652d1901d4de54aef6d527fbcfaf357",
+      "README.md": "b417a7ca39a59db60e7028ef4cea81a81c0efff53c2fa6604c33c55c5c5beeca",
+      "server.test.ts": "bb1649860e1d7352ec8b97183fa011f10adc313388d54e7eb4cbdc047feb053a",
+      "server.ts": "a98dd75d0e2cdc8e34c979a19e3bcfbe43c7fef0264b2f872142f1e79c92cb8f",
+      "tsconfig.json": "5e03fc0ac93dd5f6c046450e06f71464d4a8be6670fb8cbb90a54678e6afd5fc"
+    }
+  },
+  "identity": {
+    "revision": "b060a46d879df998ed90e7f79d9665ca5d9a0cd3",
+    "dirty": " M README.md\n M index.html\n M server.ts\n?? server.title.test.ts\n",
+    "sourceDigest": "21cfbec56c9a047ad90ffb532680c62cc7794451b12e0e754f5021cbf7ccd1d1",
+    "files": {
+      ".gitignore": "6480f7fe160f230fc566261475255150f6f92a03d5164b4b6b404aa099180af3",
+      "AGENTS.md": "b97dc52ad1417a89a8c25382da6e3ebe436074c2670ad1322de6fdd134d43758",
+      "index.html": "4fef6a3401d4ce7e060f4f60b051747abf3446b1a974616aa23cfd276ba2a575",
+      "package.json": "62f0ee4d7d7ce615849e54513a2cb5b6b652d1901d4de54aef6d527fbcfaf357",
+      "README.md": "77ef7e4fe835bc438f206344b47b00422d77ba6e1231a745d27a341d78ba199a",
+      "server.test.ts": "bb1649860e1d7352ec8b97183fa011f10adc313388d54e7eb4cbdc047feb053a",
+      "server.title.test.ts": "b0b076cbd7ef21af4d53a8fce42b95e9b4bd6bed99355e84adc84e1544d21654",
+      "server.ts": "dbf26e2d351220e4a770a13bea0ca5edd4201866c756db9900224f03ffc187d5",
+      "tsconfig.json": "5e03fc0ac93dd5f6c046450e06f71464d4a8be6670fb8cbb90a54678e6afd5fc"
+    }
+  },
+  "context": {
+    "command": [
+      "/Users/rufus/.bun/bin/bun",
+      "/tmp/astack-notebook-replay-20261009-v2/1-feature-candidate-repo/server.ts"
+    ],
+    "cwd": "/tmp/astack-notebook-replay-20261009-v2/1-feature-candidate-repo",
+    "env": {
+      "PATH": "/Users/rufus/.t3/worktrees/astack/t3-bf27764d/node_modules/.bin:/Users/rufus/.t3/worktrees/astack/t3-bf27764d/node_modules/.bin:/Users/rufus/.t3/worktrees/astack/node_modules/.bin:/Users/rufus/.t3/worktrees/node_modules/.bin:/Users/rufus/.t3/node_modules/.bin:/Users/rufus/node_modules/.bin:/Users/node_modules/.bin:/node_modules/.bin:/Users/rufus/.codex/packages/standalone/releases/0.161.0-aarch64-apple-darwin/codex-path:/Users/rufus/.nvm/versions/node/v24.21.0/bin:/Users/rufus/.nvm/versions/node/v24.21.0/bin:/Users/rufus/.bun/bin:/Users/rufus/.local/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/opt/homebrew/bin:/Users/rufus/.codex/tmp/arg0/codex-arg0iF27DB:/Users/rufus/.codex/packages/standalone/releases/0.161.0-aarch64-apple-darwin/codex-path:/Users/rufus/.nvm/versions/node/v24.21.0/bin:/Users/rufus/.bun/bin:/Users/rufus/.local/bin:/Users/rufus/Library/pnpm/bin:/Users/rufus/.orbstack/bin:/Users/rufus/.orbstack/bin",
+      "TMPDIR": "/var/folders/tf/fmjsy8z90630z_b91s19yvhw0000gp/T/notebook-oracle-4Zd5tY",
+      "NOTEBOOK_PORT": "64429",
+      "NOTEBOOK_DATA_FILE": "/var/folders/tf/fmjsy8z90630z_b91s19yvhw0000gp/T/notebook-oracle-4Zd5tY/notes.json"
+    },
+    "actors": [
+      "alice",
+      "bob"
+    ],
+    "authentication": "simulated x-actor identity; no live authentication proof",
+    "fixture": {
+      "notes": [
+        {
+          "id": "own-seeded",
+          "actor": "alice",
+          "title": "Plan the weekend",
+          "done": false,
+          "archived": false,
+          "operationId": "seed-alice"
+        },
+        {
+          "id": "adjacent-seeded",
+          "actor": "alice",
+          "title": "Keep this note",
+          "done": true,
+          "archived": false,
+          "operationId": "seed-adjacent"
+        },
+        {
+          "id": "other-seeded",
+          "actor": "bob",
+          "title": "Bob private note",
+          "done": false,
+          "archived": false,
+          "operationId": "seed-bob"
+        }
+      ]
+    },
+    "port": 64429
+  },
+  "error": null,
+  "cleanup": "owned service and disposable data only; evidence retained",
+  "coverage": "HTTP service, fresh reads, restart and required persisted fields (compatible internal metadata allowed; raw bytes retained). Feature checks include completed-note edits and original create retries after edits/restarts. Browser interaction remains manual acceptance."
+}

@@ -1,0 +1,2542 @@
+{
+  "format": "notebook-observations/v1",
+  "checks": [
+    {
+      "id": "initial-alice",
+      "actual": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "Plan the weekend",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Keep this note",
+              "done": true,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "Plan the weekend",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Keep this note",
+              "done": true,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "initial-bob",
+      "actual": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "other-seeded",
+              "title": "Bob private note",
+              "done": false,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "other-seeded",
+              "title": "Bob private note",
+              "done": false,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "missing-actor",
+      "actual": {
+        "status": 401,
+        "body": {
+          "error": "unauthorized"
+        }
+      },
+      "expected": {
+        "status": 401,
+        "body": {
+          "error": "unauthorized"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "unknown-actor",
+      "actual": {
+        "status": 401,
+        "body": {
+          "error": "unauthorized"
+        }
+      },
+      "expected": {
+        "status": 401,
+        "body": {
+          "error": "unauthorized"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "cross-owner",
+      "actual": {
+        "status": 404,
+        "body": {
+          "error": "not found"
+        }
+      },
+      "expected": {
+        "status": 404,
+        "body": {
+          "error": "not found"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "unknown-row",
+      "actual": {
+        "status": 404,
+        "body": {
+          "error": "not found"
+        }
+      },
+      "expected": {
+        "status": 404,
+        "body": {
+          "error": "not found"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "missing-actor-write",
+      "actual": {
+        "status": 401,
+        "body": {
+          "error": "unauthorized"
+        }
+      },
+      "expected": {
+        "status": 401,
+        "body": {
+          "error": "unauthorized"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-patch-0",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-patch-1",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-patch-2",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-patch-3",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-patch-4",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-patch-5",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-patch-6",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-patch-7",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-patch-8",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-patch-9",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-json",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "rejections-preserve-disk",
+      "actual": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "Plan the weekend",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "seed-bob"
+          }
+        ]
+      },
+      "expected": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "actor": "alice",
+            "title": "Plan the weekend",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "actor": "alice",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "actor": "bob",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-bob"
+          }
+        ]
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "requested-change",
+      "actual": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "own-seeded",
+            "title": "Edited notebook",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "own-seeded",
+            "title": "Edited notebook",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "fresh-read-change",
+      "actual": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "Edited notebook",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Keep this note",
+              "done": true,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "Edited notebook",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Keep this note",
+              "done": true,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "disk-change",
+      "actual": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "Edited notebook",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "seed-bob"
+          }
+        ]
+      },
+      "expected": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "actor": "alice",
+            "title": "Edited notebook",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "actor": "alice",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "actor": "bob",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-bob"
+          }
+        ]
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "edited-legacy-create-retry",
+      "actual": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "own-seeded",
+            "title": "Edited notebook",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "own-seeded",
+            "title": "Edited notebook",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "edited-title-is-not-original-create",
+      "actual": {
+        "status": 409,
+        "body": {
+          "error": "operation conflict"
+        }
+      },
+      "expected": {
+        "status": 409,
+        "body": {
+          "error": "operation conflict"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "restart-change",
+      "actual": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "Edited notebook",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Keep this note",
+              "done": true,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "Edited notebook",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Keep this note",
+              "done": true,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "edited-legacy-create-retry-restart",
+      "actual": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "own-seeded",
+            "title": "Edited notebook",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "own-seeded",
+            "title": "Edited notebook",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "second-change-boundary",
+      "actual": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "own-seeded",
+            "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "own-seeded",
+            "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "completed-title-preserves-status",
+      "actual": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "adjacent-seeded",
+            "title": "Renamed completed note",
+            "done": true,
+            "archived": false
+          }
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "adjacent-seeded",
+            "title": "Renamed completed note",
+            "done": true,
+            "archived": false
+          }
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "completed-title-fresh-read",
+      "actual": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Renamed completed note",
+              "done": true,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Renamed completed note",
+              "done": true,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "completed-title-disk",
+      "actual": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Renamed completed note",
+            "done": true,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "seed-bob"
+          }
+        ]
+      },
+      "expected": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "actor": "alice",
+            "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "actor": "alice",
+            "title": "Renamed completed note",
+            "done": true,
+            "archived": false,
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "actor": "bob",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-bob"
+          }
+        ]
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "completed-title-restart",
+      "actual": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Renamed completed note",
+              "done": true,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Renamed completed note",
+              "done": true,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "completed-title-create-retry-restart",
+      "actual": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "adjacent-seeded",
+            "title": "Renamed completed note",
+            "done": true,
+            "archived": false
+          }
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "adjacent-seeded",
+            "title": "Renamed completed note",
+            "done": true,
+            "archived": false
+          }
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "completed-title-restore",
+      "actual": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false
+          }
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false
+          }
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-create-0",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-create-1",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-create-2",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-create-3",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-create-4",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-create-5",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-create-6",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "invalid-create-7",
+      "actual": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "error": "invalid input"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "create-status",
+      "actual": 201,
+      "expected": 201,
+      "outcome": "pass"
+    },
+    {
+      "id": "create-id",
+      "actual": true,
+      "expected": true,
+      "outcome": "pass"
+    },
+    {
+      "id": "create-note",
+      "actual": {
+        "note": {
+          "id": "4e767561-198e-4842-a5da-6da5009bac74",
+          "title": "Durable new note",
+          "done": false,
+          "archived": false
+        }
+      },
+      "expected": {
+        "note": {
+          "id": "4e767561-198e-4842-a5da-6da5009bac74",
+          "title": "Durable new note",
+          "done": false,
+          "archived": false
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "repeated-operation",
+      "actual": [
+        {
+          "status": 200,
+          "body": {
+            "note": {
+              "id": "4e767561-198e-4842-a5da-6da5009bac74",
+              "title": "Durable new note",
+              "done": false,
+              "archived": false
+            }
+          }
+        },
+        {
+          "status": 200,
+          "body": {
+            "note": {
+              "id": "4e767561-198e-4842-a5da-6da5009bac74",
+              "title": "Durable new note",
+              "done": false,
+              "archived": false
+            }
+          }
+        }
+      ],
+      "expected": [
+        {
+          "status": 200,
+          "body": {
+            "note": {
+              "id": "4e767561-198e-4842-a5da-6da5009bac74",
+              "title": "Durable new note",
+              "done": false,
+              "archived": false
+            }
+          }
+        },
+        {
+          "status": 200,
+          "body": {
+            "note": {
+              "id": "4e767561-198e-4842-a5da-6da5009bac74",
+              "title": "Durable new note",
+              "done": false,
+              "archived": false
+            }
+          }
+        }
+      ],
+      "outcome": "pass"
+    },
+    {
+      "id": "operation-conflict",
+      "actual": {
+        "status": 409,
+        "body": {
+          "error": "operation conflict"
+        }
+      },
+      "expected": {
+        "status": 409,
+        "body": {
+          "error": "operation conflict"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "new-note-title-edit",
+      "actual": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "4e767561-198e-4842-a5da-6da5009bac74",
+            "title": "Edited created note",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "4e767561-198e-4842-a5da-6da5009bac74",
+            "title": "Edited created note",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "edited-new-create-retry",
+      "actual": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "4e767561-198e-4842-a5da-6da5009bac74",
+            "title": "Edited created note",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "4e767561-198e-4842-a5da-6da5009bac74",
+            "title": "Edited created note",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "edited-new-create-conflict",
+      "actual": {
+        "status": 409,
+        "body": {
+          "error": "operation conflict"
+        }
+      },
+      "expected": {
+        "status": 409,
+        "body": {
+          "error": "operation conflict"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "actor-operation-status",
+      "actual": 201,
+      "expected": 201,
+      "outcome": "pass"
+    },
+    {
+      "id": "actor-operation-distinct",
+      "actual": true,
+      "expected": true,
+      "outcome": "pass"
+    },
+    {
+      "id": "actor-operation-note",
+      "actual": {
+        "note": {
+          "id": "08da0f30-a524-4ca5-9e21-36b69c1f10af",
+          "title": "Bob second note",
+          "done": false,
+          "archived": false
+        }
+      },
+      "expected": {
+        "note": {
+          "id": "08da0f30-a524-4ca5-9e21-36b69c1f10af",
+          "title": "Bob second note",
+          "done": false,
+          "archived": false
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "final-disk",
+      "actual": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "seed-bob"
+          },
+          {
+            "id": "4e767561-198e-4842-a5da-6da5009bac74",
+            "title": "Edited created note",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "oracle-operation"
+          },
+          {
+            "id": "08da0f30-a524-4ca5-9e21-36b69c1f10af",
+            "title": "Bob second note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "oracle-operation"
+          }
+        ]
+      },
+      "expected": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "actor": "alice",
+            "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "actor": "alice",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "actor": "bob",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-bob"
+          },
+          {
+            "id": "4e767561-198e-4842-a5da-6da5009bac74",
+            "title": "Edited created note",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "oracle-operation"
+          },
+          {
+            "id": "08da0f30-a524-4ca5-9e21-36b69c1f10af",
+            "title": "Bob second note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "oracle-operation"
+          }
+        ]
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "final-alice-restart",
+      "actual": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Keep this note",
+              "done": true,
+              "archived": false
+            },
+            {
+              "id": "4e767561-198e-4842-a5da-6da5009bac74",
+              "title": "Edited created note",
+              "done": false,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "own-seeded",
+              "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "adjacent-seeded",
+              "title": "Keep this note",
+              "done": true,
+              "archived": false
+            },
+            {
+              "id": "4e767561-198e-4842-a5da-6da5009bac74",
+              "title": "Edited created note",
+              "done": false,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "final-bob-restart",
+      "actual": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "other-seeded",
+              "title": "Bob private note",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "08da0f30-a524-4ca5-9e21-36b69c1f10af",
+              "title": "Bob second note",
+              "done": false,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "notes": [
+            {
+              "id": "other-seeded",
+              "title": "Bob private note",
+              "done": false,
+              "archived": false
+            },
+            {
+              "id": "08da0f30-a524-4ca5-9e21-36b69c1f10af",
+              "title": "Bob second note",
+              "done": false,
+              "archived": false
+            }
+          ]
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "final-disk-restart",
+      "actual": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "seed-bob"
+          },
+          {
+            "id": "4e767561-198e-4842-a5da-6da5009bac74",
+            "title": "Edited created note",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "oracle-operation"
+          },
+          {
+            "id": "08da0f30-a524-4ca5-9e21-36b69c1f10af",
+            "title": "Bob second note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "oracle-operation"
+          }
+        ]
+      },
+      "expected": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "actor": "alice",
+            "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "actor": "alice",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "actor": "bob",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-bob"
+          },
+          {
+            "id": "4e767561-198e-4842-a5da-6da5009bac74",
+            "title": "Edited created note",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "oracle-operation"
+          },
+          {
+            "id": "08da0f30-a524-4ca5-9e21-36b69c1f10af",
+            "title": "Bob second note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "oracle-operation"
+          }
+        ]
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "final-legacy-create-retry-restart",
+      "actual": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "own-seeded",
+            "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "own-seeded",
+            "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "final-legacy-create-conflict-restart",
+      "actual": {
+        "status": 409,
+        "body": {
+          "error": "operation conflict"
+        }
+      },
+      "expected": {
+        "status": 409,
+        "body": {
+          "error": "operation conflict"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "restored-completed-create-retry-restart",
+      "actual": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false
+          }
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false
+          }
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "edited-new-create-retry-restart",
+      "actual": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "4e767561-198e-4842-a5da-6da5009bac74",
+            "title": "Edited created note",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "note": {
+            "id": "4e767561-198e-4842-a5da-6da5009bac74",
+            "title": "Edited created note",
+            "done": false,
+            "archived": false
+          }
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "edited-new-create-conflict-restart",
+      "actual": {
+        "status": 409,
+        "body": {
+          "error": "operation conflict"
+        }
+      },
+      "expected": {
+        "status": 409,
+        "body": {
+          "error": "operation conflict"
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "id": "retry-after-edit-preserves-disk",
+      "actual": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "seed-bob"
+          },
+          {
+            "id": "4e767561-198e-4842-a5da-6da5009bac74",
+            "title": "Edited created note",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "oracle-operation"
+          },
+          {
+            "id": "08da0f30-a524-4ca5-9e21-36b69c1f10af",
+            "title": "Bob second note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "oracle-operation"
+          }
+        ]
+      },
+      "expected": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "actor": "alice",
+            "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-alice"
+          },
+          {
+            "id": "adjacent-seeded",
+            "actor": "alice",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false,
+            "operationId": "seed-adjacent"
+          },
+          {
+            "id": "other-seeded",
+            "actor": "bob",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false,
+            "operationId": "seed-bob"
+          },
+          {
+            "id": "4e767561-198e-4842-a5da-6da5009bac74",
+            "title": "Edited created note",
+            "done": false,
+            "archived": false,
+            "actor": "alice",
+            "operationId": "oracle-operation"
+          },
+          {
+            "id": "08da0f30-a524-4ca5-9e21-36b69c1f10af",
+            "title": "Bob second note",
+            "done": false,
+            "archived": false,
+            "actor": "bob",
+            "operationId": "oracle-operation"
+          }
+        ]
+      },
+      "outcome": "pass"
+    }
+  ],
+  "requests": [
+    {
+      "actor": "alice",
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 200,
+      "response": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "Plan the weekend",
+            "done": false,
+            "archived": false
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false
+          }
+        ]
+      }
+    },
+    {
+      "actor": "bob",
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 200,
+      "response": {
+        "notes": [
+          {
+            "id": "other-seeded",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false
+          }
+        ]
+      }
+    },
+    {
+      "actor": null,
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 401,
+      "response": {
+        "error": "unauthorized"
+      }
+    },
+    {
+      "actor": "mallory",
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 401,
+      "response": {
+        "error": "unauthorized"
+      }
+    },
+    {
+      "actor": "bob",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "title": "  Edited notebook  "
+      },
+      "status": 404,
+      "response": {
+        "error": "not found"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/absent",
+      "body": {
+        "title": "  Edited notebook  "
+      },
+      "status": 404,
+      "response": {
+        "error": "not found"
+      }
+    },
+    {
+      "actor": null,
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "title": "  Edited notebook  "
+      },
+      "status": 401,
+      "response": {
+        "error": "unauthorized"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": null,
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": [],
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {},
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "title": 1
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "title": null
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "title": "  Edited notebook  ",
+        "extra": true
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "done": false,
+        "title": "Mixed"
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "title": ""
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "title": " \t "
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "title": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": "{",
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "title": "  Edited notebook  "
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "own-seeded",
+          "title": "Edited notebook",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 200,
+      "response": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "Edited notebook",
+            "done": false,
+            "archived": false
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false
+          }
+        ]
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "  Plan the weekend  ",
+        "operationId": "seed-alice"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "own-seeded",
+          "title": "Edited notebook",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Edited notebook",
+        "operationId": "seed-alice"
+      },
+      "status": 409,
+      "response": {
+        "error": "operation conflict"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 200,
+      "response": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "Edited notebook",
+            "done": false,
+            "archived": false
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false
+          }
+        ]
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Plan the weekend",
+        "operationId": "seed-alice"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "own-seeded",
+          "title": "Edited notebook",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/own-seeded",
+      "body": {
+        "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "own-seeded",
+          "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/adjacent-seeded",
+      "body": {
+        "title": "Renamed completed note"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "adjacent-seeded",
+          "title": "Renamed completed note",
+          "done": true,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 200,
+      "response": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+            "done": false,
+            "archived": false
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Renamed completed note",
+            "done": true,
+            "archived": false
+          }
+        ]
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 200,
+      "response": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+            "done": false,
+            "archived": false
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Renamed completed note",
+            "done": true,
+            "archived": false
+          }
+        ]
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Keep this note",
+        "operationId": "seed-adjacent"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "adjacent-seeded",
+          "title": "Renamed completed note",
+          "done": true,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/adjacent-seeded",
+      "body": {
+        "title": "Keep this note"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "adjacent-seeded",
+          "title": "Keep this note",
+          "done": true,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "",
+        "operationId": "bad"
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "  ",
+        "operationId": "bad"
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "operationId": "bad"
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": 3,
+        "operationId": "bad"
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Valid",
+        "operationId": ""
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Valid",
+        "operationId": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Valid",
+        "operationId": "bad space"
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Valid",
+        "operationId": "bad",
+        "extra": true
+      },
+      "status": 400,
+      "response": {
+        "error": "invalid input"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "  Durable new note  ",
+        "operationId": "oracle-operation"
+      },
+      "status": 201,
+      "response": {
+        "note": {
+          "id": "4e767561-198e-4842-a5da-6da5009bac74",
+          "title": "Durable new note",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Durable new note",
+        "operationId": "oracle-operation"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "4e767561-198e-4842-a5da-6da5009bac74",
+          "title": "Durable new note",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Durable new note",
+        "operationId": "oracle-operation"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "4e767561-198e-4842-a5da-6da5009bac74",
+          "title": "Durable new note",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Different",
+        "operationId": "oracle-operation"
+      },
+      "status": 409,
+      "response": {
+        "error": "operation conflict"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "PATCH",
+      "path": "/api/notes/4e767561-198e-4842-a5da-6da5009bac74",
+      "body": {
+        "title": "Edited created note"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "4e767561-198e-4842-a5da-6da5009bac74",
+          "title": "Edited created note",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Durable new note",
+        "operationId": "oracle-operation"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "4e767561-198e-4842-a5da-6da5009bac74",
+          "title": "Edited created note",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Edited created note",
+        "operationId": "oracle-operation"
+      },
+      "status": 409,
+      "response": {
+        "error": "operation conflict"
+      }
+    },
+    {
+      "actor": "bob",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Bob second note",
+        "operationId": "oracle-operation"
+      },
+      "status": 201,
+      "response": {
+        "note": {
+          "id": "08da0f30-a524-4ca5-9e21-36b69c1f10af",
+          "title": "Bob second note",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 200,
+      "response": {
+        "notes": [
+          {
+            "id": "own-seeded",
+            "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+            "done": false,
+            "archived": false
+          },
+          {
+            "id": "adjacent-seeded",
+            "title": "Keep this note",
+            "done": true,
+            "archived": false
+          },
+          {
+            "id": "4e767561-198e-4842-a5da-6da5009bac74",
+            "title": "Edited created note",
+            "done": false,
+            "archived": false
+          }
+        ]
+      }
+    },
+    {
+      "actor": "bob",
+      "method": "GET",
+      "path": "/api/notes",
+      "body": null,
+      "status": 200,
+      "response": {
+        "notes": [
+          {
+            "id": "other-seeded",
+            "title": "Bob private note",
+            "done": false,
+            "archived": false
+          },
+          {
+            "id": "08da0f30-a524-4ca5-9e21-36b69c1f10af",
+            "title": "Bob second note",
+            "done": false,
+            "archived": false
+          }
+        ]
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Plan the weekend",
+        "operationId": "seed-alice"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "own-seeded",
+          "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+        "operationId": "seed-alice"
+      },
+      "status": 409,
+      "response": {
+        "error": "operation conflict"
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Keep this note",
+        "operationId": "seed-adjacent"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "adjacent-seeded",
+          "title": "Keep this note",
+          "done": true,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Durable new note",
+        "operationId": "oracle-operation"
+      },
+      "status": 200,
+      "response": {
+        "note": {
+          "id": "4e767561-198e-4842-a5da-6da5009bac74",
+          "title": "Edited created note",
+          "done": false,
+          "archived": false
+        }
+      }
+    },
+    {
+      "actor": "alice",
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "Edited created note",
+        "operationId": "oracle-operation"
+      },
+      "status": 409,
+      "response": {
+        "error": "operation conflict"
+      }
+    }
+  ],
+  "disk": [
+    {
+      "phase": "after-rejections",
+      "bytes": "{\n  \"notes\": [\n    {\n      \"id\": \"own-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"Plan the weekend\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-alice\"\n    },\n    {\n      \"id\": \"adjacent-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"Keep this note\",\n      \"done\": true,\n      \"archived\": false,\n      \"operationId\": \"seed-adjacent\"\n    },\n    {\n      \"id\": \"other-seeded\",\n      \"actor\": \"bob\",\n      \"title\": \"Bob private note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-bob\"\n    }\n  ]\n}\n",
+      "sha256": "f33e949da2684cc8e86fee28257d9f9296dcc8f197cf12f396cc54207e6b82c1"
+    },
+    {
+      "phase": "after-change",
+      "bytes": "{\n  \"notes\": [\n    {\n      \"id\": \"own-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"Edited notebook\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-alice\",\n      \"creationTitle\": \"Plan the weekend\"\n    },\n    {\n      \"id\": \"adjacent-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"Keep this note\",\n      \"done\": true,\n      \"archived\": false,\n      \"operationId\": \"seed-adjacent\"\n    },\n    {\n      \"id\": \"other-seeded\",\n      \"actor\": \"bob\",\n      \"title\": \"Bob private note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-bob\"\n    }\n  ]\n}",
+      "sha256": "17cd5f780f414d5f833afd9330ae4b36abf7779768b0a3fe5e50cdc3834b5cbe"
+    },
+    {
+      "phase": "completed-title",
+      "bytes": "{\n  \"notes\": [\n    {\n      \"id\": \"own-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-alice\",\n      \"creationTitle\": \"Plan the weekend\"\n    },\n    {\n      \"id\": \"adjacent-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"Renamed completed note\",\n      \"done\": true,\n      \"archived\": false,\n      \"operationId\": \"seed-adjacent\",\n      \"creationTitle\": \"Keep this note\"\n    },\n    {\n      \"id\": \"other-seeded\",\n      \"actor\": \"bob\",\n      \"title\": \"Bob private note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-bob\"\n    }\n  ]\n}",
+      "sha256": "141d46f39bb32389b6f37422bb47a8c0191b51082a94260cfef49125b046e1a2"
+    },
+    {
+      "phase": "final",
+      "bytes": "{\n  \"notes\": [\n    {\n      \"id\": \"own-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-alice\",\n      \"creationTitle\": \"Plan the weekend\"\n    },\n    {\n      \"id\": \"adjacent-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"Keep this note\",\n      \"done\": true,\n      \"archived\": false,\n      \"operationId\": \"seed-adjacent\",\n      \"creationTitle\": \"Keep this note\"\n    },\n    {\n      \"id\": \"other-seeded\",\n      \"actor\": \"bob\",\n      \"title\": \"Bob private note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-bob\"\n    },\n    {\n      \"id\": \"4e767561-198e-4842-a5da-6da5009bac74\",\n      \"actor\": \"alice\",\n      \"title\": \"Edited created note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"oracle-operation\",\n      \"creationTitle\": \"Durable new note\"\n    },\n    {\n      \"id\": \"08da0f30-a524-4ca5-9e21-36b69c1f10af\",\n      \"actor\": \"bob\",\n      \"title\": \"Bob second note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"oracle-operation\"\n    }\n  ]\n}",
+      "sha256": "44e09f99ff4f7e3510f24b661c6edc9fc816fe1149ede003bc83154d74a1c863"
+    },
+    {
+      "phase": "final-restart",
+      "bytes": "{\n  \"notes\": [\n    {\n      \"id\": \"own-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-alice\",\n      \"creationTitle\": \"Plan the weekend\"\n    },\n    {\n      \"id\": \"adjacent-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"Keep this note\",\n      \"done\": true,\n      \"archived\": false,\n      \"operationId\": \"seed-adjacent\",\n      \"creationTitle\": \"Keep this note\"\n    },\n    {\n      \"id\": \"other-seeded\",\n      \"actor\": \"bob\",\n      \"title\": \"Bob private note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-bob\"\n    },\n    {\n      \"id\": \"4e767561-198e-4842-a5da-6da5009bac74\",\n      \"actor\": \"alice\",\n      \"title\": \"Edited created note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"oracle-operation\",\n      \"creationTitle\": \"Durable new note\"\n    },\n    {\n      \"id\": \"08da0f30-a524-4ca5-9e21-36b69c1f10af\",\n      \"actor\": \"bob\",\n      \"title\": \"Bob second note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"oracle-operation\"\n    }\n  ]\n}",
+      "sha256": "44e09f99ff4f7e3510f24b661c6edc9fc816fe1149ede003bc83154d74a1c863"
+    },
+    {
+      "phase": "after-edited-retries",
+      "bytes": "{\n  \"notes\": [\n    {\n      \"id\": \"own-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-alice\",\n      \"creationTitle\": \"Plan the weekend\"\n    },\n    {\n      \"id\": \"adjacent-seeded\",\n      \"actor\": \"alice\",\n      \"title\": \"Keep this note\",\n      \"done\": true,\n      \"archived\": false,\n      \"operationId\": \"seed-adjacent\",\n      \"creationTitle\": \"Keep this note\"\n    },\n    {\n      \"id\": \"other-seeded\",\n      \"actor\": \"bob\",\n      \"title\": \"Bob private note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"seed-bob\"\n    },\n    {\n      \"id\": \"4e767561-198e-4842-a5da-6da5009bac74\",\n      \"actor\": \"alice\",\n      \"title\": \"Edited created note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"oracle-operation\",\n      \"creationTitle\": \"Durable new note\"\n    },\n    {\n      \"id\": \"08da0f30-a524-4ca5-9e21-36b69c1f10af\",\n      \"actor\": \"bob\",\n      \"title\": \"Bob second note\",\n      \"done\": false,\n      \"archived\": false,\n      \"operationId\": \"oracle-operation\"\n    }\n  ]\n}",
+      "sha256": "44e09f99ff4f7e3510f24b661c6edc9fc816fe1149ede003bc83154d74a1c863"
+    }
+  ]
+}
