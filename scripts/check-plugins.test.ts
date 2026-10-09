@@ -61,3 +61,8 @@ test('template links in fenced examples do not refer to packaged project files',
   writeFileSync(file, readFileSync(file, 'utf8') + '\n```markdown\n[project glossary](./src/context/GLOSSARY.md)\n```\n');
   expect(checkPlugin(path)).toBe('applification');
 });
+test('the installable package and the plugin share one version', () => {
+  const root = resolve(import.meta.dir, '..');
+  const version = (file: string) => JSON.parse(readFileSync(join(root, file), 'utf8')).version;
+  expect(version('package.json')).toBe(version('plugin.json'));
+});

@@ -1,0 +1,14 @@
+{
+  "name": "applification",
+  "description": "astack by Applification: reusable engineering skills for coding agents",
+  "owner": {
+    "name": "Applification Ltd"
+  },
+  "plugins": [
+    {
+      "name": "applification",
+      "source": "./",
+      "description": "astack by Applification: reusable engineering skills for coding agents"
+    }
+  ]
+}
