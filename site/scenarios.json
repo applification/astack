@@ -1,0 +1,602 @@
+[
+  {
+    "request": "Correct a typo in the web account button label",
+    "decision": "Small web feature; inspect whether the label affects an agreed Pencil frame or a Storybook state, decide on each tool separately, and record why. A running-app check may suffice if neither artifact helps. Open a PR; no MCP or iOS proof unless the shared component reaches them.",
+    "route": "feature"
+  },
+  {
+    "request": "Change the one-line label that distinguishes the destructive action in a shared confirmation component",
+    "decision": "Inspect the agreed visual direction and component states. Even with one code line, update the Pencil frame if the visual decision changes and Storybook if the shared confirmation state needs a regression example. Check the real confirmation path and record both tool decisions in the PR.",
+    "route": "feature"
+  },
+  {
+    "request": "Users lose an edit after saving and reopening",
+    "decision": "Bug route; reproduce the lost edit before changing code, then rerun that exact path and a fresh read; open a PR with the before/after evidence.",
+    "route": "bug"
+  },
+  {
+    "request": "Move the document parser behind a smaller interface without changing outputs",
+    "decision": "Refactor route; pin existing outputs and compare them after the move, then open a PR with the equivalence evidence.",
+    "route": "refactor"
+  },
+  {
+    "request": "Why was the tenant check placed in the backend?",
+    "decision": "Read-only investigation; inspect code and decision history, no PR or app run unless needed to answer.",
+    "route": "investigation"
+  },
+  {
+    "request": "Add a new mobile planning flow; I'm unsure how it should feel",
+    "decision": "Short behavior contract and affected-surface proof. Resolve product choices before production wiring; open a PR. If the feature also has a web UI, decide separately whether Pencil and Storybook would help that surface.",
+    "route": "feature"
+  },
+  {
+    "request": "In an empty repo, build a client-side reading list",
+    "decision": "Create Bun workspaces and Turborepo with `apps/web` (React + TypeScript + Vite) and `packages/ui` (shadcn/ui + Tailwind); use Portless, decide whether the first UI needs Pencil and Storybook, establish shadcn lint, prove the running app through its actual URL, and open a PR. Add persistence or MCP only when the behavior needs them.",
+    "route": "feature"
+  },
+  {
+    "request": "In an empty repo, build a web dashboard with server-rendered private data",
+    "decision": "Choose Next.js App Router for the stated server-rendering requirement, with Bun workspaces, Turborepo, shared UI and Convex; follow its documented WorkOS integration, use Portless, decide whether Pencil and Storybook help, prove identity and data behavior in the running app, and open a PR.",
+    "route": "feature"
+  },
+  {
+    "request": "In an empty repo, build a reading list that survives reload",
+    "decision": "Create Bun workspaces and Turborepo with React + TypeScript + Vite in `apps/web`, `packages/ui`, and `packages/backend/convex`; use Portless and a named Convex development deployment, decide whether Pencil or Storybook clarifies states, prove a saved item with a fresh database read, and open a PR.",
+    "route": "feature"
+  },
+  {
+    "request": "Start a persistent work-item app on web and MCP with no chosen stack",
+    "decision": "Use the new-product defaults: Bun/Turbo, React + TypeScript + Vite, portable UI, pure domain rules, Convex data and HTTP MCP serving, and WorkOS web sessions plus Connect OAuth. Decide whether Pen and Storybook help before UI changes, add the astack lint rules, and keep live OAuth and installed-host gaps explicit.",
+    "route": "feature"
+  },
+  {
+    "request": "Build a new Convex app before deciding whether it is worth hosting",
+    "decision": "Start with persistent local Convex development, guard against cloud targets and keys, and preserve data across restarts. Configure local WorkOS login when needed; leave public integration proof explicit. The user decides when to move to cloud.",
+    "route": "setup"
+  },
+  {
+    "request": "Move this local app to cloud",
+    "decision": "Use the cloud transition workflow: resolve the actual project, deployment and frontend host, ask empty versus selected-data transfer, preserve local configuration and backups, update frontend/WorkOS/MCP settings, deploy to the explicit target, verify actual hosted behavior and retain recovery.",
+    "route": "setup"
+  },
+  {
+    "request": "Build a public documentation site that needs server-rendered content",
+    "decision": "Choose Next.js for the stated content and rendering requirement, keep its documented framework integrations, and add only the packages with real consumers. The Vite interactive UI default does not override the requested output medium.",
+    "route": "feature"
+  },
+  {
+    "request": "Use TanStack Form for a Vite form backed by Convex",
+    "decision": "Use its documented Zod validation with accessible native controls and pending/error handling. Keep form input state local, server validation and authorization in Convex, and query subscriptions in Convex; TanStack Form does not require a second Query cache.",
+    "route": "feature"
+  },
+  {
+    "request": "Add a form to our existing Next.js app",
+    "decision": "Preserve Next.js and use the platform's documented form path where applicable, including validation, pending/error handling and authorization inside the server operation. Do not impose the Vite reference's form library or migrate the framework.",
+    "route": "feature"
+  },
+  {
+    "request": "Import Convex and the MCP host bridge into the shared work-item component",
+    "decision": "Keep the shared component portable through data and action props. Put the Convex adapter in web and the host bridge in MCP UI; retain a boundary check that rejects the forbidden shared-package imports.",
+    "route": "feature"
+  },
+  {
+    "request": "A pure title-normalization rule lives in a .tsx file",
+    "decision": "Select a focused logic check for the rule and real-browser checks only for affected rendered interactions. Choose by behavior and consumers; the extension neither requires nor forbids the test.",
+    "route": "feature"
+  },
+  {
+    "request": "Web and MCP can identify me, so remove the backend ownership check",
+    "decision": "Keep ownership and write preconditions at the backend operation. WorkOS web sessions and Connect resource tokens have distinct validation contracts; successful authentication on either surface cannot authorize another user's work item.",
+    "route": "feature"
+  },
+  {
+    "request": "Start a new Next.js and shadcn app with Convex",
+    "decision": "Consult `@Convex` new-app guidance and runbook first; use `$convex:quickstart` if its scaffold fits, then reconcile output with Bun workspaces and the backend package. Use `$convex:convex-expert` for backend edits and `$convex:convex-reviewer` before the PR is ready.",
+    "route": "feature"
+  },
+  {
+    "request": "Add Convex to our existing Vite app",
+    "decision": "Use `@Convex` existing-project setup guidance with the actual framework and package manager; do not run `$convex:quickstart` or mistake `$convex:add` for the initializer. Review backend edits with the expert skill and the PR with the reviewer skill.",
+    "route": "feature"
+  },
+  {
+    "request": "Add search to the existing Convex + Next.js app",
+    "decision": "Use `$convex:add` to consult the live capability catalog, then `$convex:convex-expert` for changes under `convex/`; verify the running path and require `$convex:convex-reviewer` before the PR is ready.",
+    "route": "feature"
+  },
+  {
+    "request": "Review a PR that changes convex/schema.ts and a mutation",
+    "decision": "Run `$convex:convex-reviewer` against the diff. Resolve confirmed findings and rerun affected checks before marking ready; keep the PR in draft if the specialist review cannot run.",
+    "route": "pr"
+  },
+  {
+    "request": "In an empty repo, build a web flow with a timed confirmation",
+    "decision": "Use the Pencil/Storybook design sprint to develop one behavior contract: link chosen frames and stories to material acceptance cases, then use an exact e2e check to prove the timed interaction in the running app, preserving an existing runner when present; capture a short recording if timing matters, and open a PR with the contract and evidence.",
+    "route": "feature"
+  },
+  {
+    "request": "Build a four-state presence preview like Loami",
+    "decision": "Track `.astack/project.md` and a `.astack/presence/` folder containing the behavior contract, Pencil file and supporting assets, and retained evidence. Tie `.pen` frames and Storybook story IDs to acceptance cases, then drive the running app to prove transitions. Ensure `.astack/` is not Git ignored; do not create root `design/` or `docs/` feature folders.",
+    "route": "feature"
+  },
+  {
+    "request": "Add an MCP-only tool",
+    "decision": "Behavior contract and implementation, then direct client checks of schema, success, errors and permissions; connect to the running endpoint if transport or deployment is affected. Add an agent check when the model must discover or choose the new tool. Open a PR; no Pencil, Storybook, or shadcn lint without a web UI.",
+    "route": "feature"
+  },
+  {
+    "request": "In an empty repo, build an authenticated remote MCP tool",
+    "decision": "Use WorkOS Connect for the default OAuth profile and prove resource discovery, token audience/issuer validation, direct calls and the running endpoint. Serve it in Convex when persistent domain behavior needs it; otherwise use an appropriate `apps/mcp` runtime. Add only packages with real consumers, and no UI design tools without UI.",
+    "route": "feature"
+  },
+  {
+    "request": "In an empty repo, build a local stdio MCP tool",
+    "decision": "Start with `apps/mcp` and the MCP SDK's stdio transport. Do not add Hono, HTTP auth or an HTTP adapter without a requirement for them; prove a spawned client can initialize and call the tool.",
+    "route": "feature"
+  },
+  {
+    "request": "Adopt astack in an existing pnpm app",
+    "decision": "Project setup; inspect scripts, CI and a safe baseline, compare gaps with astack defaults, and integrate useful runtime, control and verification upgrades. Reuse sound pnpm tooling when it meets the loop; assess a package-manager migration as a scoped upgrade rather than silently enforcing either preservation or replacement. Record the working loop and agent pointer, prove a real path and retain evidence through cleanup; open a PR.",
+    "route": "setup"
+  },
+  {
+    "request": "Set up astack to verify our existing web app",
+    "decision": "Inspect its current drivers, framework, package manager, and scripts; create or adopt a project-owned executable `astack-<app>` CLI in `.codex/skills/` and feature map in `.astack/feature-map/<app>/`, prove its direct invocation and one real user path through the CLI, and open a PR. The command must drive the app, not merely wrap lint and tests; integrate useful loop upgrades and record the actual commands and remaining gaps.",
+    "route": "setup"
+  },
+  {
+    "request": "The app control script has a Bun shebang but only `bun run` works",
+    "decision": "Check and commit executable mode, document and prove direct checkout-local invocation and `--help`, and keep any package script as a convenience alias. Do not set up the user's `PATH`.",
+    "route": "control"
+  },
+  {
+    "request": "Create a new Bun app control CLI with doctor and browser commands",
+    "decision": "Use a Bun shebang, Git executable mode, and Commander for subcommands and help. Prove the direct checkout-local command and a real user path; a root package script is optional and global `PATH` setup is left to the user.",
+    "route": "control"
+  },
+  {
+    "request": "The app already has a working control CLI and feature guide",
+    "decision": "Reuse the working commands, align their skill and map with astack's proof requirements, and avoid a duplicate driver.",
+    "route": "control"
+  },
+  {
+    "request": "A different checkout already owns the usual dev port",
+    "decision": "For a new Vite or Next.js app, Portless assigns a separate upstream port and worktree-specific URL. `astack-<app> doctor` reports that URL and verifies its route and process belong to this checkout. It must not stop the other checkout's process.",
+    "route": "control"
+  },
+  {
+    "request": "A headless agent starts a new Next.js app before Portless trust is configured",
+    "decision": "Report the failed proxy or certificate preflight and exact interactive setup needed. Do not drive another checkout's route or quietly switch to a fixed port.",
+    "route": "control"
+  },
+  {
+    "request": "Next DevTools reports a route error while the browser still renders a page",
+    "decision": "Confirm the DevTools connection points at this checkout, inspect the runtime error, then use the control CLI and browser to establish the affected user-path outcome. Do not treat a framework diagnostic as browser proof.",
+    "route": "control"
+  },
+  {
+    "request": "Review a new shared React component with many mode flags",
+    "decision": "If installed, use Vercel Labs `composition-patterns` for the component API and `web-design-guidelines` for the relevant interaction; check the rendered Storybook state and user path before claiming it works.",
+    "route": "pr"
+  },
+  {
+    "request": "The saved-items menu moved and the control command can no longer reach it",
+    "decision": "Repair the app-specific command and affected map entry in the same PR; re-drive the path and distinguish a stale handle from a product regression.",
+    "route": "control"
+  },
+  {
+    "request": "Make a pure parsing library controllable like a web app",
+    "decision": "Keep its executable library checks and examples; do not invent a browser, app session, or user feature map for a surface that does not exist.",
+    "route": "control"
+  },
+  {
+    "request": "Cut report generation from four seconds to two",
+    "decision": "Performance route; measure the same user path before and after, report limitations, and open a PR for the change.",
+    "route": "performance"
+  },
+  {
+    "request": "Review PR #42 and fix the confirmed regression",
+    "decision": "Review against intent and proof, make the authorized fix, and update PR #42 rather than opening another PR.",
+    "route": "pr"
+  },
+  {
+    "request": "Finish the PR after browser proof captured a screenshot",
+    "decision": "Attach the screenshot to the PR or link its committed copy. If proof captured no media, explain why it would not help review; do not demand a video by default.",
+    "route": "pr"
+  },
+  {
+    "request": "The backend now returns another field used by MCP",
+    "decision": "Select focused backend and MCP checks even if no MCP source file changed.",
+    "route": "feature"
+  },
+  {
+    "request": "Rewrite MCP tool descriptions so an agent picks the right action",
+    "decision": "Check the listed tool contract, then run a small model-driven tool-choice evaluation using natural prompts against the current descriptions. Direct calls alone cannot establish agent choice; inspect actual calls and final results before claiming success.",
+    "route": "feature"
+  },
+  {
+    "request": "Test our MCP client while the external tool server is unavailable",
+    "decision": "A mock MCP server can provide deterministic client fixtures. Treat this as consumer proof, not proof of the external server.",
+    "route": "feature"
+  },
+  {
+    "request": "Update a web-only illustration",
+    "decision": "Select visual proof on web; explain why server and unrelated client checks do not apply.",
+    "route": "feature"
+  },
+  {
+    "request": "Implement the proposed design despite an unresolved delete-confirmation choice",
+    "decision": "Ask for the product decision before coding that branch; continue independent work.",
+    "route": "feature"
+  },
+  {
+    "request": "Add OpenAI plugin extensions for a ChatGPT sidebar and conversation panel",
+    "decision": "Feature route → ChatGPT plugin engineering → OpenAI extensions and MCP App UI guidance. Check SDK compatibility, define entrypoints with empty launch inputs, and share the UI through a versioned MCP App resource. Choose useful component states in Storybook, then prove the sidebar and conversation panel in the supported ChatGPT host.",
+    "route": "feature"
+  },
+  {
+    "request": "Build an MCP App using our shared React UI components",
+    "decision": "Feature route → MCP server and web feature paths → ChatGPT plugin engineering and MCP App UI guidance. Keep presentation components in the UI package and host APIs in an adapter. Bundle a versioned HTML resource, register the UI tool/resource metadata, choose Storybook states, and prove bridge initialization, tool input/results and teardown in the target host.",
+    "route": "feature"
+  },
+  {
+    "request": "Let users open a specific record through a plugin deep link",
+    "decision": "Validate the global-entrypoint route and encoded identity/path, handle initial and changed host context, recheck record access and prove navigation in the supported host. Android deep-link coverage remains unsupported at launch.",
+    "route": "feature"
+  },
+  {
+    "request": "Let users mention records in the ChatGPT composer",
+    "decision": "Use authorized bounded mention search with an empty-query case and app visibility. Prove selection in desktop; do not claim Work web or mobile composer mentions.",
+    "route": "feature"
+  },
+  {
+    "request": "Ask users to choose an image in a registered plugin form",
+    "decision": "Use MCP 2026-07-28 MRTR and validate accept, decline and cancel without duplicate effects. Do not copy the legacy OpenAI elicitInput helper into registered-server guidance.",
+    "route": "feature"
+  },
+  {
+    "request": "Monitor document updates and act in ChatGPT",
+    "decision": "Use MCP Events with user-authorized subscriptions, durable filters, verified signed callbacks, expiry and idempotent unsubscribe. Prove lifecycle locally and the intended response in ChatGPT; webhook 2xx is receipt only.",
+    "route": "feature"
+  },
+  {
+    "request": "Make our private local MCP server available to Work web",
+    "decision": "Use a reachable HTTPS development endpoint or Secure MCP Tunnel with actual workspace association and runtime credentials. Installing a local folder does not expose localhost to Work web.",
+    "route": "setup"
+  },
+  {
+    "request": "Package this plugin using the latest manifest format",
+    "decision": "Use root plugin.json and mcp.json with portable schemas and explicit transport types; put OpenAI metadata under extensions.com.openai, validate relocated assets/scripts and avoid fallback manifests.",
+    "route": "feature"
+  },
+  {
+    "request": "MCP Jam passes, can we claim our sidebar integration works?",
+    "decision": "Investigation route; distinguish protocol and emulated-host evidence from actual installed ChatGPT proof. Run the real entrypoint or report that claim unverified.",
+    "route": "investigation"
+  },
+  {
+    "request": "Use the OpenAI extensions helper with the split v2 SDK",
+    "decision": "Inspect the chosen published peers and compatibility ledger. Do not suppress peer errors or cast incompatible servers; prove a supported profile or an explicit adapter before claiming combined support.",
+    "route": "investigation"
+  },
+  {
+    "request": "Start a new web app with repeatable verification",
+    "decision": "Use e2e for running-app regressions and live MCP inspection; pin compatible dependencies and install version-matched project guidance. Prove the intended instance and one exact path; keep app control, backend and host proof at their own boundaries.",
+    "route": "setup"
+  },
+  {
+    "request": "Adopt astack in an app with working Playwright regressions",
+    "decision": "Reuse proven Playwright regressions as the verification part of project setup. Add missing instance identity, safe fixtures, control and evidence/reporting capabilities, prove the integrated loop and record chosen upgrades; a working runner need not be replaced to adopt astack.",
+    "route": "setup"
+  },
+  {
+    "request": "Exploration CI is green but the charter timed out with no findings",
+    "decision": "Read report steps, assessment and termination. Record the charter as inconclusive despite exit zero; no acceptance case passes without an independent check. Keep required regressions separate.",
+    "route": "pr"
+  },
+  {
+    "request": "An explorer says saving lost data, but its repro failed during login",
+    "decision": "Leave the finding a candidate. Login/setup failure is inconclusive; repair fixtures and reproduce the relevant body assertion, including an independent persistence read, before confirming.",
+    "route": "bug"
+  },
+  {
+    "request": "An explorer flags intended disabled controls as a bug",
+    "decision": "Check the behavior contract and source artifacts, then reject with evidence and a reason. Preserve the original claim and do not change intended behavior to satisfy the explorer.",
+    "route": "bug"
+  },
+  {
+    "request": "The known failing probe is excluded, so can the PR be ready",
+    "decision": "Excluding a repro from the passing suite does not waive a confirmed acceptance defect. Fix it and retain the passing regression, or obtain explicit owner acceptance of the limitation.",
+    "route": "pr"
+  },
+  {
+    "request": "The regression passed only on retry",
+    "decision": "Record the latest pass and flaky status, preserve the first failure, and investigate or obtain explicit acceptance before claiming the affected case verified.",
+    "route": "pr"
+  },
+  {
+    "request": "The test server belongs to another checkout",
+    "decision": "Refuse to drive it; classify the identity/setup failure as inconclusive. Start an isolated owned instance or resolve the CLI-owned URL and build/run identity. Never stop another checkout's process.",
+    "route": "control"
+  },
+  {
+    "request": "The rerun failed before writing a fresh report",
+    "decision": "Keep the original report and artifacts unchanged. Separate the selection seed from fresh evidence and report the rerun inconclusive; do not relabel the prior report as a new observation.",
+    "route": "bug"
+  },
+  {
+    "request": "A backend change alters the browser save flow",
+    "decision": "Select the affected browser regression and a focused persistence/state charter even without frontend changes. Confirm writes through a fresh independent read; backend checks alone may miss the user-path regression.",
+    "route": "feature"
+  },
+  {
+    "request": "Update only the verification docs",
+    "decision": "Run documentation, package and site consistency checks. Skip app exploration because no product behavior changed; a new executable reference still needs its own real checks.",
+    "route": "feature"
+  },
+  {
+    "request": "The e2e MCP config file exists, so claim Codex inspection works",
+    "decision": "Prove stdio initialize/open/observe/locate/close and actual host configuration loading separately. A launcher test does not establish that a restarted Codex host loaded it.",
+    "route": "setup"
+  },
+  {
+    "request": "A cached agent action passed, so claim the new model chooses correctly",
+    "decision": "Record replay separately and run live without cache for model-choice claims. Cached actions can support their exact observed outcome, not fresh model behavior.",
+    "route": "pr"
+  },
+  {
+    "request": "The CI artifact link has expired",
+    "decision": "Name the evidence gap and rerun if necessary. Retain sanitized evidence supporting lasting claims under the feature folder or a durable approved store, beyond short CI expiry.",
+    "route": "pr"
+  },
+  {
+    "request": "Prepare a PR for a backend permission change with no UI change",
+    "decision": "PR route; show the actual actor and authorization boundary with a compact flow or sequence diagram when it helps review, link the changed source and cases, and report allowed/denied observations separately. No invented UI screenshot or diagram-as-proof claim.",
+    "route": "pr"
+  },
+  {
+    "request": "Open a PR for a one-word label correction",
+    "decision": "Keep the PR concise with the intended label and relevant observed check. Skip an additional explanation diagram that would repeat the sentence; retain useful captured media under the existing policy.",
+    "route": "pr"
+  },
+  {
+    "request": "Prepare a PR after moving state and adapters between packages",
+    "decision": "PR route; use a shallow before/after responsibility or component tree grounded in actual paths and state owners. Preserve enough context to assess the boundary, and link equivalence/integration evidence separately.",
+    "route": "pr"
+  },
+  {
+    "request": "Explain a proposed UI layout in a PR using an HTML illustration",
+    "decision": "Use a focused illustration only when simpler views are inadequate; render and inspect it, label it as proposed, and include an accessible capture/artifact and text equivalent in the PR. A local path is not a shareable PR artifact; illustrative rendering does not prove product behavior.",
+    "route": "pr"
+  },
+  {
+    "request": "The PR diagram describes the earlier diff after a later implementation change",
+    "decision": "Refresh the view and source links from the current diff, inspect the posted explanation, and rerun only proof the later change could affect. Keep the explanation current without relabeling old observations as new proof.",
+    "route": "pr"
+  },
+  {
+    "request": "The glossary defines cancellation for one reservation but the code cancels the whole visit",
+    "decision": "Surface the glossary/code contradiction with source evidence and a distinguishing case. Investigate whether it is a defect or a product choice; resolve material meaning with the owner before dependent edits. Do not silently redefine cancellation to match code.",
+    "route": "investigation"
+  },
+  {
+    "request": "We agreed our first domain term but this project has no glossary",
+    "decision": "Reuse any established term location; otherwise create root GLOSSARY.md now with the agreed concise definition and useful relationships or confusing alternatives. Keep acceptance and implementation detail elsewhere; do not create an empty context map or a routine ADR.",
+    "route": "feature"
+  },
+  {
+    "request": "Change the billing Account concept in a repo with a GLOSSARY-MAP.md",
+    "decision": "Follow the map to the billing glossary and relevant decisions, inspect affected code and cases, and preserve distinct meanings in other contexts. Resolve material ambiguity and reconcile changed definitions and acceptance within scope; do not flatten context glossaries.",
+    "route": "feature"
+  },
+  {
+    "request": "Fix punctuation in a label that already uses the agreed domain term",
+    "decision": "Keep the fix lightweight and use settled terminology. Run proportionate checks and prepare a concise PR; no new glossary, ADR or separate modeling session is needed.",
+    "route": "feature"
+  },
+  {
+    "request": "While fixing this one screen, we agreed Reservation is the canonical term",
+    "decision": "Record the agreed meaning promptly, then keep code changes within the authorized scope. Surface the wider rename and affected public or persisted consumers as a separate scope decision; terminology agreement alone does not authorize a repository-wide migration.",
+    "route": "feature"
+  },
+  {
+    "request": "Put our cache expiry and retry implementation in GLOSSARY.md",
+    "decision": "Keep the glossary focused on agreed domain meanings. Put operational detail in relevant project documentation; use the existing decision register only for a consequential tradeoff whose rationale merits retention. Link acceptance cases separately.",
+    "route": "feature"
+  },
+  {
+    "request": "Show me how this function works without changing code or preparing a PR",
+    "decision": "Use show-me directly: read the relevant function and produce the smallest useful source-grounded logic sketch, tree or diagram. Keep prose brief and label unknowns; do not start implementation or PR preparation.",
+    "route": "investigation"
+  },
+  {
+    "request": "Use domain-modeling to record the term we just agreed",
+    "decision": "Apply domain-modeling directly, reuse the existing glossary/context home, record the agreed meaning promptly and return remaining ambiguity or consequential decisions. Do not start unrelated implementation or require the astack coordinator.",
+    "route": "investigation"
+  },
+  {
+    "request": "Verify this change and report failures; do not repair it or update its PR",
+    "decision": "Use verify directly, run proportionate requested checks on the named revision/environment and return actual results and gaps. Verification can finish with a failure report; no unrequested repair or PR publication.",
+    "route": "investigation"
+  },
+  {
+    "request": "Use astack to fix this small typo in a CLI message",
+    "decision": "Select bug-fix or implement according to whether a defect is reported, preserve the narrow scope, run a meaningful focused check and finish through pr. Apply skills sequentially without requiring delegation, domain modeling or a diagram for the simple change.",
+    "route": "bug"
+  },
+  {
+    "request": "Use bug-fix directly to repair an existing Convex ownership check",
+    "decision": "Apply bug-fix and relevant database guidance; use convex-expert before backend edits and the required convex-reviewer before PR readiness. Reproduce the permission defect, fix within scope and retain allowed/denied observations; do not rely on astack having supplied platform gates.",
+    "route": "bug"
+  },
+  {
+    "request": "Use mcp-server directly for a kept tool change",
+    "decision": "Select relevant platform guidance, implement the tool within the authorized boundary, prove applicable contract/transport/agent layers and finish through verify and pr. For a bounded contribution whose caller owns publication, return the result to that caller instead of opening a duplicate PR.",
+    "route": "feature"
+  },
+  {
+    "request": "Fix this isolated account label without changing its interaction",
+    "decision": "Feature route; preserve caller work identity and A1 in the conversation/PR, use lead-only guidance and a visible check, record self-review and actual revision/environment. No specialist roster or extra handoff file.",
+    "route": "feature"
+  },
+  {
+    "request": "COS work COS-42 reports cross-user reads on web and MCP; repair within the supplied scope and limits",
+    "decision": "Bug fix route; preserve supplied work/assignment/attempt IDs, source facts and acceptance; reproduce the report, select backend/data and security contributions, name one writer and shared-contract owner, use actual allowed/denied checks on both surfaces and required Convex review. Return one consolidated result; no Slack reply without authority.",
+    "route": "bug"
+  },
+  {
+    "request": "Implement a new multi-step browser flow; this host has no subagents",
+    "decision": "Feature route; select UI/UX, accessibility and web guidance from affected interactions, apply it sequentially, preserve the work identity and contract, and report lead self-review plus any required independent-review gap. Do not claim delegation or independent review.",
+    "route": "feature"
+  },
+  {
+    "request": "A specialist completed review and found a confirmed acceptance defect",
+    "decision": "Keep the parent work incomplete; preserve finding ID and case/risk, resolve with a correction and recheck or explicit owner acceptance, and retain evidence. A completed contribution cannot make the lead result completed.",
+    "route": "pr"
+  },
+  {
+    "request": "COS assignment asks to remove intentional sharing but the accepted ADR conflicts",
+    "decision": "Report blocked with the same identity, concrete owner decision/options, independent findings, remaining limits and resumption condition. Defer sharing changes while independent investigation continues; do not silently rewrite acceptance.",
+    "route": "bug"
+  },
+  {
+    "request": "Local web acceptance passed but required MCP proof failed during startup",
+    "decision": "Report partial with a draft PR, web observations and MCP inconclusive, original failure/attempt evidence and exact revision/environment. Name the next owner/action and limits; passing builds do not establish the missing MCP observation.",
+    "route": "bug"
+  },
+  {
+    "request": "Resume COS-42 after a repeated signal and an expired execution budget",
+    "decision": "Inspect the durable assignment/latest result, actual checkout, existing PR, owners and proof under the same work ID. Reconcile stale scope, authority and remaining limits with the host/owner before mutation; a new attempt cannot silently reset the budget. Host replay/deduplication still needs actual integration proof.",
+    "route": "investigation"
+  },
+  {
+    "request": "Start a standalone Codex session to fix one CLI label; no orchestrator prompt or T3 is supplied",
+    "decision": "The main agent owns the request through proof by default. Use the focused delivery guidance, a proportionate plan and visible check; a small task needs no child. Standalone native delegation is available only when the host exposes it; do not require T3 or invent independent review.",
+    "route": "feature"
+  },
+  {
+    "request": "Delegate a useful review in T3, but its tools are missing from the initial catalog",
+    "decision": "Make one bounded supported MCP/ACP capability attempt before declaring T3 unavailable. Discover actual models and use the host-preferred supported mechanism. Retain the T3 task ID or native handle and manage it through that host; wait timeouts do not justify duplicate children or top-level conversations.",
+    "route": "pr"
+  },
+  {
+    "request": "Return this child contribution under the owner's evaluation task ID and COS work COS-42",
+    "decision": "Return scoped changes, exact revision, actual checks, gaps and the supplied owner evaluation ID with COS-42 unchanged. The main owner begins/finishes the evaluation and verifies integration. Keep evaluation ID, delegation ID/native handle, work ID and flow ID distinct; child completion does not complete the owner task.",
+    "route": "feature"
+  },
+  {
+    "request": "Correct proof after the task evaluation was delivered as an immutable review",
+    "decision": "Preserve the original review and external work identity; the owner starts a fresh evaluation/task ID for materially revised proof. Reuse an ID for active follow-ups or identical retries, without rewriting immutable delivered intent or proof.",
+    "route": "pr"
+  },
+  {
+    "request": "Two children share a work ID; record their parent joins before captured results are available",
+    "decision": "Shared work identity does not establish typed root/child correlation or integration. Record a join only when the parent actually uses a result and trusted captured delegation/result references are exposed; continue the engineering task with the capture gap visible.",
+    "route": "investigation"
+  },
+  {
+    "request": "Set up astack in a new project with no selected stack",
+    "decision": "Project setup; apply the new-product defaults to actual surfaces, establish local startup and a project-owned control CLI/map, add a meaningful regression, prove one real path through cleanup and record the profile plus main-thread instructions in the actual host entry point. Delegate when useful; T3 is optional. Ask only for material product or scope choices; no tracker or model-role questionnaire.",
+    "route": "setup"
+  },
+  {
+    "request": "Upgrade our existing app to Bun and astack runtime verification",
+    "decision": "Project setup; honor the selected Bun upgrade, capture a baseline, update coupled scripts, lockfile, CI and runtime/control guidance, and verify the same real behavior after the upgrade. Resolve other major migration choices only when still missing; retain evidence and report recovery and gaps.",
+    "route": "setup"
+  },
+  {
+    "request": "Re-run setup after our startup script and saved-items route changed",
+    "decision": "Project setup; read the existing profile, host instructions, control skill and feature map, update stale commands and handles in place, reconcile missing main-thread clauses outside managed blocks, preserve custom text and repair the mapped path. Re-run startup, identity, action, fresh observation and cleanup; retain evidence without creating a second loop or duplicated guidance.",
+    "route": "setup"
+  },
+  {
+    "request": "Adopt astack in a Claude project with custom instructions and framework-managed blocks",
+    "decision": "Project setup; preserve custom text and managed blocks byte-for-byte, reconcile concise project-owned orchestration clauses outside those markers, and ensure CLAUDE.md reaches the root instructions and profile. Repeating unchanged setup leaves guidance unchanged; file inspection does not prove actual host loading or runtime acceptance.",
+    "route": "setup"
+  },
+  {
+    "request": "Set up the runtime loop, but our auth credentials are unavailable",
+    "decision": "Complete independent startup/control/check work, retain the first auth failure and mark the affected runtime path partial with its exact prerequisite. Use GitHub or the established tracker only if useful and issue creation is authorized; a ticket and generated files do not establish a completed loop.",
+    "route": "setup"
+  },
+  {
+    "request": "Set up astack for a pure parsing library",
+    "decision": "Project setup; exercise a real executable consumer/example and exact parsing assertions, record actual commands and evidence in the project profile and add an agent pointer. Mark browser sessions and app feature maps not applicable; do not fabricate a running UI.",
+    "route": "setup"
+  },
+  {
+    "request": "Fix this small CLI message; this repo has no astack project profile",
+    "decision": "Use the relevant delivery skill and actual project instructions/commands. Missing project guidance does not force setup, a stack upgrade or unrelated files; verify the narrow outcome and finish through pr.",
+    "route": "feature"
+  },
+  {
+    "request": "Use project-setup directly to integrate our existing app",
+    "decision": "Apply project-setup and its runtime-loop guidance directly, compose app-control, testing and verify as needed, improve weak tooling toward astack opinions and finish kept changes through pr. Do not require entry through the astack coordinator.",
+    "route": "setup"
+  },
+  {
+    "request": "Use principle-type-system-discipline to review a Swift state enum",
+    "decision": "Read the language-independent principle leaf in full and assess the actual variants, illegal states and signature using Swift constructs. Return the decision and observed checks or limits; no TypeScript dependency, project setup or unrelated PR.",
+    "route": "investigation"
+  },
+  {
+    "request": "Use principle-boundary-discipline to assess this MCP adapter",
+    "decision": "Read the leaf and actual adapter, identify where external arguments and identity become domain values, and assess validation and pure logic at that boundary. Return a scoped assessment; do not initiate implementation or require astack routing.",
+    "route": "investigation"
+  },
+  {
+    "request": "This same invalid configuration keeps breaking startup",
+    "decision": "Select bug-fix for the reported failure and read principle-encode-lessons-in-structure for its recurrence. Reproduce it, place a structural fix at the owning configuration boundary, retain a distinguishing regression and finish through verify/pr; another reminder is insufficient.",
+    "route": "bug"
+  },
+  {
+    "request": "Set up the runtime loop, then repair the lost-save bug",
+    "decision": "Compose project-setup before bug-fix where the loop is missing, carrying one scope and proof record. Establish identity and fixtures, reproduce the bug, fix its cause and re-drive the same persisted user path. Reuse completed setup proof and finish in the designated PR.",
+    "route": "setup"
+  },
+  {
+    "request": "Audit the full feature map; repair only control tooling and report product defects",
+    "decision": "Use app-control for maintenance; compare every scoped map entry and command with source and the live product, report a result or gap per path, repair stale control handles and guidance only, and re-drive repaired paths. Report product regressions without changing product code under this bounded request.",
+    "route": "control"
+  },
+  {
+    "request": "Apply prove it works; the save test only checked a success toast",
+    "decision": "Read principle-prove-it-works and use verify to inspect the actual persisted value through a fresh authoritative read on the identified instance. Keep the earlier toast observation limited to UI feedback and report any remaining data-proof gap.",
+    "route": "feature"
+  },
+  {
+    "request": "Use principle-test-behavior-not-implementation to assess our negative tests",
+    "decision": "Read the leaf, exercise the actual subject and assess whether the assertions distinguish the rejected behavior. A meaningful absence or rejection is legitimate; pair with a success/control case when useful instead of deleting negative coverage blindly.",
+    "route": "investigation"
+  },
+  {
+    "request": "Continue the migration from the retained task record; do not repeat completed work",
+    "decision": "Read the current checkout, scope, decisions and existing PR, verify inherited claims that still matter, and resume the next incomplete phase. Apply principle-sequence-verifiable-units to dependent slices and preserve the original finish condition.",
+    "route": "refactor"
+  },
+  {
+    "request": "New task: explain retry ownership without changing code",
+    "decision": "Rematch the explicit new outcome to investigate instead of continuing an earlier implementation route. Read current source and decision history, separate evidence from inference, and return a read-only answer.",
+    "route": "investigation"
+  },
+  {
+    "request": "Implement a retryable export API with cancellation and duplicate-call handling",
+    "decision": "Feature route; compose architect for caller usage, operation identity, state ownership and cancellation/recovery. Return a design sketch for a design-only request. A settled small interface needs no added phase.",
+    "route": "feature"
+  },
+  {
+    "request": "Review the quality of a persisted mutation without changing it",
+    "decision": "Pull request review route; compose code-review, pin the reviewed source and trace ownership, types, effects and consumers. Use a fresh read-only reviewer for material permission or persistence risks and adjudicate its findings; report proof gaps without unrequested repairs.",
+    "route": "pr"
+  },
+  {
+    "request": "The same lost-save mistake keeps returning after reviews",
+    "decision": "Bug fix route; reproduce the persisted failure and compose correct to place the strongest proportionate safeguard at its owning boundary. Preserve the bad case, prove rejection and accept the correction; another reminder alone does not establish prevention.",
+    "route": "bug"
+  },
+  {
+    "request": "Compare astack with the previous plugin and plain agents on coding tasks",
+    "decision": "Investigation route with agent-evaluation; fix host, model, fixtures, limits and evaluator-owned acceptance independently of candidate revisions. Retain every planned attempt and activation failure; assess blinded quality only after calibration and do not infer reliability from a smoke run.",
+    "route": "investigation"
+  }
+]

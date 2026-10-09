@@ -8,6 +8,8 @@ A reusable engineering stack for coding agents. It has three parts:
 | [`lint/`](lint/) | Mechanical feedback when the work breaks a rule |
 | [`loops/`](loops/) | Prompts that run the skills on a schedule or a mention |
 
+**[astack.applification.net](https://astack.applification.net/)** explains the same thing visually, with a route map and searchable routing examples.
+
 ## Install
 
 **Codex**
@@ -91,7 +93,9 @@ Put that command in cron, a CI schedule or your host's scheduled tasks. For `men
 
 ## Contributing
 
-[AGENTS.md](AGENTS.md) holds the rules that keep this repository small. `bun run check` validates the plugin manifests and skill links, and runs the lint and loop tests.
+[AGENTS.md](AGENTS.md) holds the rules that keep this repository small. `bun run check` validates the site, the plugin manifests and the skill links, and runs the lint and loop tests.
+
+The site is plain HTML, CSS and JavaScript in [`site/`](site/), published to astack.applification.net by GitHub Pages on every merge to `main`. Preview it with `python3 -m http.server 8000 --directory site`.
 
 ## Sources and license
 

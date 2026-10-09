@@ -9,7 +9,7 @@
     "./tsconfig": "./lint/tsconfig.json"
   },
   "scripts": {
-    "check": "bun scripts/check-plugins.ts && bun test"
+    "check": "node site/check.mjs && bun scripts/check-plugins.ts && bun test"
   },
   "dependencies": {
     "@eslint/js": "9.39.4",
