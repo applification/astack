@@ -7,6 +7,9 @@ permissions:
   contents: read
 jobs:
   build:
+    permissions:
+      contents: read
+      pages: read
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

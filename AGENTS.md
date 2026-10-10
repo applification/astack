@@ -10,6 +10,7 @@ astack is three things, and nothing else:
 
 When changing this repository:
 
+- Keep application stack choices in the consuming project. Platform skills explain how to use selected technologies.
 - Every change serves one of those three. Apps, examples and product experiments live in their own repositories.
 - A skill is one directory under `skills/`. Keep `SKILL.md` short. When a rule can be checked mechanically, put it in `lint/` and delete the prose.
 - Commit no evidence: no screenshots, logs or run records. Proof goes in the pull request description.

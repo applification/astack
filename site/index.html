@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#d7dfe7">
-  <meta name="description" content="astack is a reusable engineering stack for coding agents: skills that say how to do the work, lint rules that push back, and loops that run the skills on a schedule or a mention.">
+  <meta name="description" content="Reusable engineering skills, lint feedback and loops for coding agents. Your project chooses its stack; astack helps build and verify the outcome.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="astack | Outcome first. Proof built in.">
   <meta property="og:description" content="Skills, lint rules and loops for coding agents, maintained with the source.">
@@ -30,7 +30,7 @@
     <div class="hero-copy">
       <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> astack by Applification</p>
       <h1 id="hero-title">Outcome first.<br><em>Proof built in.</em></h1>
-      <p class="hero-lede">A reusable engineering stack for coding agents. Skills say how to do the work, lint rules push back when it breaks a rule, and loops run the skills on a schedule or a mention. Install the Applification plugin in Codex or Claude Code, then give astack an engineering request.</p>
+      <p class="hero-lede">Reusable engineering skills, lint feedback and loops for coding agents. Your project chooses its stack. astack helps the agent explore open decisions, build the outcome and prove it works. Install the Applification plugin in Codex or Claude Code, then give it a request.</p>
       <div class="hero-actions"><a class="button button-dark" href="#adopt">Get started <span aria-hidden="true">↗</span></a><a class="text-link" href="https://github.com/applification/astack/blob/main/README.md">Read the README ↗</a></div>
       <p class="source-note">The <a href="https://github.com/applification/astack">repository</a> is the source of truth. This site explains the workflow without pinning it to a release snapshot.</p>
     </div>
@@ -313,16 +313,16 @@
                 <small>Scripts and constraints</small>
               </div>
               <div class="v-station">
-                <strong>Integrate and upgrade</strong>
-                <small>Apply useful astack defaults</small>
+                <strong>Explore open choices</strong>
+                <small>Product constraints and trade-offs</small>
               </div>
               <div class="v-station">
-                <strong>Establish runtime loop</strong>
-                <small>Start, identify, act and inspect</small>
+                <strong>Build the first milestone</strong>
+                <small>The smallest useful path</small>
               </div>
               <div class="v-station">
-                <strong>Record working guidance</strong>
-                <small>Control, checks and evidence</small>
+                <strong>Run it for real</strong>
+                <small>Report the observed result</small>
               </div>
             </div>
             <div class="v-shared">
@@ -352,14 +352,14 @@
     <div class="section-heading"><div><p class="eyebrow">02 / METHOD</p><h2 id="method-title">The check follows<br><em>the claim.</em></h2></div><p>A passing command says what that command checked. astack asks for evidence from the surface where the behavior actually matters.</p></div>
     <div class="method-grid">
       <article class="method-card"><span class="method-index">01 / INTENT</span><h3>Name the outcome</h3><p>For a substantial change, keep a short behavior contract in <code>.astack/&lt;feature&gt;/</code>. It ties cases, design choices, and proof together.</p><a href="https://github.com/applification/astack/blob/main/skills/implement/references/behavior-contract.md">Behavior contract ↗</a></article>
-      <article class="method-card"><span class="method-index">02 / BUILD</span><h3>Use what helps</h3><p>For web UI, decide separately whether Pencil and Storybook would answer a real design or component question. Ordinary changes use the established stack; setup can upgrade the project loop.</p><a href="https://github.com/applification/astack/blob/main/skills/web-feature/SKILL.md">Web UI guidance ↗</a></article>
+      <article class="method-card"><span class="method-index">02 / BUILD</span><h3>Use what helps</h3><p>Use the chosen stack and existing tools. Add a design or component tool only when it answers a real question. Open technology choices follow the product constraints.</p><a href="https://github.com/applification/astack/blob/main/skills/web-feature/SKILL.md">Web UI guidance ↗</a></article>
       <article class="method-card"><span class="method-index">03 / PROVE</span><h3>Observe the product</h3><p>Use exact e2e checks for known web behavior. Explore selected risks, reproduce candidates, fix confirmed defects and retain passing regressions on a named revision and environment.</p><a href="https://github.com/applification/astack/blob/main/skills/verify/SKILL.md">Proof guidance ↗</a></article>
       <article class="method-card"><span class="method-index">04 / REVIEW</span><h3>Show the evidence</h3><p>Kept repository changes finish in a PR. The description gives reviewers the outcome, observed result, and any gaps. A compact sketch or diagram explains complex logic, ownership or interactions; simple fixes stay concise. Investigation ends with an answer.</p><a href="https://github.com/applification/astack/blob/main/skills/pr/SKILL.md">PR guidance ↗</a></article>
     </div>
     <p class="source-row">Choose <a href="https://github.com/applification/astack/blob/main/skills/astack/references/specialists.md">specialist contributions ↗</a> by affected behavior and risk. Small fixes can stay with the lead. <a href="https://github.com/applification/astack/blob/main/skills/astack/references/handoffs.md">Portable handoffs ↗</a> preserve identity, acceptance, authority, findings and proof, including partial results and blocked decisions. One writer owns each worktree; self-review leaves independence explicit. The external COS host owns durable records, dispatch and follow-up. Actual specialist delivery and host integration need their own evidence.</p>
   </div></section>
   <section class="section-shell explainer-section" id="project" aria-labelledby="project-title">
-    <div class="section-heading"><div><p class="eyebrow">03 / IN A PROJECT</p><h2 id="project-title">The plugin stays put.<br><em>Your project owns the work.</em></h2></div><p>A project can pin the Applification plugin to a revision. Its own profile, control commands, feature map and contracts live beside its code.</p></div>
+    <div class="section-heading"><div><p class="eyebrow">03 / IN A PROJECT</p><h2 id="project-title">The plugin stays put.<br><em>Your project owns the work.</em></h2></div><p>A project can pin the Applification plugin to a revision. Its own stack choices, commands and product decisions live beside its code.</p></div>
     <p class="tree-hint">Scroll the file trees sideways to read each path.</p>
     <div class="explainer-pair">
       <div class="explainer-card"><p class="card-kicker">IN THE ASTACK REPOSITORY</p><pre class="file-tree"><code>astack/
@@ -385,26 +385,12 @@
 │  └─ mention.md                     <span class="tree-note">on a mention</span>
 └─ site/                             <span class="tree-note">this page</span></code></pre></div>
       <div class="explainer-card"><p class="card-kicker">IN YOUR PROJECT</p><pre class="file-tree"><code>my-project/
-├─ .agents/plugins/marketplace.json     <span class="tree-note">pinned</span>
-├─ .codex/config.toml                   <span class="tree-note">enabled</span>
-├─ .codex/skills/astack-&lt;app&gt;/
-│  ├─ SKILL.md                          <span class="tree-note">guide</span>
-│  └─ scripts/astack-&lt;app&gt;.ts           <span class="tree-note">CLI</span>
-├─ .astack/                             <span class="tree-note">tracked in Git</span>
-│  ├─ project.md                        <span class="tree-note">profile</span>
-│  ├─ feature-map/&lt;app&gt;/                <span class="tree-note">user paths</span>
-│  │  ├─ README.md                      <span class="tree-note">index</span>
-│  │  └─ presence.md                    <span class="tree-note">feature</span>
-│  ├─ presence/
-│  │  ├─ behavior-contract.md
-│  │  ├─ presence.pen                   <span class="tree-note">if selected</span>
-│  │  └─ evidence/                      <span class="tree-note">proof</span>
-│  └─ saved-items/
-│     ├─ behavior-contract.md
-│     └─ evidence/
-└─ AGENTS.md                            <span class="tree-note">pointer</span></code></pre></div>
+├─ source + tests                 <span class="tree-note">your chosen layout</span>
+├─ package + compiler settings    <span class="tree-note">your chosen tools</span>
+├─ AGENTS.md                      <span class="tree-note">project guidance</span>
+└─ .astack/project.md             <span class="tree-note">optional working notes</span></code></pre><p class="card-foot">Use existing guidance first. A control command, feature map or shared package earns its place when the project needs it.</p></div>
     </div>
-    <div class="explain-strip"><p><strong>Install.</strong> Add the Applification plugin in Codex or Claude Code, and add the lint rules as a development dependency. Pin a ref or SHA when repeatability matters.</p><p><strong>Establish the loop.</strong> Invoke <code>$applification:project-setup</code> to create or upgrade runtime control and verification. It installs project-owned main-thread instructions, proves a real path and records commands, evidence and gaps in <code>.astack/project.md</code>.</p><p><strong>Give it work.</strong> Use <code>$applification:astack &lt;task&gt;</code> for routing or invoke a focused skill directly. Both read the project loop and select applicable principle leaves.</p></div>
+    <div class="explain-strip"><p><strong>Install.</strong> Add the Applification plugin in Codex or Claude Code. Add the lint rules if they fit the project. Pin a ref or SHA when repeatability matters.</p><p><strong>Set up when needed.</strong> Give <code>$applification:project-setup</code> the product, fixed choices, open decisions and first milestone. It builds and verifies the smallest useful path with the chosen tools.</p><p><strong>Give it work.</strong> Use <code>$applification:astack &lt;task&gt;</code> for routing or invoke a focused skill directly. Both read the project guidance and select applicable principle leaves. Platform skills apply only to selected technologies.</p></div>
     <p class="source-row">The <a href="https://github.com/applification/astack/blob/main/README.md">README ↗</a> has the install commands for each host.</p>
   </section>
   <section class="section-shell explainer-section" id="skills" aria-labelledby="skills-title">
@@ -415,73 +401,48 @@
     <div class="explain-strip"><p><strong>Real proof.</strong> <a href="https://github.com/applification/astack/blob/main/skills/principle-prove-it-works/SKILL.md"><code>principle-prove-it-works</code></a> checks the actual artifact; <a href="https://github.com/applification/astack/blob/main/skills/principle-test-behavior-not-implementation/SKILL.md"><code>principle-test-behavior-not-implementation</code></a> shapes meaningful assertions.</p><p><strong>Supported repairs.</strong> <a href="https://github.com/applification/astack/blob/main/skills/principle-fix-root-causes/SKILL.md"><code>principle-fix-root-causes</code></a> traces a reproduced symptom before choosing a fix.</p><p><strong>Checked delivery.</strong> <a href="https://github.com/applification/astack/blob/main/skills/principle-sequence-verifiable-units/SKILL.md"><code>principle-sequence-verifiable-units</code></a> gives each dependent slice a baseline and useful check.</p></div>
   </section>
   <section class="explainer-band" id="lint" aria-labelledby="lint-title"><div class="section-shell">
-    <div class="section-heading"><div><p class="eyebrow">LINT RULES</p><h2 id="lint-title">Rules that answer back<br><em>before review does.</em></h2></div><p>A skill tells an agent what to do. A lint rule tells it when it didn’t. Each message says what to do instead, so the agent can fix the cause without rereading the skill.</p></div>
+    <div class="section-heading"><div><p class="eyebrow">LINT</p><h2 id="lint-title">Feedback in the tools.<br><em>Choices in the project.</em></h2></div><p>The base config supplies strict TypeScript feedback. React conventions and portable UI boundaries are explicit opt-ins. Your project owns its runtime, module settings and directory names.</p></div>
     <div class="explainer-pair">
-      <div class="explainer-card"><h3>Add it to a project</h3><pre class="contract-sample"><code>bun add -d github:applification/astack eslint typescript
-
-// eslint.config.mjs
+      <div class="explainer-card"><h3>Start with the base</h3><pre class="contract-sample"><code>// eslint.config.mjs
 import astack from 'astack/eslint';
-
-export default astack({ scope: '@acme' });
+export default astack();
 
 // tsconfig.json
-{ "extends": "astack/tsconfig" }</code></pre><p class="card-foot"><code>scope</code> is your workspace package scope. The config expects apps in <code>apps/*</code> and shared code in <code>packages/ui</code>, <code>packages/domain</code> and <code>packages/backend</code>.</p></div>
-      <div class="explainer-card"><h3>What it enforces</h3><ul class="plain-list"><li><strong>Strict types.</strong> No floating promises, no unsafe <code>any</code> access, exhaustive switches.</li><li><strong>React and accessibility.</strong> Hook rules and accessible names in <code>.tsx</code> files.</li><li><strong>Portable UI.</strong> UI and domain packages cannot import the backend, Node builtins or network clients, or call <code>fetch</code> directly.</li><li><strong>Pure domain.</strong> No <code>window</code> or <code>document</code> in the domain package.</li></ul><p class="card-foot">When a rule can be checked mechanically it belongs here, and the skill gets shorter.</p></div>
+{ "extends": "astack/tsconfig" }</code></pre><p class="card-foot">Install compatible ESLint and TypeScript API dependencies using the <a href="https://github.com/applification/astack/blob/main/README.md">README commands ↗</a>. TypeScript 7 compilation can run alongside the API used by lint.</p></div>
+      <div class="explainer-card"><h3>Choose additional checks</h3><pre class="contract-sample"><code>import astack, { react, portableUi }
+  from 'astack/eslint';
+
+export default [
+  ...astack(),
+  react(),
+  ...portableUi({
+    ui: 'views',
+    domain: 'model',
+    backend: 'server',
+  }),
+];</code></pre><p class="card-foot"><code>react()</code> checks hooks and accessibility. <code>portableUi()</code> checks the boundaries you choose: portable code cannot reach the backend or network, and domain code stays independent of presentation. Neither is enabled by the base config.</p></div>
     </div>
-    <p class="source-row"><a href="https://github.com/applification/astack/blob/main/lint/eslint.mjs">The config ↗</a> · <a href="https://github.com/applification/astack/blob/main/lint/eslint.test.ts">One test case per rule ↗</a></p>
+    <p class="source-row">Base feedback includes unowned promises, unsafe <code>any</code> access and exhaustive switches. When a rule can be checked mechanically it belongs here. <a href="https://github.com/applification/astack/blob/main/lint/eslint.mjs">The config ↗</a> · <a href="https://github.com/applification/astack/blob/main/lint/eslint.test.ts">Behavior checks ↗</a></p>
   </div></section>
   <section class="section-shell explainer-section" id="loops" aria-labelledby="loops-title">
     <div class="section-heading"><div><p class="eyebrow">LOOPS</p><h2 id="loops-title">The same skills,<br><em>without being asked.</em></h2></div><p>A loop is one prompt file that names a trigger and the skills it composes. astack ships no scheduler: run a loop from cron, a CI schedule or your host’s scheduled tasks.</p></div>
-    <div class="control-flow" aria-label="Loops"><div><span>WEEKLY</span><strong><code>lint-debt</code></strong><p>Fixes one lint rule’s findings and opens a pull request.</p></div><div><span>HOURLY OR ON PR</span><strong><code>pr-review</code></strong><p>Reviews open pull requests and reports what the checks showed.</p></div><div><span>DAILY</span><strong><code>bug-fix</code></strong><p>Reproduces and fixes the oldest unassigned bug.</p></div><div><span>ON A MENTION</span><strong><code>mention</code></strong><p>Answers the question or makes the requested change.</p></div></div>
-    <div class="explain-strip"><p><strong>Run one.</strong> From a project with the plugin installed, pass the file on stdin: <code>claude -p &lt; loops/lint-debt.md</code>.</p><p><strong>Bounded.</strong> Each run does one slice of work, continues an open pull request instead of opening a second, and never merges.</p><p><strong>Mentions.</strong> Have the trigger append the comment and its thread to the <code>mention</code> prompt.</p></div>
+    <div class="control-flow" aria-label="Loops"><div><span>WEEKLY</span><strong><code>lint-debt</code></strong><p>Fixes one lint rule or compiler diagnostic and opens a pull request.</p></div><div><span>HOURLY OR ON PR</span><strong><code>pr-review</code></strong><p>Reviews open pull requests and reports what the checks showed.</p></div><div><span>DAILY</span><strong><code>bug-fix</code></strong><p>Reproduces and fixes the oldest eligible bug. Skips a previously blocked report until new reproduction information arrives.</p></div><div><span>ON A MENTION</span><strong><code>mention</code></strong><p>Answers the question or makes the requested change.</p></div></div>
+    <div class="explain-strip"><p><strong>Run one.</strong> With the plugin and lint package installed, pass <code>claude -p &lt; node_modules/astack/loops/lint-debt.md</code>. Plugin-only users copy the chosen prompt from this repository to a local file first.</p><p><strong>Bounded.</strong> Each run does one slice of work using the project’s chosen tools. It checks for existing work and never merges.</p><p><strong>Mentions.</strong> Have the trigger append the comment and its thread to the <code>mention</code> prompt.</p></div>
     <p class="source-row"><a href="https://github.com/applification/astack/blob/main/loops/lint-debt.md">lint-debt ↗</a> · <a href="https://github.com/applification/astack/blob/main/loops/pr-review.md">pr-review ↗</a> · <a href="https://github.com/applification/astack/blob/main/loops/bug-fix.md">bug-fix ↗</a> · <a href="https://github.com/applification/astack/blob/main/loops/mention.md">mention ↗</a></p>
   </section>
-  <section class="explainer-band" id="sprint" aria-labelledby="sprint-title"><div class="section-shell">
-    <div class="section-heading"><div><p class="eyebrow">04 / WEB UI</p><h2 id="sprint-title">A design sprint<br><em>with one contract.</em></h2></div><p>For a substantial behavior change, the tracked contract names the outcome and acceptance cases. Pencil and Storybook are selected independently when they help answer a design or component question.</p></div>
-    <div class="explainer-pair sprint-pair">
-      <div class="explainer-card"><h3>From choice to proof</h3><ol class="step-list"><li><strong>Start the contract.</strong><span>Record the actor, problem, outcome, material states, open choices and observable cases.</span></li><li><strong>Design consequential states.</strong><span>If Pencil helps, keep the <code>.pen</code> file and its assets in the feature folder.</span></li><li><strong>Exercise components.</strong><span>If Storybook helps, put stories beside components and run the project's UI checks.</span></li><li><strong>Compare and record.</strong><span>When both tools are selected, compare the story with the chosen frame. Link frame and story IDs to the cases they support.</span></li><li><strong>Prove in the product.</strong><span>Implement the real data path, then record running-product observations and retained evidence against the same cases.</span></li></ol><p class="card-foot">A small change can keep its outcome and tool decisions in the PR. An unavailable selected check remains an explicit gap.</p></div>
-      <div class="explainer-card"><h3>What a contract looks like</h3><p class="card-intro">Illustrative excerpt. Plain acceptance sentences work as well as Given/When/Then.</p><pre class="contract-sample"><code>## Outcome
-A member can see when another member is idle.
-
-## Acceptance
-A1. After two minutes of inactivity, the
-    member's avatar shows the Idle state.
-    Design: presence.pen → "Idle"
-    Story:  presence-avatar--idle
-    Proof:  pass · local · 3f2a91c
-            evidence/a1.png
-
-## Open decision
-Should "away" hide the last-seen time?</code></pre><p class="card-foot">A frame supports a visual decision. A story supports component states. Neither establishes timing, real data effects or persistence in the running app.</p></div>
-    </div>
-    <p>When domain concepts change, clarify terms against the existing glossary, code and concrete cases. Record agreed definitions in the glossary, acceptance in the contract and consequential rationale in the decision register. Follow existing context maps; create files only when needed. <a href="https://github.com/applification/astack/blob/main/skills/domain-modeling/SKILL.md">Domain language guide ↗</a></p>
-    <p class="source-row">The <a href="https://github.com/applification/astack/blob/main/skills/web-feature/SKILL.md">web UI path ↗</a> and <a href="https://github.com/applification/astack/blob/main/skills/implement/references/behavior-contract.md">contract guide ↗</a> define the current process.</p>
-  </div></section>
-  <section class="section-shell explainer-section" id="control" aria-labelledby="control-title">
-    <div class="section-heading"><div><p class="eyebrow">05 / APP CONTROL</p><h2 id="control-title">Give the agent a way<br><em>to drive the product.</em></h2></div><p>The project owns a small CLI around its working browser, simulator, terminal or protocol tools. The feature map tells an agent how a user reaches each behavior.</p></div>
-    <div class="control-flow" aria-label="App control flow"><div><span>01 / FIND</span><strong>Feature map</strong><p>User entry points, commands, expected results and prerequisites.</p></div><div><span>02 / CHECK</span><strong><code>doctor</code></strong><p>Identify the checkout, revision, target and whether it belongs to this run.</p></div><div><span>03 / DRIVE</span><strong><code>astack-&lt;app&gt;</code></strong><p>Act through the real product using its existing driver.</p></div><div><span>04 / OBSERVE</span><strong>Evidence</strong><p>Record the end state and confirm material effects with a fresh read.</p></div></div>
-    <p class="source-row">A passing CLI command reports what it observed. Acceptance still depends on the case and result. <a href="https://github.com/applification/astack/blob/main/skills/app-control/SKILL.md">Read the app control guide ↗</a></p>
-  </section>
-  <section class="section-shell explainer-section" id="plugins" aria-labelledby="plugins-title">
-    <div class="section-heading"><div><p class="eyebrow">CHATGPT PLUGINS</p><h2 id="plugins-title">Build the integration.<br><em>Check it in its host.</em></h2></div><p>astack guides MCP Apps, sidebar and conversation views, shared UI, deep links, forms, mentions and event subscriptions. It checks SDK compatibility before implementation and records which client supports the requested behavior.</p></div>
-    <div class="explain-strip"><p><strong>Share the UI.</strong> Bundle production components from your UI package. Storybook checks component states; the MCP bridge handles host context and tools.</p><p><strong>Package locally.</strong> Use portable <code>plugin.json</code> and <code>mcp.json</code>. A local marketplace package and a reachable server connection are separate pieces.</p><p><strong>Prove the claim.</strong> Protocol tests and MCP Jam support local checks. Installed ChatGPT proof establishes navigation, native forms and responses to subscribed events.</p></div>
-    <p class="source-row"><a href="https://github.com/applification/astack/blob/main/skills/chatgpt-plugin/SKILL.md">Plugin engineering ↗</a></p>
-  </section>
   <section class="explainer-band" id="stack" aria-labelledby="stack-title"><div class="section-shell">
-    <div class="section-heading"><div><p class="eyebrow">06 / PROJECT FOUNDATION</p><h2 id="stack-title">Defaults for new work.<br><em>Specialists for specific work.</em></h2></div><p>New interactive UI starts with React, TypeScript and Vite. Choose Next.js for server rendering or public content requirements. Existing-project setup integrates and upgrades the runtime loop toward these opinions, reusing sound tooling and resolving larger migration choices. The core profile below shares persistent behavior across web and MCP.</p></div>
+    <div class="section-heading"><div><p class="eyebrow">PROJECT CHOICES</p><h2 id="stack-title">State what is fixed.<br><em>Explore what is open.</em></h2></div><p>Early preferences can be wrong for a product. astack brings engineering discipline while leaving technology choices with the project. Explore trade-offs before an open choice becomes a commitment.</p></div>
     <div class="explainer-pair">
-      <div class="explainer-card"><h3>Convex + MCP + WorkOS</h3><pre class="file-tree"><code>my-product/
-├─ bun.lock
-├─ turbo.json
-├─ eslint.config.mjs          <span class="tree-note">astack/eslint</span>
-├─ apps/
-│  ├─ web/                    <span class="tree-note">React + Vite</span>
-│  └─ mcp-ui/                 <span class="tree-note">host bridge</span>
-└─ packages/
-   ├─ ui/                     <span class="tree-note">portable presentation</span>
-   ├─ domain/                 <span class="tree-note">pure rules</span>
-   └─ backend/convex/         <span class="tree-note">data + MCP endpoint</span></code></pre><p class="card-foot">astack’s lint rules enforce these package boundaries: UI and domain code cannot reach the backend or the network directly. <a href="#lint">Lint rules ↓</a></p></div>
-      <div class="explainer-card"><h3>Specialist paths</h3><div class="specialist-row"><strong>Convex + WorkOS</strong><p>Use the companion Convex plugin for backend work. Web sessions and MCP OAuth share identity while keeping their token contracts distinct. Backend operations enforce ownership.</p></div><div class="specialist-row"><strong>MCP server</strong><p>Check tool contracts, running transport and agent use separately. The core profile serves MCP in Convex; a separate runtime can own its own service.</p></div><div class="specialist-row"><strong>Web UI</strong><p>Share presentation through props and keep host APIs in adapters. Choose supported forms for the platform and tests by behavior; Convex owns its reactive data.</p></div><p class="card-foot"><a href="https://github.com/applification/astack/blob/main/skills/project-setup/SKILL.md">Project setup ↗</a> · <a href="https://github.com/applification/astack/blob/main/skills/convex/references/integration.md">Convex path ↗</a> · <a href="https://github.com/applification/astack/blob/main/skills/mcp-server/SKILL.md">MCP path ↗</a></p></div>
+      <div class="explainer-card"><h3>A useful first request</h3><pre class="contract-sample"><code>Product: a CLI for checking release notes.
+Fixed: TypeScript 7, Node 24, pnpm.
+Open: module boundaries and config format.
+First milestone: read a real config file
+and print the parsed release summary.
+
+Explore the open choices and recommend.
+Run it to settle observable questions.
+Ask about product or preference decisions.</code></pre></div>
+      <div class="explainer-card"><h3>Three kinds of decision</h3><div class="specialist-row"><strong>Fixed choices</strong><p>Accept the selected language, runtime, framework and providers. Load their platform guidance when needed.</p></div><div class="specialist-row"><strong>Open choices</strong><p>Compare viable options against the product constraints. Show trade-offs and choose within the authority given.</p></div><div class="specialist-row"><strong>Observable questions</strong><p>Run the command, try the integration or inspect the real artifact. Report what happened.</p></div><p class="card-foot"><a href="https://github.com/applification/astack/blob/main/skills/project-setup/SKILL.md">Project setup ↗</a> · <a href="https://github.com/applification/astack/blob/main/skills/app-control/SKILL.md">Optional app control ↗</a> · <a href="https://github.com/applification/astack/blob/main/skills/chatgpt-plugin/SKILL.md">Selected plugin integration ↗</a></p></div>
     </div>
   </div></section>
   <section class="section-shell explainer-section" id="proof" aria-labelledby="proof-title">
@@ -491,14 +452,14 @@ Should "away" hide the last-seen time?</code></pre><p class="card-foot">A frame 
   </section>
   <section class="explainer-band reading-band" id="reading" aria-labelledby="reading-title"><div class="section-shell">
     <div class="section-heading"><div><p class="eyebrow">08 / UNDER THE HOOD</p><h2 id="reading-title">The skill reads<br><em>what the task needs.</em></h2></div><p>The entry skill chooses a route. It composes focused skills and their relevant references with project guidance, without loading the whole collection for every task.</p></div>
-    <div class="reading-grid"><p><strong><code>astack/SKILL.md</code></strong><span><a href="https://github.com/applification/astack/blob/main/skills/astack/references/orchestration.md">Main-thread ownership</a>, selection and consolidation.</span></p><p><strong><code>&lt;delivery-skill&gt;/SKILL.md</code></strong><span>The selected outcome and its instructions.</span></p><p><strong><code>web-feature/SKILL.md</code></strong><span>A change to web UI.</span></p><p><strong><code>.astack/project.md</code></strong><span>Shared by the coordinator and directly invoked skills.</span></p><p><strong><code>.astack/feature-map/&lt;app&gt;/</code></strong><span>When finding and driving a user path.</span></p><p><strong><code>verify/SKILL.md</code></strong><span>Before claiming behavior is verified.</span></p><p><strong><code>references/e2e.md</code></strong><span>When setting up or running e2e verification.</span></p></div>
+    <div class="reading-grid"><p><strong><code>astack/SKILL.md</code></strong><span><a href="https://github.com/applification/astack/blob/main/skills/astack/references/orchestration.md">Main-thread ownership</a>, selection and consolidation.</span></p><p><strong><code>&lt;delivery-skill&gt;/SKILL.md</code></strong><span>The selected outcome and its instructions.</span></p><p><strong><code>web-feature/SKILL.md</code></strong><span>A change to web UI.</span></p><p><strong><code>.astack/project.md</code></strong><span>Working choices and commands, when the project needs this file.</span></p><p><strong><code>.astack/feature-map/&lt;app&gt;/</code></strong><span>When a feature map exists and helps find a user path.</span></p><p><strong><code>verify/SKILL.md</code></strong><span>Before claiming behavior is verified.</span></p><p><strong><code>references/e2e.md</code></strong><span>When the project has selected Tester Army e2e verification.</span></p></div>
   </div></section>
   <section class="section-shell adopt-section" id="adopt" aria-labelledby="adopt-title">
     <div class="section-heading"><div><p class="eyebrow">09 / GET STARTED</p><h2 id="adopt-title">Put it to work<br><em>in your project.</em></h2></div><p>The installable plugin is called <strong>Applification</strong>. astack's guidance stays in this repo; your project owns its commands, environments, and product decisions.</p></div>
     <div class="adopt-grid">
       <div class="install-card"><div class="install-heading"><span>TRY IT IN CODEX</span><button id="copy-command" class="copy-button" type="button" aria-label="Copy installation commands">Copy</button></div><pre><code id="install-command">codex plugin marketplace add applification/astack
-codex plugin add applification@applification</code></pre><p>Install once, then establish the runtime and verification loop in each project.</p></div>
-      <div class="adopt-notes"><div><span class="note-index">01 / INSTALL</span><h3>Install the plugin</h3><p>Use the commands alongside for Codex. In Claude Code, run <code>/plugin marketplace add applification/astack</code>, then <code>/plugin install applification@applification</code>.</p><a href="https://github.com/applification/astack/blob/main/README.md">Install commands ↗</a></div><div><span class="note-index">02 / SET UP</span><h3>Establish or upgrade the loop</h3><p>Run <code>$applification:project-setup</code> for a new or existing project. Setup installs main-thread ownership and the profile pointer in the actual host’s project instructions, preserving custom text and managed blocks on re-runs. It integrates useful upgrades and proves the runtime loop.</p><a href="https://github.com/applification/astack/blob/main/skills/project-setup/SKILL.md">Project setup ↗</a></div><div><span class="note-index">03 / USE</span><h3>Describe the outcome</h3><p>Give <code>$applification:astack</code> an engineering request and let it route the work. Invoke any focused skill or <code>principle-*</code> leaf directly when you already know the job.</p><a href="#skills">Explore the callable skills ↓</a></div></div>
+codex plugin add applification@applification</code></pre><p>Install once, then describe the outcome in your project.</p></div>
+      <div class="adopt-notes"><div><span class="note-index">01 / INSTALL</span><h3>Install the plugin</h3><p>Use the commands alongside for Codex. In Claude Code, run <code>/plugin marketplace add applification/astack</code>, then <code>/plugin install applification@applification</code>.</p><a href="https://github.com/applification/astack/blob/main/README.md">Install commands ↗</a></div><div><span class="note-index">02 / SET UP</span><h3>Reach a first milestone</h3><p>When setup is needed, run <code>$applification:project-setup</code>. State the product, fixed choices, open decisions and smallest milestone. Setup preserves project guidance and verifies the real result.</p><a href="https://github.com/applification/astack/blob/main/skills/project-setup/SKILL.md">Project setup ↗</a></div><div><span class="note-index">03 / USE</span><h3>Describe the outcome</h3><p>Give <code>$applification:astack</code> an engineering request and let it route the work. Invoke any focused skill or <code>principle-*</code> leaf directly when you already know the job.</p><a href="#skills">Explore the callable skills ↓</a></div></div>
     </div>
   </section>
 </main>

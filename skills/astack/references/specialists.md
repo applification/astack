@@ -8,7 +8,7 @@ Apply [main-thread orchestration](orchestration.md) for host selection and child
 
 ## Select by behavior and risk
 
-Inspect the intended outcome, diff or proposed boundaries, project profile, accepted ADRs and available evidence. Select contributions that can resolve a specific uncertainty, protect an affected boundary or supply a required review. Record the selected roles and purpose briefly in the assignment or PR. Reassess when investigation changes the scope.
+Inspect the intended outcome, diff or proposed boundaries, project guidance, accepted ADRs and available evidence. Select contributions that can resolve a specific uncertainty, protect an affected boundary or supply a required review. Record the selected roles and purpose briefly in the assignment or PR. Reassess when investigation changes the scope.
 
 A local label correction with no changed interaction can use the lead and a visible check. A permissions change shared by web and MCP needs backend/data and security attention plus checks on both reachable surfaces. A new interactive flow may need UI/UX, accessibility and web expertise. A slow path needs performance expertise only when a measurement or stated performance requirement makes it relevant. File count, extension and a generic role roster do not settle selection.
 

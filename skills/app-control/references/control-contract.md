@@ -1,57 +1,42 @@
 # App control and feature map
 
-Use this when a project needs a repeatable way for an agent to launch, drive, inspect, and debug its running product. The result is a project-owned `astack-<app>` CLI and a small feature map. astack supplies the creation and upkeep method; the project owns its runtime commands and product knowledge.
+Use this when repeated product driving needs a capability the project does not have. The project owns its launch commands, language, drivers, fixtures and product knowledge. Reuse a working control route before building another.
 
 ## Inspect before building
 
-Read the project's user entry points, startup scripts, existing test and browser tools, auth and fixture setup, and any current proof route in `.astack/project.md`. Run a working path before replacing it. For a web app, reuse its working driver. New web projects use [Tester Army e2e](../../testing/references/e2e.md) for repeatable verification and live MCP inspection. A project CLI may retain `agent-browser` for quick product actions; follow its version-matched `agent-browser skills get core` guidance when using it. For a new Next.js web app using the greenfield default, start through [Portless](https://portless.sh/) and use its actual URL; use the configured [Next DevTools MCP](https://nextjs.org/docs/app/guides/mcp) for framework diagnostics when available. For a CLI, service, iOS app, or desktop app, use its existing PTY, HTTP, simulator, or debugging tools. Build only the commands the actual product needs.
+Read the actual user entry points, scripts, browser or native tools, auth/fixtures and verification commands. Run a working path first. Use the chosen runtime and installed drivers; select any missing capability against the product's actual constraints. A wrapper around lint and tests alone does not drive the product.
 
-Identify what the agent must do repeatedly: start or connect to the right instance, reach a feature through a user path, act, observe the result, capture useful evidence, and clean up. A wrapper around `lint` and `test` alone does not meet this goal. Keep those checks in the project's normal scripts.
+Identify the repeated actions: start or connect to the correct instance, reach a feature, act, inspect the result and clean up. Build only the commands that remove demonstrated repetition or make a result observable.
 
 ## Create the project skill and CLI
 
-Use a short lowercase hyphenated app name. Keep the executable and its operating instructions in the project skill; keep the product map in tracked `.astack/` project knowledge:
+Keep the executable and operating instructions in a project-owned skill at the chosen host's supported skill path. Use the project's installed language, package manager and executable convention. An existing parser or driver should not be replaced just to match an example. Document checkout-local invocation and useful help; a global install or PATH change is unnecessary.
 
-```text
-.codex/skills/astack-<app>/
-  SKILL.md
-  scripts/astack-<app>.ts
-.astack/feature-map/<app>/
-    README.md
-    <feature-area>.md
-```
+Implement a small command set. A read-only `doctor` reports the checkout, revision and dirty state, target URL or process, build/deployment identity when available and readiness. Include commands to drive and observe a real user path. Add start/stop only when this CLI owns a long-lived instance. Add screenshots, logs or traces only when the chosen driver supports them and they help inspect behavior.
 
-In a new astack-default product, make the script an executable Bun TypeScript CLI with a `#!/usr/bin/env bun` shebang and Git executable mode (`100755`). Use Commander as the default parser for its subcommands, arguments, options, help, and usage errors; add it as a project dependency. Document the direct checkout-local invocation, such as `./.codex/skills/astack-<app>/scripts/astack-<app>.ts doctor`, as the primary command. A root `astack-<app>` package script may provide a shorter `bun run astack-<app> doctor` alias. In an existing project, use its installed language, package manager, executable convention, and working parser; do not replace a sound CLI just to use Commander. Its `--help` lists real subcommands, arguments, examples, and evidence locations. The skill points to `.astack/feature-map/<app>/README.md`. Do not require a global install or modify the user's `PATH`; that is an optional user choice.
+Dispatch subprocesses with argument arrays and an explicit working directory. Give failures nonzero exit codes and structured output when an agent consumes it. Keep selectors, URLs, startup and fixtures in the project; do not parse prose guidance as executable configuration or copy another tool's entire command tree.
 
-Implement a small command set around the product. Include `doctor` and commands to drive and observe at least one real user path. Add `start` and `stop` when the CLI owns a long-lived instance; a short-lived CLI or service may need a different launch model. Expose app-specific actions such as `new-session`, `send`, or `select-state` when they hide repeated navigation or interaction. Add `snapshot`, `screenshot`, `console`, `network`, `record`, or `trace` only when the underlying driver and product support them. Avoid a large pass-through copy of another tool's command tree. Prefer accessible names and stable user-visible handles to coordinates or private component state.
-
-Use the project's runtime to dispatch commands and start subprocesses with argument arrays, an explicit working directory, and inherited or captured output as appropriate. Keep project selectors, URLs, readiness checks, and fixture rules in the project CLI. Do not parse `.astack/project.md` as executable configuration. Give commands useful failures and nonzero exit codes; add `--json` for results an agent needs to parse. Command success means the command ran and observed what it claims. It does not certify every acceptance case.
-
-`doctor` is read-only. It reports the checkout, full Git commit and dirty state, target URL or process, build or deployment identity when available, browser or simulator session, and whether the target is ready and belongs to this run. For a Portless web app, inspect the actual route and upstream process (for example with `portless list` and the app's startup record), check that the proxy, DNS, and TLS work with `portless doctor`, and confirm the returned page belongs to this checkout. Print the resolved URL, including any worktree prefix, in text and `--json` output. Do not assume `localhost:3000`, infer the URL from a branch name, or treat an open port or responsive hostname as proof of identity. For final proof, use a named revision and recheck after code changes that could affect the behavior.
-
-When the CLI launches a Portless-backed web instance, invoke the project's `dev` script and let Portless assign the upstream port and worktree-specific hostname. Capture its actual URL from startup or `PORTLESS_URL` in the child environment, and associate the route with the launched process. For other web apps and surfaces, use their existing launch model and derive an isolated port or equivalent target per checkout or explicit run ID. Keep browser profile, session, and disposable data isolated per run. Track what the CLI starts. Refuse to drive an unrelated shared instance by default, and stop only processes and sessions it owns. Do not use Portless `--force`, `prune`, or a global proxy stop as routine cleanup; these can affect other checkouts. Preserve screenshots, recordings, logs, and the first failure through cleanup. Keep credentials and private user data out of recorded evidence.
-
-For a Next.js app, let the agent inspect routes, compilation issues, and server logs through Next DevTools MCP after confirming it is attached to the same running app. Keep the CLI's browser actions and observations as the user-path proof. If Portless first-run proxy or certificate setup is blocked in a headless session, report that prerequisite clearly instead of silently connecting to a different local server.
+Use the startup command's actual target and confirm the returned artifact belongs to this checkout. An open port or responsive hostname alone does not establish identity. Isolate targets, sessions and disposable data per checkout or run. Track what the CLI starts; drive and stop only owned instances. Preserve decisive observations through cleanup and keep credentials out of them.
 
 ## Share ownership with the test runner
 
-When adopting [e2e](../../testing/references/e2e.md), use its MCP session for inspection and locator validation rather than adding duplicate inspection commands. Keep project-specific startup, identity, fixtures and diagnosis in the project control route. Reuse the same identity and fixture helpers across the CLI and tests; avoid competing selector sets for the same journey.
+Reuse identity, fixture and navigation helpers across the CLI and the project's chosen runner. Choose one owner per instance: a runner-owned instance is cleaned up by the runner; a CLI-owned instance supplies its verified target and fixture context to tests that do not stop it. Keep sessions and actors isolated even when the process is shared.
 
-Choose one owner per instance. An e2e-owned run starts an isolated app and stops what it starts. A CLI-owned run exports its verified URL, run/build identity and fixture context to a URL-only test config; tests must not stop the shared stack. For Portless, resolve the actual worktree URL from the CLI, never infer it. In CI, prefer an isolated production build without a development proxy. Each browser/session and account or fixture stays isolated even when the app process is shared. Repeated navigation belongs in the working driver or test helpers, not another pass-through command tree.
+When using [Tester Army e2e](../../testing/references/e2e.md), its MCP session can provide inspection and locator validation. Other runners keep their own working inspection tools. Avoid competing selector sets or launchers for the same path.
 
 ## Map user behavior
 
-The feature map is an index plus one short file per real feature area, sized to the product. `.astack/feature-map/<app>/README.md` links the areas and gives a useful broad-sweep order. Each feature file answers:
+Add a small feature map when several user paths need a reusable index. Use the project's existing location, or `.astack/feature-map/<app>/README.md` with short linked files per feature area. Each entry gives:
 
-- What users can do and which entry points reach it.
-- The exact `astack-<app>` commands that drive those entry points through the running product.
-- The observable end state and side effect that would support a proof claim.
-- Prerequisites and known traps, such as auth, flags, timing, or another surface.
+- The user behavior and its real entry points.
+- Commands that drive it through the running product.
+- The observable end state and any material side effect.
+- Prerequisites and known traps, such as auth, flags or timing.
 
-Write from the user's point of view. Derive the initial map from routes, commands, menus, stories, and existing product documentation; inspect source to resolve gaps. Do not invent features or copy the whole repository into the map. Keep acceptance decisions in the behavior contract. The map describes how to exercise behavior; a proof result records what this run actually observed.
+Derive entries from actual routes, commands and product documentation. Do not invent features or duplicate the repository. The map describes how to exercise behavior; a proof result records what the current run observed.
 
 ## Prove and maintain the result
 
-Run the documented direct command and `--help` from a fresh checkout to confirm the executable bit, shebang, dependency resolution, and command help work without `bun run` or a `PATH` change. Then run the new instructions end to end: launch or connect, `doctor`, drive one mapped user path, observe its end state and any material side effect, capture evidence, and clean up. Confirm the evidence survives cleanup. If the checkout cannot run, report the exact missing prerequisite and leave the skill marked as a draft rather than claiming a working control route.
+Run the documented direct command and help from the checkout, then launch or connect, verify identity, drive one real path and independently inspect its material result. Clean up owned fixtures and processes. Use [verify](../../verify/SKILL.md) for the observations and gaps; a scaffold is not a working driver.
 
-Record the CLI invocation, feature map location, safe fixture route, and evidence location in `.astack/project.md`. When a change alters a user path, control handle, or prerequisite, update the CLI and affected map entry in the same PR and rerun that path. A separate map audit can catch drift later; it should compare source with a live pass and distinguish stale guidance from a product regression.
+Record working commands in existing project guidance or `.astack/project.md`. When a user path or control handle changes, update affected instructions and map entries in the same PR and rerun that path. A full-map audit needs a result or gap for every scoped path; one passing feature does not establish complete coverage.

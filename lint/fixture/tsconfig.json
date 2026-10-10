@@ -2,10 +2,18 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "paths": {
-      "@fixture/ui": ["./packages/ui/src/index.tsx"],
-      "@fixture/backend/api": ["./packages/backend/convex/api.ts"],
-      "@private-backend": ["./packages/backend/convex/workItems.ts"]
-    }
+      "@fixture/ui": ["./views/index.tsx"],
+      "@fixture/backend/api": ["./server/api.ts"],
+      "@private-backend": ["./server/workItems.ts"]
+    },
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "types": []
   },
-  "include": ["packages"]
+  "include": ["views", "model", "server"]
 }

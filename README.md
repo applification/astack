@@ -1,16 +1,16 @@
 # astack
 
-A reusable engineering stack for coding agents. It has three parts:
+Reusable engineering skills, feedback and loops for coding agents. The project chooses its stack; astack helps reason, implement and verify within it.
 
 | Part | What it gives an agent |
 | --- | --- |
 | [`skills/`](skills/) | Instructions for how to do the work |
 | [`lint/`](lint/) | Mechanical feedback when the work breaks a rule |
-| [`loops/`](loops/) | Prompts that run the skills on a schedule or a mention |
+| [`loops/`](loops/) | Prompts that compose skills on a schedule or a mention |
 
-**[astack.applification.net](https://astack.applification.net/)** explains the same thing visually, with a route map and searchable routing examples.
+**[astack.applification.net](https://astack.applification.net/)** explains the same thing visually.
 
-## Install
+## Install the skills
 
 **Codex**
 
@@ -26,15 +26,14 @@ codex plugin add applification@applification
 /plugin install applification@applification
 ```
 
-**Lint rules**, in any Bun or Node project:
+Give `$applification:astack` in Codex, or `/applification:astack` in Claude Code, a request with:
 
-```sh
-bun add -d github:applification/astack eslint typescript
-```
+- The product and who uses it.
+- Fixed choices: language/version, runtime, package manager, framework, database, hosting and checks.
+- Open choices where you want judgment and trade-offs.
+- The smallest milestone that runs end to end, and what would prove it.
 
-## Skills
-
-Give the entry skill a request and it picks the rest: `$applification:astack <request>` in Codex, `/applification:astack <request>` in Claude Code. Every skill can also be called directly by name.
+Fixed choices are honoured. Open choices are evaluated against product constraints; the agent recommends a choice or decides within delegated authority. Observable questions are settled by running things. Platform skills apply only after their technology is selected. Each skill is also callable directly.
 
 | Group | Skills |
 | --- | --- |
@@ -45,57 +44,74 @@ Give the entry skill a request and it picks the rest: `$applification:astack <re
 | Craft | `architect`, `code-review`, `correct`, `domain-modeling`, `show-me`, `agent-evaluation` |
 | Principles | `principle-type-system-discipline`, `principle-boundary-discipline`, `principle-encode-lessons-in-structure`, `principle-prove-it-works`, `principle-test-behavior-not-implementation`, `principle-fix-root-causes`, `principle-sequence-verifiable-units` |
 
-Each skill is one directory with a `SKILL.md`. A consuming project keeps its own commands and product knowledge in `.astack/project.md`, which the skills read when it exists.
+Keep chosen tools and working commands in project instructions. Use `.astack/project.md` when a separate reference helps; the skills read it when present. Setup establishes one verified milestone. Add control tools, feature maps and shared packages when the work needs them.
 
-## Lint
+## Optional TypeScript lint
+
+Use your project's package manager. This npm example installs the shared rules with their supported ESLint 9 and TypeScript 6 API:
+
+```sh
+npm add -D github:applification/astack eslint@^9.39.0 typescript@npm:@typescript/typescript6@^6.0.2
+```
+
+For a project using the TypeScript 7 compiler, keep its `tsc` alongside that API using [TypeScript's documented aliases](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6-0):
+
+```sh
+npm add -D @typescript/native@npm:typescript@^7.0.2
+```
+
+`typescript-eslint` currently requires the older API; this does not change the chosen compiler. Projects using TypeScript 5.9 can keep that supported API. Preserve framework configuration and other compiler settings.
 
 ```js
 // eslint.config.mjs
 import astack from 'astack/eslint';
 
-export default astack({ scope: '@acme' });
+export default astack();
 ```
 
-```json
-// tsconfig.json
+The base applies strict type-checked TypeScript rules, including promise handling, unsafe access and exhaustive switches. React hooks/accessibility and portable UI boundaries are explicit opt-ins:
+
+```js
+import astack, { react, portableUi } from 'astack/eslint';
+
+export default [
+  ...astack(),
+  react(), // Only for a React project.
+  ...portableUi({ ui: 'src/views', domain: 'src/model', backend: 'src/server' }),
+];
+```
+
+Choose the paths from your architecture; none are required by astack. `portableUi` keeps those UI/domain directories free of backend, Node and direct network access, and keeps browser/presentation dependencies out of domain code. Omit an unused directory.
+
+```jsonc
+// tsconfig.json: optional strictness settings, leaving runtime/module/JSX choices to the project.
 { "extends": "astack/tsconfig" }
 ```
 
-`scope` is your workspace package scope. The config expects the astack layout: apps in `apps/*`, shared presentation in `packages/ui`, pure rules in `packages/domain`, server code in `packages/backend`.
-
-It enforces:
-
-- Strict type-checked TypeScript rules, including no floating promises and no unsafe `any` access.
-- React hooks and accessibility rules for `.tsx` files.
-- `astack/portable-ui`: UI and domain packages cannot import the backend, Node builtins, network clients or another package's private files, and cannot call `fetch` directly.
-- No `window` or `document` in the domain package.
-
-Error messages say what to do instead, so an agent can act on them without reading the skill. [`lint/eslint.test.ts`](lint/eslint.test.ts) has one case per rule.
-
 ## Loops
 
-A loop is a prompt file that names a trigger and the skills it composes. astack has no scheduler: run a loop with whatever your host provides.
+A loop is one prompt file. Run it with your host's scheduler, cron, CI or mention trigger; astack supplies no scheduler.
 
-| Loop | Trigger | What it does |
+| Loop | Trigger | Work |
 | --- | --- | --- |
-| [`lint-debt`](loops/lint-debt.md) | Weekly | Fixes one lint rule's findings and opens a pull request |
-| [`pr-review`](loops/pr-review.md) | Hourly, or on pull request | Reviews open pull requests and reports check results |
-| [`bug-fix`](loops/bug-fix.md) | Daily | Reproduces and fixes the oldest unassigned bug |
-| [`mention`](loops/mention.md) | A comment that mentions the bot | Answers the question or makes the requested change |
+| [`lint-debt`](loops/lint-debt.md) | Weekly | Fix one diagnostic's findings with the project's existing checks |
+| [`pr-review`](loops/pr-review.md) | Hourly, or on PR | Review new PR heads and report observed checks |
+| [`bug-fix`](loops/bug-fix.md) | Daily | Reproduce and fix one eligible unassigned bug |
+| [`mention`](loops/mention.md) | Bot mention | Answer the question or make the requested change |
 
-Run one from a project that has the plugin installed, passing the file on stdin:
+From a project with the skills and lint package installed:
 
 ```sh
-claude -p < loops/lint-debt.md
+claude -p < node_modules/astack/loops/lint-debt.md
 ```
 
-Put that command in cron, a CI schedule or your host's scheduled tasks. For `mention`, have the trigger append the comment and its thread to the prompt.
+For plugin-only use, copy the selected prompt from an astack checkout into your project and pass that local file instead. Installation does not create a project `loops/` directory. For mentions, append the comment and its thread to the prompt. Runs preserve the selected stack and never merge.
 
 ## Contributing
 
-[AGENTS.md](AGENTS.md) holds the rules that keep this repository small. `bun run check` validates the site, the plugin manifests and the skill links, and runs the lint and loop tests.
+[AGENTS.md](AGENTS.md) keeps this repository focused. Run `bun run check` to validate the site, plugin manifests, skill links and lint/loop tests. Keep evidence in the PR description.
 
-The site is plain HTML, CSS and JavaScript in [`site/`](site/), published to astack.applification.net by GitHub Pages on every merge to `main`. Preview it with `python3 -m http.server 8000 --directory site`.
+The plain HTML/CSS/JavaScript [`site/`](site/) publishes to astack.applification.net through GitHub Pages on merge to `main`. Preview it with `python3 -m http.server 8000 --directory site`.
 
 ## Sources and license
 

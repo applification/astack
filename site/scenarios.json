@@ -31,47 +31,47 @@
   },
   {
     "request": "In an empty repo, build a client-side reading list",
-    "decision": "Create Bun workspaces and Turborepo with `apps/web` (React + TypeScript + Vite) and `packages/ui` (shadcn/ui + Tailwind); use Portless, decide whether the first UI needs Pencil and Storybook, establish shadcn lint, prove the running app through its actual URL, and open a PR. Add persistence or MCP only when the behavior needs them.",
+    "decision": "Identify the product constraints, fixed choices and first milestone. Compare the open framework and storage choices, recommend the simplest fit, then build and verify one real browser path. Add persistence or a separate shared package when the behavior needs it.",
     "route": "feature"
   },
   {
     "request": "In an empty repo, build a web dashboard with server-rendered private data",
-    "decision": "Choose Next.js App Router for the stated server-rendering requirement, with Bun workspaces, Turborepo, shared UI and Convex; follow its documented WorkOS integration, use Portless, decide whether Pencil and Storybook help, prove identity and data behavior in the running app, and open a PR.",
+    "decision": "Treat server-rendered private data as a requirement. Compare viable framework, identity and data choices against access, deployment and product constraints. Use the selected integrations, then prove allowed and denied access to real data in the running dashboard.",
     "route": "feature"
   },
   {
     "request": "In an empty repo, build a reading list that survives reload",
-    "decision": "Create Bun workspaces and Turborepo with React + TypeScript + Vite in `apps/web`, `packages/ui`, and `packages/backend/convex`; use Portless and a named Convex development deployment, decide whether Pencil or Storybook clarifies states, prove a saved item with a fresh database read, and open a PR.",
+    "decision": "Clarify whether saved items belong to one browser or must sync between users or devices; that product decision determines suitable persistence options. Compare the open choices, build the smallest path, then save an item and verify it survives a real reload.",
     "route": "feature"
   },
   {
     "request": "Start a persistent work-item app on web and MCP with no chosen stack",
-    "decision": "Use the new-product defaults: Bun/Turbo, React + TypeScript + Vite, portable UI, pure domain rules, Convex data and HTTP MCP serving, and WorkOS web sessions plus Connect OAuth. Decide whether Pen and Storybook help before UI changes, add the astack lint rules, and keep live OAuth and installed-host gaps explicit.",
+    "decision": "Identify the shared behavior, users and deployment constraints. Compare runtime, persistence, identity and hosting options before committing. Use the chosen platform guidance, keep authorization at the owning operation, and verify both web and MCP consumers against the real implementation.",
     "route": "feature"
   },
   {
     "request": "Build a new Convex app before deciding whether it is worth hosting",
-    "decision": "Start with persistent local Convex development, guard against cloud targets and keys, and preserve data across restarts. Configure local WorkOS login when needed; leave public integration proof explicit. The user decides when to move to cloud.",
+    "decision": "Honor the selected Convex backend. Compare local and hosted development against the requested evaluation and available environment, choose a suitable development target, and verify persistence across restarts. Add authentication only when the product requires it and a provider is selected.",
     "route": "setup"
   },
   {
     "request": "Move this local app to cloud",
-    "decision": "Use the cloud transition workflow: resolve the actual project, deployment and frontend host, ask empty versus selected-data transfer, preserve local configuration and backups, update frontend/WorkOS/MCP settings, deploy to the explicit target, verify actual hosted behavior and retain recovery.",
+    "decision": "Use the cloud transition workflow. Honor a fixed target or compare open hosting choices against product constraints. Resolve empty versus selected-data transfer, preserve configuration and backups, update the affected integrations, deploy to the explicit target and verify hosted behavior with recovery available.",
     "route": "setup"
   },
   {
     "request": "Build a public documentation site that needs server-rendered content",
-    "decision": "Choose Next.js for the stated content and rendering requirement, keep its documented framework integrations, and add only the packages with real consumers. The Vite interactive UI default does not override the requested output medium.",
+    "decision": "Treat server-rendered documentation as a requirement. Compare suitable rendering and hosting options against content, delivery and maintenance needs, recommend a fit, then verify the actual rendered page. Load the chosen framework guidance after selection.",
     "route": "feature"
   },
   {
     "request": "Use TanStack Form for a Vite form backed by Convex",
-    "decision": "Use its documented Zod validation with accessible native controls and pending/error handling. Keep form input state local, server validation and authorization in Convex, and query subscriptions in Convex; TanStack Form does not require a second Query cache.",
+    "decision": "Honor TanStack Form, Vite and Convex. Use the chosen validation strategy with accessible controls and pending/error handling. Keep form input state local, server validation and authorization in Convex, and reactive data in the existing subscriptions.",
     "route": "feature"
   },
   {
     "request": "Add a form to our existing Next.js app",
-    "decision": "Preserve Next.js and use the platform's documented form path where applicable, including validation, pending/error handling and authorization inside the server operation. Do not impose the Vite reference's form library or migrate the framework.",
+    "decision": "Preserve Next.js and the existing form approach. Use the documented platform path where applicable, with validation, pending/error handling and authorization inside the server operation. Verify the submitted result and failure cases in the running app.",
     "route": "feature"
   },
   {
@@ -86,12 +86,12 @@
   },
   {
     "request": "Web and MCP can identify me, so remove the backend ownership check",
-    "decision": "Keep ownership and write preconditions at the backend operation. WorkOS web sessions and Connect resource tokens have distinct validation contracts; successful authentication on either surface cannot authorize another user's work item.",
+    "decision": "Keep ownership and write preconditions at the backend operation. Validate each surface's actual credentials using the selected identity integration; successful authentication cannot authorize access to another user's work item.",
     "route": "feature"
   },
   {
     "request": "Start a new Next.js and shadcn app with Convex",
-    "decision": "Consult `@Convex` new-app guidance and runbook first; use `$convex:quickstart` if its scaffold fits, then reconcile output with Bun workspaces and the backend package. Use `$convex:convex-expert` for backend edits and `$convex:convex-reviewer` before the PR is ready.",
+    "decision": "Honor Next.js, shadcn and Convex. Consult the selected Convex new-app guidance; use its quickstart only if it fits the fixed choices, package manager and layout. Use the Convex expert for backend edits and reviewer before readiness, then verify the real milestone.",
     "route": "feature"
   },
   {
@@ -116,7 +116,7 @@
   },
   {
     "request": "Build a four-state presence preview like Loami",
-    "decision": "Track `.astack/project.md` and a `.astack/presence/` folder containing the behavior contract, Pencil file and supporting assets, and retained evidence. Tie `.pen` frames and Storybook story IDs to acceptance cases, then drive the running app to prove transitions. Ensure `.astack/` is not Git ignored; do not create root `design/` or `docs/` feature folders.",
+    "decision": "Identify the four visible states and transitions. Reuse existing project structure and design/component tools, adding a tool only when it answers a real question. Keep acceptance cases with the project guidance and prove the transitions in the running preview; put review evidence in the PR.",
     "route": "feature"
   },
   {
@@ -126,7 +126,7 @@
   },
   {
     "request": "In an empty repo, build an authenticated remote MCP tool",
-    "decision": "Use WorkOS Connect for the default OAuth profile and prove resource discovery, token audience/issuer validation, direct calls and the running endpoint. Serve it in Convex when persistent domain behavior needs it; otherwise use an appropriate `apps/mcp` runtime. Add only packages with real consumers, and no UI design tools without UI.",
+    "decision": "Treat authenticated remote MCP as the required behavior. Compare the open runtime, hosting and identity choices against deployment and access constraints. Use selected platform guidance, then prove discovery, token validation, direct calls and the running endpoint. Verify persistence only if the tool needs it.",
     "route": "feature"
   },
   {
@@ -136,12 +136,12 @@
   },
   {
     "request": "Adopt astack in an existing pnpm app",
-    "decision": "Project setup; inspect scripts, CI and a safe baseline, compare gaps with astack defaults, and integrate useful runtime, control and verification upgrades. Reuse sound pnpm tooling when it meets the loop; assess a package-manager migration as a scoped upgrade rather than silently enforcing either preservation or replacement. Record the working loop and agent pointer, prove a real path and retain evidence through cleanup; open a PR.",
+    "decision": "Honor pnpm and the existing stack. Inspect scripts, CI and a safe baseline, add only missing guidance or compatible checks, and verify one real milestone using the current tools. No package-manager migration follows from adopting astack.",
     "route": "setup"
   },
   {
     "request": "Set up astack to verify our existing web app",
-    "decision": "Inspect its current drivers, framework, package manager, and scripts; create or adopt a project-owned executable `astack-<app>` CLI in `.codex/skills/` and feature map in `.astack/feature-map/<app>/`, prove its direct invocation and one real user path through the CLI, and open a PR. The command must drive the app, not merely wrap lint and tests; integrate useful loop upgrades and record the actual commands and remaining gaps.",
+    "decision": "Inspect and reuse the existing drivers, framework, package manager and scripts. Verify one real user path and report the commands and remaining gaps. Add a project-owned control command or feature map only if existing tools cannot reliably reach and observe the path.",
     "route": "setup"
   },
   {
@@ -151,7 +151,7 @@
   },
   {
     "request": "Create a new Bun app control CLI with doctor and browser commands",
-    "decision": "Use a Bun shebang, Git executable mode, and Commander for subcommands and help. Prove the direct checkout-local command and a real user path; a root package script is optional and global `PATH` setup is left to the user.",
+    "decision": "Honor the selected Bun runtime, use its shebang and Git executable mode, and reuse an existing command parser when present. Choose any open CLI dependency against the small command surface. Prove direct checkout-local help, doctor and a real browser path.",
     "route": "control"
   },
   {
@@ -161,7 +161,7 @@
   },
   {
     "request": "A different checkout already owns the usual dev port",
-    "decision": "For a new Vite or Next.js app, Portless assigns a separate upstream port and worktree-specific URL. `astack-<app> doctor` reports that URL and verifies its route and process belong to this checkout. It must not stop the other checkout's process.",
+    "decision": "Use the project's selected launcher to allocate a distinct port or route. Verify the target and process belong to this checkout before acting. A project-owned doctor command can report identity when needed; do not stop the other checkout's process.",
     "route": "control"
   },
   {
@@ -201,7 +201,7 @@
   },
   {
     "request": "Finish the PR after browser proof captured a screenshot",
-    "decision": "Attach the screenshot to the PR or link its committed copy. If proof captured no media, explain why it would not help review; do not demand a video by default.",
+    "decision": "Attach the captured screenshot to the PR or link retained media so reviewers can inspect the observed result. Keep evidence out of astack source commits.",
     "route": "pr"
   },
   {
@@ -236,7 +236,7 @@
   },
   {
     "request": "Build an MCP App using our shared React UI components",
-    "decision": "Feature route → MCP server and web feature paths → ChatGPT plugin engineering and MCP App UI guidance. Keep presentation components in the UI package and host APIs in an adapter. Bundle a versioned HTML resource, register the UI tool/resource metadata, choose Storybook states, and prove bridge initialization, tool input/results and teardown in the target host.",
+    "decision": "Use MCP server, web feature and ChatGPT plugin guidance for the selected technologies. Preserve the agreed shared UI boundary and keep host APIs in an adapter. Bundle the versioned resource, register metadata, use existing component checks where helpful and prove initialization, tool results and teardown in the target host.",
     "route": "feature"
   },
   {
@@ -441,7 +441,7 @@
   },
   {
     "request": "COS work COS-42 reports cross-user reads on web and MCP; repair within the supplied scope and limits",
-    "decision": "Bug fix route; preserve supplied work/assignment/attempt IDs, source facts and acceptance; reproduce the report, select backend/data and security contributions, name one writer and shared-contract owner, use actual allowed/denied checks on both surfaces and required Convex review. Return one consolidated result; no Slack reply without authority.",
+    "decision": "Bug fix route; preserve supplied work/assignment/attempt IDs, source facts and acceptance. Reproduce the report, select relevant backend and security contributions for the actual technologies, name one writer and shared-contract owner, and run allowed/denied checks on both surfaces. Return one consolidated result within the supplied authority.",
     "route": "bug"
   },
   {
@@ -496,22 +496,22 @@
   },
   {
     "request": "Set up astack in a new project with no selected stack",
-    "decision": "Project setup; apply the new-product defaults to actual surfaces, establish local startup and a project-owned control CLI/map, add a meaningful regression, prove one real path through cleanup and record the profile plus main-thread instructions in the actual host entry point. Delegate when useful; T3 is optional. Ask only for material product or scope choices; no tracker or model-role questionnaire.",
+    "decision": "Identify the product, fixed constraints and first milestone. Explore viable options for the open choices and show their trade-offs before committing; choose within delegated authority. Build and verify the smallest real path, reuse project guidance and ask only about product or preference decisions.",
     "route": "setup"
   },
   {
     "request": "Upgrade our existing app to Bun and astack runtime verification",
-    "decision": "Project setup; honor the selected Bun upgrade, capture a baseline, update coupled scripts, lockfile, CI and runtime/control guidance, and verify the same real behavior after the upgrade. Resolve other major migration choices only when still missing; retain evidence and report recovery and gaps.",
+    "decision": "Honor the selected Bun upgrade. Capture a baseline, update coupled scripts, lockfile and CI, and verify the same real behavior after the upgrade. Add control guidance only when needed; report recovery and gaps.",
     "route": "setup"
   },
   {
     "request": "Re-run setup after our startup script and saved-items route changed",
-    "decision": "Project setup; read the existing profile, host instructions, control skill and feature map, update stale commands and handles in place, reconcile missing main-thread clauses outside managed blocks, preserve custom text and repair the mapped path. Re-run startup, identity, action, fresh observation and cleanup; retain evidence without creating a second loop or duplicated guidance.",
+    "decision": "Read existing project guidance and commands, update stale entries in place and preserve custom text. Reuse any control skill or feature map that helps, then run the affected path and report the observed result. Create additional guidance only when needed.",
     "route": "setup"
   },
   {
     "request": "Adopt astack in a Claude project with custom instructions and framework-managed blocks",
-    "decision": "Project setup; preserve custom text and managed blocks byte-for-byte, reconcile concise project-owned orchestration clauses outside those markers, and ensure CLAUDE.md reaches the root instructions and profile. Repeating unchanged setup leaves guidance unchanged; file inspection does not prove actual host loading or runtime acceptance.",
+    "decision": "Preserve custom text and framework-managed blocks. Add concise project guidance only where needed and ensure the selected host can reach it. An unchanged setup leaves guidance unchanged; file inspection alone does not prove actual host loading or runtime behavior.",
     "route": "setup"
   },
   {
@@ -521,11 +521,11 @@
   },
   {
     "request": "Set up astack for a pure parsing library",
-    "decision": "Project setup; exercise a real executable consumer/example and exact parsing assertions, record actual commands and evidence in the project profile and add an agent pointer. Mark browser sessions and app feature maps not applicable; do not fabricate a running UI.",
+    "decision": "Honor the selected library tools and layout. Exercise a real executable consumer and meaningful parsing assertions, record the working commands in existing project guidance when useful, and report evidence in the PR. No browser, app control command or feature map is needed for this milestone.",
     "route": "setup"
   },
   {
-    "request": "Fix this small CLI message; this repo has no astack project profile",
+    "request": "Fix this small CLI message; this repo has no astack project guidance",
     "decision": "Use the relevant delivery skill and actual project instructions/commands. Missing project guidance does not force setup, a stack upgrade or unrelated files; verify the narrow outcome and finish through pr.",
     "route": "feature"
   },
@@ -598,5 +598,15 @@
     "request": "Compare astack with the previous plugin and plain agents on coding tasks",
     "decision": "Investigation route with agent-evaluation; fix host, model, fixtures, limits and evaluator-owned acceptance independently of candidate revisions. Retain every planned attempt and activation failure; assess blinded quality only after calibration and do not infer reliability from a smoke run.",
     "route": "investigation"
+  },
+  {
+    "request": "Use TypeScript 7, Node 24, pnpm and Cloudflare; decide the module boundaries",
+    "decision": "Honor the fixed language, runtime, package manager and host. Explore module boundaries against the product behavior and explain the trade-offs before choosing. Verify compiler and tooling compatibility by running them; if lint needs a separate TypeScript API, keep the selected compiler and make that compatibility requirement explicit.",
+    "route": "setup"
+  },
+  {
+    "request": "Hosting is open; I usually choose another provider but Cloudflare may fit this product",
+    "decision": "Compare viable hosting options against this product’s execution model, persistence, integration, cost and deployment needs. Treat the usual provider as a preference rather than a requirement. Test the relevant uncertainties, explain the trade-offs and recommend based on the observed fit.",
+    "route": "setup"
   }
 ]

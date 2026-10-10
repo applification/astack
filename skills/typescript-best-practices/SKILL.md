@@ -33,9 +33,9 @@ Apply [type-system discipline](../principle-type-system-discipline/SKILL.md) fir
 
 Examples: `references/patterns.md`.
 
-## Applification integration
+## Project integration
 
-Keep the existing TypeScript configuration, schema library, generated types and package manager. New projects use Bun/Turbo with React/Vite; framework-specific validators remain at their owning boundary (for example Convex `v` validators). Use the existing logger; this skill does not require another logging dependency.
+Keep the project's chosen TypeScript version, configuration, schema library, generated types and package manager. Framework-specific validators remain at their owning boundary. Use the existing logger; this skill does not require another logging dependency.
 
 Read [patterns](references/patterns.md) for the rule being changed. Helpers and generated imports in examples are illustrative. A plain numeric duration still needs boundary validation if non-negativity is a domain invariant; the representation alone does not prove it. Preserve established brands and generated ID types instead of introducing a competing convention. Read the applicable principle leaf in full; TypeScript examples supply concrete syntax alongside the language-independent discipline.
 

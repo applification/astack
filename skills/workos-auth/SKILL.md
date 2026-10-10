@@ -11,11 +11,11 @@ Read `.astack/project.md` when present for the project's runtime, control and ve
 
 Apply [boundary discipline](../principle-boundary-discipline/SKILL.md) to credentials, token validation and identity adapters.
 
-Use directly for a WorkOS integration or auth defect. Inspect the installed SDKs, current callbacks/origins, server auth configuration, actual resource URL and ownership checks. Keep existing provider/project conventions. For new Applification web/MCP products use AuthKit for web and Connect for MCP; they share a user system with distinct token contracts.
+Use directly for a WorkOS integration or auth defect. Inspect the installed SDKs, current callbacks/origins, server auth configuration, actual resource URL and ownership checks. Apply this only when the project selects WorkOS. Keep its chosen framework and backend; AuthKit web sessions and Connect MCP tokens have distinct contracts when both are used.
 
 ## Web session and data access
 
-Follow the selected framework's AuthKit integration and [Convex's AuthKit adapter](https://docs.convex.dev/auth/authkit/add-to-app). Treat the web login session and Convex's validated auth readiness as separate states. Gate authenticated queries on the latter; test initial loading, sign-out and expired session behavior. Derive the principal from verified identity server-side, not a client-supplied user ID. Keep ownership checks in the operation that reads or writes data.
+Follow the selected framework's AuthKit integration. For a Convex backend, use [its AuthKit adapter](https://docs.convex.dev/auth/authkit/add-to-app) and treat the web login session and backend auth readiness as separate states. Gate authenticated queries on validated backend readiness; test initial loading, sign-out and expired session behavior. Derive the principal from verified identity server-side, not a client-supplied user ID. Keep ownership checks in the operation that reads or writes data.
 
 Register the checkout's actual origin and callbacks, including the worktree/preview hostname. Preserve unrelated dashboard settings and verify saved values through a fresh read when authorized to change them. Keep API keys and session secrets server-side; public client IDs do not prove issuer/audience configuration.
 

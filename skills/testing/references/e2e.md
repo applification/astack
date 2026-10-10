@@ -1,6 +1,6 @@
 # Tester Army e2e proof loop
 
-Use [Tester Army e2e](https://e2e.tester.army/docs) for repeatable running-app verification in new astack web projects, or when an existing project adopts it. Existing projects keep working runners unless a migration is requested. The shared loop is discover → reproduce → fix → retain regression; e2e implements the web checks, live inspection and exploration. Backend, MCP, native mobile and installed-host proof retain their own boundaries. A phone-sized Chromium viewport does not prove a native phone app.
+Use this guidance when the project selects [Tester Army e2e](https://e2e.tester.army/docs) for running-app verification. The shared loop is discover → reproduce → fix → retain regression; e2e implements the web checks, live inspection and exploration. Backend, MCP, native mobile and installed-host proof retain their own boundaries. A phone-sized Chromium viewport does not prove a native phone app.
 
 ## Set up from the installed version
 

@@ -20,7 +20,7 @@
   },
   "peerDependencies": {
     "eslint": "^9.39.0",
-    "typescript": ">=5.9"
+    "typescript": ">=5.9 <6.1"
   },
   "devDependencies": {
     "@cfworker/json-schema": "4.1.1",
