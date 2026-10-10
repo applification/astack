@@ -1,6 +1,7 @@
 import { Validator } from '@cfworker/json-schema';
 import { readFileSync, existsSync, readdirSync, realpathSync } from 'node:fs';
 import { resolve, relative, isAbsolute, dirname } from 'node:path';
+import { roles } from '../skills/setup-astack/scripts/models.mjs';
 const root = resolve(import.meta.dir, '..');
 const read = (p) => JSON.parse(readFileSync(p, 'utf8'));
 function isRecord(value) {
@@ -70,6 +71,21 @@ function checkSkills(base) {
     }
   }
   links(skills);
+  const playbooks = resolve(skills, 'astack/playbooks');
+  const routes = new Set();
+  for (const file of readdirSync(playbooks)) {
+    if (!file.endsWith('.md')) continue;
+    const source = readFileSync(resolve(playbooks, file), 'utf8');
+    const metadata = record(Bun.YAML.parse(source.match(/^---\r?\n([\s\S]*?)\r?\n---/)?.[1] ?? ''));
+    if (metadata.name !== file.slice(0, -3) || typeof metadata.route !== 'string' || routes.has(metadata.route)) {
+      throw new Error(`Invalid or duplicate playbook identity: ${file}`);
+    }
+    routes.add(metadata.route);
+    const steps = [...prose(source).matchAll(/^(\d+)\. (.+)$/gm)].map((step) => ({ number: Number(step[1]), role: step[2].match(/^\*\*([^*]+)\*\*:/)?.[1], text: step[2] }));
+    if (!steps.length || steps.some((step, index) => step.number !== index + 1 || ![...roles, 'lead'].includes(step.role))) throw new Error(`Invalid playbook role or order: ${file}`);
+    if (steps.at(-1).role !== 'lead' || steps.some((step) => step.role !== 'lead' && /\]\([^)]*\/pr\/SKILL\.md\)/.test(step.text))) throw new Error(`Invalid playbook delivery owner: ${file}`);
+    if (steps.some((step) => step.role === 'review' && !step.text.includes('/code-review/SKILL.md'))) throw new Error(`Missing playbook diff review: ${file}`);
+  }
 }
 export function checkPlugin(base) {
   for (const name of ['plugin', 'mcp']) {

@@ -12,7 +12,7 @@ Use the selected language, runtime, package manager, framework and test runner. 
 
 Run the real artifact with a safe input or fixture, inspect the result and exercise a meaningful failure when relevant. A CLI should run as a CLI; a service should answer a real request; a user interaction should be driven in the running app. Use [testing](../../testing/SKILL.md) for a useful regression and [verify](../../verify/SKILL.md) to distinguish observed behavior from compilation or mock coverage.
 
-Reuse working launch, diagnostic and verification tools. Add [app control](../../app-control/SKILL.md) when repeated driving lacks a capability, and use existing design/component tools when they answer a useful question. Neither is required for every setup. Select local, preview or hosted verification from the project's chosen deployment and available authority.
+Reuse working launch, diagnostic and verification tools. Add [app control](../../app-control/SKILL.md) when repeated driving lacks a capability, and use existing design/component tools when they answer a useful question. Neither is required for every new project. Select local, preview or hosted verification from the project's chosen deployment and available authority.
 
 Run the project's chosen lint, compiler and test commands when present. Report incompatibility rather than silently replacing selected tools to satisfy a check. Keep CI aligned with the working commands.
 
@@ -30,4 +30,4 @@ Keep secrets and temporary run artifacts out of Git. Put concise observations an
 
 Rerun the documented milestone from the checkout and inspect its material result. Stop only owned processes and clean up disposable fixtures. Report the revision, commands, observations and any missing prerequisite. Several surfaces need separate checks; one web observation does not establish MCP or native-host behavior.
 
-Use [pr](../../pr/SKILL.md) to finish kept changes. Keep delivery partial or draft when required behavior cannot be observed; do not substitute a ticket or a generated scaffold for proof.
+Report incomplete behavior to the lead; do not substitute a ticket or a generated scaffold for proof.

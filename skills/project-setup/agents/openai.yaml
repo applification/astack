@@ -1,6 +1,0 @@
-interface:
-  display_name: "Project Setup"
-  short_description: "Set up the chosen stack and verify a first milestone"
-  default_prompt: "Use $applification:project-setup to honour this project's fixed choices, evaluate open ones, and verify the smallest working milestone."
-policy:
-  allow_implicit_invocation: true

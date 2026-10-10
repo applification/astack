@@ -14,7 +14,7 @@
       "interface": {
         "displayName": "Applification",
         "shortDescription": "astack: build and prove the intended change",
-        "longDescription": "astack by Applification routes engineering tasks through a short intent contract, proportional feedback, real-product proof, and focused review.",
+        "longDescription": "astack by Applification composes engineering skills into ordered playbooks, using project model preferences and existing checks to deliver observed proof and focused review.",
         "developerName": "Applification Ltd",
         "category": "Developer Tools",
         "capabilities": [

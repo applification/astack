@@ -8,7 +8,7 @@ metadata:
 
 # Evaluate agent outcomes
 
-Use this for an experiment about agent or skill effectiveness, alongside the owning investigation, implementation or verification route. Ordinary application tests use [testing](../testing/SKILL.md). Read project instructions and [the experiment protocol](references/protocol.md). Preserve an existing experiment identity and its predeclared criteria across follow-ups; material changes after results require a new version.
+Use this for an experiment about agent or skill effectiveness, alongside the owning investigation, implementation or verification work. Ordinary application tests use [testing](../testing/SKILL.md). Read project instructions and [the experiment protocol](references/protocol.md). Preserve an existing experiment identity and its predeclared criteria across follow-ups; material changes after results require a new version.
 
 Name the intervention and the claim it could support. Freeze task fixtures and acceptance checks independently of the candidate plugin/model revision. Keep models, host, user goals and budgets comparable when testing skills. Use ordinary task requests and keep experiment labels, grading criteria and other candidates out of candidate context. Necessary task requirements and ordinary project tests remain available.
 

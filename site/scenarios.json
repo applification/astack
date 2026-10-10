@@ -42,27 +42,27 @@
   {
     "request": "Set up a new project; the language and test runner are fixed",
     "decision": "Honor fixed choices. Identify product constraints and the first milestone, compare open decisions, then build and verify the smallest real path using project-owned guidance.",
-    "route": "setup"
+    "route": "new-project"
   },
   {
     "request": "Use Rust and cargo for a file converter; module boundaries are open",
     "decision": "Keep the selected language and build tools. Compare module boundaries against the input/output behavior and consumers. Use the project’s Rust guidance and run a real conversion before reporting success.",
-    "route": "setup"
+    "route": "new-project"
   },
   {
     "request": "Use Python and the standard library for a small config CLI",
     "decision": "Honor those choices and add only what the milestone requires. Read a real configuration file, execute the CLI and inspect its actual output and a meaningful failure case.",
-    "route": "setup"
+    "route": "new-project"
   },
   {
     "request": "Hosting is open and my usual provider may be wrong for this product",
     "decision": "Compare viable choices against execution, persistence, deployment and maintenance needs. Treat the usual provider as a preference; test relevant uncertainties and show trade-offs before committing.",
-    "route": "setup"
+    "route": "new-project"
   },
   {
     "request": "Move this local app to the chosen cloud host",
     "decision": "Use the agreed provider and existing deployment guidance. Preserve configuration and recovery, transfer only selected data and verify the hosted path against the actual target.",
-    "route": "setup"
+    "route": "feature"
   },
   {
     "request": "Pay down one compiler diagnostic in our existing project",
@@ -75,8 +75,8 @@
     "route": "bug"
   },
   {
-    "request": "Continue the change in our existing PR",
+    "request": "Resume implementing saved release notes in our existing PR",
     "decision": "Read the current checkout, prior decisions and relevant proof. Resume the next incomplete slice in the owner-selected PR and recheck affected results.",
-    "route": "pr"
+    "route": "feature"
   }
 ]

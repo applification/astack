@@ -1,16 +1,16 @@
 # astack
 
-Reusable engineering skills, mechanical feedback and loops for coding agents. The consuming project owns its languages, frameworks, providers and checks.
+Engineering playbooks, focused skills and feedback for coding agents. Install once, choose model roles if useful, then describe the task and what would prove it done. The project owns its application technologies.
 
 | Part | What it does |
 | --- | --- |
-| [`skills/`](skills/) | Engineering principles and workflows from intent to proof |
-| [`lint/`](lint/) | Validate astack's skill identities, links, plugin schemas and packaged assets |
-| [`loops/`](loops/) | Compose the skills on a host schedule or mention |
+| [`skills/`](skills/) | One entry point, model setup, eight ordered playbooks and focused engineering skills |
+| [`lint/`](lint/) | Mechanical checks for astack's plugin, skill/playbook composition and model resolver |
+| [`loops/`](loops/) | Prompts that run the same playbooks on a host schedule or mention |
 
 **[astack.applification.net](https://astack.applification.net/)** explains the same three parts.
 
-## Install the skills
+## 1. Install the plugin
 
 **Codex**
 
@@ -21,52 +21,83 @@ codex plugin add applification@applification
 
 **Claude Code**
 
-```
+```text
 /plugin marketplace add applification/astack
 /plugin install applification@applification
 ```
 
-Give `$applification:astack` in Codex, or `/applification:astack` in Claude Code, a request with the product, fixed choices, open decisions and smallest useful milestone.
+Both hosts install the Applification plugin from this repository's `skills/`. No server or application toolchain is installed. In T3, make the plugin available to each provider you use; one provider's installation does not establish the other's installation. Delegated briefs include exact skill paths and project context.
 
-Fixed choices are honoured. Open choices are compared against product constraints; the agent recommends or decides within delegated authority. Observable questions are settled by running things.
+## 2. Choose models (optional)
 
-The project supplies its technology skills, vendor documentation, lint and compiler configuration. astack uses that guidance and the existing check commands. Its plugin ships engineering method, with no application stack dependencies or compiler/linter presets.
+Use `$applification:setup-astack` in Codex or `/applification:setup-astack` in Claude Code. This configures the agent, not the application.
 
-| Group | Skills |
+Setup discovers available providers/models and supported reasoning options, asks about your budget/preferences, and saves a confirmed table for four roles in the consuming project's `.astack/models.json`:
+
+| Role | Work |
 | --- | --- |
-| Entry | `astack` |
-| Delivery | `implement`, `bug-fix`, `refactor`, `performance`, `investigate`, `pr` |
-| Project | `project-setup`, `app-control`, `cloud-transition` |
-| Checks | `testing`, `verify`, `code-review`, `correct`, `agent-evaluation` |
-| Design | `architect`, `domain-modeling`, `show-me` |
-| Principles | `principle-type-system-discipline`, `principle-boundary-discipline`, `principle-encode-lessons-in-structure`, `principle-prove-it-works`, `principle-test-behavior-not-implementation`, `principle-fix-root-causes`, `principle-sequence-verifiable-units` |
+| `research` | Understand code, reproduce symptoms and gather evidence |
+| `design` | Compare approaches and settle consequential boundaries |
+| `implementation` | Make the authorized changes |
+| `review` | Challenge the diff and assess proof |
 
-Keep choices and working commands in existing project instructions. Use `.astack/project.md` when a separate reference helps. Setup establishes one verified milestone; control tools and feature maps earn their place when needed.
+Missing configuration or omitted roles inherit the current session's model/settings. A pinned role contains a provider/model target with supported options and requires a host catalog exposing that exact target. T3 supplies this through `orchestrator_capabilities`, and selected targets can run through `delegate_task` across Claude/Codex providers. An unsupported saved pin stops its contribution with a reported gap. Model IDs and aliases are not universal across hosts. Setup does not switch the main thread's model or alter host-global settings.
+
+See [model selection](skills/setup-astack/references/models.md) for the small JSON format and validation command. Commit the preference file with the project and point existing project instructions to it so worktrees and hosts read the same choices.
+
+## 3. Give it a task
+
+```text
+$applification:astack Fix the save bug.
+Done means an edited record survives reopening.
+```
+
+Claude Code uses `/applification:astack`. The entry skill chooses a playbook from the outcome. A playbook is an ordered procedure: which skills to use, what each step must establish and which model role performs that contribution. A skill supplies the expertise for a step. You do not need to name the internal skills.
+
+| Task | Playbook |
+| --- | --- |
+| New or changed behavior | [feature](skills/astack/playbooks/feature.md) |
+| Reported defect | [bug fix](skills/astack/playbooks/bug-fix.md) |
+| Structure change preserving behavior | [refactor](skills/astack/playbooks/refactor.md) |
+| Measured slowness | [performance](skills/astack/playbooks/performance.md) |
+| Read-only question | [investigation](skills/astack/playbooks/investigation.md) |
+| Assess a diff or fix its findings | [review](skills/astack/playbooks/review.md) |
+| Add or repair product-driving tools | [app control](skills/astack/playbooks/app-control.md) |
+| Empty repo or first working milestone | [new project](skills/astack/playbooks/new-project.md) |
+
+For a new product, describe the users, fixed choices, open decisions and smallest real milestone. Fixed choices are honoured; open choices are compared against product constraints; observable questions are settled by running things. New-project work is a playbook, separate from model setup.
+
+The lead owns integration and final proof. Inherited roles can work directly; selected targets use the actual host's dispatch capabilities. Independent reviews need a fresh reviewer even when the model is the same. Plans record skipped steps with reasons. A read-only task ends with its answer; changed code follows the project's delivery policy.
+
+These are callable skills, not a host-specific persistent mode. Start new tasks with astack; the host owns mode persistence, the parent model and scheduling.
+
+## Project feedback
+
+Engineering principles guide judgment. The project's types, lint rules, tests and runtime checks enforce its concrete rules. astack supplies no application compiler/linter presets.
+
+Use `$applification:correct` for repeated agent mistakes. It inspects demonstrated failures, changes the owning architecture/type/lint/test safeguard and proves that bad cases fail while valid ones pass. It records the enforcing command in the project's existing guidance. This is how reusable method becomes project-specific enforcement; model setup does not invent lint rules.
+
+Keep actual commands in existing project instructions. `.astack/project.md` is optional. A project-specific verification/control skill is useful when existing tools cannot drive a real user path; it earns its place through an observed run.
 
 ## Loops
 
-A loop is one prompt file. Your host owns scheduling, credentials and mentions.
+The four prompts are [lint debt](loops/lint-debt.md), [PR review](loops/pr-review.md), [bug fix](loops/bug-fix.md) and [mention](loops/mention.md). Each uses astack's playbooks and existing checks. Pins require a matching host catalog; an unsupported pinned contribution stops with a reported gap. The host owns scheduling, credentials, triggers and retained run state; installing the plugin starts no jobs. Runs avoid duplicate work and never merge.
 
-| Loop | Trigger | Work |
-| --- | --- | --- |
-| [`lint-debt`](loops/lint-debt.md) | Weekly | Fix one diagnostic using the project's chosen guidance and checks |
-| [`pr-review`](loops/pr-review.md) | Hourly, or on PR | Review new PR heads and report observed checks |
-| [`bug-fix`](loops/bug-fix.md) | Daily | Reproduce and fix one eligible unassigned bug |
-| [`mention`](loops/mention.md) | Bot mention | Answer the question or make the requested change |
-
-Copy the selected prompt from an astack checkout into your project. For example, after copying `lint-debt.md` to `agent-prompts/lint-debt.md`, run it from that project with the plugin installed:
+Copy the selected prompt into your project and give it to your host's scheduler. For a standalone Claude Code run with inherited roles and the plugin installed:
 
 ```sh
 claude -p < agent-prompts/lint-debt.md
 ```
 
-For mentions, append the comment and its thread. Runs use existing project tools, check for prior work and never merge. Installing the plugin does not create a project prompt directory.
+For mentions, append the comment and its thread. Installation does not create a project prompt directory.
 
 ## Contributing
 
-Run `bun install --frozen-lockfile`, then `bun run check`. The repository uses Bun for authoring checks; consuming projects keep their own tools. [`lint/plugins.mjs`](lint/plugins.mjs) checks the portable package, and its tests reject malformed identities, missing assets and broken composition links. Site and loop checks keep their references current. Keep proof in the PR description, following [AGENTS.md](AGENTS.md).
+There are 25 callable skills, including seven principle leaves. Playbooks live under `skills/astack/playbooks/`; they are task procedures, not additional slash commands. Keep step expertise in focused skills and model selection in setup/orchestration.
 
-The plain HTML/CSS/JavaScript [`site/`](site/) publishes to astack.applification.net through GitHub Pages on merge to `main`. Preview it with `python3 -m http.server 8000 --directory site`.
+Run `bun install --frozen-lockfile`, then `bun run check`. Bun is this repository's authoring tool. The checks validate package identities, metadata, contained links, playbook role labels, model-resolution behavior, loops and site references. Keep proof in the PR description, following [AGENTS.md](AGENTS.md).
+
+The plain HTML/CSS/JavaScript [site](site/) publishes to astack.applification.net through GitHub Pages on merge to `main`. Preview with `python3 -m http.server 8000 --directory site`.
 
 ## Sources and license
 

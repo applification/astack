@@ -9,19 +9,23 @@ const html = read('site/index.html');
 const app = read('site/app.js');
 const scenarios = JSON.parse(read('site/scenarios.json'));
 
-const workflowSources = {
-  Feature: 'implement', 'Bug fix': 'bug-fix', Refactor: 'refactor',
-  Performance: 'performance', Investigation: 'investigate', 'Pull request': 'pr',
-  'App control': 'app-control',
-};
-const uniqueRoutes = Object.keys(workflowSources);
-for (const [route, folder] of Object.entries(workflowSources)) {
-  if (!existsSync(path.join(root, `skills/${folder}/SKILL.md`)) ||
-      !skill.includes(`../${folder}/SKILL.md`)) throw new Error(`Missing workflow source for ${route}`);
+const routeKeys = { Feature: 'feature', 'Bug fix': 'bug', Refactor: 'refactor', Performance: 'performance', Investigation: 'investigation', Review: 'pr', 'App control': 'control', 'New project': 'new-project' };
+const playbooks = readdirSync(path.join(root, 'skills/astack/playbooks')).filter((file) => file.endsWith('.md'));
+const published = new Set();
+for (const file of playbooks) {
+  const source = read(`skills/astack/playbooks/${file}`);
+  const route = source.match(/^route: (.+)$/m)?.[1];
+  if (!Object.values(routeKeys).includes(route) || !skill.includes(`playbooks/${file}`)) {
+    throw new Error(`Missing playbook index for ${file}`);
+  }
+  const column = html.split(`data-map-route="${route}"`)[1]?.split('data-map-route=')[0] ?? '';
+  const shownRoles = [...column.matchAll(/data-step-role="([^"]+)"/g)].map((match) => match[1]);
+  const stepRoles = [...source.matchAll(/^\d+\. \*\*([^*]+)\*\*:/gm)].map((match) => match[1]);
+  if (JSON.stringify(shownRoles) !== JSON.stringify(stepRoles)) throw new Error(`Site step roles differ from playbook: ${file}`);
+  published.add(route);
 }
-const routeKeys = { Feature: 'feature', 'Bug fix': 'bug', Refactor: 'refactor', Performance: 'performance', Investigation: 'investigation', 'Pull request': 'pr', 'App control': 'control', 'Project setup': 'setup' };
-for (const name of [...uniqueRoutes, 'Project setup']) {
-  const key = routeKeys[name];
+for (const [name, key] of Object.entries(routeKeys)) {
+  if (!published.has(key)) throw new Error(`Missing playbook for ${name}`);
   if (!html.includes(`data-map-route="${key}"`) || !app.includes(`name: '${name}'`)) {
     throw new Error('Site is missing a current route: ' + name);
   }
@@ -55,4 +59,4 @@ for (const match of readme.matchAll(/!?\[[^\]]*\]\(([^)]+)\)/g)) {
   if (/^[a-z][a-z0-9+.-]*:/i.test(url) || url.startsWith('#')) continue;
   if (!existsSync(path.resolve(root, decodeURIComponent(url.split('#')[0])))) throw new Error(`Broken README link: ${url}`);
 }
-console.log(`Site routes, ${scenarios.length} routing examples, principle and loop indexes, and README links match this checkout.`);
+console.log(`Site playbooks, ${scenarios.length} routing examples, principle and loop indexes, and README links match this checkout.`);

@@ -65,4 +65,36 @@ test('the installable package and the plugin share one version', () => {
   const root = resolve(import.meta.dir, '..');
   const version = (file) => JSON.parse(readFileSync(join(root, file), 'utf8')).version;
   expect(version('package.json')).toBe(version('plugin.json'));
+  expect(version('.claude-plugin/plugin.json')).toBe(version('plugin.json'));
+});
+test('a playbook cannot dispatch an unknown role', () => {
+  const file = join(path, 'skills/astack/playbooks/feature.md');
+  writeFileSync(file, readFileSync(file, 'utf8').replace('**review**:', '**reveiw**:'));
+  expect(() => checkPlugin(path)).toThrow('Invalid playbook role');
+});
+test('playbook routes cannot silently collide', () => {
+  const file = join(path, 'skills/astack/playbooks/feature.md');
+  writeFileSync(file, readFileSync(file, 'utf8').replace('route: feature', 'route: bug'));
+  expect(() => checkPlugin(path)).toThrow('Invalid or duplicate playbook identity');
+});
+test('every playbook step must have a role', () => {
+  const file = join(path, 'skills/astack/playbooks/feature.md');
+  writeFileSync(file, readFileSync(file, 'utf8').replace('5. **lead**:', '5. Merge and release.\n6. **lead**:'));
+  expect(() => checkPlugin(path)).toThrow('Invalid playbook role');
+});
+test('PR delivery belongs to a final lead step', () => {
+  const file = join(path, 'skills/astack/playbooks/feature.md');
+  const source = readFileSync(file, 'utf8');
+  for (const mutation of [
+    source.replace('Return findings and proof gaps.', 'Finish through [pr](../../pr/SKILL.md).'),
+    source.replace(/^5\. \*\*lead\*\*:.*\n/m, ''),
+  ]) {
+    writeFileSync(file, mutation);
+    expect(() => checkPlugin(path)).toThrow('Invalid playbook delivery owner');
+  }
+});
+test('review contributions must challenge the diff', () => {
+  const file = join(path, 'skills/astack/playbooks/feature.md');
+  writeFileSync(file, readFileSync(file, 'utf8').replace('[code-review](../../code-review/SKILL.md) and ', ''));
+  expect(() => checkPlugin(path)).toThrow('Missing playbook diff review');
 });

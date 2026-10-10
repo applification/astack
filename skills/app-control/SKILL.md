@@ -19,6 +19,6 @@ Build only the commands needed to launch or connect, diagnose identity, perform 
 
 Prove the documented direct invocation and help from a fresh checkout, then use [verify](../verify/SKILL.md) for one mapped path through the actual product. Establish the correct build and fixture, independently read material side effects, and confirm evidence remains after cleanup. Stop only owned processes; an open port alone does not establish checkout identity.
 
-Return the executable path, commands, map, observed case/evidence and remaining coverage or prerequisite gaps. Kept changes finish through [pr](../pr/SKILL.md). For a read-only assessment, report missing capabilities without generating files. A blocked driver remains draft; do not claim a working route from scaffolding.
+Return the executable path, commands, map, observed case/evidence and remaining coverage or prerequisite gaps. For a read-only assessment, report missing capabilities without generating files. A blocked driver remains draft; do not claim a working route from scaffolding.
 
 For a maintenance request, compare the scoped map entries and commands with current source, then exercise those paths in the identified running product. Distinguish stale guidance or control handles from a product defect. Repair the control skill/CLI and map within the requested scope, report product regressions separately, and rerun repaired paths. A full-map audit reports every mapped path's result or gap; one passing feature does not establish full coverage.
