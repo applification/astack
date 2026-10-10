@@ -1,6 +1,0 @@
-interface:
-  display_name: "Web Feature"
-  short_description: "Design and deliver web UI with proportionate proof"
-  default_prompt: "Use $applification:web-feature to deliver this web interaction with useful design and running-product evidence."
-policy:
-  allow_implicit_invocation: true

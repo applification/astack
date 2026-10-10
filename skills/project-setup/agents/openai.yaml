@@ -1,6 +1,0 @@
-interface:
-  display_name: "Project Setup"
-  short_description: "Establish astack's runtime control and verification loop"
-  default_prompt: "Use $applification:project-setup to establish or upgrade this project's runtime control and verification loop."
-policy:
-  allow_implicit_invocation: true

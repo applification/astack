@@ -1,8 +1,0 @@
-{
-  "extends": "../config/typescript.json",
-  "include": ["src/**/*", ".storybook/**/*"],
-  "compilerOptions": {
-    "types": ["react", "react-dom"],
-    "skipLibCheck": true
-  }
-}

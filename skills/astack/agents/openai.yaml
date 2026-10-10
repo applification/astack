@@ -1,6 +1,6 @@
 interface:
   display_name: "astack"
-  short_description: "Coordinate engineering work from intent to proof"
-  default_prompt: "Use $applification:astack to carry this engineering task through implementation, proof and review."
+  short_description: "Run engineering playbooks with project model choices"
+  default_prompt: "Use $applification:astack to select a playbook and run this task with project model roles and observed proof."
 policy:
   allow_implicit_invocation: true

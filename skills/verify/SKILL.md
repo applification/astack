@@ -7,8 +7,6 @@ metadata:
 
 # Verify the outcome
 
-When owning a substantive verification task with agentlog readable capture, use the [automatic evaluation handoff](../astack/references/observatory.md#automatic-task-evaluations) at task start and delivery. During an enclosing delivery task, reuse its existing task ID and return actual proof to its owner instead of creating another evaluation. Telemetry failures must not block verification.
-
 Read [prove it works](../principle-prove-it-works/SKILL.md) before claiming the named outcome.
 
 Read `.astack/project.md` when present for the project's runtime, control and verification commands; use the requested scope without requiring the astack coordinator or a setup pass.
@@ -20,7 +18,7 @@ Use this directly to verify a named change or claim, or during astack delivery. 
 3. Run the selected checks and inspect their assertions, reports, attempts and artifacts. Confirm material effects with a fresh read or independent view. Preserve the first failure, distinguish product defects from setup failures, and retain useful regressions after an authorized fix.
 4. Return a concise result for each applicable case: expected observation, actual observation, revision/environment, evidence and remaining gap. Use pass, fail, inconclusive, skipped or not applicable with reasons. Report a retry pass as flaky rather than erasing its first failure.
 
-Read [proof policy](references/proof-policy.md) for surface selection, candidate confirmation, evidence retention and host boundaries. When authoring or repairing checks, apply [testing](../testing/SKILL.md); it owns regression design and the e2e loop. Keep component, protocol, emulated-host, live-provider and installed-host observations distinct. Builds and routing examples do not establish agent delivery.
+Read [proof policy](references/proof-policy.md) for surface selection, candidate confirmation, evidence retention and host boundaries. When authoring or repairing checks, apply [testing](../testing/SKILL.md); it owns regression design with the project’s chosen runner. Keep component, protocol, emulated-host, live-provider and installed-host observations distinct. Builds and routing examples do not establish agent delivery.
 
 For example, a save test that never gets past login is inconclusive for saving. A successful save followed by a fresh read of the changed record can support persistence on that actor/environment, while leaving another host untested. A copy correction may need only a focused rendered check.
 

@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#d7dfe7">
-  <meta name="description" content="astack is the workflow behind the Applification plugin for Codex. Give it an engineering task; it chooses a route, checks the result, and brings kept changes to a pull request.">
+  <meta name="description" content="Reusable engineering skills, lint feedback and loops for coding agents. Your project chooses its stack; astack helps build and verify the outcome.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="astack | Outcome first. Proof built in.">
-  <meta property="og:description" content="A practical map of the Applification workflow for Codex, maintained with the source.">
+  <meta property="og:description" content="Engineering skills, package checks and loops. Application technologies stay in the consuming project.">
   <meta property="og:url" content="https://astack.applification.net/">
   <link rel="canonical" href="https://astack.applification.net/">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
@@ -23,27 +23,27 @@
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
   <a class="brand" href="#top" aria-label="astack home">astack<span>.</span></a>
-  <nav class="site-nav" aria-label="Main navigation"><a href="#routes">Routes</a><a href="#method">Method</a><a href="#project">In a project</a><a href="#adopt">Get started</a><a class="nav-repo" href="https://github.com/applification/astack">GitHub ↗</a><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark theme"><span id="theme-icon" aria-hidden="true">☾</span><span class="theme-label">Dark</span></button></nav>
+  <nav class="site-nav" aria-label="Main navigation"><a href="#routes">Playbooks</a><a href="#lint">Lint</a><a href="#loops">Loops</a><a href="#project">In a project</a><a href="#adopt">Get started</a><a class="nav-repo" href="https://github.com/applification/astack">GitHub ↗</a><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark theme"><span id="theme-icon" aria-hidden="true">☾</span><span class="theme-label">Dark</span></button></nav>
 </header>
 <main id="main">
   <section class="hero section-shell" id="top" aria-labelledby="hero-title">
     <div class="hero-copy">
       <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> astack by Applification</p>
       <h1 id="hero-title">Outcome first.<br><em>Proof built in.</em></h1>
-      <p class="hero-lede">Install the Applification plugin, establish or upgrade your project’s runtime and verification loop, then give astack an engineering request. It selects the skills, checks the outcome and brings kept changes to a pull request. Every focused skill is also callable directly.</p>
-      <div class="hero-actions"><a class="button button-dark" href="#adopt">Get started <span aria-hidden="true">↗</span></a><a class="text-link" href="https://github.com/applification/astack/blob/main/docs/guide/README.md">Read the guide ↗</a></div>
+      <p class="hero-lede">Engineering playbooks, focused skills and feedback for coding agents. Install the plugin in Codex or Claude Code, choose model roles if useful, then describe the outcome. Your project owns its technology choices and checks.</p>
+      <div class="hero-actions"><a class="button button-dark" href="#adopt">Get started <span aria-hidden="true">↗</span></a><a class="text-link" href="https://github.com/applification/astack/blob/main/README.md">Read the README ↗</a></div>
       <p class="source-note">The <a href="https://github.com/applification/astack">repository</a> is the source of truth. This site explains the workflow without pinning it to a release snapshot.</p>
     </div>
-    <aside class="hero-aside"><p class="eyebrow">THE WORKING METHOD</p><p>A task goes to the route that fits it. astack asks what would prove the outcome, then brings the evidence into review.</p><a href="#routes">Follow the route map ↗</a></aside>
+    <aside class="hero-aside"><p class="eyebrow">THE WORKING METHOD</p><p>A task selects an ordered playbook. Its steps compose skills and project model roles, ending with observed proof and review.</p><a href="#routes">Follow the route map ↗</a></aside>
   </section>
   <section class="section-shell routes-section" id="routes" aria-labelledby="routes-title">
-    <div class="section-heading"><div><p class="eyebrow">01 / ROUTING</p><h2 id="routes-title">One entry point.<br><em>Different kinds of work.</em></h2></div><p>astack routes by the outcome you want. Pick a route below to see the shape of the work. The skill's <a href="https://github.com/applification/astack/blob/main/skills/astack/SKILL.md">route guide</a> has the detail.</p></div>
+    <div class="section-heading"><div><p class="eyebrow">01 / ROUTING</p><h2 id="routes-title">One entry point.<br><em>Different kinds of work.</em></h2></div><p>astack selects a playbook from the outcome you want. Each playbook names an ordered sequence, the skills it uses and the model roles that contribute. The skill's <a href="https://github.com/applification/astack/blob/main/skills/astack/SKILL.md">playbook guide</a> has the detail.</p></div>
     <div class="route-workbench" id="route-workbench">
-      <div class="map-heading"><div><span class="map-heading-index">THE ROUTE MAP</span><h3>One task. The right line.</h3><p>Choose a real request to see its expected decision and trace the line it takes.</p></div><div class="map-actions"><button id="browse-requests" type="button" aria-expanded="false" aria-controls="trace-panel">Browse eval examples <span aria-hidden="true">⌄</span></button><button id="show-all-routes" type="button">Show all lines</button></div></div>
+      <div class="map-heading"><div><span class="map-heading-index">THE ROUTE MAP</span><h3>One task. The right line.</h3><p>Choose a real request to see its expected decision and trace the line it takes.</p></div><div class="map-actions"><button id="browse-requests" type="button" aria-expanded="false" aria-controls="trace-panel">Browse routing examples <span aria-hidden="true">⌄</span></button><button id="show-all-routes" type="button">Show all lines</button></div></div>
     <div class="trace-panel" id="trace-panel" aria-labelledby="trace-title" hidden>
       <div class="trace-picker">
-        <div class="trace-intro"><span class="map-heading-index">ROUTES + REAL REQUESTS</span><h3 id="trace-title">Choose a request</h3><p>Browse by route or search the eval cases. The selected line will light up on this map.</p></div>
-        <div class="trace-controls"><label for="request-search">Search the eval examples</label><input id="request-search" type="search" placeholder="Try “parser”, “Convex”, or “review”" autocomplete="off"></div>
+        <div class="trace-intro"><span class="map-heading-index">ROUTES + REAL REQUESTS</span><h3 id="trace-title">Choose a request</h3><p>Browse by route or search the examples. The selected line will light up on this map.</p></div>
+        <div class="trace-controls"><label for="request-search">Search the routing examples</label><input id="request-search" type="search" placeholder="Try “parser”, “hosting”, or “review”" autocomplete="off"></div>
         <p id="request-count" class="request-count" aria-live="polite"></p>
         <div id="request-results" class="request-results"></div>
       </div>
@@ -66,425 +66,157 @@
           <path data-branch-route="investigation" d="M592 3 C592 62 626 47 626 124" stroke="#8875a6" />
           <path data-branch-route="pr" d="M592 3 C592 62 774 47 774 124" stroke="#5b9d9b" />
           <path data-branch-route="control" d="M592 3 C592 62 922 47 922 124" stroke="#b46f85" />
-          <path data-branch-route="setup" d="M592 3 C592 62 1070 47 1070 124" stroke="#536779" stroke-dasharray="5 5"/>
+          <path data-branch-route="new-project" d="M592 3 C592 62 1070 47 1070 124" stroke="#536779" stroke-dasharray="5 5"/>
         </svg>
         <div class="v-columns">
           <div class="v-column" data-map-route="feature" style="--route:#4b916f">
             <button class="v-title" type="button" data-map-select="feature">Feature</button>
             <div class="v-stations">
-              <div class="v-station">
-                <strong>Behavior contract</strong>
-                <small>For substantial changes</small>
-              </div>
-              <div class="v-station">
-                <strong>Choose UI evidence</strong>
-                <small>Pencil or Storybook when useful</small>
-              </div>
-              <div class="v-station">
-                <strong>Trace ownership</strong>
-                <small>Trigger, data and side effects</small>
-              </div>
-              <div class="v-station">
-                <strong>Implement in slices</strong>
-                <small>Check as you go</small>
-              </div>
-              <div class="v-station">
-                <strong>Update control path</strong>
-                <small>If a mapped path moves</small>
-              </div>
-            </div>
-            <div class="v-shared">
-              <div class="v-station">
-                <strong>Proof</strong>
-                <small>Observed result</small>
-              </div>
-              <div class="v-station">
-                <strong>Review</strong>
-                <small>Intent + quality</small>
-              </div>
-              <div class="v-station">
-                <strong>Pull request</strong>
-                <small>Evidence and gaps</small>
-              </div>
+              <div class="v-station" data-step-role="research"><strong>Define behavior</strong><small>Research · Read affected consumers</small></div>
+              <div class="v-station" data-step-role="design"><strong>Settle boundaries</strong><small>Design · Compare open choices</small></div>
+              <div class="v-station" data-step-role="implementation"><strong>Build in slices</strong><small>Implementation · Use project tools</small></div>
+              <div class="v-station" data-step-role="review"><strong>Challenge the diff</strong><small>Review · Run real checks</small></div>
+              <div class="v-station" data-step-role="lead"><strong>Deliver the change</strong><small>Lead · Resolve findings + PR</small></div>
             </div>
           </div>
           <div class="v-column" data-map-route="bug" style="--route:#d7775f">
             <button class="v-title" type="button" data-map-select="bug">Bug fix</button>
             <div class="v-stations">
-              <div class="v-station">
-                <strong>Reproduce symptom</strong>
-                <small>On the real surface</small>
-              </div>
-              <div class="v-station">
-                <strong>Find the cause</strong>
-                <small>Use code and history</small>
-              </div>
-              <div class="v-station">
-                <strong>Smallest fix</strong>
-                <small>Supported by evidence</small>
-              </div>
-              <div class="v-station">
-                <strong>Rerun the path</strong>
-                <small>The original failing journey</small>
-              </div>
-            </div>
-            <div class="v-shared">
-              <div class="v-station">
-                <strong>Proof</strong>
-                <small>Observed result</small>
-              </div>
-              <div class="v-station">
-                <strong>Review</strong>
-                <small>Intent + quality</small>
-              </div>
-              <div class="v-station">
-                <strong>Pull request</strong>
-                <small>Evidence and gaps</small>
-              </div>
+              <div class="v-station" data-step-role="research"><strong>Reproduce symptom</strong><small>Research · Trace supported cause</small></div>
+              <div class="v-station" data-step-role="implementation"><strong>Repair the cause</strong><small>Implementation · Add useful regression</small></div>
+              <div class="v-station" data-step-role="review"><strong>Challenge the diff</strong><small>Review · Rerun failing path</small></div>
+              <div class="v-station" data-step-role="lead"><strong>Deliver the fix</strong><small>Lead · Before/after proof + PR</small></div>
             </div>
           </div>
           <div class="v-column" data-map-route="refactor" style="--route:#6f8eb2">
             <button class="v-title" type="button" data-map-select="refactor">Refactor</button>
             <div class="v-stations">
-              <div class="v-station">
-                <strong>Name the invariant</strong>
-                <small>What must not change</small>
-              </div>
-              <div class="v-station">
-                <strong>Pin the output</strong>
-                <small>Test or recorded result</small>
-              </div>
-              <div class="v-station">
-                <strong>Move in small steps</strong>
-                <small>Rerun the pin</small>
-              </div>
-              <div class="v-station">
-                <strong>Delete old paths</strong>
-                <small>Once callers have moved</small>
-              </div>
-            </div>
-            <div class="v-shared">
-              <div class="v-station">
-                <strong>Proof</strong>
-                <small>Observed result</small>
-              </div>
-              <div class="v-station">
-                <strong>Review</strong>
-                <small>Intent + quality</small>
-              </div>
-              <div class="v-station">
-                <strong>Pull request</strong>
-                <small>Evidence and gaps</small>
-              </div>
+              <div class="v-station" data-step-role="research"><strong>Pin behavior</strong><small>Research · Name the invariant</small></div>
+              <div class="v-station" data-step-role="implementation"><strong>Simplify ownership</strong><small>Implementation · Move and compare</small></div>
+              <div class="v-station" data-step-role="review"><strong>Challenge the diff</strong><small>Review · Inspect affected boundaries</small></div>
+              <div class="v-station" data-step-role="lead"><strong>Deliver the change</strong><small>Lead · Equivalence proof + PR</small></div>
             </div>
           </div>
           <div class="v-column" data-map-route="performance" style="--route:#b78b3e">
             <button class="v-title" type="button" data-map-select="performance">Performance</button>
             <div class="v-stations">
-              <div class="v-station">
-                <strong>Pick a metric</strong>
-                <small>User or operational</small>
-              </div>
-              <div class="v-station">
-                <strong>Measure baseline</strong>
-                <small>Comparable conditions</small>
-              </div>
-              <div class="v-station">
-                <strong>Find bottleneck</strong>
-                <small>Before editing</small>
-              </div>
-              <div class="v-station">
-                <strong>Change one cause</strong>
-                <small>Compare with baseline</small>
-              </div>
-            </div>
-            <div class="v-shared">
-              <div class="v-station">
-                <strong>Proof</strong>
-                <small>Observed result</small>
-              </div>
-              <div class="v-station">
-                <strong>Review</strong>
-                <small>Intent + quality</small>
-              </div>
-              <div class="v-station">
-                <strong>Pull request</strong>
-                <small>Evidence and gaps</small>
-              </div>
+              <div class="v-station" data-step-role="research"><strong>Measure baseline</strong><small>Research · Pick a real metric</small></div>
+              <div class="v-station" data-step-role="design"><strong>Find bottleneck</strong><small>Design · Choose supported cause</small></div>
+              <div class="v-station" data-step-role="implementation"><strong>Make improvement</strong><small>Implementation · Keep change bounded</small></div>
+              <div class="v-station" data-step-role="review"><strong>Challenge the diff</strong><small>Review · Compare same conditions</small></div>
+              <div class="v-station" data-step-role="lead"><strong>Deliver the change</strong><small>Lead · Measurements + PR</small></div>
             </div>
           </div>
-          <div class="v-column v-investigation" data-map-route="investigation" style="--route:#8875a6">
+          <div class="v-column" data-map-route="investigation" style="--route:#8875a6">
             <button class="v-title" type="button" data-map-select="investigation">Investigation</button>
             <div class="v-stations">
-              <div class="v-station">
-                <strong>Gather evidence</strong>
-                <small>Code, history or product</small>
-              </div>
-              <div class="v-station">
-                <strong>Separate fact</strong>
-                <small>From inference</small>
-              </div>
-              <div class="v-station">
-                <strong>Answer or advise</strong>
-                <small>With tradeoffs when asked</small>
-              </div>
+              <div class="v-station" data-step-role="research"><strong>Gather evidence</strong><small>Research · Code, history or runtime</small></div>
+              <div class="v-station" data-step-role="design"><strong>Separate fact</strong><small>Design · Compare options if asked</small></div>
+              <div class="v-station" data-step-role="lead"><strong>Answer the question</strong><small>Lead · Sources and uncertainty</small></div>
             </div>
             <div class="v-end">Ends with an answer</div>
           </div>
           <div class="v-column" data-map-route="pr" style="--route:#5b9d9b">
-            <button class="v-title" type="button" data-map-select="pr">Pull request</button>
+            <button class="v-title" type="button" data-map-select="pr">Review</button>
             <div class="v-stations">
-              <div class="v-station">
-                <strong>Read full diff</strong>
-                <small>Against intended outcome</small>
-              </div>
-              <div class="v-station">
-                <strong>Trace consumers</strong>
-                <small>Beyond direct callers</small>
-              </div>
-              <div class="v-station">
-                <strong>Specialist review</strong>
-                <small>When the change needs it</small>
-              </div>
-              <div class="v-station">
-                <strong>Fix on this branch</strong>
-                <small>When authorised</small>
-              </div>
-              <div class="v-station">
-                <strong>Account for media</strong>
-                <small>Attach, link or explain</small>
-              </div>
-            </div>
-            <div class="v-shared">
-              <div class="v-station">
-                <strong>Proof</strong>
-                <small>Observed result</small>
-              </div>
-              <div class="v-station">
-                <strong>Review</strong>
-                <small>Intent + quality</small>
-              </div>
-              <div class="v-station">
-                <strong>Pull request</strong>
-                <small>Evidence and gaps</small>
-              </div>
+              <div class="v-station" data-step-role="research"><strong>Read full diff</strong><small>Research · Trace affected consumers</small></div>
+              <div class="v-station" data-step-role="review"><strong>Challenge the change</strong><small>Review · Read-only findings + checks</small></div>
+              <div class="v-station" data-step-role="implementation"><strong>Fix findings</strong><small>Implementation · Only when authorized</small></div>
+              <div class="v-station" data-step-role="lead"><strong>Resolve and report</strong><small>Lead · Recheck; deliver if authorized</small></div>
             </div>
           </div>
           <div class="v-column" data-map-route="control" style="--route:#b46f85">
             <button class="v-title" type="button" data-map-select="control">App control</button>
             <div class="v-stations">
-              <div class="v-station">
-                <strong>Inspect product</strong>
-                <small>And working drivers</small>
-              </div>
-              <div class="v-station">
-                <strong>Build or adopt CLI</strong>
-                <small>Project-owned commands</small>
-              </div>
-              <div class="v-station">
-                <strong>Write feature map</strong>
-                <small>User entry points</small>
-              </div>
-              <div class="v-station">
-                <strong>Prove one path</strong>
-                <small>Drive, observe, clean up</small>
-              </div>
-            </div>
-            <div class="v-shared">
-              <div class="v-station">
-                <strong>Proof</strong>
-                <small>Observed result</small>
-              </div>
-              <div class="v-station">
-                <strong>Review</strong>
-                <small>Intent + quality</small>
-              </div>
-              <div class="v-station">
-                <strong>Pull request</strong>
-                <small>Evidence and gaps</small>
-              </div>
+              <div class="v-station" data-step-role="research"><strong>Inspect product</strong><small>Research · Reuse working drivers</small></div>
+              <div class="v-station" data-step-role="implementation"><strong>Repair capability</strong><small>Implementation · Map paths when useful</small></div>
+              <div class="v-station" data-step-role="review"><strong>Challenge the diff</strong><small>Review · Drive, observe, clean up</small></div>
+              <div class="v-station" data-step-role="lead"><strong>Deliver the change</strong><small>Lead · Resolve findings + PR</small></div>
             </div>
           </div>
-          <div class="v-column v-setup " data-map-route="setup" style="--route:#536779">
-            <button class="v-title" type="button" data-map-select="setup">Project setup</button>
+          <div class="v-column" data-map-route="new-project" style="--route:#536779">
+            <button class="v-title" type="button" data-map-select="new-project">New project</button>
             <div class="v-stations">
-              <div class="v-station">
-                <strong>Inspect the repo</strong>
-                <small>Scripts and constraints</small>
-              </div>
-              <div class="v-station">
-                <strong>Integrate and upgrade</strong>
-                <small>Apply useful astack defaults</small>
-              </div>
-              <div class="v-station">
-                <strong>Establish runtime loop</strong>
-                <small>Start, identify, act and inspect</small>
-              </div>
-              <div class="v-station">
-                <strong>Record working guidance</strong>
-                <small>Control, checks and evidence</small>
-              </div>
-            </div>
-            <div class="v-shared">
-              <div class="v-station">
-                <strong>Proof</strong>
-                <small>Observed result</small>
-              </div>
-              <div class="v-station">
-                <strong>Review</strong>
-                <small>Intent + quality</small>
-              </div>
-              <div class="v-station">
-                <strong>Pull request</strong>
-                <small>Evidence and gaps</small>
-              </div>
+              <div class="v-station" data-step-role="research"><strong>Understand product</strong><small>Research · Fixed choices + milestone</small></div>
+              <div class="v-station" data-step-role="design"><strong>Compare open choices</strong><small>Design · Use product constraints</small></div>
+              <div class="v-station" data-step-role="implementation"><strong>Build first milestone</strong><small>Implementation · Smallest useful path</small></div>
+              <div class="v-station" data-step-role="review"><strong>Challenge the diff</strong><small>Review · Run real artifact</small></div>
+              <div class="v-station" data-step-role="lead"><strong>Deliver the milestone</strong><small>Lead · Resolve findings + PR</small></div>
             </div>
           </div>
         </div>
-        <div class="v-caption"><strong>Lines continue into shared proof, review and PR stages.</strong> Investigation stops with an answer. Project setup is a task-specific path outside the seven-route table.</div>
+        <div class="v-caption"><strong>The lead owns integration and delivery.</strong> Read-only work stops with an answer. New project builds a first milestone; model setup configures the agent separately.</div>
       </div>
     </div>
     <p class="map-hint">On a narrow screen, scroll sideways to follow the lines.</p>
     </div>
-    <p class="routes-caption">The route is a decision guide, not a compulsory checklist. <a href="https://github.com/applification/astack/blob/main/evals/routing.md">See the routing examples ↗</a></p>
+    <p class="routes-caption">The map summarizes the playbooks; their linked files own the procedures. The agent keeps skipped steps visible with reasons. <a href="https://github.com/applification/astack/blob/main/site/scenarios.json">See the routing examples ↗</a></p>
   </section>
   <section class="method-section" id="method" aria-labelledby="method-title"><div class="section-shell">
-    <div class="section-heading"><div><p class="eyebrow">02 / METHOD</p><h2 id="method-title">The check follows<br><em>the claim.</em></h2></div><p>A passing command says what that command checked. astack asks for evidence from the surface where the behavior actually matters.</p></div>
+    <div class="section-heading"><div><p class="eyebrow">02 / METHOD</p><h2 id="method-title">Playbooks order the work.<br><em>Skills supply the expertise.</em></h2></div><p>A playbook defines the task sequence and model roles. Focused skills explain how to do each contribution. The lead owns integration and proof.</p></div>
     <div class="method-grid">
-      <article class="method-card"><span class="method-index">01 / INTENT</span><h3>Name the outcome</h3><p>For a substantial change, keep a short behavior contract in <code>.astack/&lt;feature&gt;/</code>. It ties cases, design choices, and proof together.</p><a href="https://github.com/applification/astack/blob/main/skills/implement/references/behavior-contract.md">Behavior contract ↗</a></article>
-      <article class="method-card"><span class="method-index">02 / BUILD</span><h3>Use what helps</h3><p>For web UI, decide separately whether Pencil and Storybook would answer a real design or component question. Ordinary changes use the established stack; setup can upgrade the project loop.</p><a href="https://github.com/applification/astack/blob/main/skills/web-feature/SKILL.md">Web UI guidance ↗</a></article>
-      <article class="method-card"><span class="method-index">03 / PROVE</span><h3>Observe the product</h3><p>Use exact e2e checks for known web behavior. Explore selected risks, reproduce candidates, fix confirmed defects and retain passing regressions on a named revision and environment.</p><a href="https://github.com/applification/astack/blob/main/skills/verify/SKILL.md">Proof guidance ↗</a></article>
-      <article class="method-card"><span class="method-index">04 / REVIEW</span><h3>Show the evidence</h3><p>Kept repository changes finish in a PR. The description gives reviewers the outcome, observed result, and any gaps. A compact sketch or diagram explains complex logic, ownership or interactions; simple fixes stay concise. Investigation ends with an answer.</p><a href="https://github.com/applification/astack/blob/main/skills/pr/SKILL.md">PR guidance ↗</a></article>
+      <article class="method-card"><span class="method-index">01 / RESEARCH</span><h3>Understand the outcome</h3><p>Read project guidance, affected consumers and the real check commands. Reproduce a symptom or name the requested behavior.</p><a href="https://github.com/applification/astack/blob/main/skills/astack/playbooks/investigation.md">Investigation playbook ↗</a></article>
+      <article class="method-card"><span class="method-index">02 / DESIGN</span><h3>Settle open choices</h3><p>Compare consequential alternatives against product constraints. Honour fixed technologies and record why a step can be skipped.</p><a href="https://github.com/applification/astack/blob/main/skills/architect/SKILL.md">Architecture skill ↗</a></article>
+      <article class="method-card"><span class="method-index">03 / IMPLEMENT</span><h3>Build in useful slices</h3><p>Use the project's selected tools and platform guidance. Run fast checks before dependent work.</p><a href="https://github.com/applification/astack/blob/main/skills/astack/playbooks/feature.md">Feature playbook ↗</a></article>
+      <article class="method-card"><span class="method-index">04 / REVIEW</span><h3>Prove the integrated result</h3><p>Observe the actual outcome, challenge affected boundaries and resolve findings. Read-only work ends with its answer.</p><a href="https://github.com/applification/astack/blob/main/skills/astack/playbooks/review.md">Review playbook ↗</a></article>
     </div>
-    <p class="source-row">Choose <a href="https://github.com/applification/astack/blob/main/skills/astack/references/specialists.md">specialist contributions ↗</a> by affected behavior and risk. Small fixes can stay with the lead. <a href="https://github.com/applification/astack/blob/main/skills/astack/references/handoffs.md">Portable handoffs ↗</a> preserve identity, acceptance, authority, findings and proof, including partial results and blocked decisions. One writer owns each worktree; self-review leaves independence explicit. The external COS host owns durable records, dispatch and follow-up. Actual specialist delivery and host integration need their own evidence.</p>
   </div></section>
   <section class="section-shell explainer-section" id="project" aria-labelledby="project-title">
-    <div class="section-heading"><div><p class="eyebrow">03 / IN A PROJECT</p><h2 id="project-title">The plugin stays put.<br><em>Your project owns the work.</em></h2></div><p>A project can pin the Applification plugin to a revision. Its own profile, control commands, feature map and contracts live beside its code.</p></div>
-    <p class="tree-hint">Scroll the file trees sideways to read each path.</p>
-    <div class="explainer-pair">
-      <div class="explainer-card"><p class="card-kicker">IN THE ASTACK REPOSITORY</p><pre class="file-tree"><code>astack/
-├─ .agents/plugins/marketplace.json
-├─ plugin.json                      <span class="tree-note">portable manifest</span>
-├─ mcp.json                         <span class="tree-note">no bundled server</span>
-├─ assets/
-├─ skills/
-│  ├─ astack/SKILL.md                <span class="tree-note">small coordinator</span>
-│  ├─ typescript-best-practices/     <span class="tree-note">pstack rules + examples</span>
-│  ├─ react/                         <span class="tree-note">state + adapters + UI lint</span>
-│  ├─ convex/                        <span class="tree-note">data + reactive integration</span>
-│  ├─ workos-auth/                   <span class="tree-note">identity + token boundaries</span>
-│  ├─ testing/                       <span class="tree-note">regressions + e2e loop</span>
-│  ├─ implement/SKILL.md             <span class="tree-note">feature delivery</span>
-│  ├─ bug-fix/SKILL.md               <span class="tree-note">defect repair</span>
-│  ├─ refactor/SKILL.md              <span class="tree-note">equivalence</span>
-│  ├─ performance/SKILL.md           <span class="tree-note">measurement</span>
-│  ├─ investigate/SKILL.md           <span class="tree-note">evidence</span>
-│  ├─ show-me/SKILL.md               <span class="tree-note">visual explanation</span>
-│  ├─ domain-modeling/SKILL.md       <span class="tree-note">shared language</span>
-│  ├─ project-setup/SKILL.md         <span class="tree-note">setup + adoption</span>
-│  ├─ app-control/SKILL.md           <span class="tree-note">product driving</span>
-│  ├─ verify/SKILL.md                <span class="tree-note">observed proof</span>
-│  ├─ pr/SKILL.md                    <span class="tree-note">review + PR</span>
-│  ├─ web-feature/SKILL.md           <span class="tree-note">Pen + Storybook</span>
-│  ├─ mcp-server/SKILL.md            <span class="tree-note">MCP boundaries</span>
-│  ├─ chatgpt-plugin/SKILL.md        <span class="tree-note">host integration</span>
-│  └─ cloud-transition/SKILL.md      <span class="tree-note">chosen hosting</span>
-├─ docs/project-install.md
-├─ docs/guide/                       <span class="tree-note">first task + daily use</span>
-└─ evals/routing.md</code></pre></div>
-      <div class="explainer-card"><p class="card-kicker">IN YOUR PROJECT</p><pre class="file-tree"><code>my-project/
-├─ .agents/plugins/marketplace.json     <span class="tree-note">pinned</span>
-├─ .codex/config.toml                   <span class="tree-note">enabled</span>
-├─ .codex/skills/astack-&lt;app&gt;/
-│  ├─ SKILL.md                          <span class="tree-note">guide</span>
-│  └─ scripts/astack-&lt;app&gt;.ts           <span class="tree-note">CLI</span>
-├─ .astack/                             <span class="tree-note">tracked in Git</span>
-│  ├─ project.md                        <span class="tree-note">profile</span>
-│  ├─ feature-map/&lt;app&gt;/                <span class="tree-note">user paths</span>
-│  │  ├─ README.md                      <span class="tree-note">index</span>
-│  │  └─ presence.md                    <span class="tree-note">feature</span>
-│  ├─ presence/
-│  │  ├─ behavior-contract.md
-│  │  ├─ presence.pen                   <span class="tree-note">if selected</span>
-│  │  └─ evidence/                      <span class="tree-note">proof</span>
-│  └─ saved-items/
-│     ├─ behavior-contract.md
-│     └─ evidence/
-└─ AGENTS.md                            <span class="tree-note">pointer</span></code></pre></div>
-    </div>
-    <div class="explain-strip"><p><strong>Install and pin.</strong> Add a project marketplace entry, enable the plugin, then install it. Update by changing the pinned ref and exercising a representative route.</p><p><strong>Establish the loop.</strong> Invoke <code>$applification:project-setup</code> to create or upgrade runtime control and verification. It installs project-owned main-thread instructions, proves a real path and records commands, evidence and gaps in <code>.astack/project.md</code>.</p><p><strong>Give it work.</strong> Use <code>$applification:astack &lt;task&gt;</code> for routing or invoke a focused skill directly. Both read the project loop and select applicable principle leaves.</p></div>
-    <p class="source-row">Follow the <a href="https://github.com/applification/astack/blob/main/docs/project-install.md">project installation guide ↗</a> for the exact marketplace and config files.</p>
+    <div class="section-heading"><div><p class="eyebrow">03 / OWNERSHIP</p><h2 id="project-title">Reusable method.<br><em>Project-owned choices.</em></h2></div><p>astack ships 25 skills and eight playbooks. Your project supplies model preferences, application technologies and enforcement commands.</p></div>
+    <div class="explainer-pair"><div class="explainer-card"><h3>In astack</h3><pre class="contract-sample"><code>skills/
+  astack/SKILL.md          entry point
+  astack/playbooks/       eight task procedures
+  setup-astack/           model-role setup
+  architect/ verify/ …    focused expertise
+  principle-*/            seven principles
+lint/                     package + resolver checks
+loops/                    four trigger prompts
+site/                     public explainer</code></pre></div><div class="explainer-card"><h3>In your project</h3><pre class="contract-sample"><code>AGENTS.md / CLAUDE.md     working guidance
+.astack/models.json       model preferences
+source + tests            your chosen layout
+lint + compiler settings  your chosen rules
+check commands            your actual feedback</code></pre><p>Use existing guidance. <code>.astack/project.md</code> and product-driving tools are optional. The plugin adds no application stack.</p></div></div>
   </section>
-  <section class="section-shell explainer-section" id="skills" aria-labelledby="skills-title">
-    <div class="section-heading"><div><p class="eyebrow">CALLABLE SKILLS</p><h2 id="skills-title">One coordinator.<br><em>Focused skills.</em></h2></div><p>Call $applification:astack for end-to-end delivery, or call a focused skill for its own job. The main session owns integration and proof by default. astack composes useful skills and delegates when helpful; sequential work and standalone hosts need no subagents or T3.</p></div>
-    <div class="proof-grid"><div class="explainer-card"><span class="card-kicker">DELIVERY</span><h3>Own a recognizable outcome</h3><ul class="plain-list"><li><a href="https://github.com/applification/astack/blob/main/skills/implement/SKILL.md">implement ↗</a> — Feature delivery</li><li><a href="https://github.com/applification/astack/blob/main/skills/bug-fix/SKILL.md">bug-fix ↗</a> — Bug repair</li><li><a href="https://github.com/applification/astack/blob/main/skills/refactor/SKILL.md">refactor ↗</a> — Behavior-preserving refactor</li><li><a href="https://github.com/applification/astack/blob/main/skills/performance/SKILL.md">performance ↗</a> — Measured performance</li><li><a href="https://github.com/applification/astack/blob/main/skills/investigate/SKILL.md">investigate ↗</a> — Evidence-based investigation</li><li><a href="https://github.com/applification/astack/blob/main/skills/pr/SKILL.md">pr ↗</a> — PR preparation and review</li></ul></div><div class="explainer-card"><span class="card-kicker">CAPABILITIES</span><h3>Compose the needed jobs</h3><ul class="plain-list"><li><a href="https://github.com/applification/astack/blob/main/skills/show-me/SKILL.md">show-me ↗</a> — Visual explanation</li><li><a href="https://github.com/applification/astack/blob/main/skills/domain-modeling/SKILL.md">domain-modeling ↗</a> — Domain language and decisions</li><li><a href="https://github.com/applification/astack/blob/main/skills/project-setup/SKILL.md">project-setup ↗</a> — Runtime setup and upgrades</li><li><a href="https://github.com/applification/astack/blob/main/skills/app-control/SKILL.md">app-control ↗</a> — Product control and feature maps</li><li><a href="https://github.com/applification/astack/blob/main/skills/verify/SKILL.md">verify ↗</a> — Observed verification</li></ul></div><div class="explainer-card"><span class="card-kicker">ENGINEERING</span><h3>Own the technical knowledge</h3><ul class="plain-list"><li><a href="https://github.com/applification/astack/blob/main/skills/typescript-best-practices/SKILL.md">typescript-best-practices ↗</a> — Imported TypeScript rules and examples</li><li><a href="https://github.com/applification/astack/blob/main/skills/react/SKILL.md">react ↗</a> — State, forms and adapters</li><li><a href="https://github.com/applification/astack/blob/main/skills/convex/SKILL.md">convex ↗</a> — Data and reactive ownership</li><li><a href="https://github.com/applification/astack/blob/main/skills/workos-auth/SKILL.md">workos-auth ↗</a> — Web and MCP identity</li><li><a href="https://github.com/applification/astack/blob/main/skills/testing/SKILL.md">testing ↗</a> — Regression and integration checks</li><li><a href="https://github.com/applification/astack/blob/main/skills/web-feature/SKILL.md">web-feature ↗</a> — Web UI, Pen and Storybook</li><li><a href="https://github.com/applification/astack/blob/main/skills/mcp-server/SKILL.md">mcp-server ↗</a> — MCP contract and transport</li><li><a href="https://github.com/applification/astack/blob/main/skills/chatgpt-plugin/SKILL.md">chatgpt-plugin ↗</a> — ChatGPT plugin engineering</li><li><a href="https://github.com/applification/astack/blob/main/skills/cloud-transition/SKILL.md">cloud-transition ↗</a> — Chosen cloud transition</li></ul></div></div>
-    <div class="explain-strip"><p><strong>Design consequential shapes.</strong> <a href="https://github.com/applification/astack/blob/main/skills/architect/SKILL.md">architect ↗</a> starts from caller usage, state ownership and recovery.</p><p><strong>Challenge the result.</strong> <a href="https://github.com/applification/astack/blob/main/skills/code-review/SKILL.md">code-review ↗</a> checks quality independently of acceptance; <a href="https://github.com/applification/astack/blob/main/skills/correct/SKILL.md">correct ↗</a> prevents demonstrated recurring mistakes.</p><p><strong>Measure agent delivery.</strong> <a href="https://github.com/applification/astack/blob/main/skills/agent-evaluation/SKILL.md">agent-evaluation ↗</a> uses controlled conditions and independent checks. <a href="https://github.com/applification/astack/blob/main/docs/agent-validation.md">Try the fresh-repo validation path ↗</a>.</p></div>
-    <div class="explain-strip"><p><strong>Typed states and signatures.</strong> Read <a href="https://github.com/applification/astack/blob/main/skills/principle-type-system-discipline/SKILL.md"><code>principle-type-system-discipline</code></a> when designing types in any typed language.</p><p><strong>Validation and adapters.</strong> Read <a href="https://github.com/applification/astack/blob/main/skills/principle-boundary-discipline/SKILL.md"><code>principle-boundary-discipline</code></a> when data or identity crosses a system boundary.</p><p><strong>Recurring failures.</strong> Read <a href="https://github.com/applification/astack/blob/main/skills/principle-encode-lessons-in-structure/SKILL.md"><code>principle-encode-lessons-in-structure</code></a> to prevent a demonstrated mistake with a structural mechanism.</p></div>
-    <div class="explain-strip"><p><strong>Real proof.</strong> <a href="https://github.com/applification/astack/blob/main/skills/principle-prove-it-works/SKILL.md"><code>principle-prove-it-works</code></a> checks the actual artifact; <a href="https://github.com/applification/astack/blob/main/skills/principle-test-behavior-not-implementation/SKILL.md"><code>principle-test-behavior-not-implementation</code></a> shapes meaningful assertions.</p><p><strong>Supported repairs.</strong> <a href="https://github.com/applification/astack/blob/main/skills/principle-fix-root-causes/SKILL.md"><code>principle-fix-root-causes</code></a> traces a reproduced symptom before choosing a fix.</p><p><strong>Checked delivery.</strong> <a href="https://github.com/applification/astack/blob/main/skills/principle-sequence-verifiable-units/SKILL.md"><code>principle-sequence-verifiable-units</code></a> gives each dependent slice a baseline and useful check.</p></div>
-  </section>
-  <section class="explainer-band" id="sprint" aria-labelledby="sprint-title"><div class="section-shell">
-    <div class="section-heading"><div><p class="eyebrow">04 / WEB UI</p><h2 id="sprint-title">A design sprint<br><em>with one contract.</em></h2></div><p>For a substantial behavior change, the tracked contract names the outcome and acceptance cases. Pencil and Storybook are selected independently when they help answer a design or component question.</p></div>
-    <div class="explainer-pair sprint-pair">
-      <div class="explainer-card"><h3>From choice to proof</h3><ol class="step-list"><li><strong>Start the contract.</strong><span>Record the actor, problem, outcome, material states, open choices and observable cases.</span></li><li><strong>Design consequential states.</strong><span>If Pencil helps, keep the <code>.pen</code> file and its assets in the feature folder.</span></li><li><strong>Exercise components.</strong><span>If Storybook helps, put stories beside components and run the project's UI checks.</span></li><li><strong>Compare and record.</strong><span>When both tools are selected, compare the story with the chosen frame. Link frame and story IDs to the cases they support.</span></li><li><strong>Prove in the product.</strong><span>Implement the real data path, then record running-product observations and retained evidence against the same cases.</span></li></ol><p class="card-foot">A small change can keep its outcome and tool decisions in the PR. An unavailable selected check remains an explicit gap.</p></div>
-      <div class="explainer-card"><h3>What a contract looks like</h3><p class="card-intro">Illustrative excerpt. Plain acceptance sentences work as well as Given/When/Then.</p><pre class="contract-sample"><code>## Outcome
-A member can see when another member is idle.
-
-## Acceptance
-A1. After two minutes of inactivity, the
-    member's avatar shows the Idle state.
-    Design: presence.pen → "Idle"
-    Story:  presence-avatar--idle
-    Proof:  pass · local · 3f2a91c
-            evidence/a1.png
-
-## Open decision
-Should "away" hide the last-seen time?</code></pre><p class="card-foot">A frame supports a visual decision. A story supports component states. Neither establishes timing, real data effects or persistence in the running app.</p></div>
-    </div>
-    <p>When domain concepts change, clarify terms against the existing glossary, code and concrete cases. Record agreed definitions in the glossary, acceptance in the contract and consequential rationale in the decision register. Follow existing context maps; create files only when needed. <a href="https://github.com/applification/astack/blob/main/skills/domain-modeling/SKILL.md">Domain language guide ↗</a></p>
-    <p class="source-row">The <a href="https://github.com/applification/astack/blob/main/skills/web-feature/SKILL.md">web UI path ↗</a> and <a href="https://github.com/applification/astack/blob/main/skills/implement/references/behavior-contract.md">contract guide ↗</a> define the current process.</p>
+  <section class="explainer-band" id="setup" aria-labelledby="setup-title"><div class="section-shell">
+    <div class="section-heading"><div><p class="eyebrow">MODEL SETUP</p><h2 id="setup-title">Choose the models.<br><em>Save choices with the project.</em></h2></div><p><code>$applification:setup-astack</code> discovers available models and asks about budget/preferences. It saves confirmed research, design, implementation and review choices in this project's committed <code>.astack/models.json</code>.</p></div>
+    <div class="explainer-pair"><div class="explainer-card"><h3>Claude and Codex through T3</h3><p>T3's live provider catalog supplies valid models and reasoning options. Pinned targets run through a host that exposes those exact model IDs and options, including cross-provider work in T3. The lead stays responsible for the task.</p><p class="card-foot">Setup configures contributions. It does not change the main chat's model or scaffold a product.</p></div><div class="explainer-card"><h3>Start without configuration</h3><p>Missing configuration and omitted roles inherit the current session. An unavailable saved pin stops its contribution with a reported gap.</p><p class="card-foot">Persistent modes, parent-model selection and scheduling belong to the host.</p></div></div>
+    <p class="source-row"><a href="https://github.com/applification/astack/blob/main/skills/setup-astack/SKILL.md">Setup skill ↗</a> · <a href="https://github.com/applification/astack/blob/main/skills/setup-astack/references/models.md">Model format and validation ↗</a></p>
   </div></section>
-  <section class="section-shell explainer-section" id="control" aria-labelledby="control-title">
-    <div class="section-heading"><div><p class="eyebrow">05 / APP CONTROL</p><h2 id="control-title">Give the agent a way<br><em>to drive the product.</em></h2></div><p>The project owns a small CLI around its working browser, simulator, terminal or protocol tools. The feature map tells an agent how a user reaches each behavior.</p></div>
-    <div class="control-flow" aria-label="App control flow"><div><span>01 / FIND</span><strong>Feature map</strong><p>User entry points, commands, expected results and prerequisites.</p></div><div><span>02 / CHECK</span><strong><code>doctor</code></strong><p>Identify the checkout, revision, target and whether it belongs to this run.</p></div><div><span>03 / DRIVE</span><strong><code>astack-&lt;app&gt;</code></strong><p>Act through the real product using its existing driver.</p></div><div><span>04 / OBSERVE</span><strong>Evidence</strong><p>Record the end state and confirm material effects with a fresh read.</p></div></div>
-    <p class="source-row">A passing CLI command reports what it observed. Acceptance still depends on the case and result. <a href="https://github.com/applification/astack/blob/main/skills/app-control/SKILL.md">Read the app control guide ↗</a></p>
+  <section class="section-shell explainer-section" id="skills" aria-labelledby="skills-title">
+    <div class="section-heading"><div><p class="eyebrow">FOCUSED SKILLS</p><h2 id="skills-title">Read what the step needs.<br><em>Enforce what can be checked.</em></h2></div><p>The entry point selects the playbook and relevant expertise. You can also call a focused skill directly.</p></div>
+    <div class="proof-grid"><div class="explainer-card"><h3>Engineering work</h3><ul class="plain-list"><li><a href="https://github.com/applification/astack/blob/main/skills/implement/SKILL.md">implement</a>, <a href="https://github.com/applification/astack/blob/main/skills/bug-fix/SKILL.md">bug-fix</a>, <a href="https://github.com/applification/astack/blob/main/skills/refactor/SKILL.md">refactor</a></li><li><a href="https://github.com/applification/astack/blob/main/skills/performance/SKILL.md">performance</a>, <a href="https://github.com/applification/astack/blob/main/skills/investigate/SKILL.md">investigate</a></li><li><a href="https://github.com/applification/astack/blob/main/skills/testing/SKILL.md">testing</a>, <a href="https://github.com/applification/astack/blob/main/skills/verify/SKILL.md">verify</a></li><li><a href="https://github.com/applification/astack/blob/main/skills/code-review/SKILL.md">code-review</a>, <a href="https://github.com/applification/astack/blob/main/skills/pr/SKILL.md">pr</a></li></ul></div><div class="explainer-card"><h3>Useful contributions</h3><ul class="plain-list"><li><a href="https://github.com/applification/astack/blob/main/skills/architect/SKILL.md">architect</a>, <a href="https://github.com/applification/astack/blob/main/skills/domain-modeling/SKILL.md">domain-modeling</a></li><li><a href="https://github.com/applification/astack/blob/main/skills/show-me/SKILL.md">show-me</a>, <a href="https://github.com/applification/astack/blob/main/skills/correct/SKILL.md">correct</a></li><li><a href="https://github.com/applification/astack/blob/main/skills/app-control/SKILL.md">app-control</a>, <a href="https://github.com/applification/astack/blob/main/skills/cloud-transition/SKILL.md">cloud-transition</a></li><li><a href="https://github.com/applification/astack/blob/main/skills/agent-evaluation/SKILL.md">agent-evaluation</a></li></ul></div><div class="explainer-card"><h3>Seven principles</h3><ul class="plain-list"><li><a href="https://github.com/applification/astack/blob/main/skills/principle-type-system-discipline/SKILL.md">type-system-discipline</a></li><li><a href="https://github.com/applification/astack/blob/main/skills/principle-boundary-discipline/SKILL.md">boundary-discipline</a></li><li><a href="https://github.com/applification/astack/blob/main/skills/principle-encode-lessons-in-structure/SKILL.md">encode-lessons-in-structure</a></li><li><a href="https://github.com/applification/astack/blob/main/skills/principle-prove-it-works/SKILL.md">prove-it-works</a></li><li><a href="https://github.com/applification/astack/blob/main/skills/principle-test-behavior-not-implementation/SKILL.md">test-behavior-not-implementation</a></li><li><a href="https://github.com/applification/astack/blob/main/skills/principle-fix-root-causes/SKILL.md">fix-root-causes</a></li><li><a href="https://github.com/applification/astack/blob/main/skills/principle-sequence-verifiable-units/SKILL.md">sequence-verifiable-units</a></li></ul></div></div>
   </section>
-  <section class="section-shell explainer-section" id="plugins" aria-labelledby="plugins-title">
-    <div class="section-heading"><div><p class="eyebrow">CHATGPT PLUGINS</p><h2 id="plugins-title">Build the integration.<br><em>Check it in its host.</em></h2></div><p>astack guides MCP Apps, sidebar and conversation views, shared UI, deep links, forms, mentions and event subscriptions. It checks SDK compatibility before implementation and records which client supports the requested behavior.</p></div>
-    <div class="explain-strip"><p><strong>Share the UI.</strong> Bundle production components from your UI package. Storybook checks component states; the MCP bridge handles host context and tools.</p><p><strong>Package locally.</strong> Use portable <code>plugin.json</code> and <code>mcp.json</code>. A local marketplace package and a reachable server connection are separate pieces.</p><p><strong>Prove the claim.</strong> Protocol tests and MCP Jam support local checks. Installed ChatGPT proof establishes navigation, native forms and responses to subscribed events.</p></div>
-    <p class="source-row"><a href="https://github.com/applification/astack/blob/main/skills/chatgpt-plugin/SKILL.md">Plugin engineering ↗</a> · <a href="https://github.com/applification/astack/blob/main/examples/chatgpt-plugin/README.md">Reference example ↗</a></p>
+  <section class="explainer-band" id="lint" aria-labelledby="lint-title"><div class="section-shell">
+    <div class="section-heading"><div><p class="eyebrow">FEEDBACK</p><h2 id="lint-title">Principles guide judgment.<br><em>Project checks enforce rules.</em></h2></div><p>Use the project's compiler, lint, tests and runtime checks. Repeated agent corrections should become demonstrated safeguards in that project.</p></div>
+    <div class="explainer-pair"><div class="explainer-card"><h3>Improve your project's guardrails</h3><p>Ask <code>$applification:astack</code> to prevent a repeated mistake. It uses the feature playbook with <code>correct</code> to investigate failures and add a safeguard in the owning architecture, type, lint or behavior check. Prove the bad case fails and valid usage passes; record the enforcing command in project guidance.</p><p class="card-foot">You can also call <code>$applification:correct</code> directly.</p></div><div class="explainer-card"><h3>astack package checks</h3><pre class="contract-sample"><code>bun install --frozen-lockfile
+bun run check</code></pre><p>Checks reject malformed metadata, missing assets, broken skill/playbook links, and invalid model targets or options. Bun is this repository's authoring tool.</p></div></div>
+    <p class="source-row"><a href="https://github.com/applification/astack/blob/main/skills/correct/SKILL.md">Correction skill ↗</a> · <a href="https://github.com/applification/astack/blob/main/lint/plugins.mjs">Package checks ↗</a></p>
+  </div></section>
+  <section class="section-shell explainer-section" id="loops" aria-labelledby="loops-title">
+    <div class="section-heading"><div><p class="eyebrow">LOOPS</p><h2 id="loops-title">The same playbooks,<br><em>on a trigger.</em></h2></div><p>A loop is a prompt. Your host owns scheduling, repository access, credentials and run state. Installing the plugin starts no jobs.</p></div>
+    <div class="control-flow"><div><span>WEEKLY</span><strong>lint-debt</strong><p>Fix one diagnostic using project checks.</p></div><div><span>HOURLY OR ON PR</span><strong>pr-review</strong><p>Review new heads with the configured review role.</p></div><div><span>DAILY</span><strong>bug-fix</strong><p>Reproduce and repair one eligible bug.</p></div><div><span>ON A MENTION</span><strong>mention</strong><p>Run the playbook for the comment's request.</p></div></div>
+    <p>Copy the prompt into your project and pass it to the host with the plugin installed, for example <code>claude -p &lt; agent-prompts/lint-debt.md</code>. Pins require a matching host catalog; unsupported contributions stop with a reported gap. Runs avoid duplicate work and never merge.</p>
+    <p class="source-row"><a href="https://github.com/applification/astack/blob/main/loops/lint-debt.md">lint-debt ↗</a> · <a href="https://github.com/applification/astack/blob/main/loops/pr-review.md">pr-review ↗</a> · <a href="https://github.com/applification/astack/blob/main/loops/bug-fix.md">bug-fix ↗</a> · <a href="https://github.com/applification/astack/blob/main/loops/mention.md">mention ↗</a></p>
   </section>
   <section class="explainer-band" id="stack" aria-labelledby="stack-title"><div class="section-shell">
-    <div class="section-heading"><div><p class="eyebrow">06 / PROJECT FOUNDATION</p><h2 id="stack-title">Defaults for new work.<br><em>Specialists for specific work.</em></h2></div><p>New interactive UI starts with React, TypeScript and Vite. Choose Next.js for server rendering or public content requirements. Existing-project setup integrates and upgrades the runtime loop toward these opinions, reusing sound tooling and resolving larger migration choices. The core profile below shares persistent behavior across web and MCP.</p></div>
-    <div class="explainer-pair">
-      <div class="explainer-card"><h3>Convex + MCP + WorkOS</h3><pre class="file-tree"><code>my-product/
-├─ bun.lock
-├─ turbo.json
-├─ apps/
-│  ├─ web/                    <span class="tree-note">React + Vite</span>
-│  └─ mcp-ui/                 <span class="tree-note">host bridge</span>
-└─ packages/
-   ├─ ui/                     <span class="tree-note">portable presentation</span>
-   ├─ domain/                 <span class="tree-note">pure rules</span>
-   ├─ config/                 <span class="tree-note">shared tooling</span>
-   └─ backend/convex/         <span class="tree-note">data + MCP endpoint</span></code></pre><p class="card-foot">The work-item reference gives scoped checks and disposable local readiness. Live WorkOS OAuth, installed-host behavior and fresh-agent trials need their own evidence. <a href="https://github.com/applification/astack/blob/main/examples/foundation/docs/engineering-profile.md">Foundation profile ↗</a></p></div>
-      <div class="explainer-card"><h3>Specialist paths</h3><div class="specialist-row"><strong>Convex + WorkOS</strong><p>Use the companion Convex plugin for backend work. Web sessions and MCP OAuth share identity while keeping their token contracts distinct. Backend operations enforce ownership.</p></div><div class="specialist-row"><strong>MCP server</strong><p>Check tool contracts, running transport and agent use separately. The core profile serves MCP in Convex; a separate runtime can own its own service.</p></div><div class="specialist-row"><strong>Web UI</strong><p>Share presentation through props and keep host APIs in adapters. Choose supported forms for the platform and tests by behavior; Convex owns its reactive data.</p></div><p class="card-foot"><a href="https://github.com/applification/astack/blob/main/skills/project-setup/SKILL.md">Project setup ↗</a> · <a href="https://github.com/applification/astack/blob/main/skills/convex/references/integration.md">Convex path ↗</a> · <a href="https://github.com/applification/astack/blob/main/skills/mcp-server/SKILL.md">MCP path ↗</a></p></div>
-    </div>
+    <div class="section-heading"><div><p class="eyebrow">NEW PROJECT</p><h2 id="stack-title">Describe the product.<br><em>Run a first milestone.</em></h2></div><p>New-project work is a playbook. It honours fixed technologies, compares open choices and verifies the smallest useful end-to-end path.</p></div>
+    <pre class="contract-sample"><code>$applification:astack Build a release-notes CLI.
+Fixed: Python and the standard library.
+Open: module boundaries and config format.
+Done: parse a real config and print the release summary.</code></pre>
+    <p class="source-row"><a href="https://github.com/applification/astack/blob/main/skills/astack/playbooks/new-project.md">New-project playbook ↗</a></p>
   </div></section>
   <section class="section-shell explainer-section" id="proof" aria-labelledby="proof-title">
-    <div class="section-heading"><div><p class="eyebrow">07 / FINISHING THE WORK</p><h2 id="proof-title">Say what passed.<br><em>Show what was checked.</em></h2></div><p>Proof names a revision, environment, action and observed result. A later code change calls for a new check when it could affect that result.</p></div>
-    <div class="proof-grid"><div class="explainer-card"><span class="card-kicker">CHOOSE THE CHECK</span><h3>Match evidence to the claim</h3><ul class="plain-list"><li><strong>Component story</strong> for rendering or interaction states.</li><li><strong>Focused test</strong> for domain or protocol behavior.</li><li><strong>Running product</strong> for data, identity, timing or integration.</li><li><strong>MCP layers</strong> for tool contract, transport and agent choice where applicable.</li></ul></div><div class="explainer-card"><span class="card-kicker">REPORT THE RESULT</span><h3>Keep gaps visible</h3><p>Record pass, fail, inconclusive, skipped or not applicable with a reason. A green exploration job can still be inconclusive when steps fail or budgets expire. Confirm candidates with exact assertions and preserve the first failure when a retry passes.</p><p>When proof captures a screenshot or recording, attach it to the PR or link retained media. If no media helps review, say why.</p></div><div class="explainer-card"><span class="card-kicker">OPEN THE PR</span><h3>Connect outcome and evidence</h3><p>The PR states why the work happened, what changed, the affected users or systems, the contract when there is one, and observed results with gaps.</p><p>Use the <a href="https://github.com/applification/astack/blob/main/skills/show-me/SKILL.md">show-me skill ↗</a> when it clarifies the change. An illustration explains the design; actual observations establish proof. Blocked design, proof or required specialist review stays visible in a draft PR. Investigation alone ends with an answer.</p></div></div>
-    <p class="source-row"><a href="https://github.com/applification/astack/blob/main/skills/verify/SKILL.md">Proof guide ↗</a> · <a href="https://github.com/applification/astack/blob/main/skills/testing/references/e2e.md">e2e loop ↗</a> · <a href="https://github.com/applification/astack/blob/main/examples/e2e-proof/README.md">Runnable reference ↗</a> · <a href="https://github.com/applification/astack/blob/main/skills/pr/SKILL.md">PR and review guide ↗</a></p>
+    <div class="section-heading"><div><p class="eyebrow">PROOF</p><h2 id="proof-title">Run the real thing.<br><em>Keep gaps visible.</em></h2></div><p>Proof names a revision, environment, action and observed result. Package validation and saved model choices do not prove an agent delivered the requested outcome.</p></div>
+    <p>Use the project's actual check commands and running-product tools. For a pinned role, inspect the host's returned provider/model identity. The lead resolves findings and verifies the integrated result; read-only work ends with its answer. Retain concise evidence in the PR when publication is part of the assignment.</p>
+    <p class="source-row"><a href="https://github.com/applification/astack/blob/main/skills/verify/SKILL.md">Verification skill ↗</a> · <a href="https://github.com/applification/astack/blob/main/skills/astack/references/orchestration.md">Role execution ↗</a></p>
   </section>
-  <section class="explainer-band reading-band" id="reading" aria-labelledby="reading-title"><div class="section-shell">
-    <div class="section-heading"><div><p class="eyebrow">08 / UNDER THE HOOD</p><h2 id="reading-title">The skill reads<br><em>what the task needs.</em></h2></div><p>The entry skill chooses a route. It composes focused skills and their relevant references with project guidance, without loading the whole collection for every task.</p></div>
-    <div class="reading-grid"><p><strong><code>astack/SKILL.md</code></strong><span><a href="https://github.com/applification/astack/blob/main/skills/astack/references/orchestration.md">Main-thread ownership</a>, selection and consolidation.</span></p><p><strong><code>&lt;delivery-skill&gt;/SKILL.md</code></strong><span>The selected outcome and its instructions.</span></p><p><strong><code>web-feature/SKILL.md</code></strong><span>A change to web UI.</span></p><p><strong><code>.astack/project.md</code></strong><span>Shared by the coordinator and directly invoked skills.</span></p><p><strong><code>.astack/feature-map/&lt;app&gt;/</code></strong><span>When finding and driving a user path.</span></p><p><strong><code>verify/SKILL.md</code></strong><span>Before claiming behavior is verified.</span></p><p><strong><code>references/e2e.md</code></strong><span>When setting up or running e2e verification.</span></p></div>
-  </div></section>
   <section class="section-shell adopt-section" id="adopt" aria-labelledby="adopt-title">
     <div class="section-heading"><div><p class="eyebrow">09 / GET STARTED</p><h2 id="adopt-title">Put it to work<br><em>in your project.</em></h2></div><p>The installable plugin is called <strong>Applification</strong>. astack's guidance stays in this repo; your project owns its commands, environments, and product decisions.</p></div>
     <div class="adopt-grid">
       <div class="install-card"><div class="install-heading"><span>TRY IT IN CODEX</span><button id="copy-command" class="copy-button" type="button" aria-label="Copy installation commands">Copy</button></div><pre><code id="install-command">codex plugin marketplace add applification/astack
-codex plugin add applification@applification</code></pre><p>Install once, then establish the runtime and verification loop in each project.</p></div>
-      <div class="adopt-notes"><div><span class="note-index">01 / INSTALL</span><h3>Install the Codex plugin</h3><p>Use the commands alongside, or pin an astack ref or SHA through your project’s marketplace entry.</p><a href="https://github.com/applification/astack/blob/main/docs/project-install.md">Project install guide ↗</a></div><div><span class="note-index">02 / SET UP</span><h3>Establish or upgrade the loop</h3><p>Run <code>$applification:project-setup</code> for a new or existing project. Setup installs main-thread ownership and the profile pointer in the actual host’s project instructions, preserving custom text and managed blocks on re-runs. It integrates useful upgrades and proves the runtime loop.</p><a href="https://github.com/applification/astack/blob/main/skills/project-setup/SKILL.md">Project setup ↗</a></div><div><span class="note-index">03 / USE</span><h3>Describe the outcome</h3><p>Give <code>$applification:astack</code> an engineering request and let it route the work. Invoke any focused skill or <code>principle-*</code> leaf directly when you already know the job.</p><a href="#skills">Explore the callable skills ↓</a></div></div>
+codex plugin add applification@applification</code></pre><p>Install once, then describe the outcome in your project.</p></div>
+      <div class="adopt-notes"><div><span class="note-index">01 / INSTALL</span><h3>Install the plugin</h3><p>Use the commands alongside for Codex. In Claude Code, run <code>/plugin marketplace add applification/astack</code>, then <code>/plugin install applification@applification</code>.</p><a href="https://github.com/applification/astack/blob/main/README.md">Install commands ↗</a></div><div><span class="note-index">02 / SET UP</span><h3>Choose model roles</h3><p>Optionally run <code>$applification:setup-astack</code> in Codex or <code>/applification:setup-astack</code> in Claude Code. Save project model preferences; missing roles inherit the session.</p><a href="https://github.com/applification/astack/blob/main/skills/setup-astack/SKILL.md">Model setup ↗</a></div><div><span class="note-index">03 / USE</span><h3>Describe the outcome</h3><p>Give <code>$applification:astack</code> an engineering request and let it select a playbook. Claude Code uses <code>/applification:astack</code>. Invoke any focused skill or <code>principle-*</code> leaf directly when you already know the job.</p><a href="#skills">Explore the callable skills ↓</a></div></div>
     </div>
   </section>
 </main>

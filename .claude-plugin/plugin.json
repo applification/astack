@@ -1,0 +1,9 @@
+{
+  "name": "applification",
+  "version": "0.5.0",
+  "description": "astack by Applification: reusable engineering skills for coding agents",
+  "author": { "name": "Applification Ltd" },
+  "homepage": "https://github.com/applification/astack",
+  "repository": "https://github.com/applification/astack",
+  "license": "MIT"
+}

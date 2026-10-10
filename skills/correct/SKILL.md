@@ -16,6 +16,6 @@ For each retained safeguard, reproduce the original bad case in a disposable fix
 
 Record the mistake, its evidence, owning layer, enforcement command and negative/positive results in the existing task record or a concise [rule table](references/rule-table.md). Put project enforcement in the project. Change reusable skills only when the lesson applies across projects. Reuse the same command locally and in CI, including affected script/tooling boundaries when they own the failure.
 
-Return the corrected classes, selected mechanism and observed coverage. Unresolved classes name the missing decision or prerequisite. Kept changes follow the owning delivery route and its PR; investigations may end with findings. Do not weaken an invariant simply to silence its check.
+Return the corrected classes, selected mechanism and observed coverage. Unresolved classes name the missing decision or prerequisite. Kept changes follow the project's delivery policy; investigations may end with findings. Do not weaken an invariant simply to silence its check.
 
 [Source and adaptations](upstream.json); [MIT licence](LICENSE).

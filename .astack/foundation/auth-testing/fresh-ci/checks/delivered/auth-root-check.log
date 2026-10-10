@@ -1,3 +1,0 @@
-$ node site/check.mjs && bun scripts/check-plugins.ts
-Site routes, 72 eval examples, and source links match this checkout.
-Portable plugin schemas, package assets, skills and marketplace identities pass.

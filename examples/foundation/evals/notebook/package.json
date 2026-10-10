@@ -1,9 +1,0 @@
-{
-  "name": "local-notebook",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "bun server.ts",
-    "test": "bun test"
-  }
-}

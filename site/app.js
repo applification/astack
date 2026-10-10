@@ -1,51 +1,35 @@
 const routes = {
   feature: {
     number: '01', name: 'Feature', title: 'Make the intended behavior real.',
-    description: 'For new or changed user behavior, start with the outcome and a few observable cases when the change is substantial. Build in slices and check the integrated result.',
-    steps: ['Describe the outcome and material cases', 'Decide which design or component checks help', 'Implement and observe the real user path', 'Open a PR with the contract and proof'],
-    example: '“Add a reading list that survives reload.”'
+    description: 'For new behavior or project guardrails, start with the outcome and observable cases. For guardrail improvements, use correct to turn demonstrated mistakes into safeguards and prove bad cases fail while valid usage passes.',
   },
   bug: {
     number: '02', name: 'Bug fix', title: 'Follow the reported failure.',
     description: 'Reproduce the symptom on its real surface, find the cause, and rerun the same path after the smallest supported fix.',
-    steps: ['Reproduce the reported symptom', 'Find the cause in code and history', 'Fix the mechanism', 'Rerun the original path and open a PR'],
-    example: '“Edits disappear after I save and reopen.”'
   },
   refactor: {
     number: '03', name: 'Refactor', title: 'Change the structure. Hold the behavior.',
     description: 'Pin the output that must stay the same, make the code easier to understand, and compare the result before opening a PR.',
-    steps: ['Name the behavior to preserve', 'Record a test or equivalent output', 'Move code in small steps', 'Compare the result and open a PR'],
-    example: '“Move the parser behind a smaller interface.”'
   },
   performance: {
     number: '04', name: 'Performance', title: 'Measure the path people feel.',
     description: 'Choose a user or operational metric, measure a baseline, change the likely bottleneck, and compare under similar conditions.',
-    steps: ['Choose the metric', 'Measure a baseline', 'Change one plausible cause', 'Compare and report the result in a PR'],
-    example: '“Cut report generation from four seconds to two.”'
   },
   investigation: {
     number: '05', name: 'Investigation', title: 'Find out before changing anything.',
     description: 'Use code, history, the running product, or primary documentation to answer a question. Separate observed facts from inference.',
-    steps: ['Gather relevant evidence', 'Separate fact from inference', 'Answer with tradeoffs when useful', 'Stop with the answer'],
-    example: '“Why is the tenant check in the backend?”'
   },
   pr: {
-    number: '06', name: 'Pull request', title: 'Review the change against its intent.',
+    number: '06', name: 'Review', title: 'Review the change against its intent.',
     description: 'Inspect the full diff, trace affected consumers, assess the proof, and make authorized fixes on the same branch.',
-    steps: ['Read the diff and intended outcome', 'Trace affected paths and review quality', 'Check proof and material gaps', 'Update the existing PR when fixes are needed'],
-    example: '“Review PR #42 and fix the regression.”'
   },
   control: {
     number: '07', name: 'App control', title: 'Make the real product drivable.',
-    description: 'Create or repair a project-owned command and feature map so later work can reach, act on, and observe the product.',
-    steps: ['Inspect the product and working drivers', 'Make the checkout-local CLI directly executable', 'Map user entry points', 'Drive one real path and open a PR'],
-    example: '“Repair the browser command that opens saved items.”'
+    description: 'Create or repair a project-owned command when existing tools cannot reliably drive the product. Add a feature map when it helps later work find a user path.',
   },
-  setup: {
-    number: '08', name: 'Project setup', title: 'Establish the project’s working loop.',
-    description: 'Set up a new product or integrate and upgrade an existing project toward astack’s runtime control and verification loop. Apply useful defaults, prove a real path and record working guidance.',
-    steps: ['Inspect surfaces, constraints and a safe baseline', 'Integrate useful astack defaults and upgrades', 'Start, identify, act, inspect and verify', 'Retain evidence and record the project loop'],
-    example: '“Adopt astack in an existing pnpm app.”'
+  'new-project': {
+    number: '08', name: 'New project', title: 'Verify the first useful milestone.',
+    description: 'Honor fixed stack choices, explore open decisions against product constraints, then build and verify the smallest useful milestone. Reuse existing tools and project guidance.',
   }
 };
 
@@ -101,9 +85,9 @@ function selectRoute(key, scenarioIndex = null) {
   }
   detail.hidden = false;
   detail.style.setProperty('--active-route', getComputedStyle(map.querySelector(`[data-map-route="${key}"]`)).getPropertyValue('--route'));
-  document.querySelector('#route-kicker').textContent = key === 'setup' ? 'PROJECT SETUP PATH' : 'ROUTE ' + route.number + ' / ' + route.name.toUpperCase();
+  document.querySelector('#route-kicker').textContent = 'PLAYBOOK ' + route.number + ' / ' + route.name.toUpperCase();
   document.querySelector('#route-title').textContent = scenario ? `“${scenario.request}”` : route.title;
-  document.querySelector('#route-decision-label').textContent = scenario ? 'EXPECTED DECISION FROM THE EVAL' : 'ABOUT THIS ROUTE';
+  document.querySelector('#route-decision-label').textContent = scenario ? 'EXPECTED DECISION' : 'ABOUT THIS PLAYBOOK';
   if (scenario) renderInlineCode(document.querySelector('#route-description'), scenario.decision);
   else document.querySelector('#route-description').textContent = route.description;
   renderResults();
@@ -165,7 +149,7 @@ function renderResults() {
   results.replaceChildren(...groups);
   requestCount.textContent = query
     ? `${matchCount} matching ${matchCount === 1 ? 'example' : 'examples'} across ${groups.length} ${groups.length === 1 ? 'route' : 'routes'}`
-    : `${scenarios.length} eval examples across ${Object.keys(routes).length} lines`;
+    : `${scenarios.length} routing examples across ${Object.keys(routes).length} lines`;
   if (groups.length === 0) {
     const empty = document.createElement('p');
     empty.className = 'request-empty';

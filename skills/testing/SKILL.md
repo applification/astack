@@ -24,7 +24,7 @@ Choose the seam that owns the rule: pure functions for deterministic domain tran
 - Scope each test's actor/state and cleanup. Stop only owned processes, preserve first failures and attempts, and keep raw reports ignored. Do not weaken an expectation, suppress a relevant test or move it to advisory status to obtain green output.
 - Confirm that the intended tests ran: inspect selection, body assertions and report format. Setup/locator/provider/budget failures are inconclusive for the product case. A retry pass retains its first failure as flaky.
 
-For new web projects Tester Army e2e is the default; read [the e2e loop](references/e2e.md) for its actual inspection, cache, charter, reproduction and report rules. Use its version-matched project skill when installed rather than copying its manual. Existing projects keep their proven runner. [WorkOS auth testing](../workos-auth/references/testing.md) owns provider/host layers.
+Use the project's chosen runner, browser tools and platform guidance. Distinguish checks against fixtures or emulators from real provider and installed-host observations.
 
 Return the tested claim, fixtures, original failure when relevant, actual observations and remaining gaps. Do not add ceremonial tests for a reversible low-impact edit. Use [pr](../pr/SKILL.md) when the requested job retains code/test changes; test work alone does not authorize external effects or a broader repair.
 

@@ -1,19 +1,17 @@
 ---
 name: implement
-description: Implement an agreed feature or behavior change in coherent slices with affected-surface proof and a pull request.
+description: Implement an agreed feature or behavior change in coherent slices with affected-surface proof.
 metadata:
   short-description: "Deliver an agreed feature with observable proof"
 ---
 
 # Feature
 
-When owning substantive work with agentlog readable capture, use the [automatic evaluation handoff](../astack/references/observatory.md#automatic-task-evaluations) at task start and delivery. Reuse its task ID across follow-ups and keep telemetry failures from blocking the work.
-
 For multi-step delivery, apply [sequence verifiable units](../principle-sequence-verifiable-units/SKILL.md).
 
-Use this skill directly for the requested outcome, or as the selected astack delivery route. Read relevant project instructions, `.astack/project.md` when present and working commands; user scope and project constraints take precedence.
+Read relevant project instructions, `.astack/project.md` when present and working commands; user scope and project constraints take precedence.
 
-Clarify the observable outcome through a [behavior contract](references/behavior-contract.md). For a web UI feature, use [the web feature path](../web-feature/SKILL.md) to decide independently whether Pencil and Storybook are useful before production wiring. For a new app without a chosen stack, use [the astack greenfield default](../project-setup/SKILL.md); if it needs a database, follow [the Convex path](../convex/SKILL.md). In an existing app, work with its current stack. Trace affected entry points from trigger through data, ownership, and side effects. Check history before removing an unusual constraint; distinguish recorded intent from an inference based on current code. Sketch data shape and module boundaries before promoting prototype state or changing a costly interface. Implement in coherent slices, use fast checks, and [prove](../verify/SKILL.md) the integrated behavior on applicable surfaces. End with a [pull request](../pr/SKILL.md) linking the contract and proof result, including any unresolved gaps.
+Clarify the observable outcome through a [behavior contract](references/behavior-contract.md). For a visible interaction, use the project’s design and component tools when they resolve an actual choice or catch a likely regression. Honour the project's chosen stack. Use [first milestone guidance](../astack/references/new-project.md) when the work needs an initial runnable milestone or a consequential technology choice remains open; compare options against product constraints before committing. Trace affected entry points from trigger through data, ownership, and side effects. Check history before removing an unusual constraint; distinguish recorded intent from an inference based on current code. Sketch data shape and module boundaries before promoting prototype state or changing a costly interface. Implement in coherent slices, use fast checks, and [prove](../verify/SKILL.md) the integrated behavior on applicable surfaces.
 
 Return the delivered outcome, changed boundaries, acceptance results and remaining choices. Use domain-modeling when concepts need sharpening, and show-me when a shape or alternative needs explaining.
 

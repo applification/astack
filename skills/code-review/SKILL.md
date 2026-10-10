@@ -16,7 +16,7 @@ Use a fresh read-only reviewer by default for changed authorization/identity, pe
 
 The lead adjudicates every material finding against actual source and behavior. Separate confirmed fixes, justified optional improvements and dismissed findings, with reasons. Agreement between reviewers is a signal to inspect, not proof. Require a distinguishing reproduction or precise source argument for a claimed defect; keep unavailable proof visible. When authoring a check, apply [testing](../testing/SKILL.md) and challenge it with a plausible incorrect implementation where useful.
 
-Returned review evidence belongs to the reviewed revision. Recheck findings and affected acceptance after material changes; an earlier review does not certify the new diff. Keep the existing required platform reviews, including the companion Convex reviewer, in the owning PR workflow.
+Returned review evidence belongs to the reviewed revision. Recheck findings and affected acceptance after material changes; an earlier review does not certify the new diff. Keep platform reviews required by the consuming project in the owning PR workflow.
 
 Return prioritized findings with source locations, consequence, supporting evidence, scope and unresolved proof. Name self-review honestly when a fresh reviewer is unavailable. The delivery owner resolves findings and verifies the integrated result.
 

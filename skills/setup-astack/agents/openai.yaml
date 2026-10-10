@@ -1,0 +1,6 @@
+interface:
+  display_name: "Setup astack"
+  short_description: "Choose project models for astack's engineering roles"
+  default_prompt: "Use $applification:setup-astack to choose and validate this project's research, design, implementation and review models."
+policy:
+  allow_implicit_invocation: true
