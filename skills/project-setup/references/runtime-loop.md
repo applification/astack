@@ -12,9 +12,9 @@ Use the selected language, runtime, package manager, framework and test runner. 
 
 Run the real artifact with a safe input or fixture, inspect the result and exercise a meaningful failure when relevant. A CLI should run as a CLI; a service should answer a real request; a user interaction should be driven in the running app. Use [testing](../../testing/SKILL.md) for a useful regression and [verify](../../verify/SKILL.md) to distinguish observed behavior from compilation or mock coverage.
 
-Reuse working launch, diagnostic and verification tools. Add [app control](../../app-control/SKILL.md) when repeated driving lacks a capability, and design/component tools when [web-feature](../../web-feature/SKILL.md) identifies a useful question. Neither is required for every setup. Select local, preview or hosted verification from the project's chosen deployment and available authority.
+Reuse working launch, diagnostic and verification tools. Add [app control](../../app-control/SKILL.md) when repeated driving lacks a capability, and use existing design/component tools when they answer a useful question. Neither is required for every setup. Select local, preview or hosted verification from the project's chosen deployment and available authority.
 
-Run the project's chosen lint and typecheck commands when present. astack's shared lint is optional and must be compatible with the selected compiler and framework. Report incompatibility rather than silently replacing them to satisfy a check. Keep CI aligned with the working commands.
+Run the project's chosen lint, compiler and test commands when present. Report incompatibility rather than silently replacing selected tools to satisfy a check. Keep CI aligned with the working commands.
 
 For an upgrade, retain a baseline before changing behavior and rerun it afterwards. Explain consequential data, identity or deployment migrations with their recovery before acting when those choices remain unresolved. Keep an ordinary feature or fix inside its scope.
 

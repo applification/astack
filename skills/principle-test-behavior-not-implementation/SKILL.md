@@ -24,7 +24,7 @@ Before keeping a test, ask whether an empty or plausibly wrong implementation co
 
 **The fix:** call the subject inside the test body with one concrete input and assert the literal output or the observable effect, `expect(slugify("Hello, World!")).toBe("hello-world")`. An absence or rejection can be the correct expected behavior; pair it with a meaningful success/control case where useful. For a constant, test the mechanism that reads it with one input instead of restating the value. For a mock, assert the payload it received or the state after the call, not that it was called. When no such assertion exists, delete the test.
 
-**Keep** a test of a relation across a table's rows (a key present in two tables, a parent that exists), and a compile-time check in a `*.test-d.ts` file.
+**Keep** a test of a relation across a table's rows (a key present in two tables, a parent that exists), and compile-time checks using the chosen language’s supported test format.
 
 Apply this leaf directly or alongside a workflow/platform skill. Read relevant project instructions and `.astack/project.md` when present. Return the concrete decision and actual evidence or limits; the caller owns delivery and publication.
 

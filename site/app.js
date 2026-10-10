@@ -2,7 +2,7 @@ const routes = {
   feature: {
     number: '01', name: 'Feature', title: 'Make the intended behavior real.',
     description: 'For new or changed user behavior, start with the outcome and a few observable cases when the change is substantial. Build in slices and check the integrated result.',
-    steps: ['Describe the outcome and material cases', 'Decide which design or component checks help', 'Implement and observe the real user path', 'Open a PR with the contract and proof'],
+    steps: ['Describe the outcome and material cases', 'Choose checks from the requested behavior', 'Implement and observe the real user path', 'Open a PR with the contract and proof'],
     example: '“Add a reading list that survives reload.”'
   },
   bug: {

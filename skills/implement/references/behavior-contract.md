@@ -1,23 +1,17 @@
 # Behavior contract
 
-For ChatGPT plugin work, also record the target client/version, entrypoint, authenticated actor, model-visible context, UI-only state, persistence owner, fallback and installed-host proof. For events include the user-authorized monitoring action and stop condition. See [plugin engineering](../../chatgpt-plugin/SKILL.md).
+For a substantial change, keep a short account of the outcome and the cases that distinguish success from plausible wrong behavior. Use existing project records; `.astack/<feature>/behavior-contract.md` is an option when a separate file helps. A small change can keep this in the task and PR.
 
-Use for substantial behavior changes and design sprints. The contract is one reviewable account of the intended behavior and the evidence used to implement and validate it. Start it with an outcome and a few observable acceptance cases, then add design evidence and proof as the work progresses. For a design sprint, keep it at `.astack/<feature>/behavior-contract.md` with retained evidence and any selected Pencil file in the same tracked feature folder.
-
-Keep the contract short enough to read during implementation and review. It should answer:
+Record only what the change needs:
 
 - Who can do what, and why?
-- Which observable cases distinguish success from plausible wrong behavior? Give material cases stable IDs such as A1 and A2.
-- For web UI work, why were Pencil and Storybook each selected or skipped? When selected, which frames or stories demonstrate the relevant states or interactions? Tie each to the relevant case and say what was actually checked.
-- How will each material case be validated? Give it a stable ID and link its test or check, target, actor, fixture, expected observation and independent read when side effects matter. Record the result on the exact revision and environment once checked.
-- Which exploration charters can expose missing cases, and why were they selected or skipped? Keep candidates, confirmation/rejection evidence, fixes and retained regressions distinct from acceptance results. A charter with no findings does not establish that its acceptance cases passed.
-- Which product choices remain open, and what is outside this change?
-- For changed persisted shapes, retries, migrations or background effects, what happens after interruption, duplicate delivery or restart? Name compatibility and recovery cases when they materially affect success.
+- Which observable cases distinguish success, failure and material boundary conditions?
+- Which product or design choices are open, and what is outside scope?
+- How will each case be checked: target, actor, fixture, expected result and any fresh read needed for a side effect?
+- For persistence, retries, migrations or background effects, what happens after interruption, duplicate delivery or restart?
 
-Given/When/Then is optional shorthand for a case, not an executable specification. Include cancellation, authorization, persistence, errors, or accessibility when they materially change the outcome. Do not turn every visual state into another requirement.
+Use the project's selected design and component tools when they answer a real question. Link relevant artifacts to the cases they support. A visual comparison or component fixture establishes only those states; data, identity and persistence need checks at their owning boundary.
 
-For web UI work, selected `.pen` files and Storybook stories are evidence inside the contract, with paths, frame names, and story IDs that a reviewer can open. Pencil validates the selected visual direction; Storybook can validate component rendering and interaction with fixture data. Neither proves real data effects, timing in the app, or authorized persistence. Name the running-product check needed for those claims. If a frame or story changes, update the contract's evidence rather than leaving an old reference as the agreed design.
+Given/When/Then and case IDs are useful when they clarify the change. They are not a required format. Resolve choices that change the intended outcome before dependent implementation. If learning changes acceptance, update it explicitly rather than letting it drift to match the code.
 
-Resolve decisions that change the intended result before implementing them. If learning changes acceptance, update the contract explicitly and tell the user when the choice is theirs. The contract may evolve; it must not drift silently to match the implementation.
-
-Update the tracked contract as decisions and proof change. The PR links it and summarizes the outcome and remaining gaps; it need not duplicate the full contract. Link agreed domain definitions from the project's glossary and consequential rationale from its decision register, following [domain language guidance](../../domain-modeling/SKILL.md), so feature folders do not acquire competing definitions. Keep feature-specific design and asset decisions with the contract when useful. For work without a design sprint, a short contract may stay in the task and PR. Do not create a parallel `docs/` feature file or leave a selected `.pen` file in a separate `design/` workstream.
+Keep agreed definitions and consequential rationale in the project's existing glossary or decision register, following [domain language guidance](../../domain-modeling/SKILL.md). Update relevant links and results as the work changes. Put concise proof and any remaining gaps in the PR, with the actual revision and environment.

@@ -2,18 +2,18 @@ import { Validator } from '@cfworker/json-schema';
 import { readFileSync, existsSync, readdirSync, realpathSync } from 'node:fs';
 import { resolve, relative, isAbsolute, dirname } from 'node:path';
 const root = resolve(import.meta.dir, '..');
-const read = (p: string) => JSON.parse(readFileSync(p, 'utf8'));
-function isRecord(value: unknown): value is Record<string, unknown> {
+const read = (p) => JSON.parse(readFileSync(p, 'utf8'));
+function isRecord(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
-function record(value: unknown): Record<string, unknown> {
+function record(value) {
   return isRecord(value) ? value : {};
 }
-function prose(source: string) {
+function prose(source) {
   // Code samples describe the adopting project, not files in this package.
   return source.replace(/^(`{3,}|~{3,})[^\n]*\n[\s\S]*?^\1\s*$/gm, '');
 }
-function contained(base: string, value: string) {
+function contained(base, value) {
   if (!value.startsWith('./') || value.split('/').includes('..')) throw new Error(`Invalid package path: ${value}`);
   const path = resolve(base, value);
   if (!existsSync(path)) throw new Error(`Missing package path: ${value}`);
@@ -21,9 +21,9 @@ function contained(base: string, value: string) {
   if (rel.startsWith('..') || isAbsolute(rel)) throw new Error(`Package escape: ${value}`);
   return path;
 }
-function checkSkills(base: string) {
+function checkSkills(base) {
   const skills = resolve(base, 'skills');
-  const names = new Set<string>();
+  const names = new Set();
   for (const folder of readdirSync(skills)) {
     const entry = contained(base, `./skills/${folder}/SKILL.md`);
     const source = readFileSync(entry, 'utf8');
@@ -48,7 +48,7 @@ function checkSkills(base: string) {
     if (typeof prompt !== 'string' || !new RegExp(`\\$(?:${read(resolve(base, 'plugin.json')).name}:)?${identity}(?![a-z0-9-])`).test(prompt)) throw new Error(`Skill invocation prompt differs from identity: ${agentPath}`);
     if (typeof record(agent.policy).allow_implicit_invocation !== 'boolean') throw new Error(`Invalid skill invocation policy: ${agentPath}`);
   }
-  function links(directory: string) {
+  function links(directory) {
     for (const item of readdirSync(directory, { withFileTypes: true })) {
       const file = resolve(directory, item.name);
       if (item.isDirectory()) { links(file); continue; }
@@ -71,10 +71,10 @@ function checkSkills(base: string) {
   }
   links(skills);
 }
-export function checkPlugin(base: string) {
+export function checkPlugin(base) {
   for (const name of ['plugin', 'mcp']) {
     const path = resolve(base, `${name}.json`);
-    const schema = read(resolve(root, `scripts/schemas/${name}.schema.json`));
+    const schema = read(resolve(root, `lint/schemas/${name}.schema.json`));
     const result = new Validator(schema, '2020-12').validate(read(path));
     if (!result.valid) throw new Error(`${path}: ${JSON.stringify(result.errors)}`);
   }
@@ -88,7 +88,7 @@ export function checkPlugin(base: string) {
   for (const value of ext?.interface?.screenshots ?? []) contained(base, value);
   checkSkills(base);
   const servers = read(resolve(base, 'mcp.json')).mcpServers ?? {};
-  for (const server of Object.values(servers) as { type: string; command?: string; args?: string[] }[]) {
+  for (const server of Object.values(servers)) {
     for (const value of [server.command, ...(server.args ?? [])]) {
       if (value?.startsWith('${PLUGIN_ROOT}/')) contained(base, './' + value.slice('${PLUGIN_ROOT}/'.length));
     }

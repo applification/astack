@@ -46,7 +46,7 @@ limits: One writer, maximum two concurrent read-only contributions;
 decisions: None initially; escalate if intended sharing differs from the ownership ADR.
 ```
 
-The lead selects Bug fix and reproduces before changing code. Backend/data traces consumers and the actual operation; security examines allowed/denied actors and token boundaries. Convex changes still require its expert and reviewer. Roles can be combined if useful, with independence disclosed.
+The lead selects Bug fix and reproduces before changing code. Backend/data traces consumers and the actual operation; security examines allowed/denied actors and token boundaries. Apply platform review requirements from the consuming project. Roles can be combined if useful, with independence disclosed.
 
 A security brief carries `COS-42`, `assignment-7`, `attempt-1`, `contribution_id: security-1`, A1–A3, relevant code/context and the pinned revision/target. It permits read-only inspection and disposable local checks, gives a budget inside the parent limits, and returns findings to the lead. It grants no write, messaging or live identity authority.
 

@@ -2,8 +2,8 @@ import { test, expect, beforeEach, afterEach } from 'bun:test';
 import { cpSync, mkdtempSync, rmSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { checkPlugin } from './check-plugins';
-let path: string;
+import { checkPlugin } from './plugins.mjs';
+let path;
 beforeEach(() => {
   path = mkdtempSync(join(tmpdir(), 'astack-portable-'));
   const root = resolve(import.meta.dir, '..');
@@ -63,6 +63,6 @@ test('template links in fenced examples do not refer to packaged project files',
 });
 test('the installable package and the plugin share one version', () => {
   const root = resolve(import.meta.dir, '..');
-  const version = (file: string) => JSON.parse(readFileSync(join(root, file), 'utf8')).version;
+  const version = (file) => JSON.parse(readFileSync(join(root, file), 'utf8')).version;
   expect(version('package.json')).toBe(version('plugin.json'));
 });

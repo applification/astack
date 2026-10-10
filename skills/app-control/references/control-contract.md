@@ -22,7 +22,7 @@ Use the startup command's actual target and confirm the returned artifact belong
 
 Reuse identity, fixture and navigation helpers across the CLI and the project's chosen runner. Choose one owner per instance: a runner-owned instance is cleaned up by the runner; a CLI-owned instance supplies its verified target and fixture context to tests that do not stop it. Keep sessions and actors isolated even when the process is shared.
 
-When using [Tester Army e2e](../../testing/references/e2e.md), its MCP session can provide inspection and locator validation. Other runners keep their own working inspection tools. Avoid competing selector sets or launchers for the same path.
+Use the project’s working inspection and locator tools. Avoid competing selector sets or launchers for the same path.
 
 ## Map user behavior
 
