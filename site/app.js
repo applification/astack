@@ -1,7 +1,7 @@
 const routes = {
   feature: {
     number: '01', name: 'Feature', title: 'Make the intended behavior real.',
-    description: 'For new or changed user behavior, start with the outcome and a few observable cases when the change is substantial. Build in slices and check the integrated result.',
+    description: 'For new behavior or project guardrails, start with the outcome and observable cases. For guardrail improvements, use correct to turn demonstrated mistakes into safeguards and prove bad cases fail while valid usage passes.',
   },
   bug: {
     number: '02', name: 'Bug fix', title: 'Follow the reported failure.',

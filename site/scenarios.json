@@ -10,6 +10,11 @@
     "route": "feature"
   },
   {
+    "request": "Agents keep bypassing our validation helper; improve the guardrails",
+    "decision": "Use the feature playbook with `correct`. Inspect the repeated failures, choose and implement a safeguard in the project’s existing tools, then prove the bypass fails while valid usage passes. Record the enforcing command in project guidance.",
+    "route": "feature"
+  },
+  {
     "request": "Saved edits disappear after reopening a record",
     "decision": "Reproduce the original failure, trace the owning operation and repair the supported cause. Rerun the same path and retain a meaningful regression using the project’s runner.",
     "route": "bug"

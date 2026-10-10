@@ -16,6 +16,7 @@ A playbook is an ordered task procedure that composes skills and names the model
 | Task | Playbook |
 | --- | --- |
 | New or changed behavior | [feature](playbooks/feature.md) |
+| Improve project guardrails or prevent repeated agent mistakes | [feature](playbooks/feature.md) with [correct](../correct/SKILL.md) |
 | Reported defect | [bug fix](playbooks/bug-fix.md) |
 | Structure change with behavior preserved | [refactor](playbooks/refactor.md) |
 | Measured slowness | [performance](playbooks/performance.md) |
@@ -40,6 +41,6 @@ Read the relevant leaf in full at its decision. Principles guide judgment; the p
 | Diagnosing a defect | [fix root causes](../principle-fix-root-causes/SKILL.md) |
 | Ordering a multi-step change | [sequence verifiable units](../principle-sequence-verifiable-units/SKILL.md) |
 
-For repeated agent corrections, use [correct](../correct/SKILL.md) to add demonstrated safeguards in the consuming project and prove bad/valid cases with its existing tools. Keep commands and any enforcement table in project guidance; astack's `lint/` validates its own package, not the application's architecture.
+Keep safeguard commands and any enforcement table in project guidance; astack's `lint/` validates its own package, not the application's architecture.
 
 Carry the task through its selected finish condition. Report actual revision, observations and gaps; resolve findings before claiming completion. Read-only work ends with an answer. Kept changes follow the project's delivery policy and [PR guidance](../pr/SKILL.md). Builds, routing examples and saved model preferences alone do not establish agent delivery.
