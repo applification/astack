@@ -57,7 +57,7 @@ Claude Code uses `/applification:astack`. The entry skill chooses a playbook fro
 | Task | Playbook |
 | --- | --- |
 | New or changed behavior | [feature](skills/astack/playbooks/feature.md) |
-| Improve project guardrails or prevent repeated agent mistakes | [feature](skills/astack/playbooks/feature.md) with [correct](skills/correct/SKILL.md) |
+| Improve the agent's environment or prevent repeated agent mistakes | [feature](skills/astack/playbooks/feature.md) with [correct](skills/correct/SKILL.md); tooling and checks only |
 | Reported defect | [bug fix](skills/astack/playbooks/bug-fix.md) |
 | Structure change preserving behavior | [refactor](skills/astack/playbooks/refactor.md) |
 | Measured slowness | [performance](skills/astack/playbooks/performance.md) |
@@ -76,12 +76,13 @@ These are callable skills, not a host-specific persistent mode. Start new tasks 
 
 Engineering principles guide judgment. The project's types, lint rules, tests and runtime checks enforce its concrete rules. astack supplies no application compiler/linter presets.
 
-Ask astack to improve project guardrails or prevent repeated agent mistakes. It uses the feature playbook with `correct`: inspect demonstrated failures, choose and implement the owning architecture/type/lint/test safeguard, then prove that bad cases fail while valid ones pass. It records the enforcing command in the project's existing guidance. You can also call `$applification:correct` directly.
+Ask astack to improve the agent's codebase environment. It uses the feature playbook with `correct` to change deterministic tooling, lint/compiler configuration, structural checks, verification tools, hooks and CI. Application source and runtime behavior stay unchanged; product defects are returned as findings for separate work. Prove that bad contributions are rejected and valid ones pass, wire the command into local verification and CI, and record it in existing project guidance. Reminders alone do not complete correction work. You can also call `$applification:correct` directly.
 
 ```text
 $applification:astack Agents keep bypassing our validation helper.
-Use the failures in this PR to prevent it happening again.
-Done means the bypass fails a check and valid usage passes.
+Use the failures in this PR to improve our development checks.
+Done means the bypass fails a check and valid usage passes,
+with application source and behavior unchanged.
 ```
 
 Keep actual commands in existing project instructions. `.astack/project.md` is optional. A project-specific verification/control skill is useful when existing tools cannot drive a real user path; it earns its place through an observed run.

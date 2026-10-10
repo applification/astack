@@ -1,21 +1,23 @@
 ---
 name: correct
-description: Investigate repeated agent mistakes in a project and replace recurring corrections with demonstrated architectural, type, lint or behavioral safeguards within the authorized scope.
+description: Improve the agent's codebase environment with deterministic tooling and checks that prevent demonstrated mistakes, while preserving application source and behavior.
 license: MIT
 metadata:
-  short-description: "Prevent repeated mistakes with proven safeguards"
+  short-description: "Improve the agent environment with proven checks"
 ---
 
-# Close the correction loop
+# Improve the agent's environment
 
-Read project instructions, relevant corrections, failing observations, reverts and review findings. Group demonstrated repeats by the mechanism that allowed them; do not invent a recurring class from one unrelated failure. Use [encode lessons in structure](../principle-encode-lessons-in-structure/SKILL.md) to choose the strongest practical safeguard.
+Change only the environment in which the agent works: project tooling, lint/compiler configuration, structural checks, verification tools, hooks and CI. Make the intended development path obvious and mechanically enforce it. Preserve application source and runtime behavior; application fixes, refactors, types, schemas and runtime helpers belong to separately requested work.
 
-First ask whether clearer ownership or one supported interface eliminates the mistake. Then consider a type that cannot express it, a focused lint/banned import with an actionable diagnostic, or a real behavioral regression. Write guidance for decisions that still require judgment. Preserve the user's task and authority; a correction request does not authorize an unrelated migration or global host change.
+Read project instructions, relevant conversations, corrections, failing observations, reverts, review findings and existing check commands. Ground each change in a demonstrated mistake or missing enforcement of an explicit project invariant. Group repeats by mechanism; distinguish a single gap from a recurring class. Use [encode lessons in structure](../principle-encode-lessons-in-structure/SKILL.md) to choose enforcement within this environment-only remit.
 
-For each retained safeguard, reproduce the original bad case in a disposable fixture or use its preserved failing revision. Run the guard and observe rejection, correct the case, and run the same guard again. Keep valid neighboring behavior passing. A new rule that has never rejected the demonstrated mistake has unproven coverage.
+Prefer the project's existing tools: strengthen or wire an existing check before adding one. Use deterministic lint/compiler rules, import/API or filesystem checks, check-runner improvements and regression checks for the named invariant. Diagnostics should identify the rejected pattern and supported alternative. Guidance may explain the enforcing command; reminders alone do not complete this task. Preserve the selected stack and host configuration.
 
-Record the mistake, its evidence, owning layer, enforcement command and negative/positive results in the existing task record or a concise [rule table](references/rule-table.md). Put project enforcement in the project. Change reusable skills only when the lesson applies across projects. Reuse the same command locally and in CI, including affected script/tooling boundaries when they own the failure.
+For each retained guard, reproduce the bad contribution in a disposable fixture or use a preserved failing revision. Observe its rejection, then run the same guard on a valid case and valid neighbors. Verify application source is unchanged. If the current application violates the proposed rule, report that prerequisite for separate work; do not repair production code, disable checks or hide violations to get a passing baseline.
 
-Return the corrected classes, selected mechanism and observed coverage. Unresolved classes name the missing decision or prerequisite. Kept changes follow the project's delivery policy; investigations may end with findings. Do not weaken an invariant simply to silence its check.
+Wire retained checks into local verification and CI. Record the evidence, environment change, enforcing command, negative/positive results and remaining coverage in the existing task record or [rule table](references/rule-table.md). Put project enforcement in the project; change reusable skills only for lessons that apply across projects.
+
+Return the deterministic environment improvements and observed coverage. Report application defects and judgment-only findings separately. If no justified deterministic improvement is available, return findings rather than substitute product changes. Kept changes follow the project's delivery policy; investigations may end with findings.
 
 [Source and adaptations](upstream.json); [MIT licence](LICENSE).

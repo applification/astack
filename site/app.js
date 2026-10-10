@@ -1,7 +1,7 @@
 const routes = {
   feature: {
     number: '01', name: 'Feature', title: 'Make the intended behavior real.',
-    description: 'For new behavior or project guardrails, start with the outcome and observable cases. For guardrail improvements, use correct to turn demonstrated mistakes into safeguards and prove bad cases fail while valid usage passes.',
+    description: 'For application work, define the outcome and observable cases. For agent environment improvements, use correct to change deterministic tooling, configuration and checks while preserving application source and behavior. Prove bad contributions are rejected and valid ones pass.',
   },
   bug: {
     number: '02', name: 'Bug fix', title: 'Follow the reported failure.',

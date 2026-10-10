@@ -11,7 +11,7 @@
   },
   {
     "request": "Agents keep bypassing our validation helper; improve the guardrails",
-    "decision": "Use the feature playbook with `correct`. Inspect the repeated failures, choose and implement a safeguard in the project’s existing tools, then prove the bypass fails while valid usage passes. Record the enforcing command in project guidance.",
+    "decision": "Use the feature playbook with `correct` to improve deterministic development checks. Preserve application source and behavior. Prove the bypass is rejected and valid usage passes; wire the command into local verification and CI and record it in project guidance. Return application defects as separate findings.",
     "route": "feature"
   },
   {
