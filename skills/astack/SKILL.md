@@ -16,7 +16,7 @@ A playbook is an ordered task procedure that composes skills and names the model
 | Task | Playbook |
 | --- | --- |
 | New or changed behavior | [feature](playbooks/feature.md) |
-| Improve project guardrails or prevent repeated agent mistakes | [feature](playbooks/feature.md) with [correct](../correct/SKILL.md) |
+| Improve the agent's environment or prevent repeated agent mistakes | [feature](playbooks/feature.md) with [correct](../correct/SKILL.md); tooling and checks only, preserving application source and behavior |
 | Reported defect | [bug fix](playbooks/bug-fix.md) |
 | Structure change with behavior preserved | [refactor](playbooks/refactor.md) |
 | Measured slowness | [performance](playbooks/performance.md) |

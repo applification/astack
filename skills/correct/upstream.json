@@ -13,6 +13,7 @@
   "adaptations": [
     "Adapt the referenced method into concise project-independent Codex guidance; these local files are adaptations rather than verbatim imports.",
     "Use available host delegation and inherited model choices instead of Cursor-specific tools or fixed model defaults.",
-    "Preserve caller scope, proportional work, project-owned proof and publication boundaries."
+    "Preserve caller scope, proportional work, project-owned proof and publication boundaries.",
+    "Narrow correction work to deterministic development-environment tooling and checks; preserve application source and behavior and return product defects as separate findings."
   ]
 }
