@@ -1,5 +1,5 @@
-import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const roles = ['research', 'design', 'implementation', 'review'];
@@ -8,51 +8,171 @@ const nonempty = (value) => typeof value === 'string' && value.trim().length > 0
 
 export function validateConfig(config) {
   if (config === undefined) return;
-  if (!isRecord(config) || Object.keys(config).some((key) => key !== 'roles') || !isRecord(config.roles)) {
-    throw new Error('Expected an object with a roles map.');
+  if (!isRecord(config) || Object.keys(config).some((key) => !['roles', 'reviewPanel'].includes(key)) || !isRecord(config.roles)) {
+    throw new Error('Expected an object with a roles map and optional reviewPanel.');
   }
   for (const [role, target] of Object.entries(config.roles)) {
     if (!roles.includes(role)) throw new Error(`Unknown model role: ${role}`);
-    if (target === 'inherit') continue;
-    if (!isRecord(target) || Object.keys(target).some((key) => !['providerInstanceId', 'model', 'options'].includes(key)) ||
-        !nonempty(target.providerInstanceId) || !nonempty(target.model)) {
-      throw new Error(`Invalid target for ${role}: use inherit or providerInstanceId/model/options.`);
+    validateTarget(target, role, true);
+  }
+  if (config.reviewPanel !== undefined && config.reviewPanel !== null) {
+    if (!Array.isArray(config.reviewPanel) || config.reviewPanel.length !== 2) {
+      throw new Error('reviewPanel must contain exactly two pinned targets, or null to select roles.review.');
     }
-    if (target.options !== undefined && (!isRecord(target.options) ||
-        Object.values(target.options).some((value) => typeof value !== 'string' && typeof value !== 'boolean'))) {
-      throw new Error(`Invalid options for ${role}: use string or boolean values.`);
+    config.reviewPanel.forEach((target, index) => validateTarget(target, `reviewPanel[${index}]`, false));
+    if (config.reviewPanel[0].providerInstanceId === config.reviewPanel[1].providerInstanceId) {
+      throw new Error('reviewPanel targets must use different provider instances.');
     }
+  }
+}
+
+function validateTarget(target, label, allowInherit) {
+  if (allowInherit && target === 'inherit') return;
+  if (!isRecord(target) || Object.keys(target).some((key) => !['providerInstanceId', 'model', 'options'].includes(key)) ||
+      !nonempty(target.providerInstanceId) || !nonempty(target.model)) {
+    throw new Error(`Invalid target for ${label}: use ${allowInherit ? 'inherit or ' : ''}providerInstanceId/model/options.`);
+  }
+  if (target.options !== undefined && (!isRecord(target.options) ||
+      Object.values(target.options).some((value) => typeof value !== 'string' && typeof value !== 'boolean'))) {
+    throw new Error(`Invalid options for ${label}: use string or boolean values.`);
   }
 }
 
 export function resolveRole(config, role, catalog) {
   validateConfig(config);
+  validateCatalog(catalog);
   if (!roles.includes(role)) throw new Error(`Unknown model role: ${role}`);
-  const target = config?.roles[role];
+  if (role === 'review' && Array.isArray(config?.reviewPanel)) {
+    return config.reviewPanel.map((target, index) => resolveTarget(target, `reviewPanel[${index}]`, catalog));
+  }
+  return resolveTarget(config?.roles[role], role, catalog);
+}
+
+function resolveTarget(target, label, catalog) {
   if (target === undefined || target === 'inherit') return null;
   const provider = catalog?.providers?.find((item) => item.providerInstanceId === target.providerInstanceId);
-  if (!provider || provider.canRunChildTask !== true) throw new Error(`Provider unavailable for ${role}: ${target.providerInstanceId}`);
+  if (!provider || provider.canRunChildTask !== true) {
+    const reason = provider?.constraints?.join(' ') || (catalog ? 'Not runnable in the live catalog.' : 'Supply the live host catalog.');
+    throw new Error(`Provider unavailable for ${label}: ${target.providerInstanceId}. ${reason}`);
+  }
+  if (catalog.inheritedProviderInstanceId && catalog.inheritedProviderInstanceId !== target.providerInstanceId &&
+      provider.canRunCrossProviderChildTask !== true) {
+    throw new Error(`Cross-provider delegation unavailable for ${label}: ${target.providerInstanceId}`);
+  }
   const model = provider.models?.find((item) => item.id === target.model);
-  if (!model) throw new Error(`Model unavailable for ${role}: ${target.model}`);
+  if (!model) throw new Error(`Model unavailable for ${label}: ${target.providerInstanceId}/${target.model}. Available models: ${provider.models?.map((item) => item.id).join(', ') || 'none'}`);
   for (const [id, value] of Object.entries(target.options ?? {})) {
     const option = model.options?.find((item) => item.id === id);
     const valid = option?.type === 'boolean' ? typeof value === 'boolean' :
       option?.type === 'select' && typeof value === 'string' && option.options?.some((item) => item.id === value);
-    if (!valid) throw new Error(`Unsupported model option for ${role}: ${id}=${value}`);
+    if (!valid) {
+      const allowed = option?.type === 'boolean' ? 'boolean' : option?.type === 'select' ? option.options?.map((item) => item.id).join(', ') :
+        option ? `no supported values for option type ${option.type}` : 'unknown option ID';
+      throw new Error(`Unsupported model option for ${label} (${target.providerInstanceId}/${target.model}): ${id}=${value}. Allowed: ${allowed}`);
+    }
   }
   return { ...target, ...(target.options ? { options: { ...target.options } } : {}) };
+}
+
+export function resolveConfig(config, catalog) {
+  validateConfig(config);
+  validateCatalog(catalog);
+  const resolved = Object.fromEntries(roles.map((role) => [role, resolveRole(config, role, catalog)]));
+  if (Array.isArray(config?.reviewPanel)) resolveTarget(config.roles.review, 'roles.review', catalog);
+  return resolved;
+}
+
+function projectFile(project) {
+  if (!project || !existsSync(project) || !statSync(project).isDirectory()) throw new Error(`Project directory unavailable: ${project}`);
+  const directory = resolve(project, '.astack');
+  if (lstatSync(directory, { throwIfNoEntry: false })?.isSymbolicLink() && !existsSync(directory)) {
+    throw new Error(`Model settings directory unavailable: ${directory}. Symlink target is missing.`);
+  }
+  return resolve(project, '.astack/models.json');
+}
+
+function validateCatalog(catalog) {
+  if (catalog === undefined) return;
+  if (!isRecord(catalog) || !Array.isArray(catalog.providers)) {
+    throw new Error('Invalid host catalog: expected a providers array from orchestrator_capabilities.');
+  }
+  catalog.providers.forEach((provider, index) => {
+    const label = `Invalid host catalog: providers[${index}]`;
+    if (!isRecord(provider) || !nonempty(provider.providerInstanceId) || typeof provider.canRunChildTask !== 'boolean' ||
+        !Array.isArray(provider.models)) throw new Error(`${label} requires providerInstanceId, canRunChildTask and a models array.`);
+    if (provider.constraints != null && (!Array.isArray(provider.constraints) || provider.constraints.some((value) => typeof value !== 'string'))) {
+      throw new Error(`${label}.constraints must be an array of strings.`);
+    }
+    provider.models.forEach((model, modelIndex) => {
+      const modelLabel = `${label}.models[${modelIndex}]`;
+      if (!isRecord(model) || !nonempty(model.id) || (model.options != null && !Array.isArray(model.options))) {
+        throw new Error(`${modelLabel} requires an id and optional options array.`);
+      }
+      model.options?.forEach((option, optionIndex) => {
+        if (!isRecord(option) || !nonempty(option.id) || !nonempty(option.type) ||
+            (option.type === 'select' && (!Array.isArray(option.options) || option.options.some((value) => !isRecord(value) || !nonempty(value.id))))) {
+          throw new Error(`${modelLabel}.options[${optionIndex}] requires an id, type and a select's allowed option IDs.`);
+        }
+      });
+    });
+  });
+}
+
+function readJson(file, validate) {
+  try {
+    const value = JSON.parse(readFileSync(file, 'utf8'));
+    validate(value);
+    return value;
+  } catch (error) { throw new Error(`${file}: ${error.message}`); }
+}
+
+const readConfig = (file) => lstatSync(file, { throwIfNoEntry: false }) ? readJson(file, validateConfig) : undefined;
+
+export function setupProject(project, choices = { roles: {} }, catalog) {
+  const file = projectFile(project);
+  if (lstatSync(file, { throwIfNoEntry: false })?.isSymbolicLink()) {
+    throw new Error(`Setup will not replace symlinked model settings: ${file}. Update the project-owned target explicitly.`);
+  }
+  const saved = readConfig(file);
+  validateConfig(choices);
+  const config = {
+    ...saved,
+    roles: { ...Object.fromEntries(roles.map((role) => [role, 'inherit'])), ...saved?.roles, ...choices.roles },
+  };
+  if (choices.reviewPanel !== undefined) config.reviewPanel = choices.reviewPanel;
+  resolveConfig(config, catalog);
+  const directory = resolve(project, '.astack');
+  mkdirSync(directory, { recursive: true });
+  const temporary = mkdtempSync(join(directory, '.models-'));
+  try {
+    const staged = join(temporary, 'models.json');
+    writeFileSync(staged, JSON.stringify(config, null, 2) + '\n');
+    resolveConfig(readConfig(staged), catalog);
+    renameSync(staged, file);
+  } finally { rmSync(temporary, { recursive: true, force: true }); }
+  const written = readConfig(file);
+  return { config: written, resolved: resolveConfig(written, catalog) };
 }
 
 if (process.argv[1] && existsSync(process.argv[1]) &&
     realpathSync(fileURLToPath(import.meta.url)) === realpathSync(process.argv[1])) {
   try {
-    const [project, role, catalogFile] = process.argv.slice(2);
-    if (!project || !role) throw new Error('Usage: models.mjs <project-dir> <role> [catalog.json]');
-    if (!existsSync(project) || !statSync(project).isDirectory()) throw new Error(`Project directory unavailable: ${project}`);
-    const file = resolve(project, '.astack/models.json');
-    const config = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : undefined;
-    const catalog = catalogFile ? JSON.parse(readFileSync(catalogFile, 'utf8')) : undefined;
-    console.log(JSON.stringify(resolveRole(config, role, catalog)));
+    const args = process.argv.slice(2);
+    const setup = args[0] === '--setup';
+    const [project, roleOrChoices, catalogFile] = setup ? args.slice(1) : args;
+    if (!project || !roleOrChoices || args.length > (setup ? 4 : 3)) {
+      throw new Error('Usage: models.mjs <project-dir> <role|--check> [catalog.json]\n       models.mjs --setup <project-dir> <choices.json> [catalog.json]');
+    }
+    const catalog = catalogFile ? readJson(catalogFile, validateCatalog) : undefined;
+    let result;
+    if (setup) result = setupProject(project, readJson(roleOrChoices, validateConfig), catalog);
+    else {
+      const file = projectFile(project);
+      const config = readConfig(file);
+      if (roleOrChoices === '--check' && config === undefined) throw new Error(`Model settings unavailable: ${file}. Run setup first.`);
+      result = roleOrChoices === '--check' ? resolveConfig(config, catalog) : resolveRole(config, roleOrChoices, catalog);
+    }
+    console.log(JSON.stringify(result));
   } catch (error) {
     console.error(error.message);
     process.exitCode = 1;

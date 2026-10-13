@@ -1,6 +1,6 @@
 # astack
 
-Engineering playbooks, focused skills and feedback for coding agents. Install once, choose model roles if useful, then describe the task and what would prove it done. The project owns its application technologies.
+Engineering playbooks, focused skills and feedback for coding agents. Install once, set up project model roles, then describe the task and what would prove it done. Setup and delegation carry choices through the actual host. The project owns its application technologies.
 
 | Part | What it does |
 | --- | --- |
@@ -28,11 +28,11 @@ codex plugin add applification@applification
 
 Both hosts install the Applification plugin from this repository's `skills/`. No server or application toolchain is installed. In T3, make the plugin available to each provider you use; one provider's installation does not establish the other's installation. Delegated briefs include exact skill paths and project context.
 
-## 2. Choose models (optional)
+## 2. Set up project models
 
 Use `$applification:setup-astack` in Codex or `/applification:setup-astack` in Claude Code. This configures the agent, not the application.
 
-Setup discovers available providers/models and supported reasoning options, asks about your budget/preferences, and saves a confirmed table for four roles in the consuming project's `.astack/models.json`:
+Setup discovers available providers/models and supported options through the live host catalog. It uses supplied preferences, asks only about unresolved choices, and finishes by saving and checking all four roles in the consuming project's `.astack/models.json`. Reruns preserve existing choices; omitted roles are saved explicitly as `inherit`:
 
 | Role | Work |
 | --- | --- |
@@ -41,9 +41,11 @@ Setup discovers available providers/models and supported reasoning options, asks
 | `implementation` | Make the authorized changes |
 | `review` | Challenge the diff and assess proof |
 
-Missing configuration or omitted roles inherit the current session's model/settings. A pinned role contains a provider/model target with supported options and requires a host catalog exposing that exact target. T3 supplies this through `orchestrator_capabilities`, and selected targets can run through `delegate_task` across Claude/Codex providers. An unsupported saved pin stops its contribution with a reported gap. Model IDs and aliases are not universal across hosts. Setup does not switch the main thread's model or alter host-global settings.
+Existing single-reviewer settings remain valid. An optional `reviewPanel` contains two pinned targets from different providers, such as Codex and Claude. An explicit task choice takes precedence; otherwise review uses the panel when configured, or `roles.review` when the panel is absent or `null`. Both panel targets must resolve before either runs. Reruns preserve the panel and the saved single-reviewer choice.
 
-See [model selection](skills/setup-astack/references/models.md) for the small JSON format and validation command. Commit the preference file with the project and point existing project instructions to it so worktrees and hosts read the same choices.
+Missing settings and omitted roles inherit the current session. A pin requires the exact provider/model/options in the live catalog. T3 supplies `orchestrator_capabilities` and runs contributions through `delegate_task`, including across Codex and Claude. Unavailable targets/options fail with a diagnostic; setup leaves existing settings intact and reports incomplete setup. No model is silently substituted. Setup checks small read-only contributions for newly selected providers, retains task handles and compares the host-returned provider/model identities. Model IDs and aliases are not universal across hosts. Setup does not switch the main thread's model or alter host-global settings.
+
+See [model selection](skills/setup-astack/references/models.md) for the JSON format, checked `--setup` writer and `--check`/role resolver commands. Commit the preference file with the project and point existing project instructions to it so worktrees and hosts read the same choices. Validation alone does not establish delegation.
 
 ## 3. Give it a task
 
@@ -68,7 +70,7 @@ Claude Code uses `/applification:astack`. The entry skill chooses a playbook fro
 
 For a new product, describe the users, fixed choices, open decisions and smallest real milestone. Fixed choices are honoured; open choices are compared against product constraints; observable questions are settled by running things. New-project work is a playbook, separate from model setup.
 
-The lead owns integration and final proof. Inherited roles can work directly; selected targets use the actual host's dispatch capabilities. Independent reviews need a fresh reviewer even when the model is the same. Plans record skipped steps with reasons. A read-only task ends with its answer; changed code follows the project's delivery policy.
+The main agent acts as chief of staff (CoS): it owns scope, delegates contributions, adjudicates findings and verifies the integrated result. Inherited roles can work directly; pinned targets use the actual host's dispatch capabilities. Briefs include absolute skill paths, project instructions, exact revision, scope, allowed actions, expected proof and return format. Retain each task handle and verify returned provider/model identities before accepting proof. Independent reviews need a fresh reviewer even when the model is the same. Plans record skipped steps with reasons. A read-only task ends with its answer; changed code follows the project's delivery policy.
 
 These are callable skills, not a host-specific persistent mode. Start new tasks with astack; the host owns mode persistence, the parent model and scheduling.
 
