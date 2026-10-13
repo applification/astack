@@ -125,6 +125,20 @@ test('malformed provider and model entries fail with catalog diagnostics', () =>
   }
   expect(resolveRole({ roles: { review: critic } }, 'review', catalog)).toEqual(critic);
 });
+test('new catalog option types do not block unrelated targets or inherited setup', () => {
+  const extended = structuredClone(catalog);
+  extended.providers[0].models[0].options.push({ id: 'prompt', type: 'text' });
+  extended.providers[2].models[0].options = [{ id: 'limit', type: 'number' }];
+  expect(resolveRole({ roles: { review: writer } }, 'review', extended)).toEqual(writer);
+  expect(resolveRole({ roles: { review: critic } }, 'review', extended)).toEqual(critic);
+  const project = mkdtempSync(join(tmpdir(), 'astack-setup-new-options-'));
+  try {
+    expect(setupProject(project, { roles: {} }, extended).resolved)
+      .toEqual({ research: null, design: null, implementation: null, review: null });
+    expect(() => resolveRole({ roles: { review: { ...writer, options: { prompt: 'hello' } } } }, 'review', extended))
+      .toThrow('no supported values for option type text');
+  } finally { rmSync(project, { recursive: true, force: true }); }
+});
 test('setup preserves a settings symlink and its target instead of replacing the link', () => {
   const project = mkdtempSync(join(tmpdir(), 'astack-setup-link-'));
   try {
@@ -152,6 +166,23 @@ test('dangling settings symlinks fail role resolution instead of silently inheri
     expect(result.stdout).toBe('');
     expect(result.stderr).toContain(file);
     expect(lstatSync(file).isSymbolicLink()).toBe(true);
+  } finally { rmSync(project, { recursive: true, force: true }); }
+});
+test('a dangling settings directory link fails every CLI mode without being replaced', () => {
+  const project = mkdtempSync(join(tmpdir(), 'astack-directory-dangling-'));
+  const script = resolve(import.meta.dir, '../skills/setup-astack/scripts/models.mjs');
+  try {
+    const directory = join(project, '.astack');
+    symlinkSync(join(project, 'missing-directory'), directory);
+    const choices = join(project, 'choices.json');
+    writeFileSync(choices, '{"roles":{}}');
+    for (const args of [[project, 'review'], [project, '--check'], ['--setup', project, choices]]) {
+      const result = spawnSync('node', [script, ...args], { encoding: 'utf8' });
+      expect(result.status).toBe(1);
+      expect(result.stdout).toBe('');
+      expect(result.stderr).toContain(`Model settings directory unavailable: ${directory}`);
+      expect(lstatSync(directory).isSymbolicLink()).toBe(true);
+    }
   } finally { rmSync(project, { recursive: true, force: true }); }
 });
 test('CLI setup errors identify each input file and preserve saved bytes', () => {

@@ -66,7 +66,8 @@ function resolveTarget(target, label, catalog) {
     const valid = option?.type === 'boolean' ? typeof value === 'boolean' :
       option?.type === 'select' && typeof value === 'string' && option.options?.some((item) => item.id === value);
     if (!valid) {
-      const allowed = option?.type === 'boolean' ? 'boolean' : option?.type === 'select' ? option.options?.map((item) => item.id).join(', ') : 'unknown option ID';
+      const allowed = option?.type === 'boolean' ? 'boolean' : option?.type === 'select' ? option.options?.map((item) => item.id).join(', ') :
+        option ? `no supported values for option type ${option.type}` : 'unknown option ID';
       throw new Error(`Unsupported model option for ${label} (${target.providerInstanceId}/${target.model}): ${id}=${value}. Allowed: ${allowed}`);
     }
   }
@@ -83,6 +84,10 @@ export function resolveConfig(config, catalog) {
 
 function projectFile(project) {
   if (!project || !existsSync(project) || !statSync(project).isDirectory()) throw new Error(`Project directory unavailable: ${project}`);
+  const directory = resolve(project, '.astack');
+  if (lstatSync(directory, { throwIfNoEntry: false })?.isSymbolicLink() && !existsSync(directory)) {
+    throw new Error(`Model settings directory unavailable: ${directory}. Symlink target is missing.`);
+  }
   return resolve(project, '.astack/models.json');
 }
 
@@ -104,9 +109,9 @@ function validateCatalog(catalog) {
         throw new Error(`${modelLabel} requires an id and optional options array.`);
       }
       model.options?.forEach((option, optionIndex) => {
-        if (!isRecord(option) || !nonempty(option.id) || !['select', 'boolean'].includes(option.type) ||
+        if (!isRecord(option) || !nonempty(option.id) || !nonempty(option.type) ||
             (option.type === 'select' && (!Array.isArray(option.options) || option.options.some((value) => !isRecord(value) || !nonempty(value.id))))) {
-          throw new Error(`${modelLabel}.options[${optionIndex}] requires an id, select/boolean type and a select's allowed option IDs.`);
+          throw new Error(`${modelLabel}.options[${optionIndex}] requires an id, type and a select's allowed option IDs.`);
         }
       });
     });
