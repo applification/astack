@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import { existsSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync, symlinkSync } from 'node:fs';
+import { existsSync, lstatSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -97,6 +97,69 @@ test('setup rejects corrupt saved settings instead of replacing them with defaul
       expect(() => setupProject(project)).toThrow();
       expect(readFileSync(join(project, '.astack/models.json'), 'utf8')).toBe(bytes);
     }
+  } finally { rmSync(project, { recursive: true, force: true }); }
+});
+test('undefined panel updates preserve the saved panel rather than silently falling back', () => {
+  const project = mkdtempSync(join(tmpdir(), 'astack-setup-undefined-'));
+  try {
+    const saved = setupProject(project, { roles: {}, reviewPanel: [writer, critic] }, catalog);
+    expect(setupProject(project, { roles: {}, reviewPanel: undefined }, catalog)).toEqual(saved);
+  } finally { rmSync(project, { recursive: true, force: true }); }
+});
+test('malformed catalogs identify the catalog shape rather than a runnable provider', () => {
+  for (const bad of [null, [], {}, { result: catalog }, { providers: {} }]) {
+    expect(() => resolveRole({ roles: { review: critic } }, 'review', bad)).toThrow('Invalid host catalog: expected a providers array');
+    expect(() => resolveConfig({ roles: {} }, bad)).toThrow('Invalid host catalog');
+  }
+});
+test('setup preserves a settings symlink and its target instead of replacing the link', () => {
+  const project = mkdtempSync(join(tmpdir(), 'astack-setup-link-'));
+  try {
+    const shared = join(project, 'shared.json');
+    const bytes = JSON.stringify({ roles: { review: critic } });
+    writeFileSync(shared, bytes);
+    mkdirSync(join(project, '.astack'));
+    const file = join(project, '.astack/models.json');
+    symlinkSync(shared, file);
+    expect(resolveRole(JSON.parse(readFileSync(file, 'utf8')), 'review', catalog)).toEqual(critic);
+    expect(() => setupProject(project, { roles: {} }, catalog)).toThrow(`symlinked model settings: ${file}`);
+    expect(lstatSync(file).isSymbolicLink()).toBe(true);
+    expect(readFileSync(shared, 'utf8')).toBe(bytes);
+  } finally { rmSync(project, { recursive: true, force: true }); }
+});
+test('CLI setup errors identify each input file and preserve saved bytes', () => {
+  const project = mkdtempSync(join(tmpdir(), 'astack-setup-inputs-'));
+  const script = resolve(import.meta.dir, '../skills/setup-astack/scripts/models.mjs');
+  const choicesFile = join(project, 'choices.json');
+  const catalogFile = join(project, 'catalog.json');
+  const savedFile = join(project, '.astack/models.json');
+  const run = () => spawnSync('node', [script, '--setup', project, choicesFile, catalogFile], { encoding: 'utf8' });
+  try {
+    setupProject(project, { roles: { review: critic } }, catalog);
+    const savedBytes = readFileSync(savedFile, 'utf8');
+    for (const [badFile, badBytes] of [
+      [savedFile, '{broken'], [savedFile, '{"roles":{},"version":1}'],
+      [choicesFile, '{broken'], [choicesFile, '{"reviewPanel":null}'],
+      [catalogFile, '{broken'], [catalogFile, '{"result":{}}'],
+    ]) {
+      writeFileSync(savedFile, savedBytes);
+      writeFileSync(choicesFile, '{"roles":{}}');
+      writeFileSync(catalogFile, JSON.stringify(catalog));
+      writeFileSync(badFile, badBytes);
+      const before = readFileSync(savedFile, 'utf8');
+      const result = run();
+      expect(result.status).toBe(1);
+      expect(result.stdout).toBe('');
+      expect(result.stderr).toContain(badFile);
+      expect(readFileSync(savedFile, 'utf8')).toBe(before);
+    }
+    writeFileSync(savedFile, savedBytes);
+    writeFileSync(choicesFile, JSON.stringify({ roles: { review: { ...critic, options: { unknown: true } } } }));
+    writeFileSync(catalogFile, JSON.stringify(catalog));
+    const invalid = run();
+    expect(invalid.status).toBe(1);
+    expect(invalid.stderr).toContain('Unsupported model option for review');
+    expect(readFileSync(savedFile, 'utf8')).toBe(savedBytes);
   } finally { rmSync(project, { recursive: true, force: true }); }
 });
 test('the setup CLI saves, checks and selects a panel using the same resolver', () => {

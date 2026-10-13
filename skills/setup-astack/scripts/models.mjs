@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -40,6 +40,7 @@ function validateTarget(target, label, allowInherit) {
 
 export function resolveRole(config, role, catalog) {
   validateConfig(config);
+  validateCatalog(catalog);
   if (!roles.includes(role)) throw new Error(`Unknown model role: ${role}`);
   if (role === 'review' && Array.isArray(config?.reviewPanel)) {
     return config.reviewPanel.map((target, index) => resolveTarget(target, `reviewPanel[${index}]`, catalog));
@@ -74,6 +75,7 @@ function resolveTarget(target, label, catalog) {
 
 export function resolveConfig(config, catalog) {
   validateConfig(config);
+  validateCatalog(catalog);
   const resolved = Object.fromEntries(roles.map((role) => [role, resolveRole(config, role, catalog)]));
   if (Array.isArray(config?.reviewPanel)) resolveTarget(config.roles.review, 'roles.review', catalog);
   return resolved;
@@ -84,17 +86,34 @@ function projectFile(project) {
   return resolve(project, '.astack/models.json');
 }
 
-const readConfig = (file) => existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : undefined;
+function validateCatalog(catalog) {
+  if (catalog !== undefined && (!isRecord(catalog) || !Array.isArray(catalog.providers))) {
+    throw new Error('Invalid host catalog: expected a providers array from orchestrator_capabilities.');
+  }
+}
+
+function readJson(file, validate) {
+  try {
+    const value = JSON.parse(readFileSync(file, 'utf8'));
+    validate(value);
+    return value;
+  } catch (error) { throw new Error(`${file}: ${error.message}`); }
+}
+
+const readConfig = (file) => existsSync(file) ? readJson(file, validateConfig) : undefined;
 
 export function setupProject(project, choices = { roles: {} }, catalog) {
   const file = projectFile(project);
+  if (lstatSync(file, { throwIfNoEntry: false })?.isSymbolicLink()) {
+    throw new Error(`Setup will not replace symlinked model settings: ${file}. Update the project-owned target explicitly.`);
+  }
   const saved = readConfig(file);
-  validateConfig(saved);
   validateConfig(choices);
   const config = {
-    ...saved, ...choices,
+    ...saved,
     roles: { ...Object.fromEntries(roles.map((role) => [role, 'inherit'])), ...saved?.roles, ...choices.roles },
   };
+  if (choices.reviewPanel !== undefined) config.reviewPanel = choices.reviewPanel;
   resolveConfig(config, catalog);
   const directory = resolve(project, '.astack');
   mkdirSync(directory, { recursive: true });
@@ -118,9 +137,9 @@ if (process.argv[1] && existsSync(process.argv[1]) &&
     if (!project || !roleOrChoices || args.length > (setup ? 4 : 3)) {
       throw new Error('Usage: models.mjs <project-dir> <role|--check> [catalog.json]\n       models.mjs --setup <project-dir> <choices.json> [catalog.json]');
     }
-    const catalog = catalogFile ? JSON.parse(readFileSync(catalogFile, 'utf8')) : undefined;
+    const catalog = catalogFile ? readJson(catalogFile, validateCatalog) : undefined;
     let result;
-    if (setup) result = setupProject(project, JSON.parse(readFileSync(roleOrChoices, 'utf8')), catalog);
+    if (setup) result = setupProject(project, readJson(roleOrChoices, validateConfig), catalog);
     else {
       const file = projectFile(project);
       const config = readConfig(file);
