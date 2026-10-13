@@ -87,9 +87,30 @@ function projectFile(project) {
 }
 
 function validateCatalog(catalog) {
-  if (catalog !== undefined && (!isRecord(catalog) || !Array.isArray(catalog.providers))) {
+  if (catalog === undefined) return;
+  if (!isRecord(catalog) || !Array.isArray(catalog.providers)) {
     throw new Error('Invalid host catalog: expected a providers array from orchestrator_capabilities.');
   }
+  catalog.providers.forEach((provider, index) => {
+    const label = `Invalid host catalog: providers[${index}]`;
+    if (!isRecord(provider) || !nonempty(provider.providerInstanceId) || typeof provider.canRunChildTask !== 'boolean' ||
+        !Array.isArray(provider.models)) throw new Error(`${label} requires providerInstanceId, canRunChildTask and a models array.`);
+    if (provider.constraints != null && (!Array.isArray(provider.constraints) || provider.constraints.some((value) => typeof value !== 'string'))) {
+      throw new Error(`${label}.constraints must be an array of strings.`);
+    }
+    provider.models.forEach((model, modelIndex) => {
+      const modelLabel = `${label}.models[${modelIndex}]`;
+      if (!isRecord(model) || !nonempty(model.id) || (model.options != null && !Array.isArray(model.options))) {
+        throw new Error(`${modelLabel} requires an id and optional options array.`);
+      }
+      model.options?.forEach((option, optionIndex) => {
+        if (!isRecord(option) || !nonempty(option.id) || !['select', 'boolean'].includes(option.type) ||
+            (option.type === 'select' && (!Array.isArray(option.options) || option.options.some((value) => !isRecord(value) || !nonempty(value.id))))) {
+          throw new Error(`${modelLabel}.options[${optionIndex}] requires an id, select/boolean type and a select's allowed option IDs.`);
+        }
+      });
+    });
+  });
 }
 
 function readJson(file, validate) {
@@ -100,7 +121,7 @@ function readJson(file, validate) {
   } catch (error) { throw new Error(`${file}: ${error.message}`); }
 }
 
-const readConfig = (file) => existsSync(file) ? readJson(file, validateConfig) : undefined;
+const readConfig = (file) => lstatSync(file, { throwIfNoEntry: false }) ? readJson(file, validateConfig) : undefined;
 
 export function setupProject(project, choices = { roles: {} }, catalog) {
   const file = projectFile(project);

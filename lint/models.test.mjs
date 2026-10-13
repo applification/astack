@@ -80,6 +80,7 @@ test('failed setup leaves existing choices intact and does not create an invalid
     const bad = { roles: { review: { ...critic, model: 'missing' } } };
     expect(() => setupProject(project, bad, catalog)).toThrow('critic/missing');
     expect(existsSync(join(project, '.astack/models.json'))).toBe(false);
+    expect(existsSync(join(project, '.astack'))).toBe(false);
     setupProject(project, { roles: { implementation: writer, review: critic } }, catalog);
     const bytes = readFileSync(join(project, '.astack/models.json'), 'utf8');
     expect(() => setupProject(project, bad, catalog)).toThrow('critic/missing');
@@ -112,6 +113,18 @@ test('malformed catalogs identify the catalog shape rather than a runnable provi
     expect(() => resolveConfig({ roles: {} }, bad)).toThrow('Invalid host catalog');
   }
 });
+test('malformed provider and model entries fail with catalog diagnostics', () => {
+  for (const provider of [null, { ...catalog.providers[1], constraints: 'disabled' },
+    { ...catalog.providers[1], models: {} }, { ...catalog.providers[1], models: [null] },
+    { ...catalog.providers[1], models: [{ id: 'review-v1', options: {} }] },
+    { ...catalog.providers[1], models: [{ id: 'review-v1', options: [null] }] },
+    { ...catalog.providers[1], models: [{ id: 'review-v1', options: [{ id: 'effort', type: 'select', options: {} }] }] },
+  ]) {
+    expect(() => resolveRole({ roles: { review: critic } }, 'review', { providers: [provider] }))
+      .toThrow('Invalid host catalog: providers[0]');
+  }
+  expect(resolveRole({ roles: { review: critic } }, 'review', catalog)).toEqual(critic);
+});
 test('setup preserves a settings symlink and its target instead of replacing the link', () => {
   const project = mkdtempSync(join(tmpdir(), 'astack-setup-link-'));
   try {
@@ -125,6 +138,20 @@ test('setup preserves a settings symlink and its target instead of replacing the
     expect(() => setupProject(project, { roles: {} }, catalog)).toThrow(`symlinked model settings: ${file}`);
     expect(lstatSync(file).isSymbolicLink()).toBe(true);
     expect(readFileSync(shared, 'utf8')).toBe(bytes);
+  } finally { rmSync(project, { recursive: true, force: true }); }
+});
+test('dangling settings symlinks fail role resolution instead of silently inheriting', () => {
+  const project = mkdtempSync(join(tmpdir(), 'astack-setup-dangling-'));
+  const script = resolve(import.meta.dir, '../skills/setup-astack/scripts/models.mjs');
+  try {
+    mkdirSync(join(project, '.astack'));
+    const file = join(project, '.astack/models.json');
+    symlinkSync(join(project, 'missing.json'), file);
+    const result = spawnSync('node', [script, project, 'review'], { encoding: 'utf8' });
+    expect(result.status).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain(file);
+    expect(lstatSync(file).isSymbolicLink()).toBe(true);
   } finally { rmSync(project, { recursive: true, force: true }); }
 });
 test('CLI setup errors identify each input file and preserve saved bytes', () => {
