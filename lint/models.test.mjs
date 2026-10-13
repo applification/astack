@@ -1,10 +1,10 @@
 import { expect, test } from 'bun:test';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { roles, resolveRole } from '../skills/setup-astack/scripts/models.mjs';
+import { roles, resolveConfig, resolveRole, setupProject } from '../skills/setup-astack/scripts/models.mjs';
 
 const catalog = { providers: [
   { providerInstanceId: 'writer', canRunChildTask: true, models: [{ id: 'write-v1', options: [
@@ -15,6 +15,117 @@ const catalog = { providers: [
   { providerInstanceId: 'offline', canRunChildTask: false, models: [{ id: 'cached-v1' }] },
 ] };
 const writer = { providerInstanceId: 'writer', model: 'write-v1', options: { reasoning: 'high', fast: false } };
+const critic = { providerInstanceId: 'critic', model: 'review-v1' };
+
+test('setup creates explicit inheritance and reads back valid project settings', () => {
+  const project = mkdtempSync(join(tmpdir(), 'astack-setup-'));
+  try {
+    const result = setupProject(project);
+    expect(result.config).toEqual({ roles: { research: 'inherit', design: 'inherit', implementation: 'inherit', review: 'inherit' } });
+    expect(result.resolved).toEqual({ research: null, design: null, implementation: null, review: null });
+    expect(JSON.parse(readFileSync(join(project, '.astack/models.json'), 'utf8'))).toEqual(result.config);
+  } finally { rmSync(project, { recursive: true, force: true }); }
+});
+test('rerunning setup preserves saved single-reviewer choices and fills only omitted roles', () => {
+  const project = mkdtempSync(join(tmpdir(), 'astack-setup-rerun-'));
+  try {
+    mkdirSync(join(project, '.astack'));
+    writeFileSync(join(project, '.astack/models.json'), JSON.stringify({ roles: { implementation: writer, review: critic } }));
+    const first = setupProject(project, { roles: {} }, catalog);
+    expect(first.config).toEqual({ roles: { research: 'inherit', design: 'inherit', implementation: writer, review: critic } });
+    const bytes = readFileSync(join(project, '.astack/models.json'), 'utf8');
+    expect(setupProject(project, { roles: {} }, catalog)).toEqual(first);
+    expect(readFileSync(join(project, '.astack/models.json'), 'utf8')).toBe(bytes);
+    expect(first.resolved.review).toEqual(critic);
+    const updated = setupProject(project, { roles: { design: writer } }, catalog);
+    expect(updated.config.roles).toEqual({ research: 'inherit', design: writer, implementation: writer, review: critic });
+  } finally { rmSync(project, { recursive: true, force: true }); }
+});
+test('configured panels select both targets and explicit null restores the preserved single reviewer', () => {
+  const project = mkdtempSync(join(tmpdir(), 'astack-setup-panel-'));
+  try {
+    const first = setupProject(project, { roles: { review: critic }, reviewPanel: [writer, critic] }, catalog);
+    expect(first.resolved.review).toEqual([writer, critic]);
+    expect(setupProject(project, { roles: {} }, catalog)).toEqual(first);
+    expect(resolveRole(first.config, 'implementation', catalog)).toBeNull();
+    expect(setupProject(project, { roles: {}, reviewPanel: null }, catalog).resolved.review).toEqual(critic);
+  } finally { rmSync(project, { recursive: true, force: true }); }
+});
+test('invalid panel shapes cannot turn into single-reviewer work', () => {
+  for (const reviewPanel of [[], [writer], [writer, critic, writer], ['inherit', critic], [writer, writer], {}, false]) {
+    expect(() => resolveRole({ roles: {}, reviewPanel }, 'review', catalog)).toThrow(/reviewPanel/);
+  }
+});
+test('a panel member failure rejects the whole review with the target and index', () => {
+  expect(() => resolveRole({ roles: {}, reviewPanel: [writer, { ...critic, model: 'removed' }] }, 'review', catalog))
+    .toThrow('Model unavailable for reviewPanel[1]: critic/removed. Available models: review-v1');
+  expect(() => resolveRole({ roles: {}, reviewPanel: [{ ...writer, options: { reasoning: 'max' } }, critic] }, 'review', catalog))
+    .toThrow('reviewPanel[0] (writer/write-v1): reasoning=max. Allowed: high, medium');
+});
+test('T3 cross-provider capability and disabled-provider constraints are enforced', () => {
+  const live = { inheritedProviderInstanceId: 'writer', providers: [
+    catalog.providers[0], { ...catalog.providers[1], canRunCrossProviderChildTask: false },
+    { ...catalog.providers[2], constraints: ['Provider instance is disabled.'] },
+  ] };
+  expect(resolveRole({ roles: { review: writer } }, 'review', live)).toEqual(writer);
+  expect(() => resolveRole({ roles: { review: critic } }, 'review', live)).toThrow('Cross-provider delegation unavailable for review: critic');
+  expect(() => resolveRole({ roles: { review: { providerInstanceId: 'offline', model: 'cached-v1' } } }, 'review', live))
+    .toThrow('Provider instance is disabled.');
+  live.providers[1].canRunCrossProviderChildTask = true;
+  expect(resolveRole({ roles: {}, reviewPanel: [writer, critic] }, 'review', live)).toEqual([writer, critic]);
+});
+test('failed setup leaves existing choices intact and does not create an invalid file', () => {
+  const project = mkdtempSync(join(tmpdir(), 'astack-setup-failure-'));
+  try {
+    const bad = { roles: { review: { ...critic, model: 'missing' } } };
+    expect(() => setupProject(project, bad, catalog)).toThrow('critic/missing');
+    expect(existsSync(join(project, '.astack/models.json'))).toBe(false);
+    setupProject(project, { roles: { implementation: writer, review: critic } }, catalog);
+    const bytes = readFileSync(join(project, '.astack/models.json'), 'utf8');
+    expect(() => setupProject(project, bad, catalog)).toThrow('critic/missing');
+    expect(() => setupProject(project, { roles: {} })).toThrow('Supply the live host catalog');
+    expect(readFileSync(join(project, '.astack/models.json'), 'utf8')).toBe(bytes);
+    expect(() => resolveConfig({ roles: bad.roles, reviewPanel: [writer, critic] }, catalog)).toThrow('roles.review: critic/missing');
+  } finally { rmSync(project, { recursive: true, force: true }); }
+});
+test('setup rejects corrupt saved settings instead of replacing them with defaults', () => {
+  const project = mkdtempSync(join(tmpdir(), 'astack-setup-corrupt-'));
+  try {
+    mkdirSync(join(project, '.astack'));
+    for (const bytes of ['{broken', '{"roles":{"typo":"inherit"}}']) {
+      writeFileSync(join(project, '.astack/models.json'), bytes);
+      expect(() => setupProject(project)).toThrow();
+      expect(readFileSync(join(project, '.astack/models.json'), 'utf8')).toBe(bytes);
+    }
+  } finally { rmSync(project, { recursive: true, force: true }); }
+});
+test('the setup CLI saves, checks and selects a panel using the same resolver', () => {
+  const project = mkdtempSync(join(tmpdir(), 'astack-setup-cli-'));
+  const script = resolve(import.meta.dir, '../skills/setup-astack/scripts/models.mjs');
+  const run = (...args) => spawnSync('node', [script, ...args], { encoding: 'utf8' });
+  try {
+    const absent = run(project, '--check');
+    expect(absent.status).toBe(1);
+    expect(absent.stderr).toContain('Run setup first');
+    const choicesFile = join(project, 'choices.json');
+    const catalogFile = join(project, 'catalog.json');
+    writeFileSync(choicesFile, JSON.stringify({ roles: {}, reviewPanel: [writer, critic] }));
+    writeFileSync(catalogFile, JSON.stringify(catalog));
+    const setup = run('--setup', project, choicesFile, catalogFile);
+    expect(setup.status).toBe(0);
+    expect(JSON.parse(setup.stdout).config.roles).toEqual({ research: 'inherit', design: 'inherit', implementation: 'inherit', review: 'inherit' });
+    const check = run(project, '--check', catalogFile);
+    expect(check.status).toBe(0);
+    expect(JSON.parse(check.stdout).review).toEqual([writer, critic]);
+    const review = run(project, 'review', catalogFile);
+    expect(review.status).toBe(0);
+    expect(JSON.parse(review.stdout)).toEqual([writer, critic]);
+    const bad = run(project, 'review');
+    expect(bad.status).toBe(1);
+    expect(bad.stdout).toBe('');
+    expect(bad.stderr).toContain('reviewPanel[0]');
+  } finally { rmSync(project, { recursive: true, force: true }); }
+});
 
 test('missing setup and omitted roles inherit without a model catalog', () => {
   for (const role of roles) expect(resolveRole(undefined, role)).toBeNull();

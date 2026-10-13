@@ -1,17 +1,17 @@
 ---
 name: setup-astack
-description: Configure astack's research, design, implementation and review models for this project using the current host's available providers and reasoning options.
+description: Create and check astack's project model settings using the live host catalog, preserving existing choices and supporting a single reviewer or a two-provider panel.
 metadata:
   short-description: "Choose project models for astack's engineering roles"
 ---
 
 # Configure the agent
 
-This configures model roles, not application technology. Read project instructions and `.astack/models.json` when present. Preserve existing choices on a rerun.
+Read project instructions and existing `.astack/models.json`. Setup finishes with a saved, checked preference file. Preserve prior choices on reruns; change only choices the user requests.
 
 1. Discover the current host's runnable providers, models and model options. In T3 use `orchestrator_capabilities`; do not treat a native tool's list as the complete T3 catalog. Pins require the host catalog described in [model selection](references/models.md). If it is unavailable, offer `inherit` and report saved pins as unsupported; do not invent provider IDs or translate model aliases.
-2. Ask about reasoning/cost preferences and any preferred models. Propose a short table for `research`, `design`, `implementation` and `review`, using only available choices and supported options. `inherit` uses the current session model/settings. Do not guess prices or hard-code a model roster. No configured model changes the main chat's provider.
-3. Confirm the proposed choices as product preferences, or use choices already explicitly supplied by the user. Read [model selection](references/models.md) for the config format and host boundaries. Validate the proposed object with the resolver's exported `resolveRole(config, role, catalog)` for every role before writing `.astack/models.json` atomically. Preserve unrelated project guidance. Store no credentials; track the preferences with the project.
-4. Read the saved file and resolve each role again. Ensure the project instructions tell the agent to read this file for astack work. Report the resolved table, project scope and any host limitation. A successful config check does not prove a delegated model actually ran.
+2. Use supplied preferences; ask only about unresolved model, reasoning or cost choices. Offer `inherit`, a single reviewer or a panel of two pinned providers, including Codex and Claude when available. Use only live catalog IDs/options and preserve saved choices without another confirmation. Do not guess prices or hard-code a roster.
+3. Read [model selection](references/models.md). Put only requested changes in a temporary choices file; `{ "roles": {} }` preserves all existing choices. Run the packaged `--setup` command with the live catalog. It fills omitted roles with explicit `inherit`, validates all saved targets, writes atomically and checks the saved file. A failure leaves prior settings intact and setup incomplete; report the exact prerequisite without substituting a target.
+4. Report the saved path and resolved roles/panel. Ensure project instructions tell agents to read this file. Preserve unrelated guidance and store no credentials. Check a small read-only contribution through the actual host for newly selected pinned providers; retain task handles, compare returned provider/model identities with resolved targets and report results or execution gaps. Validation alone does not prove delegation.
 
-Missing configuration defaults to `inherit` for every role. Setup is optional. Do not install an application framework, change host-global settings or create a control CLI as part of model setup. To build a new product, use astack's [new-project playbook](../astack/playbooks/new-project.md).
+Work can begin without saved settings and inherit the current session. Setup records those choices explicitly when invoked; it never changes the main chat's provider. Application scaffolding uses the [new-project playbook](../astack/playbooks/new-project.md); persistent modes and host settings stay with the host.

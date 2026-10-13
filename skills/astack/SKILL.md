@@ -25,7 +25,7 @@ A playbook is an ordered task procedure that composes skills and names the model
 | Repair or add a product-driving capability | [app control](playbooks/app-control.md) |
 | Empty repo or first working milestone | [new project](playbooks/new-project.md) |
 
-For model preferences use [setup-astack](../setup-astack/SKILL.md). It configures the agent; it does not scaffold an application. Use [role orchestration](references/orchestration.md) for model resolution and delegation. Missing setup inherits the current session. Load only the skills and project-owned platform guidance the selected steps need.
+Use [setup-astack](../setup-astack/SKILL.md) to create and check project model preferences, including a single reviewer or a two-provider panel. Use [role orchestration](references/orchestration.md) for live model resolution and actual delegation. The main agent owns scope, delegates contributions, adjudicates findings and verifies integration. Missing settings inherit the current session. Load only the skills and project-owned platform guidance the selected steps need.
 
 ## Apply principles where they matter
 
